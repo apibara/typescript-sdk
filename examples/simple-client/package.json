@@ -1,0 +1,15 @@
+{
+  "name": "simple-client-example",
+  "private": true,
+  "scripts": {
+    "build": "tsc",
+    "lint": "eslint src --ext .ts",
+    "lint:fix": "eslint --fix src --ext .ts"
+  },
+  "dependencies": {
+    "@apibara/protocol": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^18.11.9"
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "$schema": "https://turborepo.org/schema.json",
+  "pipeline": {
+    "build": {
+      "dependsOn": ["^build"]
+    },
+    "@apibara/protocol#prebuild": {
+      "dependsOn": []
+    },
+    "@apibara/protocol#build": {
+      "dependsOn": ["@apibara/protocol#prebuild"]
+    },
+    "simple-client-example#build": {
+      "dependsOn": ["@apibara/protocol#build"]
+    },
+    "lint": {
+      "outputs": []
+    },
+    "lint:fix": {
+      "outputs": []
+    }
+  }
+}

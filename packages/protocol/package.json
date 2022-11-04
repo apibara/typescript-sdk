@@ -1,0 +1,28 @@
+{
+  "name": "@apibara/protocol",
+  "version": "0.1.0",
+  "source": "src/index.ts",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "src",
+    "README.md"
+  ],
+  "scripts": {
+    "prebuild": "pnpm run protobuf && pnpm run gen-types",
+    "build": "tsc",
+    "lint": "eslint src --ext .ts",
+    "lint:fix": "eslint --fix src --ext .ts",
+    "protobuf": "mkdir -p dist/proto && cp src/proto/*.proto dist/proto",
+    "gen-types": "proto-loader-gen-types --longs=String --enums=String --defaults --oneofs --grpcLib=@grpc/grpc-js --outDir=src/proto src/proto/*.proto"
+  },
+  "dependencies": {
+    "@grpc/grpc-js": "^1.7.3",
+    "@grpc/proto-loader": "^0.7.3",
+    "google-protobuf": "^3.21.2"
+  },
+  "devDependencies": {
+    "@types/node": "^18.11.9"
+  }
+}
