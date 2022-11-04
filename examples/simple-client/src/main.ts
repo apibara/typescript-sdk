@@ -1,8 +1,11 @@
-import { node } from '@apibara/protocol'
+import { NodeClient, credentials } from '@apibara/protocol'
 
 async function main() {
-  console.log(node.v1alpha1.Node)
-  console.log('Hello, World')
+  const node = new NodeClient('goerli.starknet.stream.apibara.com:443', credentials.createSsl())
+  const status = await node.status()
+  console.log(status)
+  console.log('start streaming')
+  await node.streamMessages()
 }
 
 main()
