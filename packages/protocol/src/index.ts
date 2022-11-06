@@ -4,11 +4,13 @@ import {
   credentials as grpcCredentials,
   ClientOptions,
   ChannelCredentials,
+  ClientReadableStream,
 } from '@grpc/grpc-js'
 import { loadSync } from '@grpc/proto-loader'
 import { NodeClient as GrpcNodeClient } from './proto/apibara/node/v1alpha1/Node'
 import { ProtoGrpcType } from './proto/node'
 import { StatusResponse__Output } from './proto/apibara/node/v1alpha1/StatusResponse'
+import { StreamMessagesResponse__Output } from './proto/apibara/node/v1alpha1/StreamMessagesResponse'
 
 const __NODE_PROTO_PATH = __dirname + '/proto/node.proto'
 
@@ -30,13 +32,7 @@ export class NodeClient {
     return promisify(this.client.Status.bind(this.client, {}))()
   }
 
-  public streamMessages() {
-    const s = this.client.streamMessages({})
-    return new Promise((resolve, reject) => {
-      s.on('data', console.log)
-      s.on('end', () => resolve(undefined))
-      s.on('error', (err) => reject(err))
-      s.on('status', console.log)
-    })
+  public streamMessages(): ClientReadableStream<StreamMessagesResponse__Output> {
+    return this.client.streamMessages({})
   }
 }

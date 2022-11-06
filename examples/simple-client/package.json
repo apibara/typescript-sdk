@@ -7,7 +7,8 @@
     "lint:fix": "eslint --fix src --ext .ts"
   },
   "dependencies": {
-    "@apibara/protocol": "workspace:*"
+    "@apibara/protocol": "workspace:*",
+    "@apibara/starknet": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "^18.11.9"

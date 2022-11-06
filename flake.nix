@@ -14,6 +14,7 @@
         {
           devShells.default = pkgs.mkShell {
             nativeBuildInputs = [
+              pkgs.protobuf
               pkgs.nodejs-16_x
               pkgs.nodePackages.pnpm
               pkgs.nodePackages.typescript
