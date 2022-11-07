@@ -6,9 +6,11 @@
   "scripts": {
     "build": "turbo run build --parallel",
     "lint": "turbo run lint --parallel",
-    "lint:fix": "turbo run lint:fix --parallel"
+    "lint:fix": "turbo run lint:fix --parallel",
+    "release": "pnpm build && pnpm changeset publish"
   },
   "devDependencies": {
+    "@changesets/cli": "^2.25.2",
     "@typescript-eslint/eslint-plugin": "^5.42.0",
     "@typescript-eslint/parser": "^5.42.0",
     "eslint": "^8.26.0",
