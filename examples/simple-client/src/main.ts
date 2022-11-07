@@ -4,7 +4,7 @@ import { Block } from '@apibara/starknet'
 
 async function main() {
   const node = new NodeClient('goerli.starknet.stream.apibara.com:443', credentials.createSsl())
-  const messages = node.streamMessages()
+  const messages = node.streamMessages({})
   return new Promise((resolve, reject) => {
     messages.on('end', resolve)
     messages.on('error', reject)

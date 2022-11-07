@@ -11,6 +11,7 @@ import { NodeClient as GrpcNodeClient } from './proto/apibara/node/v1alpha1/Node
 import { ProtoGrpcType } from './proto/node'
 import { StatusResponse__Output } from './proto/apibara/node/v1alpha1/StatusResponse'
 import { StreamMessagesResponse__Output } from './proto/apibara/node/v1alpha1/StreamMessagesResponse'
+import { StreamMessagesRequest } from './proto/apibara/node/v1alpha1/StreamMessagesRequest'
 
 const __NODE_PROTO_PATH = __dirname + '/proto/node.proto'
 
@@ -32,7 +33,9 @@ export class NodeClient {
     return promisify(this.client.Status.bind(this.client, {}))()
   }
 
-  public streamMessages(): ClientReadableStream<StreamMessagesResponse__Output> {
-    return this.client.streamMessages({})
+  public streamMessages(
+    args: StreamMessagesRequest
+  ): ClientReadableStream<StreamMessagesResponse__Output> {
+    return this.client.streamMessages(args)
   }
 }
