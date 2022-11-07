@@ -28,8 +28,8 @@ jobs:
         uses: changesets/action@v1
         with:
           publish: pnpm run release
-          commit: 'chore: version bump'
-          title: 'chore: version bump'
+          commit: 'version bump'
+          title: 'version bump'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
