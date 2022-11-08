@@ -13,13 +13,22 @@
       in
         {
           devShells.default = pkgs.mkShell {
-            nativeBuildInputs = [
-              pkgs.protobuf
-              pkgs.nodejs-16_x
-              pkgs.nodePackages.pnpm
-              pkgs.nodePackages.typescript
-              pkgs.nodePackages.typescript-language-server
+            nativeBuildInputs = with pkgs; [
+              protobuf
+              prisma-engines
+              nodejs-16_x
+              nodePackages.prisma
+              nodePackages.pnpm
+              nodePackages.typescript
+              nodePackages.typescript-language-server
             ];
+            shellHook = with pkgs; ''
+              export PRISMA_MIGRATION_ENGINE_BINARY="${prisma-engines}/bin/migration-engine"
+              export PRISMA_QUERY_ENGINE_BINARY="${prisma-engines}/bin/query-engine"
+              export PRISMA_QUERY_ENGINE_LIBRARY="${prisma-engines}/lib/libquery_engine.node"
+              export PRISMA_INTROSPECTION_ENGINE_BINARY="${prisma-engines}/bin/introspection-engine"
+              export PRISMA_FMT_BINARY="${prisma-engines}/bin/prisma-fmt"
+            '';
           };
         }
     );

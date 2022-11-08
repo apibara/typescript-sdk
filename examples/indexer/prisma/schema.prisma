@@ -1,0 +1,30 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:/tmp/apibara-example.db"
+}
+
+model Account {
+  address           Bytes      @id
+  inboundTransfers  Transfer[] @relation("InboundTransfers")
+  outboundTransfers Transfer[] @relation("OutboundTransfers")
+  tokens            Token[]    @relation("TokenOwner")
+}
+
+model Transfer {
+  id          Int   @id @default(autoincrement())
+  toAddress   Bytes
+  fromAddress Bytes
+
+  to   Account @relation("InboundTransfers", fields: [toAddress], references: [address])
+  from Account @relation("OutboundTransfers", fields: [fromAddress], references: [address])
+}
+
+model Token {
+  id           Bytes    @id
+  ownerAddress Bytes
+  owner        Account? @relation("TokenOwner", fields: [ownerAddress], references: [address])
+}

@@ -19,6 +19,9 @@
     "simple-client-example#build": {
       "dependsOn": ["@apibara/protocol#build", "@apibara/starknet#build"]
     },
+    "indexer-example#build": {
+      "dependsOn": ["@apibara/protocol#build", "@apibara/starknet#build", "@apibara/prisma#build"]
+    },
     "lint": {
       "outputs": []
     },

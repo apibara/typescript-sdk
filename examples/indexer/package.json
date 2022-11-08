@@ -1,0 +1,21 @@
+{
+  "name": "indexer-example",
+  "private": true,
+  "scripts": {
+    "build": "tsc",
+    "lint": "eslint src --ext .ts",
+    "lint:fix": "eslint --fix src --ext .ts"
+  },
+  "dependencies": {
+    "@apibara/prisma": "workspace:*",
+    "@apibara/protocol": "workspace:*",
+    "@apibara/starknet": "workspace:*",
+    "@prisma/client": "^4.5.0",
+    "prisma": "^4.5.0",
+    "starknet": "^4.9.0"
+  },
+  "devDependencies": {
+    "@types/node": "^18.11.9"
+  },
+  "version": null
+}
