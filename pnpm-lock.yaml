@@ -30,7 +30,9 @@ importers:
       '@apibara/protocol': workspace:*
       '@apibara/starknet': workspace:*
       '@prisma/client': ^4.5.0
+      '@types/bn.js': ^5.1.1
       '@types/node': ^18.11.9
+      bn.js: ^5.2.1
       prisma: ^4.5.0
       starknet: ^4.9.0
     dependencies:
@@ -38,9 +40,11 @@ importers:
       '@apibara/protocol': link:../../packages/protocol
       '@apibara/starknet': link:../../packages/starknet
       '@prisma/client': 4.5.0_prisma@4.5.0
+      bn.js: 5.2.1
       prisma: 4.5.0
       starknet: 4.9.0
     devDependencies:
+      '@types/bn.js': 5.1.1
       '@types/node': 18.11.9
 
   examples/simple-client:
@@ -534,6 +538,12 @@ packages:
       '@noble/hashes': 1.1.2
       '@scure/base': 1.1.1
     dev: false
+
+  /@types/bn.js/5.1.1:
+    resolution: {integrity: sha512-qNrYbZqMx0uJAfKnKclPh+dTwK33KfLHYqtyODwd5HnXOjnkhc4qgn3BrK6RWyGZm5+sIFE7Q7Vz6QQtJB7w7g==}
+    dependencies:
+      '@types/node': 18.11.9
+    dev: true
 
   /@types/is-ci/3.0.0:
     resolution: {integrity: sha512-Q0Op0hdWbYd1iahB+IFNQcWXFq4O0Q5MwQP7uN0souuQ4rPg1vEYcnIOfr1gY+M+6rc8FGoRaBO1mOOvL29sEQ==}

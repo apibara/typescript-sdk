@@ -7,6 +7,13 @@ datasource db {
   url      = "file:/tmp/apibara-example.db"
 }
 
+model Block {
+  hash   Bytes @id
+  number Int
+
+  transfers Transfer[] @relation("BlockTransfers")
+}
+
 model Account {
   address           Bytes      @id
   inboundTransfers  Transfer[] @relation("InboundTransfers")
@@ -18,13 +25,20 @@ model Transfer {
   id          Int   @id @default(autoincrement())
   toAddress   Bytes
   fromAddress Bytes
+  tokenId     Bytes
 
-  to   Account @relation("InboundTransfers", fields: [toAddress], references: [address])
-  from Account @relation("OutboundTransfers", fields: [fromAddress], references: [address])
+  transactionHash Bytes
+  blockHash       Bytes
+
+  to    Account @relation("InboundTransfers", fields: [toAddress], references: [address])
+  from  Account @relation("OutboundTransfers", fields: [fromAddress], references: [address])
+  token Token   @relation("TokenTransfers", fields: [tokenId], references: [id])
+  block Block   @relation("BlockTransfers", fields: [blockHash], references: [hash])
 }
 
 model Token {
-  id           Bytes    @id
+  id           Bytes      @id
   ownerAddress Bytes
-  owner        Account? @relation("TokenOwner", fields: [ownerAddress], references: [address])
+  owner        Account?   @relation("TokenOwner", fields: [ownerAddress], references: [address])
+  transfers    Transfer[] @relation("TokenTransfers")
 }
