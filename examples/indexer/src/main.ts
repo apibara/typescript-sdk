@@ -2,7 +2,7 @@ import { NodeClient, credentials } from '@apibara/protocol'
 import { StreamMessagesResponse__Output } from '@apibara/protocol/dist/proto/apibara/node/v1alpha1/StreamMessagesResponse'
 import { Block, Transaction, TransactionReceipt } from '@apibara/starknet'
 import BN from 'bn.js'
-import { PrismaClient } from '@prisma/client'
+import { Prisma, PrismaClient } from '@prisma/client'
 import { getSelectorFromName } from 'starknet/dist/utils/hash'
 
 function hexToBuffer(h: string): Buffer {
@@ -53,7 +53,44 @@ class Indexer {
     this.event = hexToBuffer(getSelectorFromName(event))
   }
 
-  async handleTransaction(blockHash: Buffer, tx: Transaction, receipt: TransactionReceipt) {
+  async handleData(data: StreamMessagesResponse__Output) {
+    if (data.data) {
+      if (!data.data.data?.value) {
+        throw new Error('Received empty message from stream')
+      }
+      const block = Block.decode(data.data.data.value)
+
+      if (!block.blockHash?.hash) {
+        throw new Error('Block missing hash')
+      }
+      const blockHash = Buffer.from(block.blockHash.hash)
+
+      // wrap everything in a transaction.
+      // this ensure data is always consistent even if the indexer
+      // is stopped in the middle of indexing a block.
+      await this.prisma.$transaction(async (prisma: Prisma.TransactionClient) => {
+        console.log(`Process block ${block.blockNumber} / 0x${bufferToHex(blockHash)}`)
+        await this.createBlock(prisma, blockHash, block.blockNumber)
+
+        for (let txIndex = 0; txIndex < block.transactions.length; txIndex++) {
+          const receipt = block.transactionReceipts[txIndex]
+          const tx = block.transactions[txIndex]
+          await this.handleTransaction(prisma, blockHash, tx, receipt)
+        }
+      })
+    } else if (data.invalidate) {
+      throw new Error('invalidation not implemented')
+    } else if (data.heartbeat) {
+      console.debug('Received heartbeat')
+    }
+  }
+
+  async handleTransaction(
+    prisma: Prisma.TransactionClient,
+    blockHash: Buffer,
+    tx: Transaction,
+    receipt: TransactionReceipt
+  ) {
     const txHash = transactionHash(tx)
     for (let event of receipt.events) {
       if (!this.address.equals(event.fromAddress)) {
@@ -72,42 +109,15 @@ class Indexer {
         `Transfer(${bufferToHex(fromAddress)}, ${bufferToHex(toAddress)}, ${tokenId.toString()})`
       )
 
-      await this.findOrCreateAccount(fromAddress)
-      await this.findOrCreateAccount(toAddress)
-      await this.updateToken(tokenId, toAddress)
-      await this.createTransfer(fromAddress, toAddress, tokenId, blockHash, txHash)
+      await this.findOrCreateAccount(prisma, fromAddress)
+      await this.findOrCreateAccount(prisma, toAddress)
+      await this.updateToken(prisma, tokenId, toAddress)
+      await this.createTransfer(prisma, fromAddress, toAddress, tokenId, blockHash, txHash)
     }
   }
 
-  async handleData(data: StreamMessagesResponse__Output) {
-    if (data.data) {
-      if (!data.data.data?.value) {
-        throw new Error('Received empty message from stream')
-      }
-      const block = Block.decode(data.data.data.value)
-
-      if (!block.blockHash?.hash) {
-        throw new Error('Block missing hash')
-      }
-      const blockHash = Buffer.from(block.blockHash.hash)
-
-      await this.createBlock(blockHash, block.blockNumber)
-      console.log(`Process block ${block.blockNumber} / 0x${bufferToHex(blockHash)}`)
-
-      for (let txIndex = 0; txIndex < block.transactions.length; txIndex++) {
-        const receipt = block.transactionReceipts[txIndex]
-        const tx = block.transactions[txIndex]
-        await this.handleTransaction(blockHash, tx, receipt)
-      }
-    } else if (data.invalidate) {
-      throw new Error('invalidation not implemented')
-    } else if (data.heartbeat) {
-      console.debug('Received heartbeat')
-    }
-  }
-
-  async findOrCreateAccount(address: Buffer) {
-    const existing = await this.prisma.account.findUnique({
+  async findOrCreateAccount(prisma: Prisma.TransactionClient, address: Buffer) {
+    const existing = await prisma.account.findUnique({
       where: {
         address,
       },
@@ -117,16 +127,16 @@ class Indexer {
       return existing
     }
 
-    return await this.prisma.account.create({
+    return await prisma.account.create({
       data: {
         address,
       },
     })
   }
 
-  async updateToken(tokenId: BN, ownerAddress: Buffer) {
+  async updateToken(prisma: Prisma.TransactionClient, tokenId: BN, ownerAddress: Buffer) {
     const id = tokenId.toBuffer('be', 32)
-    return this.prisma.token.upsert({
+    return prisma.token.upsert({
       where: {
         id,
       },
@@ -141,6 +151,7 @@ class Indexer {
   }
 
   async createTransfer(
+    prisma: Prisma.TransactionClient,
     fromAddress: Buffer,
     toAddress: Buffer,
     tokenId: BN,
@@ -148,7 +159,7 @@ class Indexer {
     transactionHash: Buffer
   ) {
     const id = tokenId.toBuffer('be', 32)
-    this.prisma.transfer.create({
+    return await prisma.transfer.create({
       data: {
         toAddress,
         fromAddress,
@@ -159,8 +170,8 @@ class Indexer {
     })
   }
 
-  async createBlock(hash: Buffer, number: number) {
-    return await this.prisma.block.create({
+  async createBlock(prisma: Prisma.TransactionClient, hash: Buffer, number: number) {
+    return await prisma.block.create({
       data: {
         hash,
         number,
