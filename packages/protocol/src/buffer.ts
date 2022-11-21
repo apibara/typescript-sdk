@@ -1,7 +1,7 @@
 /**
  * Converts the hex-encoded bytes to a `Buffer`.
  * @param hex The hex string
- * @param size The buffer size, in bits
+ * @param size The buffer size, in bytes
  */
 export function hexToBuffer(hex: string, size: number): Buffer {
   const padSize = size * 2
