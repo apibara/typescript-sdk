@@ -17,12 +17,14 @@ export interface StreamMessagesResponse {
   invalidate?: _apibara_node_v1alpha1_Invalidate | null
   data?: _apibara_node_v1alpha1_Data | null
   heartbeat?: _apibara_node_v1alpha1_Heartbeat | null
-  message?: 'invalidate' | 'data' | 'heartbeat'
+  pending?: _apibara_node_v1alpha1_Data | null
+  message?: 'invalidate' | 'data' | 'heartbeat' | 'pending'
 }
 
 export interface StreamMessagesResponse__Output {
   invalidate?: _apibara_node_v1alpha1_Invalidate__Output | null
   data?: _apibara_node_v1alpha1_Data__Output | null
   heartbeat?: _apibara_node_v1alpha1_Heartbeat__Output | null
-  message: 'invalidate' | 'data' | 'heartbeat'
+  pending?: _apibara_node_v1alpha1_Data__Output | null
+  message: 'invalidate' | 'data' | 'heartbeat' | 'pending'
 }
