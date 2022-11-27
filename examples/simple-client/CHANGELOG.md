@@ -4,6 +4,13 @@
 
 ### Patch Changes
 
+- Updated dependencies [[`439a61f`](https://github.com/apibara/typescript-sdk/commit/439a61f36e14f3b69ba6cdf9032f87f81d6475ef)]:
+  - @apibara/protocol@0.2.0
+
+## null
+
+### Patch Changes
+
 - Updated dependencies [[`5383826`](https://github.com/apibara/typescript-sdk/commit/538382698f03dc1623a66c24bfef67e3e629b06d)]:
   - @apibara/protocol@0.1.2
 
