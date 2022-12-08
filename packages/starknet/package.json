@@ -12,6 +12,7 @@
   "scripts": {
     "prebuild": "pnpm run protobuf && pnpm run gen-types",
     "build": "tsc",
+    "test": "jest",
     "lint": "eslint src --ext .ts",
     "lint:fix": "eslint --fix src --ext .ts",
     "protobuf": "mkdir -p dist/proto && cp src/proto/*.proto dist/proto",

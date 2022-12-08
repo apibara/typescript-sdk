@@ -5,6 +5,7 @@
   "description": "Apibara Typescript monorepo",
   "scripts": {
     "build": "turbo run build --parallel",
+    "test": "turbo run test",
     "lint": "turbo run lint --parallel",
     "lint:fix": "turbo run lint:fix --parallel",
     "release": "pnpm build && pnpm changeset publish"
@@ -12,11 +13,16 @@
   "devDependencies": {
     "@changesets/changelog-github": "^0.4.7",
     "@changesets/cli": "^2.25.2",
+    "@types/jest": "^29.2.4",
+    "@types/node": "^18.11.9",
     "@typescript-eslint/eslint-plugin": "^5.42.0",
     "@typescript-eslint/parser": "^5.42.0",
     "eslint": "^8.26.0",
     "eslint-plugin-prettier": "^4.2.1",
+    "jest": "^29.3.1",
     "prettier": "^2.7.1",
+    "ts-jest": "^29.0.3",
+    "ts-node": "^10.9.1",
     "turbo": "^1.2.16",
     "typescript": "^4.8.4"
   },
