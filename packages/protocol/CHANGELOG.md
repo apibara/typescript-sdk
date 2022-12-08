@@ -1,5 +1,11 @@
 # @apibara/protocol
 
+## 0.3.0
+
+### Minor Changes
+
+- [#8](https://github.com/apibara/typescript-sdk/pull/8) [`7f1def7`](https://github.com/apibara/typescript-sdk/commit/7f1def70426e8b5704599d2e989e5db5461aa9ac) Thanks [@fracek](https://github.com/fracek)! - Add option to automatically reconnect stream
+
 ## 0.2.0
 
 ### Minor Changes
