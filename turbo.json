@@ -22,6 +22,9 @@
     "pending-data-example#build": {
       "dependsOn": ["@apibara/protocol#build", "@apibara/starknet#build"]
     },
+    "test": {
+      "dependsOn": ["build"]
+    },
     "lint": {
       "outputs": []
     },
