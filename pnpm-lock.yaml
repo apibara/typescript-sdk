@@ -51,15 +51,18 @@ importers:
       '@grpc/proto-loader': ^0.7.3
       '@types/node': ^18.11.9
       google-protobuf: ^3.21.2
+      protobufjs: ^7.1.2
     dependencies:
       '@grpc/grpc-js': 1.7.3
       '@grpc/proto-loader': 0.7.3
       google-protobuf: 3.21.2
+      protobufjs: 7.1.2
     devDependencies:
       '@types/node': 18.11.9
 
   packages/starknet:
     specifiers:
+      '@types/long': ^5.0.0
       '@types/node': ^18.11.9
       google-protobuf: ^3.21.2
       long: ^5.2.1
@@ -71,6 +74,7 @@ importers:
       protobufjs: 7.1.2
       ts-proto: 1.131.0
     devDependencies:
+      '@types/long': 5.0.0
       '@types/node': 18.11.9
 
 packages:
@@ -1148,6 +1152,13 @@ packages:
   /@types/long/4.0.2:
     resolution: {integrity: sha512-MqTGEo5bj5t157U6fA/BiDynNkn0YknVdh48CMPkTSpFTVmvao5UQmm7uEF6xBEo7qIMAlY/JSleYaE6VOdpaA==}
     dev: false
+
+  /@types/long/5.0.0:
+    resolution: {integrity: sha512-eQs9RsucA/LNjnMoJvWG/nXa7Pot/RbBzilF/QRIU/xRl+0ApxrSUFsV5lmf01SvSlqMzJ7Zwxe440wmz2SJGA==}
+    deprecated: This is a stub types definition. long provides its own type definitions, so you do not need this installed.
+    dependencies:
+      long: 5.2.1
+    dev: true
 
   /@types/minimist/1.2.2:
     resolution: {integrity: sha512-jhuKLIRrhvCPLqwPcx6INqmKeiA5EWrsCOPhrlFSrbrmU4ZMPjj5Ul/oLCMDO98XRUIwVm78xICz4EPCektzeQ==}
@@ -3208,7 +3219,6 @@ packages:
 
   /long/5.2.1:
     resolution: {integrity: sha512-GKSNGeNAtw8IryjjkhZxuKB3JzlcLTwjtiQCHKvqQet81I93kXslhDQruGI/QsddO83mcDToBVy7GqGS/zYf/A==}
-    dev: false
 
   /lru-cache/4.1.5:
     resolution: {integrity: sha512-sWZlbEP2OsHNkXrMl5GYk/jKk70MBng6UU4YI/qGDYbgf6YbP4EvmqISbXCoJiRKs+1bSpFHVgQxvJ17F2li5g==}

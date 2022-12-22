@@ -12,11 +12,11 @@
   "scripts": {
     "prebuild": "pnpm run protobuf && pnpm run gen-types",
     "build": "tsc",
-    "test": "jest",
+    "test": "jest src",
     "lint": "eslint src --ext .ts",
     "lint:fix": "eslint --fix src --ext .ts",
     "protobuf": "mkdir -p dist/proto && cp src/proto/*.proto dist/proto",
-    "gen-types": "protoc --plugin=node_modules/ts-proto/protoc-gen-ts_proto --ts_proto_opt=esModuleInterop=true --ts_proto_out=./src/proto -I src/proto ./src/proto/starknet.proto"
+    "gen-types": "protoc --plugin=node_modules/ts-proto/protoc-gen-ts_proto --ts_proto_opt=forceLong=long --ts_proto_opt=esModuleInterop=true --ts_proto_opt=useExactTypes=false --ts_proto_out=./src/proto -I src/proto ./src/proto/*.proto"
   },
   "dependencies": {
     "google-protobuf": "^3.21.2",
@@ -25,6 +25,7 @@
     "ts-proto": "^1.131.0"
   },
   "devDependencies": {
+    "@types/long": "^5.0.0",
     "@types/node": "^18.11.9"
   }
 }
