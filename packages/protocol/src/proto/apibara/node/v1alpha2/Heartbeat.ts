@@ -1,4 +1,4 @@
-// Original file: src/proto/node.proto
+// Original file: src/proto/stream.proto
 
 export interface Heartbeat {}
 

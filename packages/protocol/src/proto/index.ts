@@ -1,11 +1,19 @@
-export * from './apibara/node/v1alpha1/Data'
-export * from './apibara/node/v1alpha1/Heartbeat'
-export * from './apibara/node/v1alpha1/InputSyncingStatus'
-export * from './apibara/node/v1alpha1/Invalidate'
-export * from './apibara/node/v1alpha1/NotStartedStatus'
-export * from './apibara/node/v1alpha1/StatusRequest'
-export * from './apibara/node/v1alpha1/StatusResponse'
-export * from './apibara/node/v1alpha1/StreamMessagesRequest'
-export * from './apibara/node/v1alpha1/StreamMessagesResponse'
-export * from './apibara/node/v1alpha1/SyncedStatus'
-export * from './apibara/node/v1alpha1/SyncingStatus'
+import { loadPackageDefinition } from '@grpc/grpc-js'
+import { loadSync } from '@grpc/proto-loader'
+import { ProtoGrpcType } from './stream'
+
+const __NODE_PROTO_PATH = __dirname + '/stream.proto'
+
+// export definitions
+export const packageDefinition = loadSync(__NODE_PROTO_PATH, {})
+export const protoDescriptor = loadPackageDefinition(packageDefinition) as unknown as ProtoGrpcType
+
+// re-export all types
+export * from './apibara/node/v1alpha2/Cursor'
+export * from './apibara/node/v1alpha2/Data'
+export * from './apibara/node/v1alpha2/DataFinality'
+export * from './apibara/node/v1alpha2/Heartbeat'
+export * from './apibara/node/v1alpha2/Invalidate'
+export * from './apibara/node/v1alpha2/Stream'
+export * from './apibara/node/v1alpha2/StreamDataRequest'
+export * from './apibara/node/v1alpha2/StreamDataResponse'

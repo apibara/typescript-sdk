@@ -12,7 +12,7 @@
   "scripts": {
     "prebuild": "pnpm run protobuf && pnpm run gen-types",
     "build": "tsc",
-    "test": "jest",
+    "test": "jest src/",
     "lint": "eslint src --ext .ts",
     "lint:fix": "eslint --fix src --ext .ts",
     "protobuf": "mkdir -p dist/proto && cp src/proto/*.proto dist/proto",
@@ -21,7 +21,8 @@
   "dependencies": {
     "@grpc/grpc-js": "^1.7.3",
     "@grpc/proto-loader": "^0.7.3",
-    "google-protobuf": "^3.21.2"
+    "google-protobuf": "^3.21.2",
+    "protobufjs": "^7.1.2"
   },
   "devDependencies": {
     "@types/node": "^18.11.9"

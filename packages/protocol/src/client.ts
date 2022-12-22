@@ -1,56 +1,21 @@
-import { promisify } from 'util'
-import {
-  loadPackageDefinition,
-  credentials as grpcCredentials,
-  ClientOptions,
-  ChannelCredentials,
-} from '@grpc/grpc-js'
-import { loadSync } from '@grpc/proto-loader'
-import { Retry, neverRetry, defaultOnRetry, StreamMessagesStream } from './stream'
-import { NodeClient as GrpcNodeClient } from './proto/apibara/node/v1alpha1/Node'
-import { ProtoGrpcType } from './proto/node'
-import { StatusResponse__Output } from './proto/apibara/node/v1alpha1/StatusResponse'
-import { StreamMessagesRequest } from './proto/apibara/node/v1alpha1/StreamMessagesRequest'
+import { ChannelCredentials, ClientDuplexStream } from '@grpc/grpc-js'
+import * as proto from './proto'
 
-const __NODE_PROTO_PATH = __dirname + '/proto/node.proto'
+const StreamService = proto.protoDescriptor.apibara.node.v1alpha2.Stream
 
-const packageDefinition = loadSync(__NODE_PROTO_PATH, {})
-const protoDescriptor = loadPackageDefinition(packageDefinition) as unknown as ProtoGrpcType
+export type DataStream = ClientDuplexStream<
+  proto.StreamDataRequest,
+  proto.StreamDataResponse__Output
+>
 
-export const Node = protoDescriptor.apibara.node.v1alpha1.Node
+export class StreamClient {
+  private readonly inner: proto.StreamClient
 
-export const credentials = grpcCredentials
-
-export interface StreamMessagesOptions {
-  reconnect?: boolean
-  onRetry?: (retryCount: number) => Retry
-}
-
-export class NodeClient {
-  private readonly client: GrpcNodeClient
-
-  constructor(address: string, credentials: ChannelCredentials, options?: ClientOptions) {
-    this.client = new Node(address, credentials, options)
+  constructor(address: string, credentials: ChannelCredentials) {
+    this.inner = new StreamService(address, credentials)
   }
 
-  public async status(): Promise<StatusResponse__Output | undefined> {
-    return promisify(this.client.Status.bind(this.client, {}))()
-  }
-
-  public streamMessages(
-    args: StreamMessagesRequest,
-    options?: StreamMessagesOptions
-  ): StreamMessagesStream {
-    // only reconnect if user has opted-in
-    let onRetry = neverRetry
-    if (options?.reconnect) {
-      if (options.onRetry) {
-        onRetry = options.onRetry
-      } else {
-        onRetry = defaultOnRetry
-      }
-    }
-
-    return new StreamMessagesStream({ args, onRetry, client: this.client })
+  connect(): DataStream {
+    return this.inner.streamData()
   }
 }
