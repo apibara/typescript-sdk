@@ -1,4 +1,4 @@
-import { apibara } from './proto/generated'
+import { v1alpha2 } from './proto'
 
 /**
  * Helper functions to create StarkNet data filters.
@@ -31,10 +31,10 @@ export const Filter = {
 }
 
 export class FilterBuilder {
-  private inner: apibara.starknet.v1alpha2.Filter
+  private inner: v1alpha2.Filter
 
   constructor() {
-    this.inner = new apibara.starknet.v1alpha2.Filter()
+    this.inner = new v1alpha2.Filter()
   }
 
   /**
@@ -62,8 +62,8 @@ export class FilterBuilder {
    */
   addEvent(
     filterOrBuilder:
-      | IEncodable<apibara.starknet.v1alpha2.IEventFilter>
-      | ((builder: EventFilter) => IEncodable<apibara.starknet.v1alpha2.IEventFilter>)
+      | IEncodable<v1alpha2.IEventFilter>
+      | ((builder: EventFilter) => IEncodable<v1alpha2.IEventFilter>)
   ) {
     this.inner.events.push(createFilter(filterOrBuilder, () => new EventFilter()))
     return this
@@ -74,10 +74,8 @@ export class FilterBuilder {
    */
   addMessage(
     filterOrBuilder:
-      | IEncodable<apibara.starknet.v1alpha2.IL2ToL1MessageFilter>
-      | ((
-          builder: L2ToL1MessageFilter
-        ) => IEncodable<apibara.starknet.v1alpha2.IL2ToL1MessageFilter>)
+      | IEncodable<v1alpha2.IL2ToL1MessageFilter>
+      | ((builder: L2ToL1MessageFilter) => IEncodable<v1alpha2.IL2ToL1MessageFilter>)
   ) {
     this.inner.messages.push(createFilter(filterOrBuilder, () => new L2ToL1MessageFilter()))
     return this
@@ -88,8 +86,8 @@ export class FilterBuilder {
    */
   withStateUpdate(
     filterOrBuilder:
-      | IEncodable<apibara.starknet.v1alpha2.IStateUpdateFilter>
-      | ((filter: StateUpdateFilter) => IEncodable<apibara.starknet.v1alpha2.IStateUpdateFilter>)
+      | IEncodable<v1alpha2.IStateUpdateFilter>
+      | ((filter: StateUpdateFilter) => IEncodable<v1alpha2.IStateUpdateFilter>)
   ) {
     this.inner.stateUpdate = createFilter(filterOrBuilder, () => new StateUpdateFilter())
     return this
@@ -99,18 +97,24 @@ export class FilterBuilder {
    * Returns the filter in encoded form, ready to be added to a request.
    */
   encode(): Uint8Array {
-    return apibara.starknet.v1alpha2.Filter.encode(this.inner).finish()
+    return v1alpha2.Filter.encode(this.inner).finish()
   }
 
   /**
    * Returns the filter as a plain object.
    */
-  toObject(): apibara.starknet.v1alpha2.IFilter {
+  toObject(): v1alpha2.IFilter {
     return this.inner
   }
 }
 
 export class TransactionFilter {
+  /**
+   * Includes any transaction type.
+   */
+  any() {
+    return new AnyTransactionFilter()
+  }
   /**
    * Include invoke transactions, V0
    */
@@ -158,10 +162,16 @@ export interface IEncodable<T> {
   encode(): T
 }
 
-type IEncodableTransactionFilter = IEncodable<apibara.starknet.v1alpha2.ITransactionFilter>
+export class AnyTransactionFilter implements IEncodable<v1alpha2.ITransactionFilter> {
+  encode(): v1alpha2.ITransactionFilter {
+    return {}
+  }
+}
+
+type IEncodableTransactionFilter = IEncodable<v1alpha2.ITransactionFilter>
 
 export class InvokeV0TransactionFilter implements IEncodableTransactionFilter {
-  private inner: apibara.starknet.v1alpha2.IInvokeTransactionV0Filter
+  private inner: v1alpha2.IInvokeTransactionV0Filter
 
   constructor() {
     this.inner = {}
@@ -170,7 +180,7 @@ export class InvokeV0TransactionFilter implements IEncodableTransactionFilter {
   /**
    * Filter by contract address.
    */
-  withContractAddress(address: apibara.starknet.v1alpha2.IFieldElement) {
+  withContractAddress(address: v1alpha2.IFieldElement) {
     this.inner.contractAddress = address
     return this
   }
@@ -178,7 +188,7 @@ export class InvokeV0TransactionFilter implements IEncodableTransactionFilter {
   /**
    * Filter by entry point selector.
    */
-  withEntryPointSelector(selector: apibara.starknet.v1alpha2.IFieldElement) {
+  withEntryPointSelector(selector: v1alpha2.IFieldElement) {
     this.inner.entryPointSelector = selector
     return this
   }
@@ -186,12 +196,12 @@ export class InvokeV0TransactionFilter implements IEncodableTransactionFilter {
   /**
    * Filter by calldata prefix.
    */
-  withCalldata(calldata: apibara.starknet.v1alpha2.IFieldElement[]) {
+  withCalldata(calldata: v1alpha2.IFieldElement[]) {
     this.inner.calldata = calldata
     return this
   }
 
-  encode(): apibara.starknet.v1alpha2.ITransactionFilter {
+  encode(): v1alpha2.ITransactionFilter {
     return {
       invokeV0: this.inner,
     }
@@ -199,7 +209,7 @@ export class InvokeV0TransactionFilter implements IEncodableTransactionFilter {
 }
 
 export class InvokeV1TransactionFilter implements IEncodableTransactionFilter {
-  private inner: apibara.starknet.v1alpha2.IInvokeTransactionV1Filter
+  private inner: v1alpha2.IInvokeTransactionV1Filter
 
   constructor() {
     this.inner = {}
@@ -208,7 +218,7 @@ export class InvokeV1TransactionFilter implements IEncodableTransactionFilter {
   /**
    * Filter by sender address.
    */
-  withSenderAddress(address: apibara.starknet.v1alpha2.IFieldElement) {
+  withSenderAddress(address: v1alpha2.IFieldElement) {
     this.inner.senderAddress = address
     return this
   }
@@ -216,12 +226,12 @@ export class InvokeV1TransactionFilter implements IEncodableTransactionFilter {
   /**
    * Filter by calldata prefix.
    */
-  withCalldata(calldata: apibara.starknet.v1alpha2.IFieldElement[]) {
+  withCalldata(calldata: v1alpha2.IFieldElement[]) {
     this.inner.calldata = calldata
     return this
   }
 
-  encode(): apibara.starknet.v1alpha2.ITransactionFilter {
+  encode(): v1alpha2.ITransactionFilter {
     return {
       invokeV1: this.inner,
     }
@@ -229,7 +239,7 @@ export class InvokeV1TransactionFilter implements IEncodableTransactionFilter {
 }
 
 export class DeployTransactionFilter implements IEncodableTransactionFilter {
-  private inner: apibara.starknet.v1alpha2.IDeployTransactionFilter
+  private inner: v1alpha2.IDeployTransactionFilter
 
   constructor() {
     this.inner = {}
@@ -238,7 +248,7 @@ export class DeployTransactionFilter implements IEncodableTransactionFilter {
   /**
    * Filter by contract address salt.
    */
-  withContractAddressSalt(salt: apibara.starknet.v1alpha2.IFieldElement) {
+  withContractAddressSalt(salt: v1alpha2.IFieldElement) {
     this.inner.contractAddressSalt = salt
     return this
   }
@@ -246,7 +256,7 @@ export class DeployTransactionFilter implements IEncodableTransactionFilter {
   /**
    * Filter by class hash.
    */
-  withClassHash(hash: apibara.starknet.v1alpha2.IFieldElement) {
+  withClassHash(hash: v1alpha2.IFieldElement) {
     this.inner.classHash = hash
     return this
   }
@@ -254,12 +264,12 @@ export class DeployTransactionFilter implements IEncodableTransactionFilter {
   /**
    * Filter by constructor calldata prefix.
    */
-  withConstructorCalldata(calldata: apibara.starknet.v1alpha2.IFieldElement[]) {
+  withConstructorCalldata(calldata: v1alpha2.IFieldElement[]) {
     this.inner.constructorCalldata = calldata
     return this
   }
 
-  encode(): apibara.starknet.v1alpha2.ITransactionFilter {
+  encode(): v1alpha2.ITransactionFilter {
     return {
       deploy: this.inner,
     }
@@ -267,7 +277,7 @@ export class DeployTransactionFilter implements IEncodableTransactionFilter {
 }
 
 export class DeclareTransactionFilter implements IEncodableTransactionFilter {
-  private inner: apibara.starknet.v1alpha2.IDeclareTransactionFilter
+  private inner: v1alpha2.IDeclareTransactionFilter
 
   constructor() {
     this.inner = {}
@@ -276,7 +286,7 @@ export class DeclareTransactionFilter implements IEncodableTransactionFilter {
   /**
    * Filter by sender address.
    */
-  withSenderAddress(address: apibara.starknet.v1alpha2.IFieldElement) {
+  withSenderAddress(address: v1alpha2.IFieldElement) {
     this.inner.senderAddress = address
     return this
   }
@@ -284,12 +294,12 @@ export class DeclareTransactionFilter implements IEncodableTransactionFilter {
   /**
    * Filter by class hash.
    */
-  withClassHash(hash: apibara.starknet.v1alpha2.IFieldElement) {
+  withClassHash(hash: v1alpha2.IFieldElement) {
     this.inner.classHash = hash
     return this
   }
 
-  encode(): apibara.starknet.v1alpha2.ITransactionFilter {
+  encode(): v1alpha2.ITransactionFilter {
     return {
       declare: this.inner,
     }
@@ -297,7 +307,7 @@ export class DeclareTransactionFilter implements IEncodableTransactionFilter {
 }
 
 export class L1HandlerTransactionFilter implements IEncodableTransactionFilter {
-  private inner: apibara.starknet.v1alpha2.IL1HandlerTransactionFilter
+  private inner: v1alpha2.IL1HandlerTransactionFilter
 
   constructor() {
     this.inner = {}
@@ -306,7 +316,7 @@ export class L1HandlerTransactionFilter implements IEncodableTransactionFilter {
   /**
    * Filter by contract address.
    */
-  withContractAddress(address: apibara.starknet.v1alpha2.IFieldElement) {
+  withContractAddress(address: v1alpha2.IFieldElement) {
     this.inner.contractAddress = address
     return this
   }
@@ -314,7 +324,7 @@ export class L1HandlerTransactionFilter implements IEncodableTransactionFilter {
   /**
    * Filter by entry point selector.
    */
-  withEntryPointSelector(selector: apibara.starknet.v1alpha2.IFieldElement) {
+  withEntryPointSelector(selector: v1alpha2.IFieldElement) {
     this.inner.entryPointSelector = selector
     return this
   }
@@ -322,12 +332,12 @@ export class L1HandlerTransactionFilter implements IEncodableTransactionFilter {
   /**
    * Filter by calldata prefix.
    */
-  withCalldata(calldata: apibara.starknet.v1alpha2.IFieldElement[]) {
+  withCalldata(calldata: v1alpha2.IFieldElement[]) {
     this.inner.calldata = calldata
     return this
   }
 
-  encode(): apibara.starknet.v1alpha2.ITransactionFilter {
+  encode(): v1alpha2.ITransactionFilter {
     return {
       l1Handler: this.inner,
     }
@@ -335,7 +345,7 @@ export class L1HandlerTransactionFilter implements IEncodableTransactionFilter {
 }
 
 export class DeployAccountTransactionFilter implements IEncodableTransactionFilter {
-  private inner: apibara.starknet.v1alpha2.IDeployAccountTransactionFilter
+  private inner: v1alpha2.IDeployAccountTransactionFilter
 
   constructor() {
     this.inner = {}
@@ -344,7 +354,7 @@ export class DeployAccountTransactionFilter implements IEncodableTransactionFilt
   /**
    * Filter by contract address salt.
    */
-  withContractAddressSalt(salt: apibara.starknet.v1alpha2.IFieldElement) {
+  withContractAddressSalt(salt: v1alpha2.IFieldElement) {
     this.inner.contractAddressSalt = salt
     return this
   }
@@ -352,7 +362,7 @@ export class DeployAccountTransactionFilter implements IEncodableTransactionFilt
   /**
    * Filter by class hash.
    */
-  withClassHash(hash: apibara.starknet.v1alpha2.IFieldElement) {
+  withClassHash(hash: v1alpha2.IFieldElement) {
     this.inner.classHash = hash
     return this
   }
@@ -360,20 +370,20 @@ export class DeployAccountTransactionFilter implements IEncodableTransactionFilt
   /**
    * Filter by constructor calldata prefix.
    */
-  withConstructorCalldata(calldata: apibara.starknet.v1alpha2.IFieldElement[]) {
+  withConstructorCalldata(calldata: v1alpha2.IFieldElement[]) {
     this.inner.constructorCalldata = calldata
     return this
   }
 
-  encode(): apibara.starknet.v1alpha2.ITransactionFilter {
+  encode(): v1alpha2.ITransactionFilter {
     return {
       deployAccount: this.inner,
     }
   }
 }
 
-export class EventFilter implements IEncodable<apibara.starknet.v1alpha2.IEventFilter> {
-  private inner: apibara.starknet.v1alpha2.IEventFilter
+export class EventFilter implements IEncodable<v1alpha2.IEventFilter> {
+  private inner: v1alpha2.IEventFilter
 
   constructor() {
     this.inner = {}
@@ -382,7 +392,7 @@ export class EventFilter implements IEncodable<apibara.starknet.v1alpha2.IEventF
   /**
    * Filter by address emitting the event.
    */
-  withFromAddress(address: apibara.starknet.v1alpha2.IFieldElement) {
+  withFromAddress(address: v1alpha2.IFieldElement) {
     this.inner.fromAddress = address
     return this
   }
@@ -390,7 +400,7 @@ export class EventFilter implements IEncodable<apibara.starknet.v1alpha2.IEventF
   /**
    * Filter by keys prefix.
    */
-  withKeys(keys: apibara.starknet.v1alpha2.IFieldElement[]) {
+  withKeys(keys: v1alpha2.IFieldElement[]) {
     this.inner.keys = keys
     return this
   }
@@ -398,20 +408,18 @@ export class EventFilter implements IEncodable<apibara.starknet.v1alpha2.IEventF
   /**
    * Filter by data prefix.
    */
-  withData(data: apibara.starknet.v1alpha2.IFieldElement[]) {
+  withData(data: v1alpha2.IFieldElement[]) {
     this.inner.data = data
     return this
   }
 
-  encode(): apibara.starknet.v1alpha2.IEventFilter {
+  encode(): v1alpha2.IEventFilter {
     return this.inner
   }
 }
 
-export class L2ToL1MessageFilter
-  implements IEncodable<apibara.starknet.v1alpha2.IL2ToL1MessageFilter>
-{
-  private inner: apibara.starknet.v1alpha2.IL2ToL1MessageFilter
+export class L2ToL1MessageFilter implements IEncodable<v1alpha2.IL2ToL1MessageFilter> {
+  private inner: v1alpha2.IL2ToL1MessageFilter
 
   constructor() {
     this.inner = {}
@@ -420,7 +428,7 @@ export class L2ToL1MessageFilter
   /**
    * Filter by destination address.
    */
-  withToAddress(address: apibara.starknet.v1alpha2.IFieldElement) {
+  withToAddress(address: v1alpha2.IFieldElement) {
     this.inner.toAddress = address
     return this
   }
@@ -428,21 +436,21 @@ export class L2ToL1MessageFilter
   /**
    * Filter by payload prefix.
    */
-  withPayload(payload: apibara.starknet.v1alpha2.IFieldElement[]) {
+  withPayload(payload: v1alpha2.IFieldElement[]) {
     this.inner.payload = payload
     return this
   }
 
-  encode(): apibara.starknet.v1alpha2.IL2ToL1MessageFilter {
+  encode(): v1alpha2.IL2ToL1MessageFilter {
     return this.inner
   }
 }
 
-export class StateUpdateFilter implements IEncodable<apibara.starknet.v1alpha2.IStateUpdateFilter> {
-  private inner: apibara.starknet.v1alpha2.StateUpdateFilter
+export class StateUpdateFilter implements IEncodable<v1alpha2.IStateUpdateFilter> {
+  private inner: v1alpha2.StateUpdateFilter
 
   constructor() {
-    this.inner = new apibara.starknet.v1alpha2.StateUpdateFilter()
+    this.inner = new v1alpha2.StateUpdateFilter()
   }
 
   /**
@@ -450,8 +458,8 @@ export class StateUpdateFilter implements IEncodable<apibara.starknet.v1alpha2.I
    */
   addStorageDiff(
     filterOrBuilder:
-      | IEncodable<apibara.starknet.v1alpha2.IStorageDiffFilter>
-      | ((builder: StorageDiffFilter) => IEncodable<apibara.starknet.v1alpha2.IStorageDiffFilter>)
+      | IEncodable<v1alpha2.IStorageDiffFilter>
+      | ((builder: StorageDiffFilter) => IEncodable<v1alpha2.IStorageDiffFilter>)
   ) {
     this.inner.storageDiffs.push(createFilter(filterOrBuilder, () => new StorageDiffFilter()))
     return this
@@ -462,10 +470,8 @@ export class StateUpdateFilter implements IEncodable<apibara.starknet.v1alpha2.I
    */
   addDeclaredContract(
     filterOrBuilder:
-      | IEncodable<apibara.starknet.v1alpha2.IDeclaredContractFilter>
-      | ((
-          builder: DeclaredContractFilter
-        ) => IEncodable<apibara.starknet.v1alpha2.IDeclaredContractFilter>)
+      | IEncodable<v1alpha2.IDeclaredContractFilter>
+      | ((builder: DeclaredContractFilter) => IEncodable<v1alpha2.IDeclaredContractFilter>)
   ) {
     this.inner.declaredContracts.push(
       createFilter(filterOrBuilder, () => new DeclaredContractFilter())
@@ -478,10 +484,8 @@ export class StateUpdateFilter implements IEncodable<apibara.starknet.v1alpha2.I
    */
   addDeployedContract(
     filterOrBuilder:
-      | IEncodable<apibara.starknet.v1alpha2.IDeployedContractFilter>
-      | ((
-          builder: DeployedContractFilter
-        ) => IEncodable<apibara.starknet.v1alpha2.IDeployedContractFilter>)
+      | IEncodable<v1alpha2.IDeployedContractFilter>
+      | ((builder: DeployedContractFilter) => IEncodable<v1alpha2.IDeployedContractFilter>)
   ) {
     this.inner.deployedContracts.push(
       createFilter(filterOrBuilder, () => new DeployedContractFilter())
@@ -494,73 +498,69 @@ export class StateUpdateFilter implements IEncodable<apibara.starknet.v1alpha2.I
    */
   addNonceUpdate(
     filterOrBuilder:
-      | IEncodable<apibara.starknet.v1alpha2.INonceUpdateFilter>
-      | ((builder: NonceUpdateFilter) => IEncodable<apibara.starknet.v1alpha2.INonceUpdateFilter>)
+      | IEncodable<v1alpha2.INonceUpdateFilter>
+      | ((builder: NonceUpdateFilter) => IEncodable<v1alpha2.INonceUpdateFilter>)
   ) {
     this.inner.nonces.push(createFilter(filterOrBuilder, () => new NonceUpdateFilter()))
     return this
   }
 
-  encode(): apibara.starknet.v1alpha2.IStateUpdateFilter {
+  encode(): v1alpha2.IStateUpdateFilter {
     return this.inner
   }
 }
 
-export class StorageDiffFilter implements IEncodable<apibara.starknet.v1alpha2.IStorageDiffFilter> {
-  private inner: apibara.starknet.v1alpha2.StorageDiffFilter
+export class StorageDiffFilter implements IEncodable<v1alpha2.IStorageDiffFilter> {
+  private inner: v1alpha2.StorageDiffFilter
 
   constructor() {
-    this.inner = new apibara.starknet.v1alpha2.StorageDiffFilter()
+    this.inner = new v1alpha2.StorageDiffFilter()
   }
 
   /**
    * Filter by contract address.
    */
-  withContractAddress(address: apibara.starknet.v1alpha2.IFieldElement) {
+  withContractAddress(address: v1alpha2.IFieldElement) {
     this.inner.contractAddress = address
     return this
   }
 
-  encode(): apibara.starknet.v1alpha2.IStorageDiffFilter {
+  encode(): v1alpha2.IStorageDiffFilter {
     return this.inner
   }
 }
 
-export class DeclaredContractFilter
-  implements IEncodable<apibara.starknet.v1alpha2.IDeclaredContractFilter>
-{
-  private inner: apibara.starknet.v1alpha2.DeclaredContractFilter
+export class DeclaredContractFilter implements IEncodable<v1alpha2.IDeclaredContractFilter> {
+  private inner: v1alpha2.DeclaredContractFilter
 
   constructor() {
-    this.inner = new apibara.starknet.v1alpha2.DeclaredContractFilter()
+    this.inner = new v1alpha2.DeclaredContractFilter()
   }
 
   /**
    * Filter by class hash.
    */
-  withClassHash(hash: apibara.starknet.v1alpha2.IFieldElement) {
+  withClassHash(hash: v1alpha2.IFieldElement) {
     this.inner.classHash = hash
     return this
   }
 
-  encode(): apibara.starknet.v1alpha2.IDeclaredContractFilter {
+  encode(): v1alpha2.IDeclaredContractFilter {
     return this.inner
   }
 }
 
-export class DeployedContractFilter
-  implements IEncodable<apibara.starknet.v1alpha2.IDeployedContractFilter>
-{
-  private inner: apibara.starknet.v1alpha2.DeployedContractFilter
+export class DeployedContractFilter implements IEncodable<v1alpha2.IDeployedContractFilter> {
+  private inner: v1alpha2.DeployedContractFilter
 
   constructor() {
-    this.inner = new apibara.starknet.v1alpha2.DeployedContractFilter()
+    this.inner = new v1alpha2.DeployedContractFilter()
   }
 
   /**
    * Filter by contract address.
    */
-  withContractAddress(address: apibara.starknet.v1alpha2.IFieldElement) {
+  withContractAddress(address: v1alpha2.IFieldElement) {
     this.inner.contractAddress = address
     return this
   }
@@ -568,27 +568,27 @@ export class DeployedContractFilter
   /**
    * Filter by class hash.
    */
-  withClassHash(hash: apibara.starknet.v1alpha2.IFieldElement) {
+  withClassHash(hash: v1alpha2.IFieldElement) {
     this.inner.classHash = hash
     return this
   }
 
-  encode(): apibara.starknet.v1alpha2.IDeployedContractFilter {
+  encode(): v1alpha2.IDeployedContractFilter {
     return this.inner
   }
 }
 
-export class NonceUpdateFilter implements IEncodable<apibara.starknet.v1alpha2.INonceUpdateFilter> {
-  private inner: apibara.starknet.v1alpha2.NonceUpdateFilter
+export class NonceUpdateFilter implements IEncodable<v1alpha2.INonceUpdateFilter> {
+  private inner: v1alpha2.NonceUpdateFilter
 
   constructor() {
-    this.inner = new apibara.starknet.v1alpha2.NonceUpdateFilter()
+    this.inner = new v1alpha2.NonceUpdateFilter()
   }
 
   /**
    * Filter by contract address.
    */
-  withContractAddress(address: apibara.starknet.v1alpha2.IFieldElement) {
+  withContractAddress(address: v1alpha2.IFieldElement) {
     this.inner.contractAddress = address
     return this
   }
@@ -596,12 +596,12 @@ export class NonceUpdateFilter implements IEncodable<apibara.starknet.v1alpha2.I
   /**
    * Filter by nonce.
    */
-  withNonce(nonce: apibara.starknet.v1alpha2.IFieldElement) {
+  withNonce(nonce: v1alpha2.IFieldElement) {
     this.inner.nonce = nonce
     return this
   }
 
-  encode(): apibara.starknet.v1alpha2.INonceUpdateFilter {
+  encode(): v1alpha2.INonceUpdateFilter {
     return this.inner
   }
 }
