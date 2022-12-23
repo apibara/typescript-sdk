@@ -1,6 +1,6 @@
-import { DataFinality } from './proto'
+import { v1alpha2 } from './proto'
 import { TestFilter } from './proto/testing'
-import { streamDataRequest } from './request'
+import { StreamDataRequest } from './request'
 
 describe('RequestBuilder', () => {
   it('returns the final request', () => {
@@ -9,11 +9,11 @@ describe('RequestBuilder', () => {
       text: 'abcdef',
     })
 
-    const request = streamDataRequest()
+    const request = StreamDataRequest.create()
       .withBatchSize(10)
-      .withFilter(filter)
-      .withFinality(DataFinality.DATA_STATUS_FINALIZED)
-      .build()
+      .withFilter(TestFilter.encode(filter).finish())
+      .withFinality(v1alpha2.DataFinality.DATA_STATUS_FINALIZED)
+      .encode()
 
     expect(request.batchSize).toBe(10)
     expect(request.filter).toBeInstanceOf(Buffer)

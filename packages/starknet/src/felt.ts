@@ -1,18 +1,18 @@
 import Long from 'long'
-import { apibara } from './proto/generated'
+import { v1alpha2 } from './proto'
 
 const MAX_FELT = 2n ** 251n + 17n * 2n ** 192n
 
 export const FieldElement = {
-  encode: apibara.starknet.v1alpha2.FieldElement.encode,
-  decode: apibara.starknet.v1alpha2.FieldElement.decode,
-  fromObject: apibara.starknet.v1alpha2.FieldElement.fromObject,
-  toObject: apibara.starknet.v1alpha2.FieldElement.toObject,
+  encode: v1alpha2.FieldElement.encode,
+  decode: v1alpha2.FieldElement.decode,
+  fromObject: v1alpha2.FieldElement.fromObject,
+  toObject: v1alpha2.FieldElement.toObject,
 
   /**
    * Converts from the wire representation to a bigint.
    */
-  toBigInt(message: apibara.starknet.v1alpha2.IFieldElement): bigint {
+  toBigInt(message: v1alpha2.IFieldElement): bigint {
     const loLo = hexEncodedU64(message.loLo)
     const loHi = hexEncodedU64(message.loHi)
     const hiLo = hexEncodedU64(message.hiLo)
@@ -23,7 +23,7 @@ export const FieldElement = {
   /**
    * Returns the wire representation of the given bigint.
    */
-  fromBigInt(number: string | number | bigint): apibara.starknet.v1alpha2.IFieldElement {
+  fromBigInt(number: string | number | bigint): v1alpha2.IFieldElement {
     if (number < 0 || number > MAX_FELT) {
       throw new Error('FieldElement outside of range')
     }

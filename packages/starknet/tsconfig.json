@@ -4,6 +4,7 @@
     "outDir": "dist",
     "declarationDir": "dist",
     "noEmit": false,
+    "allowJs": true,
     "rootDir": "src",
     "types": ["jest", "node"]
   },

@@ -1,15 +1,14 @@
-import { Message } from 'protobufjs'
-import { Cursor, DataFinality, StreamDataRequest } from './proto'
+import { v1alpha2 } from './proto'
 
-/**
- * Start building a `StreamData` request.
- */
-export function streamDataRequest() {
-  return new StreamDataRequestBuilder()
+export const StreamDataRequest = {
+  /**
+   * Start building a `StreamData` request.
+   */
+  create: () => new StreamDataRequestBuilder(),
 }
 
 export class StreamDataRequestBuilder {
-  private request: StreamDataRequest
+  private request: v1alpha2.IStreamDataRequest
 
   constructor() {
     this.request = {}
@@ -34,7 +33,7 @@ export class StreamDataRequestBuilder {
   /**
    * Set the cursor from where to resume streaming.
    */
-  withStartingCursor(cursor: Cursor) {
+  withStartingCursor(cursor: v1alpha2.ICursor) {
     this.request.startingCursor = cursor
     return this
   }
@@ -42,7 +41,7 @@ export class StreamDataRequestBuilder {
   /**
    * Set the request finality for data.
    */
-  withFinality(finality: DataFinality) {
+  withFinality(finality: v1alpha2.DataFinality) {
     this.request.finality = finality
     return this
   }
@@ -50,15 +49,15 @@ export class StreamDataRequestBuilder {
   /**
    * Set the stream-specific filter.
    */
-  withFilter<T extends Message>(filter: Message<T>) {
-    this.request.filter = filter.$type.encode(filter).finish()
+  withFilter(filter: Uint8Array) {
+    this.request.filter = filter
     return this
   }
 
   /**
    * Build and return the request.
    */
-  build() {
+  encode() {
     return this.request
   }
 }

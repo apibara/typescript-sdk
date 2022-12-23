@@ -1,1 +1,3 @@
-export * as proto from './proto'
+export * from './proto'
+export * from './client'
+export * from './request'
