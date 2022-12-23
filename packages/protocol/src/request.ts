@@ -4,7 +4,7 @@ import { Cursor, DataFinality, StreamDataRequest } from './proto'
 /**
  * Start building a `StreamData` request.
  */
-export function stream_data_request() {
+export function streamDataRequest() {
   return new StreamDataRequestBuilder()
 }
 
@@ -18,7 +18,7 @@ export class StreamDataRequestBuilder {
   /**
    * Set the new stream id.
    */
-  with_stream_id(streamId: number) {
+  withStreamId(streamId: number) {
     this.request.streamId = streamId
     return this
   }
@@ -26,7 +26,7 @@ export class StreamDataRequestBuilder {
   /**
    * Set the number of items in each response batch.
    */
-  with_batch_size(size: number) {
+  withBatchSize(size: number) {
     this.request.batchSize = size
     return this
   }
@@ -34,7 +34,7 @@ export class StreamDataRequestBuilder {
   /**
    * Set the cursor from where to resume streaming.
    */
-  with_starting_cursor(cursor: Cursor) {
+  withStartingCursor(cursor: Cursor) {
     this.request.startingCursor = cursor
     return this
   }
@@ -42,7 +42,7 @@ export class StreamDataRequestBuilder {
   /**
    * Set the request finality for data.
    */
-  with_finality(finality: DataFinality) {
+  withFinality(finality: DataFinality) {
     this.request.finality = finality
     return this
   }
@@ -50,7 +50,7 @@ export class StreamDataRequestBuilder {
   /**
    * Set the stream-specific filter.
    */
-  with_filter<T extends Message>(filter: Message<T>) {
+  withFilter<T extends Message>(filter: Message<T>) {
     this.request.filter = filter.$type.encode(filter).finish()
     return this
   }

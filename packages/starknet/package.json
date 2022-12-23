@@ -10,22 +10,29 @@
     "README.md"
   ],
   "scripts": {
-    "prebuild": "pnpm run protobuf && pnpm run gen-types",
+    "prebuild": "pnpm run protobuf && pnpm run gen-proto",
     "build": "tsc",
     "test": "jest src",
     "lint": "eslint src --ext .ts",
     "lint:fix": "eslint --fix src --ext .ts",
     "protobuf": "mkdir -p dist/proto && cp src/proto/*.proto dist/proto",
-    "gen-types": "protoc --plugin=node_modules/ts-proto/protoc-gen-ts_proto --ts_proto_opt=forceLong=long --ts_proto_opt=esModuleInterop=true --ts_proto_opt=useExactTypes=false --ts_proto_out=./src/proto -I src/proto ./src/proto/*.proto"
+    "gen-module": "pbjs -t static-module -w commonjs -o src/proto/generated.js src/proto/*.proto",
+    "gen-types": "pbts -o src/proto/generated.d.ts src/proto/generated.js",
+    "gen-proto": "pnpm run gen-module && pnpm run gen-types"
   },
   "dependencies": {
     "google-protobuf": "^3.21.2",
     "long": "^5.2.1",
-    "protobufjs": "^7.1.2",
-    "ts-proto": "^1.131.0"
+    "protobufjs": "^7.1.2"
   },
   "devDependencies": {
     "@types/long": "^5.0.0",
-    "@types/node": "^18.11.9"
+    "@types/node": "^18.11.9",
+    "protobufjs-cli": "^1.0.2"
+  },
+  "eslintConfig": {
+    "ignorePatterns": [
+      "src/proto/generated.d.ts"
+    ]
   }
 }
