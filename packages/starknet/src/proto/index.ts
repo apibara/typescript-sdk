@@ -1,0 +1,1 @@
+export { apibara } from './generated'
