@@ -15,9 +15,9 @@ describe('RequestBuilder', () => {
       .withFinality(v1alpha2.DataFinality.DATA_STATUS_FINALIZED)
       .encode()
 
-    expect(request.batchSize).toBe(10)
+    expect(request.batchSize).toEqual(10)
     expect(request.filter).toBeInstanceOf(Buffer)
-    expect(request.filter?.length).toBe(10)
+    expect(request.filter?.length).toEqual(10)
 
     // make ts happy
     if (!request.filter || typeof request.filter == 'string') {
@@ -25,7 +25,7 @@ describe('RequestBuilder', () => {
     }
 
     const back = TestFilter.decode(request.filter)
-    expect(back.num).toBe(123)
-    expect(back.text).toBe('abcdef')
+    expect(back.num.toString()).toEqual('123')
+    expect(back.text).toEqual('abcdef')
   })
 })
