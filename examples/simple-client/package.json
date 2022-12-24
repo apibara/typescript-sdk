@@ -8,7 +8,9 @@
   },
   "dependencies": {
     "@apibara/protocol": "workspace:*",
-    "@apibara/starknet": "workspace:*"
+    "@apibara/starknet": "workspace:*",
+    "decimal.js": "^10.4.3",
+    "starknet": "^4.17.1"
   },
   "devDependencies": {
     "@types/node": "^18.11.9"

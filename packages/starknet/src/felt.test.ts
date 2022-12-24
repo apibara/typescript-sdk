@@ -11,5 +11,14 @@ describe('FieldElement', () => {
 
       expect(back).toBe(original)
     })
+
+    it('encodes the value as big endian', () => {
+      const prime = 2n ** 251n + 17n * 2n ** 192n
+      const encoded = FieldElement.fromBigInt(prime)
+      expect(encoded.hiHi?.toString()).toEqual('0')
+      expect(encoded.hiLo?.toString()).toEqual('0')
+      expect(encoded.loHi?.toString()).toEqual('0')
+      expect(encoded.loLo?.toString()).toEqual('576460752303423505')
+    })
   })
 })

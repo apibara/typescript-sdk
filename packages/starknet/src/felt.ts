@@ -13,11 +13,11 @@ export const FieldElement = {
    * Converts from the wire representation to a bigint.
    */
   toBigInt(message: v1alpha2.IFieldElement): bigint {
-    const loLo = hexEncodedU64(message.loLo)
-    const loHi = hexEncodedU64(message.loHi)
-    const hiLo = hexEncodedU64(message.hiLo)
     const hiHi = hexEncodedU64(message.hiHi)
-    return BigInt(`0x${hiHi}${hiLo}${loHi}${loLo}`)
+    const hiLo = hexEncodedU64(message.hiLo)
+    const loHi = hexEncodedU64(message.loHi)
+    const loLo = hexEncodedU64(message.loLo)
+    return BigInt(`0x${loLo}${loHi}${hiLo}${hiHi}`)
   },
 
   /**
@@ -33,17 +33,25 @@ export const FieldElement = {
     // convert to hex and from there breakup in pieces
     const hex = bn.toString(16).padStart(64, '0')
     const s = hex.length
-    const loLo = Long.fromString(hex.slice(s - 16, s), true, 16)
-    const loHi = Long.fromString(hex.slice(s - 32, s - 16), true, 16)
-    const hiLo = Long.fromString(hex.slice(s - 48, s - 32), true, 16)
-    const hiHi = Long.fromString(hex.slice(s - 64, s - 48), true, 16)
+    const hiHi = Long.fromString(hex.slice(s - 16, s), true, 16)
+    const hiLo = Long.fromString(hex.slice(s - 32, s - 16), true, 16)
+    const loHi = Long.fromString(hex.slice(s - 48, s - 32), true, 16)
+    const loLo = Long.fromString(hex.slice(s - 64, s - 48), true, 16)
 
     return {
-      loLo,
-      loHi,
-      hiLo,
       hiHi,
+      hiLo,
+      loHi,
+      loLo,
     }
+  },
+
+  /**
+   * Returns the hex value of the field element.
+   */
+  toHex(message: v1alpha2.IFieldElement): string {
+    const num = this.toBigInt(message)
+    return `0x${num.toString(16)}`
   },
 }
 

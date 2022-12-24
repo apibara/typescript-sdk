@@ -1,19 +1,16 @@
 // Original file: src/proto/stream.proto
 
-import type {
-  Cursor as _apibara_node_v1alpha2_Cursor,
-  Cursor__Output as _apibara_node_v1alpha2_Cursor__Output,
-} from '../../../apibara/node/v1alpha2/Cursor'
-import type { DataFinality as _apibara_node_v1alpha2_DataFinality } from '../../../apibara/node/v1alpha2/DataFinality'
+import type { Cursor as _apibara_node_v1alpha2_Cursor, Cursor__Output as _apibara_node_v1alpha2_Cursor__Output } from '../../../apibara/node/v1alpha2/Cursor';
+import type { DataFinality as _apibara_node_v1alpha2_DataFinality } from '../../../apibara/node/v1alpha2/DataFinality';
 
 export interface Data {
-  endCursor?: _apibara_node_v1alpha2_Cursor | null
-  finality?: _apibara_node_v1alpha2_DataFinality | keyof typeof _apibara_node_v1alpha2_DataFinality
-  data?: (Buffer | Uint8Array | string)[]
+  'endCursor'?: (_apibara_node_v1alpha2_Cursor | null);
+  'finality'?: (_apibara_node_v1alpha2_DataFinality | keyof typeof _apibara_node_v1alpha2_DataFinality);
+  'data'?: (Buffer | Uint8Array | string)[];
 }
 
 export interface Data__Output {
-  endCursor: _apibara_node_v1alpha2_Cursor__Output | null
-  finality: keyof typeof _apibara_node_v1alpha2_DataFinality
-  data: Buffer[]
+  'endCursor': (_apibara_node_v1alpha2_Cursor__Output | null);
+  'finality': (keyof typeof _apibara_node_v1alpha2_DataFinality);
+  'data': (Buffer)[];
 }
