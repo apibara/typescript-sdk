@@ -1,3 +1,4 @@
+import Long from 'long'
 import { v1alpha2 } from './proto'
 
 export const StreamDataRequest = {
@@ -17,7 +18,7 @@ export class StreamDataRequestBuilder {
   /**
    * Set the new stream id.
    */
-  withStreamId(streamId: number) {
+  withStreamId(streamId: number | Long) {
     this.request.streamId = streamId
     return this
   }
@@ -25,7 +26,7 @@ export class StreamDataRequestBuilder {
   /**
    * Set the number of items in each response batch.
    */
-  withBatchSize(size: number) {
+  withBatchSize(size: number | Long) {
     this.request.batchSize = size
     return this
   }

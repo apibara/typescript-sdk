@@ -1,5 +1,5 @@
 import Decimal from 'decimal.js'
-import { StreamClient, ChannelCredentials, StreamDataRequest, v1alpha2 } from '@apibara/protocol'
+import { StreamClient, ChannelCredentials, v1alpha2 } from '@apibara/protocol'
 import { Filter, FieldElement, v1alpha2 as starknet } from '@apibara/starknet'
 import { hash } from 'starknet'
 
@@ -44,11 +44,14 @@ async function main() {
     .withStateUpdate((su) => su.addStorageDiff((st) => st.withContractAddress(address)))
     .encode()
 
-  const client = new StreamClient('localhost:7171', ChannelCredentials.createInsecure())
+  const client = new StreamClient({
+    url: 'localhost:7171',
+    credentials: ChannelCredentials.createInsecure(),
+  }).connect()
 
-  const stream = client.connect()
+  client.configure({ filter, batchSize: 10, finality: v1alpha2.DataFinality.DATA_STATUS_FINALIZED })
 
-  stream.on('data', (message) => {
+  for await (const message of client) {
     if (message.data?.data) {
       for (let item of message.data.data) {
         const block = starknet.Block.decode(item)
@@ -93,19 +96,7 @@ async function main() {
         }
       }
     }
-  })
-
-  stream.write(
-    StreamDataRequest.create()
-      .withFinality(v1alpha2.DataFinality.DATA_STATUS_FINALIZED)
-      .withBatchSize(10)
-      .withFilter(filter)
-      .encode()
-  )
-  return new Promise((resolve, reject) => {
-    stream.on('end', resolve)
-    stream.on('error', reject)
-  })
+  }
 }
 
 main()
