@@ -31,7 +31,9 @@ export class StreamClient {
   private stream_id: number
 
   constructor({ url, credentials }: { url: string; credentials?: ChannelCredentials }) {
-    this.inner = new StreamService(url, credentials ?? ChannelCredentials.createSsl())
+    this.inner = new StreamService(url, credentials ?? ChannelCredentials.createSsl(), {
+      'grpc.keepalive_timeout_ms': 3_600_000,
+    })
     this.configured = false
     this.stream_id = 0
   }
