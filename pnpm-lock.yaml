@@ -53,15 +53,19 @@ importers:
     specifiers:
       '@grpc/grpc-js': ^1.7.3
       '@grpc/proto-loader': ^0.7.3
+      '@types/long': ^5.0.0
       '@types/node': ^18.11.9
       google-protobuf: ^3.21.2
+      long: ^5.2.1
       protobufjs: ^7.1.2
     dependencies:
       '@grpc/grpc-js': 1.7.3
       '@grpc/proto-loader': 0.7.3
       google-protobuf: 3.21.2
+      long: 5.2.1
       protobufjs: 7.1.2
     devDependencies:
+      '@types/long': 5.0.0
       '@types/node': 18.11.9
 
   packages/starknet:

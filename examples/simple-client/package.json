@@ -15,5 +15,5 @@
   "devDependencies": {
     "@types/node": "^18.11.9"
   },
-  "version": null
+  "version": "0.1.0"
 }
