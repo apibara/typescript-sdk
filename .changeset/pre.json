@@ -1,0 +1,12 @@
+{
+  "mode": "pre",
+  "tag": "next",
+  "initialVersions": {
+    "pending-data-example": "0.1.0",
+    "reconfigure-filter-example": "0.1.0",
+    "simple-client-example": "0.1.0",
+    "@apibara/protocol": "0.3.0",
+    "@apibara/starknet": "0.1.1"
+  },
+  "changesets": []
+}
