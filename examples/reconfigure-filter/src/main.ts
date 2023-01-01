@@ -1,4 +1,4 @@
-import { StreamClient, ChannelCredentials, v1alpha2 } from '@apibara/protocol'
+import { StreamClient, v1alpha2 } from '@apibara/protocol'
 import { Filter, FieldElement, v1alpha2 as starknet } from '@apibara/starknet'
 import { hash } from 'starknet'
 
@@ -75,8 +75,7 @@ async function main() {
   const filter = baseFilter().encode()
 
   const client = new StreamClient({
-    url: 'localhost:7171',
-    credentials: ChannelCredentials.createInsecure(),
+    url: 'mainnet.starknet.a5a.ch',
   }).connect()
 
   // force use of batches with size 1 so that reconfiguring doesn't skip any block
