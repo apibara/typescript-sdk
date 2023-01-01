@@ -8,5 +8,8 @@
     "@apibara/protocol": "0.3.0",
     "@apibara/starknet": "0.1.1"
   },
-  "changesets": []
+  "changesets": [
+    "gorgeous-shirts-drop",
+    "many-glasses-stare"
+  ]
 }
