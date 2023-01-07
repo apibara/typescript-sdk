@@ -1,5 +1,5 @@
 import Decimal from 'decimal.js'
-import { StreamClient, ChannelCredentials, v1alpha2 } from '@apibara/protocol'
+import { StreamClient, ChannelCredentials, Cursor, v1alpha2 } from '@apibara/protocol'
 import { Filter, FieldElement, v1alpha2 as starknet } from '@apibara/starknet'
 import { hash } from 'starknet'
 
@@ -40,6 +40,7 @@ async function main() {
   // - events: all transfer events from the eth contract
   // - state update: all storage diffs from the eth contract
   const filter = Filter.create()
+    .withHeader()
     .addEvent((ev) => ev.withFromAddress(address).withKeys(transfer_key))
     .withStateUpdate((su) => su.addStorageDiff((st) => st.withContractAddress(address)))
     .encode()
@@ -49,12 +50,19 @@ async function main() {
     credentials: ChannelCredentials.createInsecure(),
   }).connect()
 
-  client.configure({ filter, batchSize: 10, finality: v1alpha2.DataFinality.DATA_STATUS_FINALIZED })
+  client.configure({
+    filter,
+    batchSize: 10,
+    finality: v1alpha2.DataFinality.DATA_STATUS_FINALIZED,
+    cursor: Cursor.createWithOrderKey(40_000),
+  })
 
   for await (const message of client) {
     if (message.data?.data) {
       for (let item of message.data.data) {
         const block = starknet.Block.decode(item)
+        const blockNumber = block.header?.blockNumber
+        console.log('number = ', blockNumber?.toString())
 
         // we will use direct storage access to compute the users' new
         // balances without making an (expensive) RPC call.
