@@ -10,9 +10,11 @@
     "@apibara/protocol": "workspace:*",
     "@apibara/starknet": "workspace:*",
     "decimal.js": "^10.4.3",
+    "long": "^5.2.1",
     "starknet": "^4.17.1"
   },
   "devDependencies": {
+    "@types/long": "^5.0.0",
     "@types/node": "^18.11.9"
   },
   "version": "0.1.0"
