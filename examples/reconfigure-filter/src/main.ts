@@ -76,7 +76,7 @@ async function main() {
 
   const client = new StreamClient({
     url: 'mainnet.starknet.a5a.ch',
-  }).connect()
+  })
 
   // force use of batches with size 1 so that reconfiguring doesn't skip any block
   client.configure({ filter, batchSize: 1, finality: v1alpha2.DataFinality.DATA_STATUS_FINALIZED })

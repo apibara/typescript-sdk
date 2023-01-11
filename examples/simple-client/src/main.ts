@@ -47,7 +47,7 @@ async function main() {
 
   const client = new StreamClient({
     url: 'mainnet.starknet.a5a.ch',
-  }).connect()
+  })
 
   // Starting block. Here we specify the block hash but it's not
   // necessary since the block has been finalized.
