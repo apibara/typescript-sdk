@@ -1,6 +1,6 @@
 import Decimal from 'decimal.js'
-import { StreamClient, ChannelCredentials, Cursor, v1alpha2 } from '@apibara/protocol'
-import { Filter, FieldElement, v1alpha2 as starknet } from '@apibara/starknet'
+import { StreamClient, Cursor, v1alpha2 } from '@apibara/protocol'
+import { StarkNetCursor, Filter, FieldElement, v1alpha2 as starknet } from '@apibara/starknet'
 import { hash } from 'starknet'
 
 const ETH_DECIMALS = 18
@@ -46,23 +46,32 @@ async function main() {
     .encode()
 
   const client = new StreamClient({
-    url: 'localhost:7171',
-    credentials: ChannelCredentials.createInsecure(),
+    url: 'mainnet.starknet.a5a.ch',
   }).connect()
+
+  // Starting block. Here we specify the block hash but it's not
+  // necessary since the block has been finalized.
+  const cursor = StarkNetCursor.createWithBlockNumberAndHash(
+    1045,
+    FieldElement.fromBigInt('0x0692649d9ed2b866d241f4fb573be91882c88d09fbcbc3c2377e9f74c43f34dd')
+  )
 
   client.configure({
     filter,
     batchSize: 10,
     finality: v1alpha2.DataFinality.DATA_STATUS_FINALIZED,
-    cursor: Cursor.createWithOrderKey(40_000),
+    cursor,
   })
 
   for await (const message of client) {
     if (message.data?.data) {
+      console.log(
+        `Batch: ${Cursor.toString(message.data.cursor)} -- ${Cursor.toString(
+          message.data.endCursor
+        )}`
+      )
       for (let item of message.data.data) {
         const block = starknet.Block.decode(item)
-        const blockNumber = block.header?.blockNumber
-        console.log('number = ', blockNumber?.toString())
 
         // we will use direct storage access to compute the users' new
         // balances without making an (expensive) RPC call.
