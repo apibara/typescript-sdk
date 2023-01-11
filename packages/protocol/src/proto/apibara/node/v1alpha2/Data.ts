@@ -10,10 +10,12 @@ export interface Data {
   endCursor?: _apibara_node_v1alpha2_Cursor | null
   finality?: _apibara_node_v1alpha2_DataFinality | keyof typeof _apibara_node_v1alpha2_DataFinality
   data?: (Buffer | Uint8Array | string)[]
+  cursor?: _apibara_node_v1alpha2_Cursor | null
 }
 
 export interface Data__Output {
   endCursor: _apibara_node_v1alpha2_Cursor__Output | null
   finality: keyof typeof _apibara_node_v1alpha2_DataFinality
   data: Uint8Array[]
+  cursor: _apibara_node_v1alpha2_Cursor__Output | null
 }

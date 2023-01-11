@@ -51,7 +51,7 @@ export const FieldElement = {
    */
   toHex(message: v1alpha2.IFieldElement): string {
     const num = this.toBigInt(message)
-    return `0x${num.toString(16)}`
+    return `0x${num.toString(16).padStart(64, '0')}`
   },
 }
 

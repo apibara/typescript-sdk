@@ -27,4 +27,13 @@ export const Cursor = {
       uniqueKey: unique,
     }
   },
+
+  /**
+   * Returns the cursor string representation.
+   */
+  toString: (cursor?: ICursor | null): string | undefined => {
+    if (!cursor) return
+    let hash = Buffer.from(cursor.uniqueKey).toString('hex')
+    return `${cursor.orderKey.toString()}/0x${hash}`
+  },
 }
