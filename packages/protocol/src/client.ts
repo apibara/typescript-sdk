@@ -12,28 +12,77 @@ export type DataStream = ClientDuplexStream<
 >
 
 export type ConfigureArgs = {
+  /**
+   * Stream filter, encoded.
+   */
   filter: Uint8Array
+
+  /**
+   * How much data in a single message.
+   */
   batchSize?: number
+
+  /**
+   * Starting cursor. This cursor is stream-specific.
+   */
   cursor?: v1alpha2.ICursor | null
+
+  /**
+   * Data finality, e.g. finalized or accepted.
+   */
   finality?: v1alpha2.DataFinality | null
 }
 
+/**
+ * Reconnect callback return value.
+ */
 export type OnReconnectResult = {
+  /**
+   * If `true`, reconnects to the stream.
+   */
   reconnect: boolean
+
+  /**
+   * Stream configuration used when reconnecting.
+   *
+   * By default, the client uses the last configuration passed to
+   * `configure` and updates the `cursor` with the most recent one.
+   */
   args?: ConfigureArgs
 }
 
+/**
+ * Reconnect callback.
+ */
 export type OnReconnect = (
   err: StatusObject,
   retryCount: number
 ) => Promise<OnReconnectResult> | OnReconnectResult
 
 export type StreamClientArgs = {
+  /**
+   * The stream url.
+   */
   url: string
+
+  /**
+   * Grpc credentials.
+   *
+   * Use `ChannelCredentials.createInsecure()` to disable SSL.
+   */
   credentials?: ChannelCredentials
+
+  /**
+   * Callback to control reconnection after receiving an error from the stream.
+   *
+   * By default uses `defaultOnReconnect`, which only reconnects on internal grpc errors.
+   */
   onReconnect?: OnReconnect
 }
 
+/**
+ * A client to configure and stream data.
+ */
 export class StreamClient {
   private readonly inner: v1alpha2.StreamClient
 
@@ -42,6 +91,25 @@ export class StreamClient {
   private onReconnect: OnReconnect
   private configuration?: ConfigureArgs
 
+  /**
+   * Create a new `StreamClient`.
+   *
+   * Notice that the stream is not connected until you start iterating over it.
+   * The stream should be used as an _async iterator_.
+   *
+   * @example
+   * ```ts
+   * import { StreamClient } from '@apibara/protocol'
+   *
+   * const client = new StreamClient({ url })
+   *
+   * client.configure({ filter, cursor })
+   *
+   * for await (const message of client) {
+   *   // use message
+   * }
+   * ```
+   */
   constructor({ url, credentials, onReconnect }: StreamClientArgs) {
     this.inner = new StreamService(url, credentials ?? ChannelCredentials.createSsl(), {
       'grpc.keepalive_timeout_ms': 3_600_000,
