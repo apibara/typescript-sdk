@@ -16,16 +16,16 @@ import type { Long } from '@grpc/proto-loader'
 
 export interface StreamDataResponse {
   streamId?: number | string | Long
-  Invalidate?: _apibara_node_v1alpha2_Invalidate | null
+  invalidate?: _apibara_node_v1alpha2_Invalidate | null
   data?: _apibara_node_v1alpha2_Data | null
   heartbeat?: _apibara_node_v1alpha2_Heartbeat | null
-  message?: 'Invalidate' | 'data' | 'heartbeat'
+  message?: 'invalidate' | 'data' | 'heartbeat'
 }
 
 export interface StreamDataResponse__Output {
   streamId: Long
-  Invalidate?: _apibara_node_v1alpha2_Invalidate__Output | null
+  invalidate?: _apibara_node_v1alpha2_Invalidate__Output | null
   data?: _apibara_node_v1alpha2_Data__Output | null
   heartbeat?: _apibara_node_v1alpha2_Heartbeat__Output | null
-  message: 'Invalidate' | 'data' | 'heartbeat'
+  message: 'invalidate' | 'data' | 'heartbeat'
 }
