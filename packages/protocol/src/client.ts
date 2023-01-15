@@ -1,4 +1,4 @@
-import { ChannelCredentials, ClientDuplexStream, StatusObject } from '@grpc/grpc-js'
+import { ChannelCredentials, ClientDuplexStream, ClientOptions, StatusObject } from '@grpc/grpc-js'
 import { v1alpha2 } from './proto'
 import { StreamDataRequest } from './request'
 
@@ -73,6 +73,10 @@ export type StreamClientArgs = {
   credentials?: ChannelCredentials
 
   /**
+   * Grpc client options.
+   */
+  clientOptions?: ClientOptions
+  /**
    * Callback to control reconnection after receiving an error from the stream.
    *
    * By default uses `defaultOnReconnect`, which only reconnects on internal grpc errors.
@@ -110,9 +114,10 @@ export class StreamClient {
    * }
    * ```
    */
-  constructor({ url, credentials, onReconnect }: StreamClientArgs) {
+  constructor({ url, credentials, clientOptions, onReconnect }: StreamClientArgs) {
     this.inner = new StreamService(url, credentials ?? ChannelCredentials.createSsl(), {
       'grpc.keepalive_timeout_ms': 3_600_000,
+      ...clientOptions,
     })
     this.stream_id = 0
     this.onReconnect = onReconnect ?? defaultOnReconnect
