@@ -1,5 +1,11 @@
 # @apibara/protocol
 
+## 0.4.0-next.1
+
+### Patch Changes
+
+- [#13](https://github.com/apibara/typescript-sdk/pull/13) [`ef58eb0`](https://github.com/apibara/typescript-sdk/commit/ef58eb0c9132c0c41d2c74acfb896c5fdd5b9ecc) Thanks [@fracek](https://github.com/fracek)! - Add helper to create cursors
+
 ## 0.4.0-next.0
 
 ### Minor Changes
