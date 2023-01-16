@@ -47,6 +47,9 @@ async function main() {
 
   const client = new StreamClient({
     url: 'mainnet.starknet.a5a.ch',
+    clientOptions: {
+      'grpc.max_receive_message_length': 128 * 1_048_576, // 128 MiB
+    },
   })
 
   // Starting block. Here we specify the block hash but it's not
