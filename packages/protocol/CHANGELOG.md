@@ -1,5 +1,17 @@
 # @apibara/protocol
 
+## 0.4.0
+
+### Minor Changes
+
+- [#13](https://github.com/apibara/typescript-sdk/pull/13) [`0a1a959`](https://github.com/apibara/typescript-sdk/commit/0a1a9599a482520b426b0026d3a98f08cbdbb51f) Thanks [@fracek](https://github.com/fracek)! - Implement v1alpha2 protocol
+
+### Patch Changes
+
+- [#17](https://github.com/apibara/typescript-sdk/pull/17) [`ec2dc90`](https://github.com/apibara/typescript-sdk/commit/ec2dc90a548e07bc6afd20662fec5109fdc80d65) Thanks [@fracek](https://github.com/fracek)! - Support protocolo v1alpha2
+
+- [#13](https://github.com/apibara/typescript-sdk/pull/13) [`ef58eb0`](https://github.com/apibara/typescript-sdk/commit/ef58eb0c9132c0c41d2c74acfb896c5fdd5b9ecc) Thanks [@fracek](https://github.com/fracek)! - Add helper to create cursors
+
 ## 0.4.0-next.1
 
 ### Patch Changes

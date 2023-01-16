@@ -1,5 +1,15 @@
 # @apibara/starknet
 
+## 0.2.0
+
+### Minor Changes
+
+- [#13](https://github.com/apibara/typescript-sdk/pull/13) [`0a1a959`](https://github.com/apibara/typescript-sdk/commit/0a1a9599a482520b426b0026d3a98f08cbdbb51f) Thanks [@fracek](https://github.com/fracek)! - Update types based on v1alpha2 protocol
+
+### Patch Changes
+
+- [#17](https://github.com/apibara/typescript-sdk/pull/17) [`ec2dc90`](https://github.com/apibara/typescript-sdk/commit/ec2dc90a548e07bc6afd20662fec5109fdc80d65) Thanks [@fracek](https://github.com/fracek)! - Support protoclo v1alpha2
+
 ## 0.2.0-next.0
 
 ### Minor Changes
