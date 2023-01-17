@@ -33,7 +33,7 @@ async function main() {
     '0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7'
   )
 
-  const transfer_key = [FieldElement.fromBigInt(hash.getSelectorFromName('Transfer'))]
+  const transferKey = [FieldElement.fromBigInt(hash.getSelectorFromName('Transfer'))]
 
   // Create stream filter. The client will only receive the specified data.
   //
@@ -41,7 +41,7 @@ async function main() {
   // - state update: all storage diffs from the eth contract
   const filter = Filter.create()
     .withHeader()
-    .addEvent((ev) => ev.withFromAddress(address).withKeys(transfer_key))
+    .addEvent((ev) => ev.withFromAddress(address).withKeys(transferKey))
     .withStateUpdate((su) => su.addStorageDiff((st) => st.withContractAddress(address)))
     .encode()
 
@@ -56,7 +56,7 @@ async function main() {
   // necessary since the block has been finalized.
   const cursor = StarkNetCursor.createWithBlockNumberAndHash(
     1045,
-    FieldElement.fromBigInt('0x0692649d9ed2b866d241f4fb573be91882c88d09fbcbc3c2377e9f74c43f34dd')
+    FieldElement.fromBigInt('0x054992c2af0498bb3adb1d45d01388eb68778a5a24abbd98acc61a0ff5609503')
   )
 
   client.configure({
