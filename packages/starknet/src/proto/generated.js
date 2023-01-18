@@ -413,6 +413,7 @@ $root.apibara = (function() {
                  * Properties of a HeaderFilter.
                  * @memberof apibara.starknet.v1alpha2
                  * @interface IHeaderFilter
+                 * @property {boolean|null} [weak] HeaderFilter weak
                  */
 
                 /**
@@ -429,6 +430,14 @@ $root.apibara = (function() {
                             if (properties[keys[i]] != null)
                                 this[keys[i]] = properties[keys[i]];
                 }
+
+                /**
+                 * HeaderFilter weak.
+                 * @member {boolean} weak
+                 * @memberof apibara.starknet.v1alpha2.HeaderFilter
+                 * @instance
+                 */
+                HeaderFilter.prototype.weak = false;
 
                 /**
                  * Creates a new HeaderFilter instance using the specified properties.
@@ -454,6 +463,8 @@ $root.apibara = (function() {
                 HeaderFilter.encode = function encode(message, writer) {
                     if (!writer)
                         writer = $Writer.create();
+                    if (message.weak != null && Object.hasOwnProperty.call(message, "weak"))
+                        writer.uint32(/* id 1, wireType 0 =*/8).bool(message.weak);
                     return writer;
                 };
 
@@ -488,6 +499,10 @@ $root.apibara = (function() {
                     while (reader.pos < end) {
                         var tag = reader.uint32();
                         switch (tag >>> 3) {
+                        case 1: {
+                                message.weak = reader.bool();
+                                break;
+                            }
                         default:
                             reader.skipType(tag & 7);
                             break;
@@ -523,6 +538,9 @@ $root.apibara = (function() {
                 HeaderFilter.verify = function verify(message) {
                     if (typeof message !== "object" || message === null)
                         return "object expected";
+                    if (message.weak != null && message.hasOwnProperty("weak"))
+                        if (typeof message.weak !== "boolean")
+                            return "weak: boolean expected";
                     return null;
                 };
 
@@ -537,7 +555,10 @@ $root.apibara = (function() {
                 HeaderFilter.fromObject = function fromObject(object) {
                     if (object instanceof $root.apibara.starknet.v1alpha2.HeaderFilter)
                         return object;
-                    return new $root.apibara.starknet.v1alpha2.HeaderFilter();
+                    var message = new $root.apibara.starknet.v1alpha2.HeaderFilter();
+                    if (object.weak != null)
+                        message.weak = Boolean(object.weak);
+                    return message;
                 };
 
                 /**
@@ -549,8 +570,15 @@ $root.apibara = (function() {
                  * @param {$protobuf.IConversionOptions} [options] Conversion options
                  * @returns {Object.<string,*>} Plain object
                  */
-                HeaderFilter.toObject = function toObject() {
-                    return {};
+                HeaderFilter.toObject = function toObject(message, options) {
+                    if (!options)
+                        options = {};
+                    var object = {};
+                    if (options.defaults)
+                        object.weak = false;
+                    if (message.weak != null && message.hasOwnProperty("weak"))
+                        object.weak = message.weak;
+                    return object;
                 };
 
                 /**

@@ -30,17 +30,19 @@ async function main() {
 
   // Encode address to the wire format.
   const address = FieldElement.fromBigInt(
-    '0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7'
+    // '0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7'
+    '0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc8'
   )
 
   const transferKey = [FieldElement.fromBigInt(hash.getSelectorFromName('Transfer'))]
 
   // Create stream filter. The client will only receive the specified data.
   //
+  // - header: included only if any other filter matches (`weak: true`)
   // - events: all transfer events from the eth contract
   // - state update: all storage diffs from the eth contract
   const filter = Filter.create()
-    .withHeader()
+    .withHeader({ weak: true })
     .addEvent((ev) => ev.withFromAddress(address).withKeys(transferKey))
     .withStateUpdate((su) => su.addStorageDiff((st) => st.withContractAddress(address)))
     .encode()
