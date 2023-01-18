@@ -132,6 +132,9 @@ export namespace apibara {
 
             /** Properties of a HeaderFilter. */
             interface IHeaderFilter {
+
+                /** HeaderFilter weak */
+                weak?: (boolean|null);
             }
 
             /** Represents a HeaderFilter. */
@@ -142,6 +145,9 @@ export namespace apibara {
                  * @param [properties] Properties to set
                  */
                 constructor(properties?: apibara.starknet.v1alpha2.IHeaderFilter);
+
+                /** HeaderFilter weak. */
+                public weak: boolean;
 
                 /**
                  * Creates a new HeaderFilter instance using the specified properties.

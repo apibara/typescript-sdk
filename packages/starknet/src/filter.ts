@@ -39,9 +39,13 @@ export class FilterBuilder {
 
   /**
    * Include header in the returned data.
+   *
+   * If the `weak` flag is set, the block header will be included only if any
+   * other filter matches.
    */
-  withHeader() {
-    this.inner.header = {}
+  withHeader(args?: { weak?: boolean }) {
+    const { weak } = args ?? {}
+    this.inner.header = { weak }
     return this
   }
 
