@@ -178,7 +178,7 @@ export class StreamClient {
         const { reconnect, args } = await Promise.resolve(this.onReconnect(err, retryCount))
         retryCount += 1
         if (!reconnect) {
-          break
+          throw err
         }
 
         this.connect()
