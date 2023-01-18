@@ -1,5 +1,11 @@
 # @apibara/protocol
 
+## 0.4.1
+
+### Patch Changes
+
+- [#20](https://github.com/apibara/typescript-sdk/pull/20) [`9a58f52`](https://github.com/apibara/typescript-sdk/commit/9a58f5223fad6ccb067dcb7303d7f5f559a1b9b5) Thanks [@fracek](https://github.com/fracek)! - Rethrow error if not reconnecting
+
 ## 0.4.0
 
 ### Minor Changes

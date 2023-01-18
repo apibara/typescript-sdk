@@ -1,5 +1,11 @@
 # @apibara/starknet
 
+## 0.2.1
+
+### Patch Changes
+
+- [#20](https://github.com/apibara/typescript-sdk/pull/20) [`99d0d32`](https://github.com/apibara/typescript-sdk/commit/99d0d3234d1d7940967932a7dc838128ee9f024d) Thanks [@fracek](https://github.com/fracek)! - Include weak header flag
+
 ## 0.2.0
 
 ### Minor Changes
