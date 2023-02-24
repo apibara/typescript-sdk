@@ -1,4 +1,12 @@
-import { ChannelCredentials, ClientDuplexStream, ClientOptions, StatusObject } from '@grpc/grpc-js'
+import {
+  CallCredentials,
+  ChannelCredentials,
+  ClientDuplexStream,
+  ClientOptions,
+  Metadata,
+  StatusObject,
+} from '@grpc/grpc-js'
+import { CallMetadataGenerator } from '@grpc/grpc-js/build/src/call-credentials'
 import { v1alpha2 } from './proto'
 import { StreamDataRequest } from './request'
 
@@ -76,6 +84,11 @@ export type StreamClientArgs = {
    * Grpc client options.
    */
   clientOptions?: ClientOptions
+
+  /**
+   * Authorization bearer token, used to authenticate with the server.
+   */
+  token?: string
   /**
    * Callback to control reconnection after receiving an error from the stream.
    *
@@ -114,8 +127,12 @@ export class StreamClient {
    * }
    * ```
    */
-  constructor({ url, credentials, clientOptions, onReconnect }: StreamClientArgs) {
-    this.inner = new StreamService(url, credentials ?? ChannelCredentials.createSsl(), {
+  constructor({ url, credentials, clientOptions, token, onReconnect }: StreamClientArgs) {
+    const baseCredentials = credentials ?? ChannelCredentials.createSsl()
+    const credentialsWithMetadata = baseCredentials.compose(
+      CallCredentials.createFromMetadataGenerator(createMetadataGenerator(token))
+    )
+    this.inner = new StreamService(url, credentialsWithMetadata, {
       'grpc.keepalive_timeout_ms': 3_600_000,
       ...clientOptions,
     })
@@ -267,5 +284,19 @@ export async function defaultOnReconnect(
   await new Promise((resolve) => setTimeout(resolve, retryCount * 1000))
   return {
     reconnect: retryCount < 5,
+  }
+}
+
+/*
+ * Returns a generator that adds the given `token` to request metadata.
+ */
+function createMetadataGenerator(token?: string): CallMetadataGenerator {
+  const metadata = new Metadata()
+  if (token) {
+    metadata.add('authorization', `bearer ${token}`)
+  }
+
+  return (_options, cb) => {
+    cb(null, metadata)
   }
 }

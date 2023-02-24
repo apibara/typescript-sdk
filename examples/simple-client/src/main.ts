@@ -3,6 +3,9 @@ import { StreamClient, Cursor, v1alpha2 } from '@apibara/protocol'
 import { StarkNetCursor, Filter, FieldElement, v1alpha2 as starknet } from '@apibara/starknet'
 import { hash } from 'starknet'
 
+// Grab Apibara DNA token from environment, if any.
+const AUTH_TOKEN = process.env.AUTH_TOKEN
+
 const ETH_DECIMALS = 18
 
 function toDecimalAmount(amount: bigint): Decimal {
@@ -48,6 +51,7 @@ async function main() {
 
   const client = new StreamClient({
     url: 'mainnet.starknet.a5a.ch',
+    token: AUTH_TOKEN,
     clientOptions: {
       'grpc.max_receive_message_length': 128 * 1_048_576, // 128 MiB
     },
