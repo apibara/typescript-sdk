@@ -19,9 +19,6 @@
     "simple-client-example#build": {
       "dependsOn": ["@apibara/protocol#build", "@apibara/starknet#build"]
     },
-    "pending-data-example#build": {
-      "dependsOn": ["@apibara/protocol#build", "@apibara/starknet#build"]
-    },
     "reconfigure-filter-example#build": {
       "dependsOn": ["@apibara/protocol#build", "@apibara/starknet#build"]
     },

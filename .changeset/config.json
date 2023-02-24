@@ -7,5 +7,5 @@
   "access": "public",
   "baseBranch": "main",
   "updateInternalDependencies": "patch",
-  "ignore": ["pending-data-example", "simple-client-example", "reconfigure-filter-example"]
+  "ignore": ["simple-client-example", "reconfigure-filter-example"]
 }
