@@ -2,6 +2,9 @@ import { StreamClient, v1alpha2 } from '@apibara/protocol'
 import { Filter, FieldElement, v1alpha2 as starknet } from '@apibara/starknet'
 import { hash } from 'starknet'
 
+// Grab Apibara DNA token from environment, if any.
+const AUTH_TOKEN = process.env.AUTH_TOKEN
+
 const FACTORY_ADDR = FieldElement.fromBigInt(
   '0x00dad44c139a476c7a17fc8141e6db680e9abc9f56fe249a105094c44382c2fd'
 )
@@ -76,6 +79,10 @@ async function main() {
 
   const client = new StreamClient({
     url: 'mainnet.starknet.a5a.ch',
+    token: AUTH_TOKEN,
+    clientOptions: {
+      'grpc.max_receive_message_length': 128 * 1_048_576, // 128 MiB
+    },
   })
 
   // force use of batches with size 1 so that reconfiguring doesn't skip any block
