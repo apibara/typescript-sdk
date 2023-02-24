@@ -1,5 +1,11 @@
 # @apibara/protocol
 
+## 0.4.2
+
+### Patch Changes
+
+- [#23](https://github.com/apibara/typescript-sdk/pull/23) [`056c9db`](https://github.com/apibara/typescript-sdk/commit/056c9db21a3bf9b0842f3cf19ff175b38d9eb69b) Thanks [@fracek](https://github.com/fracek)! - Add option to send auth token
+
 ## 0.4.1
 
 ### Patch Changes
