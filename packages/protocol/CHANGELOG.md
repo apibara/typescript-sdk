@@ -1,5 +1,11 @@
 # @apibara/protocol
 
+## 0.4.3
+
+### Patch Changes
+
+- [#25](https://github.com/apibara/typescript-sdk/pull/25) [`51c3c9c`](https://github.com/apibara/typescript-sdk/commit/51c3c9cc19a33b4018c192ddfde905e90921598c) Thanks [@fracek](https://github.com/fracek)! - Handle client-server connection hanging
+
 ## 0.4.2
 
 ### Patch Changes
