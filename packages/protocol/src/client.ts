@@ -14,6 +14,9 @@ export { ChannelCredentials, StatusObject } from '@grpc/grpc-js'
 
 const StreamService = v1alpha2.protoDescriptor.apibara.node.v1alpha2.Stream
 
+// Server produces an heartbeat every 30 seconds, so we use 45 seconds as a timeout.
+const MESSAGE_TIMEOUT_MS = 45_000
+
 export type DataStream = ClientDuplexStream<
   v1alpha2.IStreamDataRequest,
   v1alpha2.IStreamDataResponse
@@ -157,14 +160,27 @@ export class StreamClient {
     while (true) {
       let retryCount = 1
       let cursor = null
+      let clock
       try {
         // this check is to make ts happy
         if (!this.stream) {
           throw new Error('Stream disconnected unexpectedly')
         }
 
-        for await (const message of this.stream) {
-          const messageTyped = message as v1alpha2.IStreamDataResponse
+        const streamIter = this.stream[Symbol.asyncIterator]()
+        while (true) {
+          const timeout = new Promise((_, reject) => {
+            clock = setTimeout(() => {
+              reject(new Error('Stream timed out'))
+            }, MESSAGE_TIMEOUT_MS)
+          })
+
+          const message = <IteratorResult<v1alpha2.IStreamDataResponse>>(
+            await Promise.race([streamIter.next(), timeout])
+          )
+          const messageTyped = message.value as v1alpha2.IStreamDataResponse
+
+          clearTimeout(clock)
 
           // only return messages if they are with the most recently configured stream
           if (messageTyped.streamId?.toString() == this.stream_id.toString()) {
@@ -182,6 +198,8 @@ export class StreamClient {
           }
         }
       } catch (err: any) {
+        clearTimeout(clock)
+
         const isGrpcError =
           err.hasOwnProperty('code') &&
           err.hasOwnProperty('details') &&
