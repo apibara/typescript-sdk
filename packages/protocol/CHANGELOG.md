@@ -1,5 +1,11 @@
 # @apibara/protocol
 
+## 0.4.4
+
+### Patch Changes
+
+- [#27](https://github.com/apibara/typescript-sdk/pull/27) [`e083d82`](https://github.com/apibara/typescript-sdk/commit/e083d824ad2f8885492b4b181c728ee2190c7373) Thanks [@fracek](https://github.com/fracek)! - Allow to connect to insecure endpoint
+
 ## 0.4.3
 
 ### Patch Changes
