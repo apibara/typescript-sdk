@@ -77,7 +77,7 @@ export type StreamClientArgs = {
   url: string
 
   /**
-   * Grpc credentials.
+   * Override Grpc credentials.
    *
    * Use `ChannelCredentials.createInsecure()` to disable SSL.
    */
@@ -131,10 +131,12 @@ export class StreamClient {
    * ```
    */
   constructor({ url, credentials, clientOptions, token, onReconnect }: StreamClientArgs) {
-    const baseCredentials = credentials ?? ChannelCredentials.createSsl()
-    const credentialsWithMetadata = baseCredentials.compose(
-      CallCredentials.createFromMetadataGenerator(createMetadataGenerator(token))
-    )
+    const credentialsWithMetadata =
+      credentials ??
+      ChannelCredentials.createSsl().compose(
+        CallCredentials.createFromMetadataGenerator(createMetadataGenerator(token))
+      )
+
     this.inner = new StreamService(url, credentialsWithMetadata, {
       'grpc.keepalive_timeout_ms': 3_600_000,
       ...clientOptions,
