@@ -10,6 +10,12 @@
     "@apibara/protocol#build": {
       "dependsOn": ["@apibara/protocol#prebuild"]
     },
+    "@apibara/ethereum#prebuild": {
+      "dependsOn": []
+    },
+    "@apibara/ethereum#build": {
+      "dependsOn": ["@apibara/ethereum#prebuild"]
+    },
     "@apibara/starknet#prebuild": {
       "dependsOn": []
     },
@@ -18,6 +24,9 @@
     },
     "simple-client-example#build": {
       "dependsOn": ["@apibara/protocol#build", "@apibara/starknet#build"]
+    },
+    "ethereum-client-example#build": {
+      "dependsOn": ["@apibara/protocol#build", "@apibara/ethereum#build"]
     },
     "reconfigure-filter-example#build": {
       "dependsOn": ["@apibara/protocol#build", "@apibara/starknet#build"]

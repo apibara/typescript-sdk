@@ -1,0 +1,12 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "outDir": "dist",
+    "declarationDir": "dist",
+    "noEmit": false,
+    "allowJs": true,
+    "rootDir": "src",
+    "types": ["jest", "node"]
+  },
+  "include": ["src/"]
+}

@@ -53,5 +53,12 @@
   "eslintIgnore": [
     "node_modules",
     "dist"
-  ]
+  ],
+  "dependencies": {
+    "@wagmi/chains": "^0.2.18",
+    "abitype": "^0.7.1",
+    "ethereum-client-example": "workspace:^0.1.0",
+    "viem": "^0.2.12",
+    "view": "^1.1.1"
+  }
 }
