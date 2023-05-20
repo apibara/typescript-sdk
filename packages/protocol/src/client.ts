@@ -131,11 +131,14 @@ export class StreamClient {
    * ```
    */
   constructor({ url, credentials, clientOptions, token, onReconnect }: StreamClientArgs) {
-    const credentialsWithMetadata =
-      credentials ??
-      ChannelCredentials.createSsl().compose(
-        CallCredentials.createFromMetadataGenerator(createMetadataGenerator(token))
-      )
+    const baseCredentials = credentials ?? ChannelCredentials.createSsl()
+
+    // only secure credentials can be composed with metadata generators.
+    const credentialsWithMetadata = baseCredentials._isSecure()
+      ? baseCredentials.compose(
+          CallCredentials.createFromMetadataGenerator(createMetadataGenerator(token))
+        )
+      : baseCredentials
 
     this.inner = new StreamService(url, credentialsWithMetadata, {
       'grpc.keepalive_timeout_ms': 3_600_000,
