@@ -1,5 +1,11 @@
 # @apibara/protocol
 
+## 0.4.5
+
+### Patch Changes
+
+- [#31](https://github.com/apibara/typescript-sdk/pull/31) [`936c3c3`](https://github.com/apibara/typescript-sdk/commit/936c3c3a4a5ba2e85a37a1316ed29c2ad58bb4cf) Thanks [@fracek](https://github.com/fracek)! - Add auth token to all secure credentials
+
 ## 0.4.4
 
 ### Patch Changes
