@@ -92,12 +92,20 @@ export type StreamClientArgs = {
    * Authorization bearer token, used to authenticate with the server.
    */
   token?: string
+
   /**
    * Callback to control reconnection after receiving an error from the stream.
    *
    * By default uses `defaultOnReconnect`, which only reconnects on internal grpc errors.
    */
   onReconnect?: OnReconnect
+
+  /**
+   * Maximum time to wait for a message before timing out, in milliseconds.
+   *
+   * Defaults to 45 seconds.
+   */
+  timeout?: number
 }
 
 /**
@@ -110,6 +118,7 @@ export class StreamClient {
   private stream_id: number
   private onReconnect: OnReconnect
   private configuration?: ConfigureArgs
+  private timeout: number
 
   /**
    * Create a new `StreamClient`.
@@ -130,7 +139,7 @@ export class StreamClient {
    * }
    * ```
    */
-  constructor({ url, credentials, clientOptions, token, onReconnect }: StreamClientArgs) {
+  constructor({ url, credentials, clientOptions, token, onReconnect, timeout }: StreamClientArgs) {
     const baseCredentials = credentials ?? ChannelCredentials.createSsl()
 
     // only secure credentials can be composed with metadata generators.
@@ -146,6 +155,7 @@ export class StreamClient {
     })
     this.stream_id = 0
     this.onReconnect = onReconnect ?? defaultOnReconnect
+    this.timeout = timeout ?? MESSAGE_TIMEOUT_MS
   }
 
   /**
@@ -177,7 +187,7 @@ export class StreamClient {
           const timeout = new Promise((_, reject) => {
             clock = setTimeout(() => {
               reject(new Error('Stream timed out'))
-            }, MESSAGE_TIMEOUT_MS)
+            }, this.timeout)
           })
 
           const message = <IteratorResult<v1alpha2.IStreamDataResponse>>(
