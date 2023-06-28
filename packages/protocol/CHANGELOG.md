@@ -1,5 +1,11 @@
 # @apibara/protocol
 
+## 0.4.6
+
+### Patch Changes
+
+- [#33](https://github.com/apibara/typescript-sdk/pull/33) [`3c13249`](https://github.com/apibara/typescript-sdk/commit/3c132497743cd541805cf14a822e6cd54dc82c59) Thanks [@fracek](https://github.com/fracek)! - Add message timeout option
+
 ## 0.4.5
 
 ### Patch Changes
