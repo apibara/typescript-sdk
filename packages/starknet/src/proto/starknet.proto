@@ -4,7 +4,7 @@ syntax = "proto3";
 package apibara.starknet.v1alpha2;
 
 import "google/protobuf/timestamp.proto";
-import "v1alpha2/types.proto";
+import "types.proto";
 
 // A StarkNet block.
 message Block {

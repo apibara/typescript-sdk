@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package apibara.starknet.v1alpha2;
 
-import "v1alpha2/types.proto";
+import "types.proto";
 
 // Filter describing what data to return for each block.
 message Filter {
