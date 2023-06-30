@@ -3191,6 +3191,8 @@ $root.apibara = (function() {
                  * @property {Array.<apibara.starknet.v1alpha2.IDeclaredContractFilter>|null} [declaredContracts] StateUpdateFilter declaredContracts
                  * @property {Array.<apibara.starknet.v1alpha2.IDeployedContractFilter>|null} [deployedContracts] StateUpdateFilter deployedContracts
                  * @property {Array.<apibara.starknet.v1alpha2.INonceUpdateFilter>|null} [nonces] StateUpdateFilter nonces
+                 * @property {Array.<apibara.starknet.v1alpha2.IDeclaredClassFilter>|null} [declaredClasses] StateUpdateFilter declaredClasses
+                 * @property {Array.<apibara.starknet.v1alpha2.IReplacedClassFilter>|null} [replacedClasses] StateUpdateFilter replacedClasses
                  */
 
                 /**
@@ -3206,6 +3208,8 @@ $root.apibara = (function() {
                     this.declaredContracts = [];
                     this.deployedContracts = [];
                     this.nonces = [];
+                    this.declaredClasses = [];
+                    this.replacedClasses = [];
                     if (properties)
                         for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                             if (properties[keys[i]] != null)
@@ -3245,6 +3249,22 @@ $root.apibara = (function() {
                 StateUpdateFilter.prototype.nonces = $util.emptyArray;
 
                 /**
+                 * StateUpdateFilter declaredClasses.
+                 * @member {Array.<apibara.starknet.v1alpha2.IDeclaredClassFilter>} declaredClasses
+                 * @memberof apibara.starknet.v1alpha2.StateUpdateFilter
+                 * @instance
+                 */
+                StateUpdateFilter.prototype.declaredClasses = $util.emptyArray;
+
+                /**
+                 * StateUpdateFilter replacedClasses.
+                 * @member {Array.<apibara.starknet.v1alpha2.IReplacedClassFilter>} replacedClasses
+                 * @memberof apibara.starknet.v1alpha2.StateUpdateFilter
+                 * @instance
+                 */
+                StateUpdateFilter.prototype.replacedClasses = $util.emptyArray;
+
+                /**
                  * Creates a new StateUpdateFilter instance using the specified properties.
                  * @function create
                  * @memberof apibara.starknet.v1alpha2.StateUpdateFilter
@@ -3280,6 +3300,12 @@ $root.apibara = (function() {
                     if (message.nonces != null && message.nonces.length)
                         for (var i = 0; i < message.nonces.length; ++i)
                             $root.apibara.starknet.v1alpha2.NonceUpdateFilter.encode(message.nonces[i], writer.uint32(/* id 4, wireType 2 =*/34).fork()).ldelim();
+                    if (message.declaredClasses != null && message.declaredClasses.length)
+                        for (var i = 0; i < message.declaredClasses.length; ++i)
+                            $root.apibara.starknet.v1alpha2.DeclaredClassFilter.encode(message.declaredClasses[i], writer.uint32(/* id 5, wireType 2 =*/42).fork()).ldelim();
+                    if (message.replacedClasses != null && message.replacedClasses.length)
+                        for (var i = 0; i < message.replacedClasses.length; ++i)
+                            $root.apibara.starknet.v1alpha2.ReplacedClassFilter.encode(message.replacedClasses[i], writer.uint32(/* id 6, wireType 2 =*/50).fork()).ldelim();
                     return writer;
                 };
 
@@ -3336,6 +3362,18 @@ $root.apibara = (function() {
                                 if (!(message.nonces && message.nonces.length))
                                     message.nonces = [];
                                 message.nonces.push($root.apibara.starknet.v1alpha2.NonceUpdateFilter.decode(reader, reader.uint32()));
+                                break;
+                            }
+                        case 5: {
+                                if (!(message.declaredClasses && message.declaredClasses.length))
+                                    message.declaredClasses = [];
+                                message.declaredClasses.push($root.apibara.starknet.v1alpha2.DeclaredClassFilter.decode(reader, reader.uint32()));
+                                break;
+                            }
+                        case 6: {
+                                if (!(message.replacedClasses && message.replacedClasses.length))
+                                    message.replacedClasses = [];
+                                message.replacedClasses.push($root.apibara.starknet.v1alpha2.ReplacedClassFilter.decode(reader, reader.uint32()));
                                 break;
                             }
                         default:
@@ -3409,6 +3447,24 @@ $root.apibara = (function() {
                                 return "nonces." + error;
                         }
                     }
+                    if (message.declaredClasses != null && message.hasOwnProperty("declaredClasses")) {
+                        if (!Array.isArray(message.declaredClasses))
+                            return "declaredClasses: array expected";
+                        for (var i = 0; i < message.declaredClasses.length; ++i) {
+                            var error = $root.apibara.starknet.v1alpha2.DeclaredClassFilter.verify(message.declaredClasses[i]);
+                            if (error)
+                                return "declaredClasses." + error;
+                        }
+                    }
+                    if (message.replacedClasses != null && message.hasOwnProperty("replacedClasses")) {
+                        if (!Array.isArray(message.replacedClasses))
+                            return "replacedClasses: array expected";
+                        for (var i = 0; i < message.replacedClasses.length; ++i) {
+                            var error = $root.apibara.starknet.v1alpha2.ReplacedClassFilter.verify(message.replacedClasses[i]);
+                            if (error)
+                                return "replacedClasses." + error;
+                        }
+                    }
                     return null;
                 };
 
@@ -3464,6 +3520,26 @@ $root.apibara = (function() {
                             message.nonces[i] = $root.apibara.starknet.v1alpha2.NonceUpdateFilter.fromObject(object.nonces[i]);
                         }
                     }
+                    if (object.declaredClasses) {
+                        if (!Array.isArray(object.declaredClasses))
+                            throw TypeError(".apibara.starknet.v1alpha2.StateUpdateFilter.declaredClasses: array expected");
+                        message.declaredClasses = [];
+                        for (var i = 0; i < object.declaredClasses.length; ++i) {
+                            if (typeof object.declaredClasses[i] !== "object")
+                                throw TypeError(".apibara.starknet.v1alpha2.StateUpdateFilter.declaredClasses: object expected");
+                            message.declaredClasses[i] = $root.apibara.starknet.v1alpha2.DeclaredClassFilter.fromObject(object.declaredClasses[i]);
+                        }
+                    }
+                    if (object.replacedClasses) {
+                        if (!Array.isArray(object.replacedClasses))
+                            throw TypeError(".apibara.starknet.v1alpha2.StateUpdateFilter.replacedClasses: array expected");
+                        message.replacedClasses = [];
+                        for (var i = 0; i < object.replacedClasses.length; ++i) {
+                            if (typeof object.replacedClasses[i] !== "object")
+                                throw TypeError(".apibara.starknet.v1alpha2.StateUpdateFilter.replacedClasses: object expected");
+                            message.replacedClasses[i] = $root.apibara.starknet.v1alpha2.ReplacedClassFilter.fromObject(object.replacedClasses[i]);
+                        }
+                    }
                     return message;
                 };
 
@@ -3485,6 +3561,8 @@ $root.apibara = (function() {
                         object.declaredContracts = [];
                         object.deployedContracts = [];
                         object.nonces = [];
+                        object.declaredClasses = [];
+                        object.replacedClasses = [];
                     }
                     if (message.storageDiffs && message.storageDiffs.length) {
                         object.storageDiffs = [];
@@ -3505,6 +3583,16 @@ $root.apibara = (function() {
                         object.nonces = [];
                         for (var j = 0; j < message.nonces.length; ++j)
                             object.nonces[j] = $root.apibara.starknet.v1alpha2.NonceUpdateFilter.toObject(message.nonces[j], options);
+                    }
+                    if (message.declaredClasses && message.declaredClasses.length) {
+                        object.declaredClasses = [];
+                        for (var j = 0; j < message.declaredClasses.length; ++j)
+                            object.declaredClasses[j] = $root.apibara.starknet.v1alpha2.DeclaredClassFilter.toObject(message.declaredClasses[j], options);
+                    }
+                    if (message.replacedClasses && message.replacedClasses.length) {
+                        object.replacedClasses = [];
+                        for (var j = 0; j < message.replacedClasses.length; ++j)
+                            object.replacedClasses[j] = $root.apibara.starknet.v1alpha2.ReplacedClassFilter.toObject(message.replacedClasses[j], options);
                     }
                     return object;
                 };
@@ -3952,6 +4040,480 @@ $root.apibara = (function() {
                 };
 
                 return DeclaredContractFilter;
+            })();
+
+            v1alpha2.DeclaredClassFilter = (function() {
+
+                /**
+                 * Properties of a DeclaredClassFilter.
+                 * @memberof apibara.starknet.v1alpha2
+                 * @interface IDeclaredClassFilter
+                 * @property {apibara.starknet.v1alpha2.IFieldElement|null} [classHash] DeclaredClassFilter classHash
+                 * @property {apibara.starknet.v1alpha2.IFieldElement|null} [compiledClassHash] DeclaredClassFilter compiledClassHash
+                 */
+
+                /**
+                 * Constructs a new DeclaredClassFilter.
+                 * @memberof apibara.starknet.v1alpha2
+                 * @classdesc Represents a DeclaredClassFilter.
+                 * @implements IDeclaredClassFilter
+                 * @constructor
+                 * @param {apibara.starknet.v1alpha2.IDeclaredClassFilter=} [properties] Properties to set
+                 */
+                function DeclaredClassFilter(properties) {
+                    if (properties)
+                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                            if (properties[keys[i]] != null)
+                                this[keys[i]] = properties[keys[i]];
+                }
+
+                /**
+                 * DeclaredClassFilter classHash.
+                 * @member {apibara.starknet.v1alpha2.IFieldElement|null|undefined} classHash
+                 * @memberof apibara.starknet.v1alpha2.DeclaredClassFilter
+                 * @instance
+                 */
+                DeclaredClassFilter.prototype.classHash = null;
+
+                /**
+                 * DeclaredClassFilter compiledClassHash.
+                 * @member {apibara.starknet.v1alpha2.IFieldElement|null|undefined} compiledClassHash
+                 * @memberof apibara.starknet.v1alpha2.DeclaredClassFilter
+                 * @instance
+                 */
+                DeclaredClassFilter.prototype.compiledClassHash = null;
+
+                /**
+                 * Creates a new DeclaredClassFilter instance using the specified properties.
+                 * @function create
+                 * @memberof apibara.starknet.v1alpha2.DeclaredClassFilter
+                 * @static
+                 * @param {apibara.starknet.v1alpha2.IDeclaredClassFilter=} [properties] Properties to set
+                 * @returns {apibara.starknet.v1alpha2.DeclaredClassFilter} DeclaredClassFilter instance
+                 */
+                DeclaredClassFilter.create = function create(properties) {
+                    return new DeclaredClassFilter(properties);
+                };
+
+                /**
+                 * Encodes the specified DeclaredClassFilter message. Does not implicitly {@link apibara.starknet.v1alpha2.DeclaredClassFilter.verify|verify} messages.
+                 * @function encode
+                 * @memberof apibara.starknet.v1alpha2.DeclaredClassFilter
+                 * @static
+                 * @param {apibara.starknet.v1alpha2.IDeclaredClassFilter} message DeclaredClassFilter message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                DeclaredClassFilter.encode = function encode(message, writer) {
+                    if (!writer)
+                        writer = $Writer.create();
+                    if (message.classHash != null && Object.hasOwnProperty.call(message, "classHash"))
+                        $root.apibara.starknet.v1alpha2.FieldElement.encode(message.classHash, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+                    if (message.compiledClassHash != null && Object.hasOwnProperty.call(message, "compiledClassHash"))
+                        $root.apibara.starknet.v1alpha2.FieldElement.encode(message.compiledClassHash, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
+                    return writer;
+                };
+
+                /**
+                 * Encodes the specified DeclaredClassFilter message, length delimited. Does not implicitly {@link apibara.starknet.v1alpha2.DeclaredClassFilter.verify|verify} messages.
+                 * @function encodeDelimited
+                 * @memberof apibara.starknet.v1alpha2.DeclaredClassFilter
+                 * @static
+                 * @param {apibara.starknet.v1alpha2.IDeclaredClassFilter} message DeclaredClassFilter message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                DeclaredClassFilter.encodeDelimited = function encodeDelimited(message, writer) {
+                    return this.encode(message, writer).ldelim();
+                };
+
+                /**
+                 * Decodes a DeclaredClassFilter message from the specified reader or buffer.
+                 * @function decode
+                 * @memberof apibara.starknet.v1alpha2.DeclaredClassFilter
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @param {number} [length] Message length if known beforehand
+                 * @returns {apibara.starknet.v1alpha2.DeclaredClassFilter} DeclaredClassFilter
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                DeclaredClassFilter.decode = function decode(reader, length) {
+                    if (!(reader instanceof $Reader))
+                        reader = $Reader.create(reader);
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.apibara.starknet.v1alpha2.DeclaredClassFilter();
+                    while (reader.pos < end) {
+                        var tag = reader.uint32();
+                        switch (tag >>> 3) {
+                        case 1: {
+                                message.classHash = $root.apibara.starknet.v1alpha2.FieldElement.decode(reader, reader.uint32());
+                                break;
+                            }
+                        case 2: {
+                                message.compiledClassHash = $root.apibara.starknet.v1alpha2.FieldElement.decode(reader, reader.uint32());
+                                break;
+                            }
+                        default:
+                            reader.skipType(tag & 7);
+                            break;
+                        }
+                    }
+                    return message;
+                };
+
+                /**
+                 * Decodes a DeclaredClassFilter message from the specified reader or buffer, length delimited.
+                 * @function decodeDelimited
+                 * @memberof apibara.starknet.v1alpha2.DeclaredClassFilter
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @returns {apibara.starknet.v1alpha2.DeclaredClassFilter} DeclaredClassFilter
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                DeclaredClassFilter.decodeDelimited = function decodeDelimited(reader) {
+                    if (!(reader instanceof $Reader))
+                        reader = new $Reader(reader);
+                    return this.decode(reader, reader.uint32());
+                };
+
+                /**
+                 * Verifies a DeclaredClassFilter message.
+                 * @function verify
+                 * @memberof apibara.starknet.v1alpha2.DeclaredClassFilter
+                 * @static
+                 * @param {Object.<string,*>} message Plain object to verify
+                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
+                 */
+                DeclaredClassFilter.verify = function verify(message) {
+                    if (typeof message !== "object" || message === null)
+                        return "object expected";
+                    if (message.classHash != null && message.hasOwnProperty("classHash")) {
+                        var error = $root.apibara.starknet.v1alpha2.FieldElement.verify(message.classHash);
+                        if (error)
+                            return "classHash." + error;
+                    }
+                    if (message.compiledClassHash != null && message.hasOwnProperty("compiledClassHash")) {
+                        var error = $root.apibara.starknet.v1alpha2.FieldElement.verify(message.compiledClassHash);
+                        if (error)
+                            return "compiledClassHash." + error;
+                    }
+                    return null;
+                };
+
+                /**
+                 * Creates a DeclaredClassFilter message from a plain object. Also converts values to their respective internal types.
+                 * @function fromObject
+                 * @memberof apibara.starknet.v1alpha2.DeclaredClassFilter
+                 * @static
+                 * @param {Object.<string,*>} object Plain object
+                 * @returns {apibara.starknet.v1alpha2.DeclaredClassFilter} DeclaredClassFilter
+                 */
+                DeclaredClassFilter.fromObject = function fromObject(object) {
+                    if (object instanceof $root.apibara.starknet.v1alpha2.DeclaredClassFilter)
+                        return object;
+                    var message = new $root.apibara.starknet.v1alpha2.DeclaredClassFilter();
+                    if (object.classHash != null) {
+                        if (typeof object.classHash !== "object")
+                            throw TypeError(".apibara.starknet.v1alpha2.DeclaredClassFilter.classHash: object expected");
+                        message.classHash = $root.apibara.starknet.v1alpha2.FieldElement.fromObject(object.classHash);
+                    }
+                    if (object.compiledClassHash != null) {
+                        if (typeof object.compiledClassHash !== "object")
+                            throw TypeError(".apibara.starknet.v1alpha2.DeclaredClassFilter.compiledClassHash: object expected");
+                        message.compiledClassHash = $root.apibara.starknet.v1alpha2.FieldElement.fromObject(object.compiledClassHash);
+                    }
+                    return message;
+                };
+
+                /**
+                 * Creates a plain object from a DeclaredClassFilter message. Also converts values to other types if specified.
+                 * @function toObject
+                 * @memberof apibara.starknet.v1alpha2.DeclaredClassFilter
+                 * @static
+                 * @param {apibara.starknet.v1alpha2.DeclaredClassFilter} message DeclaredClassFilter
+                 * @param {$protobuf.IConversionOptions} [options] Conversion options
+                 * @returns {Object.<string,*>} Plain object
+                 */
+                DeclaredClassFilter.toObject = function toObject(message, options) {
+                    if (!options)
+                        options = {};
+                    var object = {};
+                    if (options.defaults) {
+                        object.classHash = null;
+                        object.compiledClassHash = null;
+                    }
+                    if (message.classHash != null && message.hasOwnProperty("classHash"))
+                        object.classHash = $root.apibara.starknet.v1alpha2.FieldElement.toObject(message.classHash, options);
+                    if (message.compiledClassHash != null && message.hasOwnProperty("compiledClassHash"))
+                        object.compiledClassHash = $root.apibara.starknet.v1alpha2.FieldElement.toObject(message.compiledClassHash, options);
+                    return object;
+                };
+
+                /**
+                 * Converts this DeclaredClassFilter to JSON.
+                 * @function toJSON
+                 * @memberof apibara.starknet.v1alpha2.DeclaredClassFilter
+                 * @instance
+                 * @returns {Object.<string,*>} JSON object
+                 */
+                DeclaredClassFilter.prototype.toJSON = function toJSON() {
+                    return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+                };
+
+                /**
+                 * Gets the default type url for DeclaredClassFilter
+                 * @function getTypeUrl
+                 * @memberof apibara.starknet.v1alpha2.DeclaredClassFilter
+                 * @static
+                 * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+                 * @returns {string} The default type url
+                 */
+                DeclaredClassFilter.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
+                    if (typeUrlPrefix === undefined) {
+                        typeUrlPrefix = "type.googleapis.com";
+                    }
+                    return typeUrlPrefix + "/apibara.starknet.v1alpha2.DeclaredClassFilter";
+                };
+
+                return DeclaredClassFilter;
+            })();
+
+            v1alpha2.ReplacedClassFilter = (function() {
+
+                /**
+                 * Properties of a ReplacedClassFilter.
+                 * @memberof apibara.starknet.v1alpha2
+                 * @interface IReplacedClassFilter
+                 * @property {apibara.starknet.v1alpha2.IFieldElement|null} [contractAddress] ReplacedClassFilter contractAddress
+                 * @property {apibara.starknet.v1alpha2.IFieldElement|null} [classHash] ReplacedClassFilter classHash
+                 */
+
+                /**
+                 * Constructs a new ReplacedClassFilter.
+                 * @memberof apibara.starknet.v1alpha2
+                 * @classdesc Represents a ReplacedClassFilter.
+                 * @implements IReplacedClassFilter
+                 * @constructor
+                 * @param {apibara.starknet.v1alpha2.IReplacedClassFilter=} [properties] Properties to set
+                 */
+                function ReplacedClassFilter(properties) {
+                    if (properties)
+                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                            if (properties[keys[i]] != null)
+                                this[keys[i]] = properties[keys[i]];
+                }
+
+                /**
+                 * ReplacedClassFilter contractAddress.
+                 * @member {apibara.starknet.v1alpha2.IFieldElement|null|undefined} contractAddress
+                 * @memberof apibara.starknet.v1alpha2.ReplacedClassFilter
+                 * @instance
+                 */
+                ReplacedClassFilter.prototype.contractAddress = null;
+
+                /**
+                 * ReplacedClassFilter classHash.
+                 * @member {apibara.starknet.v1alpha2.IFieldElement|null|undefined} classHash
+                 * @memberof apibara.starknet.v1alpha2.ReplacedClassFilter
+                 * @instance
+                 */
+                ReplacedClassFilter.prototype.classHash = null;
+
+                /**
+                 * Creates a new ReplacedClassFilter instance using the specified properties.
+                 * @function create
+                 * @memberof apibara.starknet.v1alpha2.ReplacedClassFilter
+                 * @static
+                 * @param {apibara.starknet.v1alpha2.IReplacedClassFilter=} [properties] Properties to set
+                 * @returns {apibara.starknet.v1alpha2.ReplacedClassFilter} ReplacedClassFilter instance
+                 */
+                ReplacedClassFilter.create = function create(properties) {
+                    return new ReplacedClassFilter(properties);
+                };
+
+                /**
+                 * Encodes the specified ReplacedClassFilter message. Does not implicitly {@link apibara.starknet.v1alpha2.ReplacedClassFilter.verify|verify} messages.
+                 * @function encode
+                 * @memberof apibara.starknet.v1alpha2.ReplacedClassFilter
+                 * @static
+                 * @param {apibara.starknet.v1alpha2.IReplacedClassFilter} message ReplacedClassFilter message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                ReplacedClassFilter.encode = function encode(message, writer) {
+                    if (!writer)
+                        writer = $Writer.create();
+                    if (message.contractAddress != null && Object.hasOwnProperty.call(message, "contractAddress"))
+                        $root.apibara.starknet.v1alpha2.FieldElement.encode(message.contractAddress, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+                    if (message.classHash != null && Object.hasOwnProperty.call(message, "classHash"))
+                        $root.apibara.starknet.v1alpha2.FieldElement.encode(message.classHash, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
+                    return writer;
+                };
+
+                /**
+                 * Encodes the specified ReplacedClassFilter message, length delimited. Does not implicitly {@link apibara.starknet.v1alpha2.ReplacedClassFilter.verify|verify} messages.
+                 * @function encodeDelimited
+                 * @memberof apibara.starknet.v1alpha2.ReplacedClassFilter
+                 * @static
+                 * @param {apibara.starknet.v1alpha2.IReplacedClassFilter} message ReplacedClassFilter message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                ReplacedClassFilter.encodeDelimited = function encodeDelimited(message, writer) {
+                    return this.encode(message, writer).ldelim();
+                };
+
+                /**
+                 * Decodes a ReplacedClassFilter message from the specified reader or buffer.
+                 * @function decode
+                 * @memberof apibara.starknet.v1alpha2.ReplacedClassFilter
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @param {number} [length] Message length if known beforehand
+                 * @returns {apibara.starknet.v1alpha2.ReplacedClassFilter} ReplacedClassFilter
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                ReplacedClassFilter.decode = function decode(reader, length) {
+                    if (!(reader instanceof $Reader))
+                        reader = $Reader.create(reader);
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.apibara.starknet.v1alpha2.ReplacedClassFilter();
+                    while (reader.pos < end) {
+                        var tag = reader.uint32();
+                        switch (tag >>> 3) {
+                        case 1: {
+                                message.contractAddress = $root.apibara.starknet.v1alpha2.FieldElement.decode(reader, reader.uint32());
+                                break;
+                            }
+                        case 2: {
+                                message.classHash = $root.apibara.starknet.v1alpha2.FieldElement.decode(reader, reader.uint32());
+                                break;
+                            }
+                        default:
+                            reader.skipType(tag & 7);
+                            break;
+                        }
+                    }
+                    return message;
+                };
+
+                /**
+                 * Decodes a ReplacedClassFilter message from the specified reader or buffer, length delimited.
+                 * @function decodeDelimited
+                 * @memberof apibara.starknet.v1alpha2.ReplacedClassFilter
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @returns {apibara.starknet.v1alpha2.ReplacedClassFilter} ReplacedClassFilter
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                ReplacedClassFilter.decodeDelimited = function decodeDelimited(reader) {
+                    if (!(reader instanceof $Reader))
+                        reader = new $Reader(reader);
+                    return this.decode(reader, reader.uint32());
+                };
+
+                /**
+                 * Verifies a ReplacedClassFilter message.
+                 * @function verify
+                 * @memberof apibara.starknet.v1alpha2.ReplacedClassFilter
+                 * @static
+                 * @param {Object.<string,*>} message Plain object to verify
+                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
+                 */
+                ReplacedClassFilter.verify = function verify(message) {
+                    if (typeof message !== "object" || message === null)
+                        return "object expected";
+                    if (message.contractAddress != null && message.hasOwnProperty("contractAddress")) {
+                        var error = $root.apibara.starknet.v1alpha2.FieldElement.verify(message.contractAddress);
+                        if (error)
+                            return "contractAddress." + error;
+                    }
+                    if (message.classHash != null && message.hasOwnProperty("classHash")) {
+                        var error = $root.apibara.starknet.v1alpha2.FieldElement.verify(message.classHash);
+                        if (error)
+                            return "classHash." + error;
+                    }
+                    return null;
+                };
+
+                /**
+                 * Creates a ReplacedClassFilter message from a plain object. Also converts values to their respective internal types.
+                 * @function fromObject
+                 * @memberof apibara.starknet.v1alpha2.ReplacedClassFilter
+                 * @static
+                 * @param {Object.<string,*>} object Plain object
+                 * @returns {apibara.starknet.v1alpha2.ReplacedClassFilter} ReplacedClassFilter
+                 */
+                ReplacedClassFilter.fromObject = function fromObject(object) {
+                    if (object instanceof $root.apibara.starknet.v1alpha2.ReplacedClassFilter)
+                        return object;
+                    var message = new $root.apibara.starknet.v1alpha2.ReplacedClassFilter();
+                    if (object.contractAddress != null) {
+                        if (typeof object.contractAddress !== "object")
+                            throw TypeError(".apibara.starknet.v1alpha2.ReplacedClassFilter.contractAddress: object expected");
+                        message.contractAddress = $root.apibara.starknet.v1alpha2.FieldElement.fromObject(object.contractAddress);
+                    }
+                    if (object.classHash != null) {
+                        if (typeof object.classHash !== "object")
+                            throw TypeError(".apibara.starknet.v1alpha2.ReplacedClassFilter.classHash: object expected");
+                        message.classHash = $root.apibara.starknet.v1alpha2.FieldElement.fromObject(object.classHash);
+                    }
+                    return message;
+                };
+
+                /**
+                 * Creates a plain object from a ReplacedClassFilter message. Also converts values to other types if specified.
+                 * @function toObject
+                 * @memberof apibara.starknet.v1alpha2.ReplacedClassFilter
+                 * @static
+                 * @param {apibara.starknet.v1alpha2.ReplacedClassFilter} message ReplacedClassFilter
+                 * @param {$protobuf.IConversionOptions} [options] Conversion options
+                 * @returns {Object.<string,*>} Plain object
+                 */
+                ReplacedClassFilter.toObject = function toObject(message, options) {
+                    if (!options)
+                        options = {};
+                    var object = {};
+                    if (options.defaults) {
+                        object.contractAddress = null;
+                        object.classHash = null;
+                    }
+                    if (message.contractAddress != null && message.hasOwnProperty("contractAddress"))
+                        object.contractAddress = $root.apibara.starknet.v1alpha2.FieldElement.toObject(message.contractAddress, options);
+                    if (message.classHash != null && message.hasOwnProperty("classHash"))
+                        object.classHash = $root.apibara.starknet.v1alpha2.FieldElement.toObject(message.classHash, options);
+                    return object;
+                };
+
+                /**
+                 * Converts this ReplacedClassFilter to JSON.
+                 * @function toJSON
+                 * @memberof apibara.starknet.v1alpha2.ReplacedClassFilter
+                 * @instance
+                 * @returns {Object.<string,*>} JSON object
+                 */
+                ReplacedClassFilter.prototype.toJSON = function toJSON() {
+                    return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+                };
+
+                /**
+                 * Gets the default type url for ReplacedClassFilter
+                 * @function getTypeUrl
+                 * @memberof apibara.starknet.v1alpha2.ReplacedClassFilter
+                 * @static
+                 * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+                 * @returns {string} The default type url
+                 */
+                ReplacedClassFilter.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
+                    if (typeUrlPrefix === undefined) {
+                        typeUrlPrefix = "type.googleapis.com";
+                    }
+                    return typeUrlPrefix + "/apibara.starknet.v1alpha2.ReplacedClassFilter";
+                };
+
+                return ReplacedClassFilter;
             })();
 
             v1alpha2.DeployedContractFilter = (function() {
@@ -4426,335 +4988,6 @@ $root.apibara = (function() {
                 };
 
                 return NonceUpdateFilter;
-            })();
-
-            v1alpha2.FieldElement = (function() {
-
-                /**
-                 * Properties of a FieldElement.
-                 * @memberof apibara.starknet.v1alpha2
-                 * @interface IFieldElement
-                 * @property {number|Long|null} [loLo] FieldElement loLo
-                 * @property {number|Long|null} [loHi] FieldElement loHi
-                 * @property {number|Long|null} [hiLo] FieldElement hiLo
-                 * @property {number|Long|null} [hiHi] FieldElement hiHi
-                 */
-
-                /**
-                 * Constructs a new FieldElement.
-                 * @memberof apibara.starknet.v1alpha2
-                 * @classdesc Represents a FieldElement.
-                 * @implements IFieldElement
-                 * @constructor
-                 * @param {apibara.starknet.v1alpha2.IFieldElement=} [properties] Properties to set
-                 */
-                function FieldElement(properties) {
-                    if (properties)
-                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                            if (properties[keys[i]] != null)
-                                this[keys[i]] = properties[keys[i]];
-                }
-
-                /**
-                 * FieldElement loLo.
-                 * @member {number|Long} loLo
-                 * @memberof apibara.starknet.v1alpha2.FieldElement
-                 * @instance
-                 */
-                FieldElement.prototype.loLo = $util.Long ? $util.Long.fromBits(0,0,false) : 0;
-
-                /**
-                 * FieldElement loHi.
-                 * @member {number|Long} loHi
-                 * @memberof apibara.starknet.v1alpha2.FieldElement
-                 * @instance
-                 */
-                FieldElement.prototype.loHi = $util.Long ? $util.Long.fromBits(0,0,false) : 0;
-
-                /**
-                 * FieldElement hiLo.
-                 * @member {number|Long} hiLo
-                 * @memberof apibara.starknet.v1alpha2.FieldElement
-                 * @instance
-                 */
-                FieldElement.prototype.hiLo = $util.Long ? $util.Long.fromBits(0,0,false) : 0;
-
-                /**
-                 * FieldElement hiHi.
-                 * @member {number|Long} hiHi
-                 * @memberof apibara.starknet.v1alpha2.FieldElement
-                 * @instance
-                 */
-                FieldElement.prototype.hiHi = $util.Long ? $util.Long.fromBits(0,0,false) : 0;
-
-                /**
-                 * Creates a new FieldElement instance using the specified properties.
-                 * @function create
-                 * @memberof apibara.starknet.v1alpha2.FieldElement
-                 * @static
-                 * @param {apibara.starknet.v1alpha2.IFieldElement=} [properties] Properties to set
-                 * @returns {apibara.starknet.v1alpha2.FieldElement} FieldElement instance
-                 */
-                FieldElement.create = function create(properties) {
-                    return new FieldElement(properties);
-                };
-
-                /**
-                 * Encodes the specified FieldElement message. Does not implicitly {@link apibara.starknet.v1alpha2.FieldElement.verify|verify} messages.
-                 * @function encode
-                 * @memberof apibara.starknet.v1alpha2.FieldElement
-                 * @static
-                 * @param {apibara.starknet.v1alpha2.IFieldElement} message FieldElement message or plain object to encode
-                 * @param {$protobuf.Writer} [writer] Writer to encode to
-                 * @returns {$protobuf.Writer} Writer
-                 */
-                FieldElement.encode = function encode(message, writer) {
-                    if (!writer)
-                        writer = $Writer.create();
-                    if (message.loLo != null && Object.hasOwnProperty.call(message, "loLo"))
-                        writer.uint32(/* id 1, wireType 1 =*/9).fixed64(message.loLo);
-                    if (message.loHi != null && Object.hasOwnProperty.call(message, "loHi"))
-                        writer.uint32(/* id 2, wireType 1 =*/17).fixed64(message.loHi);
-                    if (message.hiLo != null && Object.hasOwnProperty.call(message, "hiLo"))
-                        writer.uint32(/* id 3, wireType 1 =*/25).fixed64(message.hiLo);
-                    if (message.hiHi != null && Object.hasOwnProperty.call(message, "hiHi"))
-                        writer.uint32(/* id 4, wireType 1 =*/33).fixed64(message.hiHi);
-                    return writer;
-                };
-
-                /**
-                 * Encodes the specified FieldElement message, length delimited. Does not implicitly {@link apibara.starknet.v1alpha2.FieldElement.verify|verify} messages.
-                 * @function encodeDelimited
-                 * @memberof apibara.starknet.v1alpha2.FieldElement
-                 * @static
-                 * @param {apibara.starknet.v1alpha2.IFieldElement} message FieldElement message or plain object to encode
-                 * @param {$protobuf.Writer} [writer] Writer to encode to
-                 * @returns {$protobuf.Writer} Writer
-                 */
-                FieldElement.encodeDelimited = function encodeDelimited(message, writer) {
-                    return this.encode(message, writer).ldelim();
-                };
-
-                /**
-                 * Decodes a FieldElement message from the specified reader or buffer.
-                 * @function decode
-                 * @memberof apibara.starknet.v1alpha2.FieldElement
-                 * @static
-                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-                 * @param {number} [length] Message length if known beforehand
-                 * @returns {apibara.starknet.v1alpha2.FieldElement} FieldElement
-                 * @throws {Error} If the payload is not a reader or valid buffer
-                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
-                 */
-                FieldElement.decode = function decode(reader, length) {
-                    if (!(reader instanceof $Reader))
-                        reader = $Reader.create(reader);
-                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.apibara.starknet.v1alpha2.FieldElement();
-                    while (reader.pos < end) {
-                        var tag = reader.uint32();
-                        switch (tag >>> 3) {
-                        case 1: {
-                                message.loLo = reader.fixed64();
-                                break;
-                            }
-                        case 2: {
-                                message.loHi = reader.fixed64();
-                                break;
-                            }
-                        case 3: {
-                                message.hiLo = reader.fixed64();
-                                break;
-                            }
-                        case 4: {
-                                message.hiHi = reader.fixed64();
-                                break;
-                            }
-                        default:
-                            reader.skipType(tag & 7);
-                            break;
-                        }
-                    }
-                    return message;
-                };
-
-                /**
-                 * Decodes a FieldElement message from the specified reader or buffer, length delimited.
-                 * @function decodeDelimited
-                 * @memberof apibara.starknet.v1alpha2.FieldElement
-                 * @static
-                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-                 * @returns {apibara.starknet.v1alpha2.FieldElement} FieldElement
-                 * @throws {Error} If the payload is not a reader or valid buffer
-                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
-                 */
-                FieldElement.decodeDelimited = function decodeDelimited(reader) {
-                    if (!(reader instanceof $Reader))
-                        reader = new $Reader(reader);
-                    return this.decode(reader, reader.uint32());
-                };
-
-                /**
-                 * Verifies a FieldElement message.
-                 * @function verify
-                 * @memberof apibara.starknet.v1alpha2.FieldElement
-                 * @static
-                 * @param {Object.<string,*>} message Plain object to verify
-                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
-                 */
-                FieldElement.verify = function verify(message) {
-                    if (typeof message !== "object" || message === null)
-                        return "object expected";
-                    if (message.loLo != null && message.hasOwnProperty("loLo"))
-                        if (!$util.isInteger(message.loLo) && !(message.loLo && $util.isInteger(message.loLo.low) && $util.isInteger(message.loLo.high)))
-                            return "loLo: integer|Long expected";
-                    if (message.loHi != null && message.hasOwnProperty("loHi"))
-                        if (!$util.isInteger(message.loHi) && !(message.loHi && $util.isInteger(message.loHi.low) && $util.isInteger(message.loHi.high)))
-                            return "loHi: integer|Long expected";
-                    if (message.hiLo != null && message.hasOwnProperty("hiLo"))
-                        if (!$util.isInteger(message.hiLo) && !(message.hiLo && $util.isInteger(message.hiLo.low) && $util.isInteger(message.hiLo.high)))
-                            return "hiLo: integer|Long expected";
-                    if (message.hiHi != null && message.hasOwnProperty("hiHi"))
-                        if (!$util.isInteger(message.hiHi) && !(message.hiHi && $util.isInteger(message.hiHi.low) && $util.isInteger(message.hiHi.high)))
-                            return "hiHi: integer|Long expected";
-                    return null;
-                };
-
-                /**
-                 * Creates a FieldElement message from a plain object. Also converts values to their respective internal types.
-                 * @function fromObject
-                 * @memberof apibara.starknet.v1alpha2.FieldElement
-                 * @static
-                 * @param {Object.<string,*>} object Plain object
-                 * @returns {apibara.starknet.v1alpha2.FieldElement} FieldElement
-                 */
-                FieldElement.fromObject = function fromObject(object) {
-                    if (object instanceof $root.apibara.starknet.v1alpha2.FieldElement)
-                        return object;
-                    var message = new $root.apibara.starknet.v1alpha2.FieldElement();
-                    if (object.loLo != null)
-                        if ($util.Long)
-                            (message.loLo = $util.Long.fromValue(object.loLo)).unsigned = false;
-                        else if (typeof object.loLo === "string")
-                            message.loLo = parseInt(object.loLo, 10);
-                        else if (typeof object.loLo === "number")
-                            message.loLo = object.loLo;
-                        else if (typeof object.loLo === "object")
-                            message.loLo = new $util.LongBits(object.loLo.low >>> 0, object.loLo.high >>> 0).toNumber();
-                    if (object.loHi != null)
-                        if ($util.Long)
-                            (message.loHi = $util.Long.fromValue(object.loHi)).unsigned = false;
-                        else if (typeof object.loHi === "string")
-                            message.loHi = parseInt(object.loHi, 10);
-                        else if (typeof object.loHi === "number")
-                            message.loHi = object.loHi;
-                        else if (typeof object.loHi === "object")
-                            message.loHi = new $util.LongBits(object.loHi.low >>> 0, object.loHi.high >>> 0).toNumber();
-                    if (object.hiLo != null)
-                        if ($util.Long)
-                            (message.hiLo = $util.Long.fromValue(object.hiLo)).unsigned = false;
-                        else if (typeof object.hiLo === "string")
-                            message.hiLo = parseInt(object.hiLo, 10);
-                        else if (typeof object.hiLo === "number")
-                            message.hiLo = object.hiLo;
-                        else if (typeof object.hiLo === "object")
-                            message.hiLo = new $util.LongBits(object.hiLo.low >>> 0, object.hiLo.high >>> 0).toNumber();
-                    if (object.hiHi != null)
-                        if ($util.Long)
-                            (message.hiHi = $util.Long.fromValue(object.hiHi)).unsigned = false;
-                        else if (typeof object.hiHi === "string")
-                            message.hiHi = parseInt(object.hiHi, 10);
-                        else if (typeof object.hiHi === "number")
-                            message.hiHi = object.hiHi;
-                        else if (typeof object.hiHi === "object")
-                            message.hiHi = new $util.LongBits(object.hiHi.low >>> 0, object.hiHi.high >>> 0).toNumber();
-                    return message;
-                };
-
-                /**
-                 * Creates a plain object from a FieldElement message. Also converts values to other types if specified.
-                 * @function toObject
-                 * @memberof apibara.starknet.v1alpha2.FieldElement
-                 * @static
-                 * @param {apibara.starknet.v1alpha2.FieldElement} message FieldElement
-                 * @param {$protobuf.IConversionOptions} [options] Conversion options
-                 * @returns {Object.<string,*>} Plain object
-                 */
-                FieldElement.toObject = function toObject(message, options) {
-                    if (!options)
-                        options = {};
-                    var object = {};
-                    if (options.defaults) {
-                        if ($util.Long) {
-                            var long = new $util.Long(0, 0, false);
-                            object.loLo = options.longs === String ? long.toString() : options.longs === Number ? long.toNumber() : long;
-                        } else
-                            object.loLo = options.longs === String ? "0" : 0;
-                        if ($util.Long) {
-                            var long = new $util.Long(0, 0, false);
-                            object.loHi = options.longs === String ? long.toString() : options.longs === Number ? long.toNumber() : long;
-                        } else
-                            object.loHi = options.longs === String ? "0" : 0;
-                        if ($util.Long) {
-                            var long = new $util.Long(0, 0, false);
-                            object.hiLo = options.longs === String ? long.toString() : options.longs === Number ? long.toNumber() : long;
-                        } else
-                            object.hiLo = options.longs === String ? "0" : 0;
-                        if ($util.Long) {
-                            var long = new $util.Long(0, 0, false);
-                            object.hiHi = options.longs === String ? long.toString() : options.longs === Number ? long.toNumber() : long;
-                        } else
-                            object.hiHi = options.longs === String ? "0" : 0;
-                    }
-                    if (message.loLo != null && message.hasOwnProperty("loLo"))
-                        if (typeof message.loLo === "number")
-                            object.loLo = options.longs === String ? String(message.loLo) : message.loLo;
-                        else
-                            object.loLo = options.longs === String ? $util.Long.prototype.toString.call(message.loLo) : options.longs === Number ? new $util.LongBits(message.loLo.low >>> 0, message.loLo.high >>> 0).toNumber() : message.loLo;
-                    if (message.loHi != null && message.hasOwnProperty("loHi"))
-                        if (typeof message.loHi === "number")
-                            object.loHi = options.longs === String ? String(message.loHi) : message.loHi;
-                        else
-                            object.loHi = options.longs === String ? $util.Long.prototype.toString.call(message.loHi) : options.longs === Number ? new $util.LongBits(message.loHi.low >>> 0, message.loHi.high >>> 0).toNumber() : message.loHi;
-                    if (message.hiLo != null && message.hasOwnProperty("hiLo"))
-                        if (typeof message.hiLo === "number")
-                            object.hiLo = options.longs === String ? String(message.hiLo) : message.hiLo;
-                        else
-                            object.hiLo = options.longs === String ? $util.Long.prototype.toString.call(message.hiLo) : options.longs === Number ? new $util.LongBits(message.hiLo.low >>> 0, message.hiLo.high >>> 0).toNumber() : message.hiLo;
-                    if (message.hiHi != null && message.hasOwnProperty("hiHi"))
-                        if (typeof message.hiHi === "number")
-                            object.hiHi = options.longs === String ? String(message.hiHi) : message.hiHi;
-                        else
-                            object.hiHi = options.longs === String ? $util.Long.prototype.toString.call(message.hiHi) : options.longs === Number ? new $util.LongBits(message.hiHi.low >>> 0, message.hiHi.high >>> 0).toNumber() : message.hiHi;
-                    return object;
-                };
-
-                /**
-                 * Converts this FieldElement to JSON.
-                 * @function toJSON
-                 * @memberof apibara.starknet.v1alpha2.FieldElement
-                 * @instance
-                 * @returns {Object.<string,*>} JSON object
-                 */
-                FieldElement.prototype.toJSON = function toJSON() {
-                    return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
-                };
-
-                /**
-                 * Gets the default type url for FieldElement
-                 * @function getTypeUrl
-                 * @memberof apibara.starknet.v1alpha2.FieldElement
-                 * @static
-                 * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
-                 * @returns {string} The default type url
-                 */
-                FieldElement.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
-                    if (typeUrlPrefix === undefined) {
-                        typeUrlPrefix = "type.googleapis.com";
-                    }
-                    return typeUrlPrefix + "/apibara.starknet.v1alpha2.FieldElement";
-                };
-
-                return FieldElement;
             })();
 
             v1alpha2.Block = (function() {
@@ -7403,6 +7636,7 @@ $root.apibara = (function() {
                  * @interface IDeclareTransaction
                  * @property {apibara.starknet.v1alpha2.IFieldElement|null} [classHash] DeclareTransaction classHash
                  * @property {apibara.starknet.v1alpha2.IFieldElement|null} [senderAddress] DeclareTransaction senderAddress
+                 * @property {apibara.starknet.v1alpha2.IFieldElement|null} [compiledClassHash] DeclareTransaction compiledClassHash
                  */
 
                 /**
@@ -7437,6 +7671,14 @@ $root.apibara = (function() {
                 DeclareTransaction.prototype.senderAddress = null;
 
                 /**
+                 * DeclareTransaction compiledClassHash.
+                 * @member {apibara.starknet.v1alpha2.IFieldElement|null|undefined} compiledClassHash
+                 * @memberof apibara.starknet.v1alpha2.DeclareTransaction
+                 * @instance
+                 */
+                DeclareTransaction.prototype.compiledClassHash = null;
+
+                /**
                  * Creates a new DeclareTransaction instance using the specified properties.
                  * @function create
                  * @memberof apibara.starknet.v1alpha2.DeclareTransaction
@@ -7464,6 +7706,8 @@ $root.apibara = (function() {
                         $root.apibara.starknet.v1alpha2.FieldElement.encode(message.classHash, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
                     if (message.senderAddress != null && Object.hasOwnProperty.call(message, "senderAddress"))
                         $root.apibara.starknet.v1alpha2.FieldElement.encode(message.senderAddress, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
+                    if (message.compiledClassHash != null && Object.hasOwnProperty.call(message, "compiledClassHash"))
+                        $root.apibara.starknet.v1alpha2.FieldElement.encode(message.compiledClassHash, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
                     return writer;
                 };
 
@@ -7504,6 +7748,10 @@ $root.apibara = (function() {
                             }
                         case 2: {
                                 message.senderAddress = $root.apibara.starknet.v1alpha2.FieldElement.decode(reader, reader.uint32());
+                                break;
+                            }
+                        case 3: {
+                                message.compiledClassHash = $root.apibara.starknet.v1alpha2.FieldElement.decode(reader, reader.uint32());
                                 break;
                             }
                         default:
@@ -7551,6 +7799,11 @@ $root.apibara = (function() {
                         if (error)
                             return "senderAddress." + error;
                     }
+                    if (message.compiledClassHash != null && message.hasOwnProperty("compiledClassHash")) {
+                        var error = $root.apibara.starknet.v1alpha2.FieldElement.verify(message.compiledClassHash);
+                        if (error)
+                            return "compiledClassHash." + error;
+                    }
                     return null;
                 };
 
@@ -7576,6 +7829,11 @@ $root.apibara = (function() {
                             throw TypeError(".apibara.starknet.v1alpha2.DeclareTransaction.senderAddress: object expected");
                         message.senderAddress = $root.apibara.starknet.v1alpha2.FieldElement.fromObject(object.senderAddress);
                     }
+                    if (object.compiledClassHash != null) {
+                        if (typeof object.compiledClassHash !== "object")
+                            throw TypeError(".apibara.starknet.v1alpha2.DeclareTransaction.compiledClassHash: object expected");
+                        message.compiledClassHash = $root.apibara.starknet.v1alpha2.FieldElement.fromObject(object.compiledClassHash);
+                    }
                     return message;
                 };
 
@@ -7595,11 +7853,14 @@ $root.apibara = (function() {
                     if (options.defaults) {
                         object.classHash = null;
                         object.senderAddress = null;
+                        object.compiledClassHash = null;
                     }
                     if (message.classHash != null && message.hasOwnProperty("classHash"))
                         object.classHash = $root.apibara.starknet.v1alpha2.FieldElement.toObject(message.classHash, options);
                     if (message.senderAddress != null && message.hasOwnProperty("senderAddress"))
                         object.senderAddress = $root.apibara.starknet.v1alpha2.FieldElement.toObject(message.senderAddress, options);
+                    if (message.compiledClassHash != null && message.hasOwnProperty("compiledClassHash"))
+                        object.compiledClassHash = $root.apibara.starknet.v1alpha2.FieldElement.toObject(message.compiledClassHash, options);
                     return object;
                 };
 
@@ -8207,6 +8468,7 @@ $root.apibara = (function() {
                  * @property {apibara.starknet.v1alpha2.IFieldElement|null} [actualFee] TransactionReceipt actualFee
                  * @property {Array.<apibara.starknet.v1alpha2.IL2ToL1Message>|null} [l2ToL1Messages] TransactionReceipt l2ToL1Messages
                  * @property {Array.<apibara.starknet.v1alpha2.IEvent>|null} [events] TransactionReceipt events
+                 * @property {apibara.starknet.v1alpha2.IFieldElement|null} [contractAddress] TransactionReceipt contractAddress
                  */
 
                 /**
@@ -8267,6 +8529,14 @@ $root.apibara = (function() {
                 TransactionReceipt.prototype.events = $util.emptyArray;
 
                 /**
+                 * TransactionReceipt contractAddress.
+                 * @member {apibara.starknet.v1alpha2.IFieldElement|null|undefined} contractAddress
+                 * @memberof apibara.starknet.v1alpha2.TransactionReceipt
+                 * @instance
+                 */
+                TransactionReceipt.prototype.contractAddress = null;
+
+                /**
                  * Creates a new TransactionReceipt instance using the specified properties.
                  * @function create
                  * @memberof apibara.starknet.v1alpha2.TransactionReceipt
@@ -8302,6 +8572,8 @@ $root.apibara = (function() {
                     if (message.events != null && message.events.length)
                         for (var i = 0; i < message.events.length; ++i)
                             $root.apibara.starknet.v1alpha2.Event.encode(message.events[i], writer.uint32(/* id 5, wireType 2 =*/42).fork()).ldelim();
+                    if (message.contractAddress != null && Object.hasOwnProperty.call(message, "contractAddress"))
+                        $root.apibara.starknet.v1alpha2.FieldElement.encode(message.contractAddress, writer.uint32(/* id 6, wireType 2 =*/50).fork()).ldelim();
                     return writer;
                 };
 
@@ -8358,6 +8630,10 @@ $root.apibara = (function() {
                                 if (!(message.events && message.events.length))
                                     message.events = [];
                                 message.events.push($root.apibara.starknet.v1alpha2.Event.decode(reader, reader.uint32()));
+                                break;
+                            }
+                        case 6: {
+                                message.contractAddress = $root.apibara.starknet.v1alpha2.FieldElement.decode(reader, reader.uint32());
                                 break;
                             }
                         default:
@@ -8426,6 +8702,11 @@ $root.apibara = (function() {
                                 return "events." + error;
                         }
                     }
+                    if (message.contractAddress != null && message.hasOwnProperty("contractAddress")) {
+                        var error = $root.apibara.starknet.v1alpha2.FieldElement.verify(message.contractAddress);
+                        if (error)
+                            return "contractAddress." + error;
+                    }
                     return null;
                 };
 
@@ -8480,6 +8761,11 @@ $root.apibara = (function() {
                             message.events[i] = $root.apibara.starknet.v1alpha2.Event.fromObject(object.events[i]);
                         }
                     }
+                    if (object.contractAddress != null) {
+                        if (typeof object.contractAddress !== "object")
+                            throw TypeError(".apibara.starknet.v1alpha2.TransactionReceipt.contractAddress: object expected");
+                        message.contractAddress = $root.apibara.starknet.v1alpha2.FieldElement.fromObject(object.contractAddress);
+                    }
                     return message;
                 };
 
@@ -8508,6 +8794,7 @@ $root.apibara = (function() {
                         } else
                             object.transactionIndex = options.longs === String ? "0" : 0;
                         object.actualFee = null;
+                        object.contractAddress = null;
                     }
                     if (message.transactionHash != null && message.hasOwnProperty("transactionHash"))
                         object.transactionHash = $root.apibara.starknet.v1alpha2.FieldElement.toObject(message.transactionHash, options);
@@ -8528,6 +8815,8 @@ $root.apibara = (function() {
                         for (var j = 0; j < message.events.length; ++j)
                             object.events[j] = $root.apibara.starknet.v1alpha2.Event.toObject(message.events[j], options);
                     }
+                    if (message.contractAddress != null && message.hasOwnProperty("contractAddress"))
+                        object.contractAddress = $root.apibara.starknet.v1alpha2.FieldElement.toObject(message.contractAddress, options);
                     return object;
                 };
 
@@ -8833,6 +9122,8 @@ $root.apibara = (function() {
                  * @interface IL2ToL1Message
                  * @property {apibara.starknet.v1alpha2.IFieldElement|null} [toAddress] L2ToL1Message toAddress
                  * @property {Array.<apibara.starknet.v1alpha2.IFieldElement>|null} [payload] L2ToL1Message payload
+                 * @property {number|Long|null} [index] L2ToL1Message index
+                 * @property {apibara.starknet.v1alpha2.IFieldElement|null} [fromAddress] L2ToL1Message fromAddress
                  */
 
                 /**
@@ -8868,6 +9159,22 @@ $root.apibara = (function() {
                 L2ToL1Message.prototype.payload = $util.emptyArray;
 
                 /**
+                 * L2ToL1Message index.
+                 * @member {number|Long} index
+                 * @memberof apibara.starknet.v1alpha2.L2ToL1Message
+                 * @instance
+                 */
+                L2ToL1Message.prototype.index = $util.Long ? $util.Long.fromBits(0,0,true) : 0;
+
+                /**
+                 * L2ToL1Message fromAddress.
+                 * @member {apibara.starknet.v1alpha2.IFieldElement|null|undefined} fromAddress
+                 * @memberof apibara.starknet.v1alpha2.L2ToL1Message
+                 * @instance
+                 */
+                L2ToL1Message.prototype.fromAddress = null;
+
+                /**
                  * Creates a new L2ToL1Message instance using the specified properties.
                  * @function create
                  * @memberof apibara.starknet.v1alpha2.L2ToL1Message
@@ -8896,6 +9203,10 @@ $root.apibara = (function() {
                     if (message.payload != null && message.payload.length)
                         for (var i = 0; i < message.payload.length; ++i)
                             $root.apibara.starknet.v1alpha2.FieldElement.encode(message.payload[i], writer.uint32(/* id 4, wireType 2 =*/34).fork()).ldelim();
+                    if (message.index != null && Object.hasOwnProperty.call(message, "index"))
+                        writer.uint32(/* id 5, wireType 0 =*/40).uint64(message.index);
+                    if (message.fromAddress != null && Object.hasOwnProperty.call(message, "fromAddress"))
+                        $root.apibara.starknet.v1alpha2.FieldElement.encode(message.fromAddress, writer.uint32(/* id 6, wireType 2 =*/50).fork()).ldelim();
                     return writer;
                 };
 
@@ -8938,6 +9249,14 @@ $root.apibara = (function() {
                                 if (!(message.payload && message.payload.length))
                                     message.payload = [];
                                 message.payload.push($root.apibara.starknet.v1alpha2.FieldElement.decode(reader, reader.uint32()));
+                                break;
+                            }
+                        case 5: {
+                                message.index = reader.uint64();
+                                break;
+                            }
+                        case 6: {
+                                message.fromAddress = $root.apibara.starknet.v1alpha2.FieldElement.decode(reader, reader.uint32());
                                 break;
                             }
                         default:
@@ -8989,6 +9308,14 @@ $root.apibara = (function() {
                                 return "payload." + error;
                         }
                     }
+                    if (message.index != null && message.hasOwnProperty("index"))
+                        if (!$util.isInteger(message.index) && !(message.index && $util.isInteger(message.index.low) && $util.isInteger(message.index.high)))
+                            return "index: integer|Long expected";
+                    if (message.fromAddress != null && message.hasOwnProperty("fromAddress")) {
+                        var error = $root.apibara.starknet.v1alpha2.FieldElement.verify(message.fromAddress);
+                        if (error)
+                            return "fromAddress." + error;
+                    }
                     return null;
                 };
 
@@ -9019,6 +9346,20 @@ $root.apibara = (function() {
                             message.payload[i] = $root.apibara.starknet.v1alpha2.FieldElement.fromObject(object.payload[i]);
                         }
                     }
+                    if (object.index != null)
+                        if ($util.Long)
+                            (message.index = $util.Long.fromValue(object.index)).unsigned = true;
+                        else if (typeof object.index === "string")
+                            message.index = parseInt(object.index, 10);
+                        else if (typeof object.index === "number")
+                            message.index = object.index;
+                        else if (typeof object.index === "object")
+                            message.index = new $util.LongBits(object.index.low >>> 0, object.index.high >>> 0).toNumber(true);
+                    if (object.fromAddress != null) {
+                        if (typeof object.fromAddress !== "object")
+                            throw TypeError(".apibara.starknet.v1alpha2.L2ToL1Message.fromAddress: object expected");
+                        message.fromAddress = $root.apibara.starknet.v1alpha2.FieldElement.fromObject(object.fromAddress);
+                    }
                     return message;
                 };
 
@@ -9037,8 +9378,15 @@ $root.apibara = (function() {
                     var object = {};
                     if (options.arrays || options.defaults)
                         object.payload = [];
-                    if (options.defaults)
+                    if (options.defaults) {
                         object.toAddress = null;
+                        if ($util.Long) {
+                            var long = new $util.Long(0, 0, true);
+                            object.index = options.longs === String ? long.toString() : options.longs === Number ? long.toNumber() : long;
+                        } else
+                            object.index = options.longs === String ? "0" : 0;
+                        object.fromAddress = null;
+                    }
                     if (message.toAddress != null && message.hasOwnProperty("toAddress"))
                         object.toAddress = $root.apibara.starknet.v1alpha2.FieldElement.toObject(message.toAddress, options);
                     if (message.payload && message.payload.length) {
@@ -9046,6 +9394,13 @@ $root.apibara = (function() {
                         for (var j = 0; j < message.payload.length; ++j)
                             object.payload[j] = $root.apibara.starknet.v1alpha2.FieldElement.toObject(message.payload[j], options);
                     }
+                    if (message.index != null && message.hasOwnProperty("index"))
+                        if (typeof message.index === "number")
+                            object.index = options.longs === String ? String(message.index) : message.index;
+                        else
+                            object.index = options.longs === String ? $util.Long.prototype.toString.call(message.index) : options.longs === Number ? new $util.LongBits(message.index.low >>> 0, message.index.high >>> 0).toNumber(true) : message.index;
+                    if (message.fromAddress != null && message.hasOwnProperty("fromAddress"))
+                        object.fromAddress = $root.apibara.starknet.v1alpha2.FieldElement.toObject(message.fromAddress, options);
                     return object;
                 };
 
@@ -9352,6 +9707,7 @@ $root.apibara = (function() {
                  * @property {apibara.starknet.v1alpha2.IFieldElement|null} [fromAddress] Event fromAddress
                  * @property {Array.<apibara.starknet.v1alpha2.IFieldElement>|null} [keys] Event keys
                  * @property {Array.<apibara.starknet.v1alpha2.IFieldElement>|null} [data] Event data
+                 * @property {number|Long|null} [index] Event index
                  */
 
                 /**
@@ -9396,6 +9752,14 @@ $root.apibara = (function() {
                 Event.prototype.data = $util.emptyArray;
 
                 /**
+                 * Event index.
+                 * @member {number|Long} index
+                 * @memberof apibara.starknet.v1alpha2.Event
+                 * @instance
+                 */
+                Event.prototype.index = $util.Long ? $util.Long.fromBits(0,0,true) : 0;
+
+                /**
                  * Creates a new Event instance using the specified properties.
                  * @function create
                  * @memberof apibara.starknet.v1alpha2.Event
@@ -9427,6 +9791,8 @@ $root.apibara = (function() {
                     if (message.data != null && message.data.length)
                         for (var i = 0; i < message.data.length; ++i)
                             $root.apibara.starknet.v1alpha2.FieldElement.encode(message.data[i], writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
+                    if (message.index != null && Object.hasOwnProperty.call(message, "index"))
+                        writer.uint32(/* id 4, wireType 0 =*/32).uint64(message.index);
                     return writer;
                 };
 
@@ -9475,6 +9841,10 @@ $root.apibara = (function() {
                                 if (!(message.data && message.data.length))
                                     message.data = [];
                                 message.data.push($root.apibara.starknet.v1alpha2.FieldElement.decode(reader, reader.uint32()));
+                                break;
+                            }
+                        case 4: {
+                                message.index = reader.uint64();
                                 break;
                             }
                         default:
@@ -9535,6 +9905,9 @@ $root.apibara = (function() {
                                 return "data." + error;
                         }
                     }
+                    if (message.index != null && message.hasOwnProperty("index"))
+                        if (!$util.isInteger(message.index) && !(message.index && $util.isInteger(message.index.low) && $util.isInteger(message.index.high)))
+                            return "index: integer|Long expected";
                     return null;
                 };
 
@@ -9575,6 +9948,15 @@ $root.apibara = (function() {
                             message.data[i] = $root.apibara.starknet.v1alpha2.FieldElement.fromObject(object.data[i]);
                         }
                     }
+                    if (object.index != null)
+                        if ($util.Long)
+                            (message.index = $util.Long.fromValue(object.index)).unsigned = true;
+                        else if (typeof object.index === "string")
+                            message.index = parseInt(object.index, 10);
+                        else if (typeof object.index === "number")
+                            message.index = object.index;
+                        else if (typeof object.index === "object")
+                            message.index = new $util.LongBits(object.index.low >>> 0, object.index.high >>> 0).toNumber(true);
                     return message;
                 };
 
@@ -9595,8 +9977,14 @@ $root.apibara = (function() {
                         object.keys = [];
                         object.data = [];
                     }
-                    if (options.defaults)
+                    if (options.defaults) {
                         object.fromAddress = null;
+                        if ($util.Long) {
+                            var long = new $util.Long(0, 0, true);
+                            object.index = options.longs === String ? long.toString() : options.longs === Number ? long.toNumber() : long;
+                        } else
+                            object.index = options.longs === String ? "0" : 0;
+                    }
                     if (message.fromAddress != null && message.hasOwnProperty("fromAddress"))
                         object.fromAddress = $root.apibara.starknet.v1alpha2.FieldElement.toObject(message.fromAddress, options);
                     if (message.keys && message.keys.length) {
@@ -9609,6 +9997,11 @@ $root.apibara = (function() {
                         for (var j = 0; j < message.data.length; ++j)
                             object.data[j] = $root.apibara.starknet.v1alpha2.FieldElement.toObject(message.data[j], options);
                     }
+                    if (message.index != null && message.hasOwnProperty("index"))
+                        if (typeof message.index === "number")
+                            object.index = options.longs === String ? String(message.index) : message.index;
+                        else
+                            object.index = options.longs === String ? $util.Long.prototype.toString.call(message.index) : options.longs === Number ? new $util.LongBits(message.index.low >>> 0, message.index.high >>> 0).toNumber(true) : message.index;
                     return object;
                 };
 
@@ -9916,6 +10309,8 @@ $root.apibara = (function() {
                  * @property {Array.<apibara.starknet.v1alpha2.IDeclaredContract>|null} [declaredContracts] StateDiff declaredContracts
                  * @property {Array.<apibara.starknet.v1alpha2.IDeployedContract>|null} [deployedContracts] StateDiff deployedContracts
                  * @property {Array.<apibara.starknet.v1alpha2.INonceUpdate>|null} [nonces] StateDiff nonces
+                 * @property {Array.<apibara.starknet.v1alpha2.IDeclaredClass>|null} [declaredClasses] StateDiff declaredClasses
+                 * @property {Array.<apibara.starknet.v1alpha2.IReplacedClass>|null} [replacedClasses] StateDiff replacedClasses
                  */
 
                 /**
@@ -9931,6 +10326,8 @@ $root.apibara = (function() {
                     this.declaredContracts = [];
                     this.deployedContracts = [];
                     this.nonces = [];
+                    this.declaredClasses = [];
+                    this.replacedClasses = [];
                     if (properties)
                         for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                             if (properties[keys[i]] != null)
@@ -9970,6 +10367,22 @@ $root.apibara = (function() {
                 StateDiff.prototype.nonces = $util.emptyArray;
 
                 /**
+                 * StateDiff declaredClasses.
+                 * @member {Array.<apibara.starknet.v1alpha2.IDeclaredClass>} declaredClasses
+                 * @memberof apibara.starknet.v1alpha2.StateDiff
+                 * @instance
+                 */
+                StateDiff.prototype.declaredClasses = $util.emptyArray;
+
+                /**
+                 * StateDiff replacedClasses.
+                 * @member {Array.<apibara.starknet.v1alpha2.IReplacedClass>} replacedClasses
+                 * @memberof apibara.starknet.v1alpha2.StateDiff
+                 * @instance
+                 */
+                StateDiff.prototype.replacedClasses = $util.emptyArray;
+
+                /**
                  * Creates a new StateDiff instance using the specified properties.
                  * @function create
                  * @memberof apibara.starknet.v1alpha2.StateDiff
@@ -10005,6 +10418,12 @@ $root.apibara = (function() {
                     if (message.nonces != null && message.nonces.length)
                         for (var i = 0; i < message.nonces.length; ++i)
                             $root.apibara.starknet.v1alpha2.NonceUpdate.encode(message.nonces[i], writer.uint32(/* id 4, wireType 2 =*/34).fork()).ldelim();
+                    if (message.declaredClasses != null && message.declaredClasses.length)
+                        for (var i = 0; i < message.declaredClasses.length; ++i)
+                            $root.apibara.starknet.v1alpha2.DeclaredClass.encode(message.declaredClasses[i], writer.uint32(/* id 5, wireType 2 =*/42).fork()).ldelim();
+                    if (message.replacedClasses != null && message.replacedClasses.length)
+                        for (var i = 0; i < message.replacedClasses.length; ++i)
+                            $root.apibara.starknet.v1alpha2.ReplacedClass.encode(message.replacedClasses[i], writer.uint32(/* id 6, wireType 2 =*/50).fork()).ldelim();
                     return writer;
                 };
 
@@ -10061,6 +10480,18 @@ $root.apibara = (function() {
                                 if (!(message.nonces && message.nonces.length))
                                     message.nonces = [];
                                 message.nonces.push($root.apibara.starknet.v1alpha2.NonceUpdate.decode(reader, reader.uint32()));
+                                break;
+                            }
+                        case 5: {
+                                if (!(message.declaredClasses && message.declaredClasses.length))
+                                    message.declaredClasses = [];
+                                message.declaredClasses.push($root.apibara.starknet.v1alpha2.DeclaredClass.decode(reader, reader.uint32()));
+                                break;
+                            }
+                        case 6: {
+                                if (!(message.replacedClasses && message.replacedClasses.length))
+                                    message.replacedClasses = [];
+                                message.replacedClasses.push($root.apibara.starknet.v1alpha2.ReplacedClass.decode(reader, reader.uint32()));
                                 break;
                             }
                         default:
@@ -10134,6 +10565,24 @@ $root.apibara = (function() {
                                 return "nonces." + error;
                         }
                     }
+                    if (message.declaredClasses != null && message.hasOwnProperty("declaredClasses")) {
+                        if (!Array.isArray(message.declaredClasses))
+                            return "declaredClasses: array expected";
+                        for (var i = 0; i < message.declaredClasses.length; ++i) {
+                            var error = $root.apibara.starknet.v1alpha2.DeclaredClass.verify(message.declaredClasses[i]);
+                            if (error)
+                                return "declaredClasses." + error;
+                        }
+                    }
+                    if (message.replacedClasses != null && message.hasOwnProperty("replacedClasses")) {
+                        if (!Array.isArray(message.replacedClasses))
+                            return "replacedClasses: array expected";
+                        for (var i = 0; i < message.replacedClasses.length; ++i) {
+                            var error = $root.apibara.starknet.v1alpha2.ReplacedClass.verify(message.replacedClasses[i]);
+                            if (error)
+                                return "replacedClasses." + error;
+                        }
+                    }
                     return null;
                 };
 
@@ -10189,6 +10638,26 @@ $root.apibara = (function() {
                             message.nonces[i] = $root.apibara.starknet.v1alpha2.NonceUpdate.fromObject(object.nonces[i]);
                         }
                     }
+                    if (object.declaredClasses) {
+                        if (!Array.isArray(object.declaredClasses))
+                            throw TypeError(".apibara.starknet.v1alpha2.StateDiff.declaredClasses: array expected");
+                        message.declaredClasses = [];
+                        for (var i = 0; i < object.declaredClasses.length; ++i) {
+                            if (typeof object.declaredClasses[i] !== "object")
+                                throw TypeError(".apibara.starknet.v1alpha2.StateDiff.declaredClasses: object expected");
+                            message.declaredClasses[i] = $root.apibara.starknet.v1alpha2.DeclaredClass.fromObject(object.declaredClasses[i]);
+                        }
+                    }
+                    if (object.replacedClasses) {
+                        if (!Array.isArray(object.replacedClasses))
+                            throw TypeError(".apibara.starknet.v1alpha2.StateDiff.replacedClasses: array expected");
+                        message.replacedClasses = [];
+                        for (var i = 0; i < object.replacedClasses.length; ++i) {
+                            if (typeof object.replacedClasses[i] !== "object")
+                                throw TypeError(".apibara.starknet.v1alpha2.StateDiff.replacedClasses: object expected");
+                            message.replacedClasses[i] = $root.apibara.starknet.v1alpha2.ReplacedClass.fromObject(object.replacedClasses[i]);
+                        }
+                    }
                     return message;
                 };
 
@@ -10210,6 +10679,8 @@ $root.apibara = (function() {
                         object.declaredContracts = [];
                         object.deployedContracts = [];
                         object.nonces = [];
+                        object.declaredClasses = [];
+                        object.replacedClasses = [];
                     }
                     if (message.storageDiffs && message.storageDiffs.length) {
                         object.storageDiffs = [];
@@ -10230,6 +10701,16 @@ $root.apibara = (function() {
                         object.nonces = [];
                         for (var j = 0; j < message.nonces.length; ++j)
                             object.nonces[j] = $root.apibara.starknet.v1alpha2.NonceUpdate.toObject(message.nonces[j], options);
+                    }
+                    if (message.declaredClasses && message.declaredClasses.length) {
+                        object.declaredClasses = [];
+                        for (var j = 0; j < message.declaredClasses.length; ++j)
+                            object.declaredClasses[j] = $root.apibara.starknet.v1alpha2.DeclaredClass.toObject(message.declaredClasses[j], options);
+                    }
+                    if (message.replacedClasses && message.replacedClasses.length) {
+                        object.replacedClasses = [];
+                        for (var j = 0; j < message.replacedClasses.length; ++j)
+                            object.replacedClasses[j] = $root.apibara.starknet.v1alpha2.ReplacedClass.toObject(message.replacedClasses[j], options);
                     }
                     return object;
                 };
@@ -10961,6 +11442,480 @@ $root.apibara = (function() {
                 return DeclaredContract;
             })();
 
+            v1alpha2.DeclaredClass = (function() {
+
+                /**
+                 * Properties of a DeclaredClass.
+                 * @memberof apibara.starknet.v1alpha2
+                 * @interface IDeclaredClass
+                 * @property {apibara.starknet.v1alpha2.IFieldElement|null} [classHash] DeclaredClass classHash
+                 * @property {apibara.starknet.v1alpha2.IFieldElement|null} [compiledClassHash] DeclaredClass compiledClassHash
+                 */
+
+                /**
+                 * Constructs a new DeclaredClass.
+                 * @memberof apibara.starknet.v1alpha2
+                 * @classdesc Represents a DeclaredClass.
+                 * @implements IDeclaredClass
+                 * @constructor
+                 * @param {apibara.starknet.v1alpha2.IDeclaredClass=} [properties] Properties to set
+                 */
+                function DeclaredClass(properties) {
+                    if (properties)
+                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                            if (properties[keys[i]] != null)
+                                this[keys[i]] = properties[keys[i]];
+                }
+
+                /**
+                 * DeclaredClass classHash.
+                 * @member {apibara.starknet.v1alpha2.IFieldElement|null|undefined} classHash
+                 * @memberof apibara.starknet.v1alpha2.DeclaredClass
+                 * @instance
+                 */
+                DeclaredClass.prototype.classHash = null;
+
+                /**
+                 * DeclaredClass compiledClassHash.
+                 * @member {apibara.starknet.v1alpha2.IFieldElement|null|undefined} compiledClassHash
+                 * @memberof apibara.starknet.v1alpha2.DeclaredClass
+                 * @instance
+                 */
+                DeclaredClass.prototype.compiledClassHash = null;
+
+                /**
+                 * Creates a new DeclaredClass instance using the specified properties.
+                 * @function create
+                 * @memberof apibara.starknet.v1alpha2.DeclaredClass
+                 * @static
+                 * @param {apibara.starknet.v1alpha2.IDeclaredClass=} [properties] Properties to set
+                 * @returns {apibara.starknet.v1alpha2.DeclaredClass} DeclaredClass instance
+                 */
+                DeclaredClass.create = function create(properties) {
+                    return new DeclaredClass(properties);
+                };
+
+                /**
+                 * Encodes the specified DeclaredClass message. Does not implicitly {@link apibara.starknet.v1alpha2.DeclaredClass.verify|verify} messages.
+                 * @function encode
+                 * @memberof apibara.starknet.v1alpha2.DeclaredClass
+                 * @static
+                 * @param {apibara.starknet.v1alpha2.IDeclaredClass} message DeclaredClass message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                DeclaredClass.encode = function encode(message, writer) {
+                    if (!writer)
+                        writer = $Writer.create();
+                    if (message.classHash != null && Object.hasOwnProperty.call(message, "classHash"))
+                        $root.apibara.starknet.v1alpha2.FieldElement.encode(message.classHash, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+                    if (message.compiledClassHash != null && Object.hasOwnProperty.call(message, "compiledClassHash"))
+                        $root.apibara.starknet.v1alpha2.FieldElement.encode(message.compiledClassHash, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
+                    return writer;
+                };
+
+                /**
+                 * Encodes the specified DeclaredClass message, length delimited. Does not implicitly {@link apibara.starknet.v1alpha2.DeclaredClass.verify|verify} messages.
+                 * @function encodeDelimited
+                 * @memberof apibara.starknet.v1alpha2.DeclaredClass
+                 * @static
+                 * @param {apibara.starknet.v1alpha2.IDeclaredClass} message DeclaredClass message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                DeclaredClass.encodeDelimited = function encodeDelimited(message, writer) {
+                    return this.encode(message, writer).ldelim();
+                };
+
+                /**
+                 * Decodes a DeclaredClass message from the specified reader or buffer.
+                 * @function decode
+                 * @memberof apibara.starknet.v1alpha2.DeclaredClass
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @param {number} [length] Message length if known beforehand
+                 * @returns {apibara.starknet.v1alpha2.DeclaredClass} DeclaredClass
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                DeclaredClass.decode = function decode(reader, length) {
+                    if (!(reader instanceof $Reader))
+                        reader = $Reader.create(reader);
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.apibara.starknet.v1alpha2.DeclaredClass();
+                    while (reader.pos < end) {
+                        var tag = reader.uint32();
+                        switch (tag >>> 3) {
+                        case 1: {
+                                message.classHash = $root.apibara.starknet.v1alpha2.FieldElement.decode(reader, reader.uint32());
+                                break;
+                            }
+                        case 2: {
+                                message.compiledClassHash = $root.apibara.starknet.v1alpha2.FieldElement.decode(reader, reader.uint32());
+                                break;
+                            }
+                        default:
+                            reader.skipType(tag & 7);
+                            break;
+                        }
+                    }
+                    return message;
+                };
+
+                /**
+                 * Decodes a DeclaredClass message from the specified reader or buffer, length delimited.
+                 * @function decodeDelimited
+                 * @memberof apibara.starknet.v1alpha2.DeclaredClass
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @returns {apibara.starknet.v1alpha2.DeclaredClass} DeclaredClass
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                DeclaredClass.decodeDelimited = function decodeDelimited(reader) {
+                    if (!(reader instanceof $Reader))
+                        reader = new $Reader(reader);
+                    return this.decode(reader, reader.uint32());
+                };
+
+                /**
+                 * Verifies a DeclaredClass message.
+                 * @function verify
+                 * @memberof apibara.starknet.v1alpha2.DeclaredClass
+                 * @static
+                 * @param {Object.<string,*>} message Plain object to verify
+                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
+                 */
+                DeclaredClass.verify = function verify(message) {
+                    if (typeof message !== "object" || message === null)
+                        return "object expected";
+                    if (message.classHash != null && message.hasOwnProperty("classHash")) {
+                        var error = $root.apibara.starknet.v1alpha2.FieldElement.verify(message.classHash);
+                        if (error)
+                            return "classHash." + error;
+                    }
+                    if (message.compiledClassHash != null && message.hasOwnProperty("compiledClassHash")) {
+                        var error = $root.apibara.starknet.v1alpha2.FieldElement.verify(message.compiledClassHash);
+                        if (error)
+                            return "compiledClassHash." + error;
+                    }
+                    return null;
+                };
+
+                /**
+                 * Creates a DeclaredClass message from a plain object. Also converts values to their respective internal types.
+                 * @function fromObject
+                 * @memberof apibara.starknet.v1alpha2.DeclaredClass
+                 * @static
+                 * @param {Object.<string,*>} object Plain object
+                 * @returns {apibara.starknet.v1alpha2.DeclaredClass} DeclaredClass
+                 */
+                DeclaredClass.fromObject = function fromObject(object) {
+                    if (object instanceof $root.apibara.starknet.v1alpha2.DeclaredClass)
+                        return object;
+                    var message = new $root.apibara.starknet.v1alpha2.DeclaredClass();
+                    if (object.classHash != null) {
+                        if (typeof object.classHash !== "object")
+                            throw TypeError(".apibara.starknet.v1alpha2.DeclaredClass.classHash: object expected");
+                        message.classHash = $root.apibara.starknet.v1alpha2.FieldElement.fromObject(object.classHash);
+                    }
+                    if (object.compiledClassHash != null) {
+                        if (typeof object.compiledClassHash !== "object")
+                            throw TypeError(".apibara.starknet.v1alpha2.DeclaredClass.compiledClassHash: object expected");
+                        message.compiledClassHash = $root.apibara.starknet.v1alpha2.FieldElement.fromObject(object.compiledClassHash);
+                    }
+                    return message;
+                };
+
+                /**
+                 * Creates a plain object from a DeclaredClass message. Also converts values to other types if specified.
+                 * @function toObject
+                 * @memberof apibara.starknet.v1alpha2.DeclaredClass
+                 * @static
+                 * @param {apibara.starknet.v1alpha2.DeclaredClass} message DeclaredClass
+                 * @param {$protobuf.IConversionOptions} [options] Conversion options
+                 * @returns {Object.<string,*>} Plain object
+                 */
+                DeclaredClass.toObject = function toObject(message, options) {
+                    if (!options)
+                        options = {};
+                    var object = {};
+                    if (options.defaults) {
+                        object.classHash = null;
+                        object.compiledClassHash = null;
+                    }
+                    if (message.classHash != null && message.hasOwnProperty("classHash"))
+                        object.classHash = $root.apibara.starknet.v1alpha2.FieldElement.toObject(message.classHash, options);
+                    if (message.compiledClassHash != null && message.hasOwnProperty("compiledClassHash"))
+                        object.compiledClassHash = $root.apibara.starknet.v1alpha2.FieldElement.toObject(message.compiledClassHash, options);
+                    return object;
+                };
+
+                /**
+                 * Converts this DeclaredClass to JSON.
+                 * @function toJSON
+                 * @memberof apibara.starknet.v1alpha2.DeclaredClass
+                 * @instance
+                 * @returns {Object.<string,*>} JSON object
+                 */
+                DeclaredClass.prototype.toJSON = function toJSON() {
+                    return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+                };
+
+                /**
+                 * Gets the default type url for DeclaredClass
+                 * @function getTypeUrl
+                 * @memberof apibara.starknet.v1alpha2.DeclaredClass
+                 * @static
+                 * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+                 * @returns {string} The default type url
+                 */
+                DeclaredClass.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
+                    if (typeUrlPrefix === undefined) {
+                        typeUrlPrefix = "type.googleapis.com";
+                    }
+                    return typeUrlPrefix + "/apibara.starknet.v1alpha2.DeclaredClass";
+                };
+
+                return DeclaredClass;
+            })();
+
+            v1alpha2.ReplacedClass = (function() {
+
+                /**
+                 * Properties of a ReplacedClass.
+                 * @memberof apibara.starknet.v1alpha2
+                 * @interface IReplacedClass
+                 * @property {apibara.starknet.v1alpha2.IFieldElement|null} [contractAddress] ReplacedClass contractAddress
+                 * @property {apibara.starknet.v1alpha2.IFieldElement|null} [classHash] ReplacedClass classHash
+                 */
+
+                /**
+                 * Constructs a new ReplacedClass.
+                 * @memberof apibara.starknet.v1alpha2
+                 * @classdesc Represents a ReplacedClass.
+                 * @implements IReplacedClass
+                 * @constructor
+                 * @param {apibara.starknet.v1alpha2.IReplacedClass=} [properties] Properties to set
+                 */
+                function ReplacedClass(properties) {
+                    if (properties)
+                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                            if (properties[keys[i]] != null)
+                                this[keys[i]] = properties[keys[i]];
+                }
+
+                /**
+                 * ReplacedClass contractAddress.
+                 * @member {apibara.starknet.v1alpha2.IFieldElement|null|undefined} contractAddress
+                 * @memberof apibara.starknet.v1alpha2.ReplacedClass
+                 * @instance
+                 */
+                ReplacedClass.prototype.contractAddress = null;
+
+                /**
+                 * ReplacedClass classHash.
+                 * @member {apibara.starknet.v1alpha2.IFieldElement|null|undefined} classHash
+                 * @memberof apibara.starknet.v1alpha2.ReplacedClass
+                 * @instance
+                 */
+                ReplacedClass.prototype.classHash = null;
+
+                /**
+                 * Creates a new ReplacedClass instance using the specified properties.
+                 * @function create
+                 * @memberof apibara.starknet.v1alpha2.ReplacedClass
+                 * @static
+                 * @param {apibara.starknet.v1alpha2.IReplacedClass=} [properties] Properties to set
+                 * @returns {apibara.starknet.v1alpha2.ReplacedClass} ReplacedClass instance
+                 */
+                ReplacedClass.create = function create(properties) {
+                    return new ReplacedClass(properties);
+                };
+
+                /**
+                 * Encodes the specified ReplacedClass message. Does not implicitly {@link apibara.starknet.v1alpha2.ReplacedClass.verify|verify} messages.
+                 * @function encode
+                 * @memberof apibara.starknet.v1alpha2.ReplacedClass
+                 * @static
+                 * @param {apibara.starknet.v1alpha2.IReplacedClass} message ReplacedClass message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                ReplacedClass.encode = function encode(message, writer) {
+                    if (!writer)
+                        writer = $Writer.create();
+                    if (message.contractAddress != null && Object.hasOwnProperty.call(message, "contractAddress"))
+                        $root.apibara.starknet.v1alpha2.FieldElement.encode(message.contractAddress, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+                    if (message.classHash != null && Object.hasOwnProperty.call(message, "classHash"))
+                        $root.apibara.starknet.v1alpha2.FieldElement.encode(message.classHash, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
+                    return writer;
+                };
+
+                /**
+                 * Encodes the specified ReplacedClass message, length delimited. Does not implicitly {@link apibara.starknet.v1alpha2.ReplacedClass.verify|verify} messages.
+                 * @function encodeDelimited
+                 * @memberof apibara.starknet.v1alpha2.ReplacedClass
+                 * @static
+                 * @param {apibara.starknet.v1alpha2.IReplacedClass} message ReplacedClass message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                ReplacedClass.encodeDelimited = function encodeDelimited(message, writer) {
+                    return this.encode(message, writer).ldelim();
+                };
+
+                /**
+                 * Decodes a ReplacedClass message from the specified reader or buffer.
+                 * @function decode
+                 * @memberof apibara.starknet.v1alpha2.ReplacedClass
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @param {number} [length] Message length if known beforehand
+                 * @returns {apibara.starknet.v1alpha2.ReplacedClass} ReplacedClass
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                ReplacedClass.decode = function decode(reader, length) {
+                    if (!(reader instanceof $Reader))
+                        reader = $Reader.create(reader);
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.apibara.starknet.v1alpha2.ReplacedClass();
+                    while (reader.pos < end) {
+                        var tag = reader.uint32();
+                        switch (tag >>> 3) {
+                        case 1: {
+                                message.contractAddress = $root.apibara.starknet.v1alpha2.FieldElement.decode(reader, reader.uint32());
+                                break;
+                            }
+                        case 2: {
+                                message.classHash = $root.apibara.starknet.v1alpha2.FieldElement.decode(reader, reader.uint32());
+                                break;
+                            }
+                        default:
+                            reader.skipType(tag & 7);
+                            break;
+                        }
+                    }
+                    return message;
+                };
+
+                /**
+                 * Decodes a ReplacedClass message from the specified reader or buffer, length delimited.
+                 * @function decodeDelimited
+                 * @memberof apibara.starknet.v1alpha2.ReplacedClass
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @returns {apibara.starknet.v1alpha2.ReplacedClass} ReplacedClass
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                ReplacedClass.decodeDelimited = function decodeDelimited(reader) {
+                    if (!(reader instanceof $Reader))
+                        reader = new $Reader(reader);
+                    return this.decode(reader, reader.uint32());
+                };
+
+                /**
+                 * Verifies a ReplacedClass message.
+                 * @function verify
+                 * @memberof apibara.starknet.v1alpha2.ReplacedClass
+                 * @static
+                 * @param {Object.<string,*>} message Plain object to verify
+                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
+                 */
+                ReplacedClass.verify = function verify(message) {
+                    if (typeof message !== "object" || message === null)
+                        return "object expected";
+                    if (message.contractAddress != null && message.hasOwnProperty("contractAddress")) {
+                        var error = $root.apibara.starknet.v1alpha2.FieldElement.verify(message.contractAddress);
+                        if (error)
+                            return "contractAddress." + error;
+                    }
+                    if (message.classHash != null && message.hasOwnProperty("classHash")) {
+                        var error = $root.apibara.starknet.v1alpha2.FieldElement.verify(message.classHash);
+                        if (error)
+                            return "classHash." + error;
+                    }
+                    return null;
+                };
+
+                /**
+                 * Creates a ReplacedClass message from a plain object. Also converts values to their respective internal types.
+                 * @function fromObject
+                 * @memberof apibara.starknet.v1alpha2.ReplacedClass
+                 * @static
+                 * @param {Object.<string,*>} object Plain object
+                 * @returns {apibara.starknet.v1alpha2.ReplacedClass} ReplacedClass
+                 */
+                ReplacedClass.fromObject = function fromObject(object) {
+                    if (object instanceof $root.apibara.starknet.v1alpha2.ReplacedClass)
+                        return object;
+                    var message = new $root.apibara.starknet.v1alpha2.ReplacedClass();
+                    if (object.contractAddress != null) {
+                        if (typeof object.contractAddress !== "object")
+                            throw TypeError(".apibara.starknet.v1alpha2.ReplacedClass.contractAddress: object expected");
+                        message.contractAddress = $root.apibara.starknet.v1alpha2.FieldElement.fromObject(object.contractAddress);
+                    }
+                    if (object.classHash != null) {
+                        if (typeof object.classHash !== "object")
+                            throw TypeError(".apibara.starknet.v1alpha2.ReplacedClass.classHash: object expected");
+                        message.classHash = $root.apibara.starknet.v1alpha2.FieldElement.fromObject(object.classHash);
+                    }
+                    return message;
+                };
+
+                /**
+                 * Creates a plain object from a ReplacedClass message. Also converts values to other types if specified.
+                 * @function toObject
+                 * @memberof apibara.starknet.v1alpha2.ReplacedClass
+                 * @static
+                 * @param {apibara.starknet.v1alpha2.ReplacedClass} message ReplacedClass
+                 * @param {$protobuf.IConversionOptions} [options] Conversion options
+                 * @returns {Object.<string,*>} Plain object
+                 */
+                ReplacedClass.toObject = function toObject(message, options) {
+                    if (!options)
+                        options = {};
+                    var object = {};
+                    if (options.defaults) {
+                        object.contractAddress = null;
+                        object.classHash = null;
+                    }
+                    if (message.contractAddress != null && message.hasOwnProperty("contractAddress"))
+                        object.contractAddress = $root.apibara.starknet.v1alpha2.FieldElement.toObject(message.contractAddress, options);
+                    if (message.classHash != null && message.hasOwnProperty("classHash"))
+                        object.classHash = $root.apibara.starknet.v1alpha2.FieldElement.toObject(message.classHash, options);
+                    return object;
+                };
+
+                /**
+                 * Converts this ReplacedClass to JSON.
+                 * @function toJSON
+                 * @memberof apibara.starknet.v1alpha2.ReplacedClass
+                 * @instance
+                 * @returns {Object.<string,*>} JSON object
+                 */
+                ReplacedClass.prototype.toJSON = function toJSON() {
+                    return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+                };
+
+                /**
+                 * Gets the default type url for ReplacedClass
+                 * @function getTypeUrl
+                 * @memberof apibara.starknet.v1alpha2.ReplacedClass
+                 * @static
+                 * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+                 * @returns {string} The default type url
+                 */
+                ReplacedClass.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
+                    if (typeUrlPrefix === undefined) {
+                        typeUrlPrefix = "type.googleapis.com";
+                    }
+                    return typeUrlPrefix + "/apibara.starknet.v1alpha2.ReplacedClass";
+                };
+
+                return ReplacedClass;
+            })();
+
             v1alpha2.DeployedContract = (function() {
 
                 /**
@@ -11433,6 +12388,335 @@ $root.apibara = (function() {
                 };
 
                 return NonceUpdate;
+            })();
+
+            v1alpha2.FieldElement = (function() {
+
+                /**
+                 * Properties of a FieldElement.
+                 * @memberof apibara.starknet.v1alpha2
+                 * @interface IFieldElement
+                 * @property {number|Long|null} [loLo] FieldElement loLo
+                 * @property {number|Long|null} [loHi] FieldElement loHi
+                 * @property {number|Long|null} [hiLo] FieldElement hiLo
+                 * @property {number|Long|null} [hiHi] FieldElement hiHi
+                 */
+
+                /**
+                 * Constructs a new FieldElement.
+                 * @memberof apibara.starknet.v1alpha2
+                 * @classdesc Represents a FieldElement.
+                 * @implements IFieldElement
+                 * @constructor
+                 * @param {apibara.starknet.v1alpha2.IFieldElement=} [properties] Properties to set
+                 */
+                function FieldElement(properties) {
+                    if (properties)
+                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                            if (properties[keys[i]] != null)
+                                this[keys[i]] = properties[keys[i]];
+                }
+
+                /**
+                 * FieldElement loLo.
+                 * @member {number|Long} loLo
+                 * @memberof apibara.starknet.v1alpha2.FieldElement
+                 * @instance
+                 */
+                FieldElement.prototype.loLo = $util.Long ? $util.Long.fromBits(0,0,false) : 0;
+
+                /**
+                 * FieldElement loHi.
+                 * @member {number|Long} loHi
+                 * @memberof apibara.starknet.v1alpha2.FieldElement
+                 * @instance
+                 */
+                FieldElement.prototype.loHi = $util.Long ? $util.Long.fromBits(0,0,false) : 0;
+
+                /**
+                 * FieldElement hiLo.
+                 * @member {number|Long} hiLo
+                 * @memberof apibara.starknet.v1alpha2.FieldElement
+                 * @instance
+                 */
+                FieldElement.prototype.hiLo = $util.Long ? $util.Long.fromBits(0,0,false) : 0;
+
+                /**
+                 * FieldElement hiHi.
+                 * @member {number|Long} hiHi
+                 * @memberof apibara.starknet.v1alpha2.FieldElement
+                 * @instance
+                 */
+                FieldElement.prototype.hiHi = $util.Long ? $util.Long.fromBits(0,0,false) : 0;
+
+                /**
+                 * Creates a new FieldElement instance using the specified properties.
+                 * @function create
+                 * @memberof apibara.starknet.v1alpha2.FieldElement
+                 * @static
+                 * @param {apibara.starknet.v1alpha2.IFieldElement=} [properties] Properties to set
+                 * @returns {apibara.starknet.v1alpha2.FieldElement} FieldElement instance
+                 */
+                FieldElement.create = function create(properties) {
+                    return new FieldElement(properties);
+                };
+
+                /**
+                 * Encodes the specified FieldElement message. Does not implicitly {@link apibara.starknet.v1alpha2.FieldElement.verify|verify} messages.
+                 * @function encode
+                 * @memberof apibara.starknet.v1alpha2.FieldElement
+                 * @static
+                 * @param {apibara.starknet.v1alpha2.IFieldElement} message FieldElement message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                FieldElement.encode = function encode(message, writer) {
+                    if (!writer)
+                        writer = $Writer.create();
+                    if (message.loLo != null && Object.hasOwnProperty.call(message, "loLo"))
+                        writer.uint32(/* id 1, wireType 1 =*/9).fixed64(message.loLo);
+                    if (message.loHi != null && Object.hasOwnProperty.call(message, "loHi"))
+                        writer.uint32(/* id 2, wireType 1 =*/17).fixed64(message.loHi);
+                    if (message.hiLo != null && Object.hasOwnProperty.call(message, "hiLo"))
+                        writer.uint32(/* id 3, wireType 1 =*/25).fixed64(message.hiLo);
+                    if (message.hiHi != null && Object.hasOwnProperty.call(message, "hiHi"))
+                        writer.uint32(/* id 4, wireType 1 =*/33).fixed64(message.hiHi);
+                    return writer;
+                };
+
+                /**
+                 * Encodes the specified FieldElement message, length delimited. Does not implicitly {@link apibara.starknet.v1alpha2.FieldElement.verify|verify} messages.
+                 * @function encodeDelimited
+                 * @memberof apibara.starknet.v1alpha2.FieldElement
+                 * @static
+                 * @param {apibara.starknet.v1alpha2.IFieldElement} message FieldElement message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                FieldElement.encodeDelimited = function encodeDelimited(message, writer) {
+                    return this.encode(message, writer).ldelim();
+                };
+
+                /**
+                 * Decodes a FieldElement message from the specified reader or buffer.
+                 * @function decode
+                 * @memberof apibara.starknet.v1alpha2.FieldElement
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @param {number} [length] Message length if known beforehand
+                 * @returns {apibara.starknet.v1alpha2.FieldElement} FieldElement
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                FieldElement.decode = function decode(reader, length) {
+                    if (!(reader instanceof $Reader))
+                        reader = $Reader.create(reader);
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.apibara.starknet.v1alpha2.FieldElement();
+                    while (reader.pos < end) {
+                        var tag = reader.uint32();
+                        switch (tag >>> 3) {
+                        case 1: {
+                                message.loLo = reader.fixed64();
+                                break;
+                            }
+                        case 2: {
+                                message.loHi = reader.fixed64();
+                                break;
+                            }
+                        case 3: {
+                                message.hiLo = reader.fixed64();
+                                break;
+                            }
+                        case 4: {
+                                message.hiHi = reader.fixed64();
+                                break;
+                            }
+                        default:
+                            reader.skipType(tag & 7);
+                            break;
+                        }
+                    }
+                    return message;
+                };
+
+                /**
+                 * Decodes a FieldElement message from the specified reader or buffer, length delimited.
+                 * @function decodeDelimited
+                 * @memberof apibara.starknet.v1alpha2.FieldElement
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @returns {apibara.starknet.v1alpha2.FieldElement} FieldElement
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                FieldElement.decodeDelimited = function decodeDelimited(reader) {
+                    if (!(reader instanceof $Reader))
+                        reader = new $Reader(reader);
+                    return this.decode(reader, reader.uint32());
+                };
+
+                /**
+                 * Verifies a FieldElement message.
+                 * @function verify
+                 * @memberof apibara.starknet.v1alpha2.FieldElement
+                 * @static
+                 * @param {Object.<string,*>} message Plain object to verify
+                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
+                 */
+                FieldElement.verify = function verify(message) {
+                    if (typeof message !== "object" || message === null)
+                        return "object expected";
+                    if (message.loLo != null && message.hasOwnProperty("loLo"))
+                        if (!$util.isInteger(message.loLo) && !(message.loLo && $util.isInteger(message.loLo.low) && $util.isInteger(message.loLo.high)))
+                            return "loLo: integer|Long expected";
+                    if (message.loHi != null && message.hasOwnProperty("loHi"))
+                        if (!$util.isInteger(message.loHi) && !(message.loHi && $util.isInteger(message.loHi.low) && $util.isInteger(message.loHi.high)))
+                            return "loHi: integer|Long expected";
+                    if (message.hiLo != null && message.hasOwnProperty("hiLo"))
+                        if (!$util.isInteger(message.hiLo) && !(message.hiLo && $util.isInteger(message.hiLo.low) && $util.isInteger(message.hiLo.high)))
+                            return "hiLo: integer|Long expected";
+                    if (message.hiHi != null && message.hasOwnProperty("hiHi"))
+                        if (!$util.isInteger(message.hiHi) && !(message.hiHi && $util.isInteger(message.hiHi.low) && $util.isInteger(message.hiHi.high)))
+                            return "hiHi: integer|Long expected";
+                    return null;
+                };
+
+                /**
+                 * Creates a FieldElement message from a plain object. Also converts values to their respective internal types.
+                 * @function fromObject
+                 * @memberof apibara.starknet.v1alpha2.FieldElement
+                 * @static
+                 * @param {Object.<string,*>} object Plain object
+                 * @returns {apibara.starknet.v1alpha2.FieldElement} FieldElement
+                 */
+                FieldElement.fromObject = function fromObject(object) {
+                    if (object instanceof $root.apibara.starknet.v1alpha2.FieldElement)
+                        return object;
+                    var message = new $root.apibara.starknet.v1alpha2.FieldElement();
+                    if (object.loLo != null)
+                        if ($util.Long)
+                            (message.loLo = $util.Long.fromValue(object.loLo)).unsigned = false;
+                        else if (typeof object.loLo === "string")
+                            message.loLo = parseInt(object.loLo, 10);
+                        else if (typeof object.loLo === "number")
+                            message.loLo = object.loLo;
+                        else if (typeof object.loLo === "object")
+                            message.loLo = new $util.LongBits(object.loLo.low >>> 0, object.loLo.high >>> 0).toNumber();
+                    if (object.loHi != null)
+                        if ($util.Long)
+                            (message.loHi = $util.Long.fromValue(object.loHi)).unsigned = false;
+                        else if (typeof object.loHi === "string")
+                            message.loHi = parseInt(object.loHi, 10);
+                        else if (typeof object.loHi === "number")
+                            message.loHi = object.loHi;
+                        else if (typeof object.loHi === "object")
+                            message.loHi = new $util.LongBits(object.loHi.low >>> 0, object.loHi.high >>> 0).toNumber();
+                    if (object.hiLo != null)
+                        if ($util.Long)
+                            (message.hiLo = $util.Long.fromValue(object.hiLo)).unsigned = false;
+                        else if (typeof object.hiLo === "string")
+                            message.hiLo = parseInt(object.hiLo, 10);
+                        else if (typeof object.hiLo === "number")
+                            message.hiLo = object.hiLo;
+                        else if (typeof object.hiLo === "object")
+                            message.hiLo = new $util.LongBits(object.hiLo.low >>> 0, object.hiLo.high >>> 0).toNumber();
+                    if (object.hiHi != null)
+                        if ($util.Long)
+                            (message.hiHi = $util.Long.fromValue(object.hiHi)).unsigned = false;
+                        else if (typeof object.hiHi === "string")
+                            message.hiHi = parseInt(object.hiHi, 10);
+                        else if (typeof object.hiHi === "number")
+                            message.hiHi = object.hiHi;
+                        else if (typeof object.hiHi === "object")
+                            message.hiHi = new $util.LongBits(object.hiHi.low >>> 0, object.hiHi.high >>> 0).toNumber();
+                    return message;
+                };
+
+                /**
+                 * Creates a plain object from a FieldElement message. Also converts values to other types if specified.
+                 * @function toObject
+                 * @memberof apibara.starknet.v1alpha2.FieldElement
+                 * @static
+                 * @param {apibara.starknet.v1alpha2.FieldElement} message FieldElement
+                 * @param {$protobuf.IConversionOptions} [options] Conversion options
+                 * @returns {Object.<string,*>} Plain object
+                 */
+                FieldElement.toObject = function toObject(message, options) {
+                    if (!options)
+                        options = {};
+                    var object = {};
+                    if (options.defaults) {
+                        if ($util.Long) {
+                            var long = new $util.Long(0, 0, false);
+                            object.loLo = options.longs === String ? long.toString() : options.longs === Number ? long.toNumber() : long;
+                        } else
+                            object.loLo = options.longs === String ? "0" : 0;
+                        if ($util.Long) {
+                            var long = new $util.Long(0, 0, false);
+                            object.loHi = options.longs === String ? long.toString() : options.longs === Number ? long.toNumber() : long;
+                        } else
+                            object.loHi = options.longs === String ? "0" : 0;
+                        if ($util.Long) {
+                            var long = new $util.Long(0, 0, false);
+                            object.hiLo = options.longs === String ? long.toString() : options.longs === Number ? long.toNumber() : long;
+                        } else
+                            object.hiLo = options.longs === String ? "0" : 0;
+                        if ($util.Long) {
+                            var long = new $util.Long(0, 0, false);
+                            object.hiHi = options.longs === String ? long.toString() : options.longs === Number ? long.toNumber() : long;
+                        } else
+                            object.hiHi = options.longs === String ? "0" : 0;
+                    }
+                    if (message.loLo != null && message.hasOwnProperty("loLo"))
+                        if (typeof message.loLo === "number")
+                            object.loLo = options.longs === String ? String(message.loLo) : message.loLo;
+                        else
+                            object.loLo = options.longs === String ? $util.Long.prototype.toString.call(message.loLo) : options.longs === Number ? new $util.LongBits(message.loLo.low >>> 0, message.loLo.high >>> 0).toNumber() : message.loLo;
+                    if (message.loHi != null && message.hasOwnProperty("loHi"))
+                        if (typeof message.loHi === "number")
+                            object.loHi = options.longs === String ? String(message.loHi) : message.loHi;
+                        else
+                            object.loHi = options.longs === String ? $util.Long.prototype.toString.call(message.loHi) : options.longs === Number ? new $util.LongBits(message.loHi.low >>> 0, message.loHi.high >>> 0).toNumber() : message.loHi;
+                    if (message.hiLo != null && message.hasOwnProperty("hiLo"))
+                        if (typeof message.hiLo === "number")
+                            object.hiLo = options.longs === String ? String(message.hiLo) : message.hiLo;
+                        else
+                            object.hiLo = options.longs === String ? $util.Long.prototype.toString.call(message.hiLo) : options.longs === Number ? new $util.LongBits(message.hiLo.low >>> 0, message.hiLo.high >>> 0).toNumber() : message.hiLo;
+                    if (message.hiHi != null && message.hasOwnProperty("hiHi"))
+                        if (typeof message.hiHi === "number")
+                            object.hiHi = options.longs === String ? String(message.hiHi) : message.hiHi;
+                        else
+                            object.hiHi = options.longs === String ? $util.Long.prototype.toString.call(message.hiHi) : options.longs === Number ? new $util.LongBits(message.hiHi.low >>> 0, message.hiHi.high >>> 0).toNumber() : message.hiHi;
+                    return object;
+                };
+
+                /**
+                 * Converts this FieldElement to JSON.
+                 * @function toJSON
+                 * @memberof apibara.starknet.v1alpha2.FieldElement
+                 * @instance
+                 * @returns {Object.<string,*>} JSON object
+                 */
+                FieldElement.prototype.toJSON = function toJSON() {
+                    return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+                };
+
+                /**
+                 * Gets the default type url for FieldElement
+                 * @function getTypeUrl
+                 * @memberof apibara.starknet.v1alpha2.FieldElement
+                 * @static
+                 * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+                 * @returns {string} The default type url
+                 */
+                FieldElement.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
+                    if (typeUrlPrefix === undefined) {
+                        typeUrlPrefix = "type.googleapis.com";
+                    }
+                    return typeUrlPrefix + "/apibara.starknet.v1alpha2.FieldElement";
+                };
+
+                return FieldElement;
             })();
 
             return v1alpha2;

@@ -1225,6 +1225,12 @@ export namespace apibara {
 
                 /** StateUpdateFilter nonces */
                 nonces?: (apibara.starknet.v1alpha2.INonceUpdateFilter[]|null);
+
+                /** StateUpdateFilter declaredClasses */
+                declaredClasses?: (apibara.starknet.v1alpha2.IDeclaredClassFilter[]|null);
+
+                /** StateUpdateFilter replacedClasses */
+                replacedClasses?: (apibara.starknet.v1alpha2.IReplacedClassFilter[]|null);
             }
 
             /** Represents a StateUpdateFilter. */
@@ -1247,6 +1253,12 @@ export namespace apibara {
 
                 /** StateUpdateFilter nonces. */
                 public nonces: apibara.starknet.v1alpha2.INonceUpdateFilter[];
+
+                /** StateUpdateFilter declaredClasses. */
+                public declaredClasses: apibara.starknet.v1alpha2.IDeclaredClassFilter[];
+
+                /** StateUpdateFilter replacedClasses. */
+                public replacedClasses: apibara.starknet.v1alpha2.IReplacedClassFilter[];
 
                 /**
                  * Creates a new StateUpdateFilter instance using the specified properties.
@@ -1520,6 +1532,212 @@ export namespace apibara {
                 public static getTypeUrl(typeUrlPrefix?: string): string;
             }
 
+            /** Properties of a DeclaredClassFilter. */
+            interface IDeclaredClassFilter {
+
+                /** DeclaredClassFilter classHash */
+                classHash?: (apibara.starknet.v1alpha2.IFieldElement|null);
+
+                /** DeclaredClassFilter compiledClassHash */
+                compiledClassHash?: (apibara.starknet.v1alpha2.IFieldElement|null);
+            }
+
+            /** Represents a DeclaredClassFilter. */
+            class DeclaredClassFilter implements IDeclaredClassFilter {
+
+                /**
+                 * Constructs a new DeclaredClassFilter.
+                 * @param [properties] Properties to set
+                 */
+                constructor(properties?: apibara.starknet.v1alpha2.IDeclaredClassFilter);
+
+                /** DeclaredClassFilter classHash. */
+                public classHash?: (apibara.starknet.v1alpha2.IFieldElement|null);
+
+                /** DeclaredClassFilter compiledClassHash. */
+                public compiledClassHash?: (apibara.starknet.v1alpha2.IFieldElement|null);
+
+                /**
+                 * Creates a new DeclaredClassFilter instance using the specified properties.
+                 * @param [properties] Properties to set
+                 * @returns DeclaredClassFilter instance
+                 */
+                public static create(properties?: apibara.starknet.v1alpha2.IDeclaredClassFilter): apibara.starknet.v1alpha2.DeclaredClassFilter;
+
+                /**
+                 * Encodes the specified DeclaredClassFilter message. Does not implicitly {@link apibara.starknet.v1alpha2.DeclaredClassFilter.verify|verify} messages.
+                 * @param message DeclaredClassFilter message or plain object to encode
+                 * @param [writer] Writer to encode to
+                 * @returns Writer
+                 */
+                public static encode(message: apibara.starknet.v1alpha2.IDeclaredClassFilter, writer?: $protobuf.Writer): $protobuf.Writer;
+
+                /**
+                 * Encodes the specified DeclaredClassFilter message, length delimited. Does not implicitly {@link apibara.starknet.v1alpha2.DeclaredClassFilter.verify|verify} messages.
+                 * @param message DeclaredClassFilter message or plain object to encode
+                 * @param [writer] Writer to encode to
+                 * @returns Writer
+                 */
+                public static encodeDelimited(message: apibara.starknet.v1alpha2.IDeclaredClassFilter, writer?: $protobuf.Writer): $protobuf.Writer;
+
+                /**
+                 * Decodes a DeclaredClassFilter message from the specified reader or buffer.
+                 * @param reader Reader or buffer to decode from
+                 * @param [length] Message length if known beforehand
+                 * @returns DeclaredClassFilter
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): apibara.starknet.v1alpha2.DeclaredClassFilter;
+
+                /**
+                 * Decodes a DeclaredClassFilter message from the specified reader or buffer, length delimited.
+                 * @param reader Reader or buffer to decode from
+                 * @returns DeclaredClassFilter
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): apibara.starknet.v1alpha2.DeclaredClassFilter;
+
+                /**
+                 * Verifies a DeclaredClassFilter message.
+                 * @param message Plain object to verify
+                 * @returns `null` if valid, otherwise the reason why it is not
+                 */
+                public static verify(message: { [k: string]: any }): (string|null);
+
+                /**
+                 * Creates a DeclaredClassFilter message from a plain object. Also converts values to their respective internal types.
+                 * @param object Plain object
+                 * @returns DeclaredClassFilter
+                 */
+                public static fromObject(object: { [k: string]: any }): apibara.starknet.v1alpha2.DeclaredClassFilter;
+
+                /**
+                 * Creates a plain object from a DeclaredClassFilter message. Also converts values to other types if specified.
+                 * @param message DeclaredClassFilter
+                 * @param [options] Conversion options
+                 * @returns Plain object
+                 */
+                public static toObject(message: apibara.starknet.v1alpha2.DeclaredClassFilter, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+                /**
+                 * Converts this DeclaredClassFilter to JSON.
+                 * @returns JSON object
+                 */
+                public toJSON(): { [k: string]: any };
+
+                /**
+                 * Gets the default type url for DeclaredClassFilter
+                 * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+                 * @returns The default type url
+                 */
+                public static getTypeUrl(typeUrlPrefix?: string): string;
+            }
+
+            /** Properties of a ReplacedClassFilter. */
+            interface IReplacedClassFilter {
+
+                /** ReplacedClassFilter contractAddress */
+                contractAddress?: (apibara.starknet.v1alpha2.IFieldElement|null);
+
+                /** ReplacedClassFilter classHash */
+                classHash?: (apibara.starknet.v1alpha2.IFieldElement|null);
+            }
+
+            /** Represents a ReplacedClassFilter. */
+            class ReplacedClassFilter implements IReplacedClassFilter {
+
+                /**
+                 * Constructs a new ReplacedClassFilter.
+                 * @param [properties] Properties to set
+                 */
+                constructor(properties?: apibara.starknet.v1alpha2.IReplacedClassFilter);
+
+                /** ReplacedClassFilter contractAddress. */
+                public contractAddress?: (apibara.starknet.v1alpha2.IFieldElement|null);
+
+                /** ReplacedClassFilter classHash. */
+                public classHash?: (apibara.starknet.v1alpha2.IFieldElement|null);
+
+                /**
+                 * Creates a new ReplacedClassFilter instance using the specified properties.
+                 * @param [properties] Properties to set
+                 * @returns ReplacedClassFilter instance
+                 */
+                public static create(properties?: apibara.starknet.v1alpha2.IReplacedClassFilter): apibara.starknet.v1alpha2.ReplacedClassFilter;
+
+                /**
+                 * Encodes the specified ReplacedClassFilter message. Does not implicitly {@link apibara.starknet.v1alpha2.ReplacedClassFilter.verify|verify} messages.
+                 * @param message ReplacedClassFilter message or plain object to encode
+                 * @param [writer] Writer to encode to
+                 * @returns Writer
+                 */
+                public static encode(message: apibara.starknet.v1alpha2.IReplacedClassFilter, writer?: $protobuf.Writer): $protobuf.Writer;
+
+                /**
+                 * Encodes the specified ReplacedClassFilter message, length delimited. Does not implicitly {@link apibara.starknet.v1alpha2.ReplacedClassFilter.verify|verify} messages.
+                 * @param message ReplacedClassFilter message or plain object to encode
+                 * @param [writer] Writer to encode to
+                 * @returns Writer
+                 */
+                public static encodeDelimited(message: apibara.starknet.v1alpha2.IReplacedClassFilter, writer?: $protobuf.Writer): $protobuf.Writer;
+
+                /**
+                 * Decodes a ReplacedClassFilter message from the specified reader or buffer.
+                 * @param reader Reader or buffer to decode from
+                 * @param [length] Message length if known beforehand
+                 * @returns ReplacedClassFilter
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): apibara.starknet.v1alpha2.ReplacedClassFilter;
+
+                /**
+                 * Decodes a ReplacedClassFilter message from the specified reader or buffer, length delimited.
+                 * @param reader Reader or buffer to decode from
+                 * @returns ReplacedClassFilter
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): apibara.starknet.v1alpha2.ReplacedClassFilter;
+
+                /**
+                 * Verifies a ReplacedClassFilter message.
+                 * @param message Plain object to verify
+                 * @returns `null` if valid, otherwise the reason why it is not
+                 */
+                public static verify(message: { [k: string]: any }): (string|null);
+
+                /**
+                 * Creates a ReplacedClassFilter message from a plain object. Also converts values to their respective internal types.
+                 * @param object Plain object
+                 * @returns ReplacedClassFilter
+                 */
+                public static fromObject(object: { [k: string]: any }): apibara.starknet.v1alpha2.ReplacedClassFilter;
+
+                /**
+                 * Creates a plain object from a ReplacedClassFilter message. Also converts values to other types if specified.
+                 * @param message ReplacedClassFilter
+                 * @param [options] Conversion options
+                 * @returns Plain object
+                 */
+                public static toObject(message: apibara.starknet.v1alpha2.ReplacedClassFilter, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+                /**
+                 * Converts this ReplacedClassFilter to JSON.
+                 * @returns JSON object
+                 */
+                public toJSON(): { [k: string]: any };
+
+                /**
+                 * Gets the default type url for ReplacedClassFilter
+                 * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+                 * @returns The default type url
+                 */
+                public static getTypeUrl(typeUrlPrefix?: string): string;
+            }
+
             /** Properties of a DeployedContractFilter. */
             interface IDeployedContractFilter {
 
@@ -1720,121 +1938,6 @@ export namespace apibara {
 
                 /**
                  * Gets the default type url for NonceUpdateFilter
-                 * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
-                 * @returns The default type url
-                 */
-                public static getTypeUrl(typeUrlPrefix?: string): string;
-            }
-
-            /** Properties of a FieldElement. */
-            interface IFieldElement {
-
-                /** FieldElement loLo */
-                loLo?: (number|Long|null);
-
-                /** FieldElement loHi */
-                loHi?: (number|Long|null);
-
-                /** FieldElement hiLo */
-                hiLo?: (number|Long|null);
-
-                /** FieldElement hiHi */
-                hiHi?: (number|Long|null);
-            }
-
-            /** Represents a FieldElement. */
-            class FieldElement implements IFieldElement {
-
-                /**
-                 * Constructs a new FieldElement.
-                 * @param [properties] Properties to set
-                 */
-                constructor(properties?: apibara.starknet.v1alpha2.IFieldElement);
-
-                /** FieldElement loLo. */
-                public loLo: (number|Long);
-
-                /** FieldElement loHi. */
-                public loHi: (number|Long);
-
-                /** FieldElement hiLo. */
-                public hiLo: (number|Long);
-
-                /** FieldElement hiHi. */
-                public hiHi: (number|Long);
-
-                /**
-                 * Creates a new FieldElement instance using the specified properties.
-                 * @param [properties] Properties to set
-                 * @returns FieldElement instance
-                 */
-                public static create(properties?: apibara.starknet.v1alpha2.IFieldElement): apibara.starknet.v1alpha2.FieldElement;
-
-                /**
-                 * Encodes the specified FieldElement message. Does not implicitly {@link apibara.starknet.v1alpha2.FieldElement.verify|verify} messages.
-                 * @param message FieldElement message or plain object to encode
-                 * @param [writer] Writer to encode to
-                 * @returns Writer
-                 */
-                public static encode(message: apibara.starknet.v1alpha2.IFieldElement, writer?: $protobuf.Writer): $protobuf.Writer;
-
-                /**
-                 * Encodes the specified FieldElement message, length delimited. Does not implicitly {@link apibara.starknet.v1alpha2.FieldElement.verify|verify} messages.
-                 * @param message FieldElement message or plain object to encode
-                 * @param [writer] Writer to encode to
-                 * @returns Writer
-                 */
-                public static encodeDelimited(message: apibara.starknet.v1alpha2.IFieldElement, writer?: $protobuf.Writer): $protobuf.Writer;
-
-                /**
-                 * Decodes a FieldElement message from the specified reader or buffer.
-                 * @param reader Reader or buffer to decode from
-                 * @param [length] Message length if known beforehand
-                 * @returns FieldElement
-                 * @throws {Error} If the payload is not a reader or valid buffer
-                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
-                 */
-                public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): apibara.starknet.v1alpha2.FieldElement;
-
-                /**
-                 * Decodes a FieldElement message from the specified reader or buffer, length delimited.
-                 * @param reader Reader or buffer to decode from
-                 * @returns FieldElement
-                 * @throws {Error} If the payload is not a reader or valid buffer
-                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
-                 */
-                public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): apibara.starknet.v1alpha2.FieldElement;
-
-                /**
-                 * Verifies a FieldElement message.
-                 * @param message Plain object to verify
-                 * @returns `null` if valid, otherwise the reason why it is not
-                 */
-                public static verify(message: { [k: string]: any }): (string|null);
-
-                /**
-                 * Creates a FieldElement message from a plain object. Also converts values to their respective internal types.
-                 * @param object Plain object
-                 * @returns FieldElement
-                 */
-                public static fromObject(object: { [k: string]: any }): apibara.starknet.v1alpha2.FieldElement;
-
-                /**
-                 * Creates a plain object from a FieldElement message. Also converts values to other types if specified.
-                 * @param message FieldElement
-                 * @param [options] Conversion options
-                 * @returns Plain object
-                 */
-                public static toObject(message: apibara.starknet.v1alpha2.FieldElement, options?: $protobuf.IConversionOptions): { [k: string]: any };
-
-                /**
-                 * Converts this FieldElement to JSON.
-                 * @returns JSON object
-                 */
-                public toJSON(): { [k: string]: any };
-
-                /**
-                 * Gets the default type url for FieldElement
                  * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
                  * @returns The default type url
                  */
@@ -2793,6 +2896,9 @@ export namespace apibara {
 
                 /** DeclareTransaction senderAddress */
                 senderAddress?: (apibara.starknet.v1alpha2.IFieldElement|null);
+
+                /** DeclareTransaction compiledClassHash */
+                compiledClassHash?: (apibara.starknet.v1alpha2.IFieldElement|null);
             }
 
             /** Represents a DeclareTransaction. */
@@ -2809,6 +2915,9 @@ export namespace apibara {
 
                 /** DeclareTransaction senderAddress. */
                 public senderAddress?: (apibara.starknet.v1alpha2.IFieldElement|null);
+
+                /** DeclareTransaction compiledClassHash. */
+                public compiledClassHash?: (apibara.starknet.v1alpha2.IFieldElement|null);
 
                 /**
                  * Creates a new DeclareTransaction instance using the specified properties.
@@ -3123,6 +3232,9 @@ export namespace apibara {
 
                 /** TransactionReceipt events */
                 events?: (apibara.starknet.v1alpha2.IEvent[]|null);
+
+                /** TransactionReceipt contractAddress */
+                contractAddress?: (apibara.starknet.v1alpha2.IFieldElement|null);
             }
 
             /** Represents a TransactionReceipt. */
@@ -3148,6 +3260,9 @@ export namespace apibara {
 
                 /** TransactionReceipt events. */
                 public events: apibara.starknet.v1alpha2.IEvent[];
+
+                /** TransactionReceipt contractAddress. */
+                public contractAddress?: (apibara.starknet.v1alpha2.IFieldElement|null);
 
                 /**
                  * Creates a new TransactionReceipt instance using the specified properties.
@@ -3344,6 +3459,12 @@ export namespace apibara {
 
                 /** L2ToL1Message payload */
                 payload?: (apibara.starknet.v1alpha2.IFieldElement[]|null);
+
+                /** L2ToL1Message index */
+                index?: (number|Long|null);
+
+                /** L2ToL1Message fromAddress */
+                fromAddress?: (apibara.starknet.v1alpha2.IFieldElement|null);
             }
 
             /** Represents a L2ToL1Message. */
@@ -3360,6 +3481,12 @@ export namespace apibara {
 
                 /** L2ToL1Message payload. */
                 public payload: apibara.starknet.v1alpha2.IFieldElement[];
+
+                /** L2ToL1Message index. */
+                public index: (number|Long);
+
+                /** L2ToL1Message fromAddress. */
+                public fromAddress?: (apibara.starknet.v1alpha2.IFieldElement|null);
 
                 /**
                  * Creates a new L2ToL1Message instance using the specified properties.
@@ -3559,6 +3686,9 @@ export namespace apibara {
 
                 /** Event data */
                 data?: (apibara.starknet.v1alpha2.IFieldElement[]|null);
+
+                /** Event index */
+                index?: (number|Long|null);
             }
 
             /** Represents an Event. */
@@ -3578,6 +3708,9 @@ export namespace apibara {
 
                 /** Event data. */
                 public data: apibara.starknet.v1alpha2.IFieldElement[];
+
+                /** Event index. */
+                public index: (number|Long);
 
                 /**
                  * Creates a new Event instance using the specified properties.
@@ -3780,6 +3913,12 @@ export namespace apibara {
 
                 /** StateDiff nonces */
                 nonces?: (apibara.starknet.v1alpha2.INonceUpdate[]|null);
+
+                /** StateDiff declaredClasses */
+                declaredClasses?: (apibara.starknet.v1alpha2.IDeclaredClass[]|null);
+
+                /** StateDiff replacedClasses */
+                replacedClasses?: (apibara.starknet.v1alpha2.IReplacedClass[]|null);
             }
 
             /** Represents a StateDiff. */
@@ -3802,6 +3941,12 @@ export namespace apibara {
 
                 /** StateDiff nonces. */
                 public nonces: apibara.starknet.v1alpha2.INonceUpdate[];
+
+                /** StateDiff declaredClasses. */
+                public declaredClasses: apibara.starknet.v1alpha2.IDeclaredClass[];
+
+                /** StateDiff replacedClasses. */
+                public replacedClasses: apibara.starknet.v1alpha2.IReplacedClass[];
 
                 /**
                  * Creates a new StateDiff instance using the specified properties.
@@ -4184,6 +4329,212 @@ export namespace apibara {
                 public static getTypeUrl(typeUrlPrefix?: string): string;
             }
 
+            /** Properties of a DeclaredClass. */
+            interface IDeclaredClass {
+
+                /** DeclaredClass classHash */
+                classHash?: (apibara.starknet.v1alpha2.IFieldElement|null);
+
+                /** DeclaredClass compiledClassHash */
+                compiledClassHash?: (apibara.starknet.v1alpha2.IFieldElement|null);
+            }
+
+            /** Represents a DeclaredClass. */
+            class DeclaredClass implements IDeclaredClass {
+
+                /**
+                 * Constructs a new DeclaredClass.
+                 * @param [properties] Properties to set
+                 */
+                constructor(properties?: apibara.starknet.v1alpha2.IDeclaredClass);
+
+                /** DeclaredClass classHash. */
+                public classHash?: (apibara.starknet.v1alpha2.IFieldElement|null);
+
+                /** DeclaredClass compiledClassHash. */
+                public compiledClassHash?: (apibara.starknet.v1alpha2.IFieldElement|null);
+
+                /**
+                 * Creates a new DeclaredClass instance using the specified properties.
+                 * @param [properties] Properties to set
+                 * @returns DeclaredClass instance
+                 */
+                public static create(properties?: apibara.starknet.v1alpha2.IDeclaredClass): apibara.starknet.v1alpha2.DeclaredClass;
+
+                /**
+                 * Encodes the specified DeclaredClass message. Does not implicitly {@link apibara.starknet.v1alpha2.DeclaredClass.verify|verify} messages.
+                 * @param message DeclaredClass message or plain object to encode
+                 * @param [writer] Writer to encode to
+                 * @returns Writer
+                 */
+                public static encode(message: apibara.starknet.v1alpha2.IDeclaredClass, writer?: $protobuf.Writer): $protobuf.Writer;
+
+                /**
+                 * Encodes the specified DeclaredClass message, length delimited. Does not implicitly {@link apibara.starknet.v1alpha2.DeclaredClass.verify|verify} messages.
+                 * @param message DeclaredClass message or plain object to encode
+                 * @param [writer] Writer to encode to
+                 * @returns Writer
+                 */
+                public static encodeDelimited(message: apibara.starknet.v1alpha2.IDeclaredClass, writer?: $protobuf.Writer): $protobuf.Writer;
+
+                /**
+                 * Decodes a DeclaredClass message from the specified reader or buffer.
+                 * @param reader Reader or buffer to decode from
+                 * @param [length] Message length if known beforehand
+                 * @returns DeclaredClass
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): apibara.starknet.v1alpha2.DeclaredClass;
+
+                /**
+                 * Decodes a DeclaredClass message from the specified reader or buffer, length delimited.
+                 * @param reader Reader or buffer to decode from
+                 * @returns DeclaredClass
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): apibara.starknet.v1alpha2.DeclaredClass;
+
+                /**
+                 * Verifies a DeclaredClass message.
+                 * @param message Plain object to verify
+                 * @returns `null` if valid, otherwise the reason why it is not
+                 */
+                public static verify(message: { [k: string]: any }): (string|null);
+
+                /**
+                 * Creates a DeclaredClass message from a plain object. Also converts values to their respective internal types.
+                 * @param object Plain object
+                 * @returns DeclaredClass
+                 */
+                public static fromObject(object: { [k: string]: any }): apibara.starknet.v1alpha2.DeclaredClass;
+
+                /**
+                 * Creates a plain object from a DeclaredClass message. Also converts values to other types if specified.
+                 * @param message DeclaredClass
+                 * @param [options] Conversion options
+                 * @returns Plain object
+                 */
+                public static toObject(message: apibara.starknet.v1alpha2.DeclaredClass, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+                /**
+                 * Converts this DeclaredClass to JSON.
+                 * @returns JSON object
+                 */
+                public toJSON(): { [k: string]: any };
+
+                /**
+                 * Gets the default type url for DeclaredClass
+                 * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+                 * @returns The default type url
+                 */
+                public static getTypeUrl(typeUrlPrefix?: string): string;
+            }
+
+            /** Properties of a ReplacedClass. */
+            interface IReplacedClass {
+
+                /** ReplacedClass contractAddress */
+                contractAddress?: (apibara.starknet.v1alpha2.IFieldElement|null);
+
+                /** ReplacedClass classHash */
+                classHash?: (apibara.starknet.v1alpha2.IFieldElement|null);
+            }
+
+            /** Represents a ReplacedClass. */
+            class ReplacedClass implements IReplacedClass {
+
+                /**
+                 * Constructs a new ReplacedClass.
+                 * @param [properties] Properties to set
+                 */
+                constructor(properties?: apibara.starknet.v1alpha2.IReplacedClass);
+
+                /** ReplacedClass contractAddress. */
+                public contractAddress?: (apibara.starknet.v1alpha2.IFieldElement|null);
+
+                /** ReplacedClass classHash. */
+                public classHash?: (apibara.starknet.v1alpha2.IFieldElement|null);
+
+                /**
+                 * Creates a new ReplacedClass instance using the specified properties.
+                 * @param [properties] Properties to set
+                 * @returns ReplacedClass instance
+                 */
+                public static create(properties?: apibara.starknet.v1alpha2.IReplacedClass): apibara.starknet.v1alpha2.ReplacedClass;
+
+                /**
+                 * Encodes the specified ReplacedClass message. Does not implicitly {@link apibara.starknet.v1alpha2.ReplacedClass.verify|verify} messages.
+                 * @param message ReplacedClass message or plain object to encode
+                 * @param [writer] Writer to encode to
+                 * @returns Writer
+                 */
+                public static encode(message: apibara.starknet.v1alpha2.IReplacedClass, writer?: $protobuf.Writer): $protobuf.Writer;
+
+                /**
+                 * Encodes the specified ReplacedClass message, length delimited. Does not implicitly {@link apibara.starknet.v1alpha2.ReplacedClass.verify|verify} messages.
+                 * @param message ReplacedClass message or plain object to encode
+                 * @param [writer] Writer to encode to
+                 * @returns Writer
+                 */
+                public static encodeDelimited(message: apibara.starknet.v1alpha2.IReplacedClass, writer?: $protobuf.Writer): $protobuf.Writer;
+
+                /**
+                 * Decodes a ReplacedClass message from the specified reader or buffer.
+                 * @param reader Reader or buffer to decode from
+                 * @param [length] Message length if known beforehand
+                 * @returns ReplacedClass
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): apibara.starknet.v1alpha2.ReplacedClass;
+
+                /**
+                 * Decodes a ReplacedClass message from the specified reader or buffer, length delimited.
+                 * @param reader Reader or buffer to decode from
+                 * @returns ReplacedClass
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): apibara.starknet.v1alpha2.ReplacedClass;
+
+                /**
+                 * Verifies a ReplacedClass message.
+                 * @param message Plain object to verify
+                 * @returns `null` if valid, otherwise the reason why it is not
+                 */
+                public static verify(message: { [k: string]: any }): (string|null);
+
+                /**
+                 * Creates a ReplacedClass message from a plain object. Also converts values to their respective internal types.
+                 * @param object Plain object
+                 * @returns ReplacedClass
+                 */
+                public static fromObject(object: { [k: string]: any }): apibara.starknet.v1alpha2.ReplacedClass;
+
+                /**
+                 * Creates a plain object from a ReplacedClass message. Also converts values to other types if specified.
+                 * @param message ReplacedClass
+                 * @param [options] Conversion options
+                 * @returns Plain object
+                 */
+                public static toObject(message: apibara.starknet.v1alpha2.ReplacedClass, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+                /**
+                 * Converts this ReplacedClass to JSON.
+                 * @returns JSON object
+                 */
+                public toJSON(): { [k: string]: any };
+
+                /**
+                 * Gets the default type url for ReplacedClass
+                 * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+                 * @returns The default type url
+                 */
+                public static getTypeUrl(typeUrlPrefix?: string): string;
+            }
+
             /** Properties of a DeployedContract. */
             interface IDeployedContract {
 
@@ -4384,6 +4735,121 @@ export namespace apibara {
 
                 /**
                  * Gets the default type url for NonceUpdate
+                 * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+                 * @returns The default type url
+                 */
+                public static getTypeUrl(typeUrlPrefix?: string): string;
+            }
+
+            /** Properties of a FieldElement. */
+            interface IFieldElement {
+
+                /** FieldElement loLo */
+                loLo?: (number|Long|null);
+
+                /** FieldElement loHi */
+                loHi?: (number|Long|null);
+
+                /** FieldElement hiLo */
+                hiLo?: (number|Long|null);
+
+                /** FieldElement hiHi */
+                hiHi?: (number|Long|null);
+            }
+
+            /** Represents a FieldElement. */
+            class FieldElement implements IFieldElement {
+
+                /**
+                 * Constructs a new FieldElement.
+                 * @param [properties] Properties to set
+                 */
+                constructor(properties?: apibara.starknet.v1alpha2.IFieldElement);
+
+                /** FieldElement loLo. */
+                public loLo: (number|Long);
+
+                /** FieldElement loHi. */
+                public loHi: (number|Long);
+
+                /** FieldElement hiLo. */
+                public hiLo: (number|Long);
+
+                /** FieldElement hiHi. */
+                public hiHi: (number|Long);
+
+                /**
+                 * Creates a new FieldElement instance using the specified properties.
+                 * @param [properties] Properties to set
+                 * @returns FieldElement instance
+                 */
+                public static create(properties?: apibara.starknet.v1alpha2.IFieldElement): apibara.starknet.v1alpha2.FieldElement;
+
+                /**
+                 * Encodes the specified FieldElement message. Does not implicitly {@link apibara.starknet.v1alpha2.FieldElement.verify|verify} messages.
+                 * @param message FieldElement message or plain object to encode
+                 * @param [writer] Writer to encode to
+                 * @returns Writer
+                 */
+                public static encode(message: apibara.starknet.v1alpha2.IFieldElement, writer?: $protobuf.Writer): $protobuf.Writer;
+
+                /**
+                 * Encodes the specified FieldElement message, length delimited. Does not implicitly {@link apibara.starknet.v1alpha2.FieldElement.verify|verify} messages.
+                 * @param message FieldElement message or plain object to encode
+                 * @param [writer] Writer to encode to
+                 * @returns Writer
+                 */
+                public static encodeDelimited(message: apibara.starknet.v1alpha2.IFieldElement, writer?: $protobuf.Writer): $protobuf.Writer;
+
+                /**
+                 * Decodes a FieldElement message from the specified reader or buffer.
+                 * @param reader Reader or buffer to decode from
+                 * @param [length] Message length if known beforehand
+                 * @returns FieldElement
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): apibara.starknet.v1alpha2.FieldElement;
+
+                /**
+                 * Decodes a FieldElement message from the specified reader or buffer, length delimited.
+                 * @param reader Reader or buffer to decode from
+                 * @returns FieldElement
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): apibara.starknet.v1alpha2.FieldElement;
+
+                /**
+                 * Verifies a FieldElement message.
+                 * @param message Plain object to verify
+                 * @returns `null` if valid, otherwise the reason why it is not
+                 */
+                public static verify(message: { [k: string]: any }): (string|null);
+
+                /**
+                 * Creates a FieldElement message from a plain object. Also converts values to their respective internal types.
+                 * @param object Plain object
+                 * @returns FieldElement
+                 */
+                public static fromObject(object: { [k: string]: any }): apibara.starknet.v1alpha2.FieldElement;
+
+                /**
+                 * Creates a plain object from a FieldElement message. Also converts values to other types if specified.
+                 * @param message FieldElement
+                 * @param [options] Conversion options
+                 * @returns Plain object
+                 */
+                public static toObject(message: apibara.starknet.v1alpha2.FieldElement, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+                /**
+                 * Converts this FieldElement to JSON.
+                 * @returns JSON object
+                 */
+                public toJSON(): { [k: string]: any };
+
+                /**
+                 * Gets the default type url for FieldElement
                  * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
                  * @returns The default type url
                  */

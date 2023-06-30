@@ -47,7 +47,7 @@ describe('Filter', () => {
     })
   })
 
-  describe('addStateUpdate', () => {
+  describe('withStateUpdate', () => {
     it('accepts a callback function', () => {
       let filter = Filter.create()
         .withStateUpdate((s) => s)
@@ -58,6 +58,60 @@ describe('Filter', () => {
     it('accepts a builder', () => {
       let filter = Filter.create().withStateUpdate(Filter.stateUpdate()).toObject()
       expect(filter.stateUpdate).toBeDefined()
+    })
+
+    describe('addStorageDiff', () => {
+      it('accepts a callback function', () => {
+        let filter = Filter.create()
+          .withStateUpdate((s) => s.addStorageDiff((d) => d).addStorageDiff((d) => d))
+          .toObject()
+        expect(filter.stateUpdate?.storageDiffs).toHaveLength(2)
+      })
+    })
+
+    describe('addDeclaredContract', () => {
+      it('accepts a callback function', () => {
+        let filter = Filter.create()
+          .withStateUpdate((s) => s.addDeclaredContract((d) => d).addDeclaredContract((d) => d))
+          .toObject()
+        expect(filter.stateUpdate?.declaredContracts).toHaveLength(2)
+      })
+    })
+
+    describe('addDeployedContract', () => {
+      it('accepts a callback function', () => {
+        let filter = Filter.create()
+          .withStateUpdate((s) => s.addDeployedContract((d) => d).addDeployedContract((d) => d))
+          .toObject()
+        expect(filter.stateUpdate?.deployedContracts).toHaveLength(2)
+      })
+    })
+
+    describe('addDeclaredClass', () => {
+      it('accepts a callback function', () => {
+        let filter = Filter.create()
+          .withStateUpdate((s) => s.addDeclaredClass((d) => d).addDeclaredClass((d) => d))
+          .toObject()
+        expect(filter.stateUpdate?.declaredClasses).toHaveLength(2)
+      })
+    })
+
+    describe('addReplacedClass', () => {
+      it('accepts a callback function', () => {
+        let filter = Filter.create()
+          .withStateUpdate((s) => s.addReplacedClass((d) => d).addReplacedClass((d) => d))
+          .toObject()
+        expect(filter.stateUpdate?.replacedClasses).toHaveLength(2)
+      })
+    })
+
+    describe('addNonceUpdated', () => {
+      it('accepts a callback function', () => {
+        let filter = Filter.create()
+          .withStateUpdate((s) => s.addNonceUpdate((d) => d).addNonceUpdate((d) => d))
+          .toObject()
+        expect(filter.stateUpdate?.nonces).toHaveLength(2)
+      })
     })
   })
 })
