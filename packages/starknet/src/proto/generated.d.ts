@@ -1944,6 +1944,121 @@ export namespace apibara {
                 public static getTypeUrl(typeUrlPrefix?: string): string;
             }
 
+            /** Properties of a FieldElement. */
+            interface IFieldElement {
+
+                /** FieldElement loLo */
+                loLo?: (number|Long|null);
+
+                /** FieldElement loHi */
+                loHi?: (number|Long|null);
+
+                /** FieldElement hiLo */
+                hiLo?: (number|Long|null);
+
+                /** FieldElement hiHi */
+                hiHi?: (number|Long|null);
+            }
+
+            /** Represents a FieldElement. */
+            class FieldElement implements IFieldElement {
+
+                /**
+                 * Constructs a new FieldElement.
+                 * @param [properties] Properties to set
+                 */
+                constructor(properties?: apibara.starknet.v1alpha2.IFieldElement);
+
+                /** FieldElement loLo. */
+                public loLo: (number|Long);
+
+                /** FieldElement loHi. */
+                public loHi: (number|Long);
+
+                /** FieldElement hiLo. */
+                public hiLo: (number|Long);
+
+                /** FieldElement hiHi. */
+                public hiHi: (number|Long);
+
+                /**
+                 * Creates a new FieldElement instance using the specified properties.
+                 * @param [properties] Properties to set
+                 * @returns FieldElement instance
+                 */
+                public static create(properties?: apibara.starknet.v1alpha2.IFieldElement): apibara.starknet.v1alpha2.FieldElement;
+
+                /**
+                 * Encodes the specified FieldElement message. Does not implicitly {@link apibara.starknet.v1alpha2.FieldElement.verify|verify} messages.
+                 * @param message FieldElement message or plain object to encode
+                 * @param [writer] Writer to encode to
+                 * @returns Writer
+                 */
+                public static encode(message: apibara.starknet.v1alpha2.IFieldElement, writer?: $protobuf.Writer): $protobuf.Writer;
+
+                /**
+                 * Encodes the specified FieldElement message, length delimited. Does not implicitly {@link apibara.starknet.v1alpha2.FieldElement.verify|verify} messages.
+                 * @param message FieldElement message or plain object to encode
+                 * @param [writer] Writer to encode to
+                 * @returns Writer
+                 */
+                public static encodeDelimited(message: apibara.starknet.v1alpha2.IFieldElement, writer?: $protobuf.Writer): $protobuf.Writer;
+
+                /**
+                 * Decodes a FieldElement message from the specified reader or buffer.
+                 * @param reader Reader or buffer to decode from
+                 * @param [length] Message length if known beforehand
+                 * @returns FieldElement
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): apibara.starknet.v1alpha2.FieldElement;
+
+                /**
+                 * Decodes a FieldElement message from the specified reader or buffer, length delimited.
+                 * @param reader Reader or buffer to decode from
+                 * @returns FieldElement
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): apibara.starknet.v1alpha2.FieldElement;
+
+                /**
+                 * Verifies a FieldElement message.
+                 * @param message Plain object to verify
+                 * @returns `null` if valid, otherwise the reason why it is not
+                 */
+                public static verify(message: { [k: string]: any }): (string|null);
+
+                /**
+                 * Creates a FieldElement message from a plain object. Also converts values to their respective internal types.
+                 * @param object Plain object
+                 * @returns FieldElement
+                 */
+                public static fromObject(object: { [k: string]: any }): apibara.starknet.v1alpha2.FieldElement;
+
+                /**
+                 * Creates a plain object from a FieldElement message. Also converts values to other types if specified.
+                 * @param message FieldElement
+                 * @param [options] Conversion options
+                 * @returns Plain object
+                 */
+                public static toObject(message: apibara.starknet.v1alpha2.FieldElement, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+                /**
+                 * Converts this FieldElement to JSON.
+                 * @returns JSON object
+                 */
+                public toJSON(): { [k: string]: any };
+
+                /**
+                 * Gets the default type url for FieldElement
+                 * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+                 * @returns The default type url
+                 */
+                public static getTypeUrl(typeUrlPrefix?: string): string;
+            }
+
             /** Properties of a Block. */
             interface IBlock {
 
@@ -4735,121 +4850,6 @@ export namespace apibara {
 
                 /**
                  * Gets the default type url for NonceUpdate
-                 * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
-                 * @returns The default type url
-                 */
-                public static getTypeUrl(typeUrlPrefix?: string): string;
-            }
-
-            /** Properties of a FieldElement. */
-            interface IFieldElement {
-
-                /** FieldElement loLo */
-                loLo?: (number|Long|null);
-
-                /** FieldElement loHi */
-                loHi?: (number|Long|null);
-
-                /** FieldElement hiLo */
-                hiLo?: (number|Long|null);
-
-                /** FieldElement hiHi */
-                hiHi?: (number|Long|null);
-            }
-
-            /** Represents a FieldElement. */
-            class FieldElement implements IFieldElement {
-
-                /**
-                 * Constructs a new FieldElement.
-                 * @param [properties] Properties to set
-                 */
-                constructor(properties?: apibara.starknet.v1alpha2.IFieldElement);
-
-                /** FieldElement loLo. */
-                public loLo: (number|Long);
-
-                /** FieldElement loHi. */
-                public loHi: (number|Long);
-
-                /** FieldElement hiLo. */
-                public hiLo: (number|Long);
-
-                /** FieldElement hiHi. */
-                public hiHi: (number|Long);
-
-                /**
-                 * Creates a new FieldElement instance using the specified properties.
-                 * @param [properties] Properties to set
-                 * @returns FieldElement instance
-                 */
-                public static create(properties?: apibara.starknet.v1alpha2.IFieldElement): apibara.starknet.v1alpha2.FieldElement;
-
-                /**
-                 * Encodes the specified FieldElement message. Does not implicitly {@link apibara.starknet.v1alpha2.FieldElement.verify|verify} messages.
-                 * @param message FieldElement message or plain object to encode
-                 * @param [writer] Writer to encode to
-                 * @returns Writer
-                 */
-                public static encode(message: apibara.starknet.v1alpha2.IFieldElement, writer?: $protobuf.Writer): $protobuf.Writer;
-
-                /**
-                 * Encodes the specified FieldElement message, length delimited. Does not implicitly {@link apibara.starknet.v1alpha2.FieldElement.verify|verify} messages.
-                 * @param message FieldElement message or plain object to encode
-                 * @param [writer] Writer to encode to
-                 * @returns Writer
-                 */
-                public static encodeDelimited(message: apibara.starknet.v1alpha2.IFieldElement, writer?: $protobuf.Writer): $protobuf.Writer;
-
-                /**
-                 * Decodes a FieldElement message from the specified reader or buffer.
-                 * @param reader Reader or buffer to decode from
-                 * @param [length] Message length if known beforehand
-                 * @returns FieldElement
-                 * @throws {Error} If the payload is not a reader or valid buffer
-                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
-                 */
-                public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): apibara.starknet.v1alpha2.FieldElement;
-
-                /**
-                 * Decodes a FieldElement message from the specified reader or buffer, length delimited.
-                 * @param reader Reader or buffer to decode from
-                 * @returns FieldElement
-                 * @throws {Error} If the payload is not a reader or valid buffer
-                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
-                 */
-                public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): apibara.starknet.v1alpha2.FieldElement;
-
-                /**
-                 * Verifies a FieldElement message.
-                 * @param message Plain object to verify
-                 * @returns `null` if valid, otherwise the reason why it is not
-                 */
-                public static verify(message: { [k: string]: any }): (string|null);
-
-                /**
-                 * Creates a FieldElement message from a plain object. Also converts values to their respective internal types.
-                 * @param object Plain object
-                 * @returns FieldElement
-                 */
-                public static fromObject(object: { [k: string]: any }): apibara.starknet.v1alpha2.FieldElement;
-
-                /**
-                 * Creates a plain object from a FieldElement message. Also converts values to other types if specified.
-                 * @param message FieldElement
-                 * @param [options] Conversion options
-                 * @returns Plain object
-                 */
-                public static toObject(message: apibara.starknet.v1alpha2.FieldElement, options?: $protobuf.IConversionOptions): { [k: string]: any };
-
-                /**
-                 * Converts this FieldElement to JSON.
-                 * @returns JSON object
-                 */
-                public toJSON(): { [k: string]: any };
-
-                /**
-                 * Gets the default type url for FieldElement
                  * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
                  * @returns The default type url
                  */

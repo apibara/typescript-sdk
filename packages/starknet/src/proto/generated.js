@@ -4990,6 +4990,335 @@ $root.apibara = (function() {
                 return NonceUpdateFilter;
             })();
 
+            v1alpha2.FieldElement = (function() {
+
+                /**
+                 * Properties of a FieldElement.
+                 * @memberof apibara.starknet.v1alpha2
+                 * @interface IFieldElement
+                 * @property {number|Long|null} [loLo] FieldElement loLo
+                 * @property {number|Long|null} [loHi] FieldElement loHi
+                 * @property {number|Long|null} [hiLo] FieldElement hiLo
+                 * @property {number|Long|null} [hiHi] FieldElement hiHi
+                 */
+
+                /**
+                 * Constructs a new FieldElement.
+                 * @memberof apibara.starknet.v1alpha2
+                 * @classdesc Represents a FieldElement.
+                 * @implements IFieldElement
+                 * @constructor
+                 * @param {apibara.starknet.v1alpha2.IFieldElement=} [properties] Properties to set
+                 */
+                function FieldElement(properties) {
+                    if (properties)
+                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                            if (properties[keys[i]] != null)
+                                this[keys[i]] = properties[keys[i]];
+                }
+
+                /**
+                 * FieldElement loLo.
+                 * @member {number|Long} loLo
+                 * @memberof apibara.starknet.v1alpha2.FieldElement
+                 * @instance
+                 */
+                FieldElement.prototype.loLo = $util.Long ? $util.Long.fromBits(0,0,false) : 0;
+
+                /**
+                 * FieldElement loHi.
+                 * @member {number|Long} loHi
+                 * @memberof apibara.starknet.v1alpha2.FieldElement
+                 * @instance
+                 */
+                FieldElement.prototype.loHi = $util.Long ? $util.Long.fromBits(0,0,false) : 0;
+
+                /**
+                 * FieldElement hiLo.
+                 * @member {number|Long} hiLo
+                 * @memberof apibara.starknet.v1alpha2.FieldElement
+                 * @instance
+                 */
+                FieldElement.prototype.hiLo = $util.Long ? $util.Long.fromBits(0,0,false) : 0;
+
+                /**
+                 * FieldElement hiHi.
+                 * @member {number|Long} hiHi
+                 * @memberof apibara.starknet.v1alpha2.FieldElement
+                 * @instance
+                 */
+                FieldElement.prototype.hiHi = $util.Long ? $util.Long.fromBits(0,0,false) : 0;
+
+                /**
+                 * Creates a new FieldElement instance using the specified properties.
+                 * @function create
+                 * @memberof apibara.starknet.v1alpha2.FieldElement
+                 * @static
+                 * @param {apibara.starknet.v1alpha2.IFieldElement=} [properties] Properties to set
+                 * @returns {apibara.starknet.v1alpha2.FieldElement} FieldElement instance
+                 */
+                FieldElement.create = function create(properties) {
+                    return new FieldElement(properties);
+                };
+
+                /**
+                 * Encodes the specified FieldElement message. Does not implicitly {@link apibara.starknet.v1alpha2.FieldElement.verify|verify} messages.
+                 * @function encode
+                 * @memberof apibara.starknet.v1alpha2.FieldElement
+                 * @static
+                 * @param {apibara.starknet.v1alpha2.IFieldElement} message FieldElement message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                FieldElement.encode = function encode(message, writer) {
+                    if (!writer)
+                        writer = $Writer.create();
+                    if (message.loLo != null && Object.hasOwnProperty.call(message, "loLo"))
+                        writer.uint32(/* id 1, wireType 1 =*/9).fixed64(message.loLo);
+                    if (message.loHi != null && Object.hasOwnProperty.call(message, "loHi"))
+                        writer.uint32(/* id 2, wireType 1 =*/17).fixed64(message.loHi);
+                    if (message.hiLo != null && Object.hasOwnProperty.call(message, "hiLo"))
+                        writer.uint32(/* id 3, wireType 1 =*/25).fixed64(message.hiLo);
+                    if (message.hiHi != null && Object.hasOwnProperty.call(message, "hiHi"))
+                        writer.uint32(/* id 4, wireType 1 =*/33).fixed64(message.hiHi);
+                    return writer;
+                };
+
+                /**
+                 * Encodes the specified FieldElement message, length delimited. Does not implicitly {@link apibara.starknet.v1alpha2.FieldElement.verify|verify} messages.
+                 * @function encodeDelimited
+                 * @memberof apibara.starknet.v1alpha2.FieldElement
+                 * @static
+                 * @param {apibara.starknet.v1alpha2.IFieldElement} message FieldElement message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                FieldElement.encodeDelimited = function encodeDelimited(message, writer) {
+                    return this.encode(message, writer).ldelim();
+                };
+
+                /**
+                 * Decodes a FieldElement message from the specified reader or buffer.
+                 * @function decode
+                 * @memberof apibara.starknet.v1alpha2.FieldElement
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @param {number} [length] Message length if known beforehand
+                 * @returns {apibara.starknet.v1alpha2.FieldElement} FieldElement
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                FieldElement.decode = function decode(reader, length) {
+                    if (!(reader instanceof $Reader))
+                        reader = $Reader.create(reader);
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.apibara.starknet.v1alpha2.FieldElement();
+                    while (reader.pos < end) {
+                        var tag = reader.uint32();
+                        switch (tag >>> 3) {
+                        case 1: {
+                                message.loLo = reader.fixed64();
+                                break;
+                            }
+                        case 2: {
+                                message.loHi = reader.fixed64();
+                                break;
+                            }
+                        case 3: {
+                                message.hiLo = reader.fixed64();
+                                break;
+                            }
+                        case 4: {
+                                message.hiHi = reader.fixed64();
+                                break;
+                            }
+                        default:
+                            reader.skipType(tag & 7);
+                            break;
+                        }
+                    }
+                    return message;
+                };
+
+                /**
+                 * Decodes a FieldElement message from the specified reader or buffer, length delimited.
+                 * @function decodeDelimited
+                 * @memberof apibara.starknet.v1alpha2.FieldElement
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @returns {apibara.starknet.v1alpha2.FieldElement} FieldElement
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                FieldElement.decodeDelimited = function decodeDelimited(reader) {
+                    if (!(reader instanceof $Reader))
+                        reader = new $Reader(reader);
+                    return this.decode(reader, reader.uint32());
+                };
+
+                /**
+                 * Verifies a FieldElement message.
+                 * @function verify
+                 * @memberof apibara.starknet.v1alpha2.FieldElement
+                 * @static
+                 * @param {Object.<string,*>} message Plain object to verify
+                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
+                 */
+                FieldElement.verify = function verify(message) {
+                    if (typeof message !== "object" || message === null)
+                        return "object expected";
+                    if (message.loLo != null && message.hasOwnProperty("loLo"))
+                        if (!$util.isInteger(message.loLo) && !(message.loLo && $util.isInteger(message.loLo.low) && $util.isInteger(message.loLo.high)))
+                            return "loLo: integer|Long expected";
+                    if (message.loHi != null && message.hasOwnProperty("loHi"))
+                        if (!$util.isInteger(message.loHi) && !(message.loHi && $util.isInteger(message.loHi.low) && $util.isInteger(message.loHi.high)))
+                            return "loHi: integer|Long expected";
+                    if (message.hiLo != null && message.hasOwnProperty("hiLo"))
+                        if (!$util.isInteger(message.hiLo) && !(message.hiLo && $util.isInteger(message.hiLo.low) && $util.isInteger(message.hiLo.high)))
+                            return "hiLo: integer|Long expected";
+                    if (message.hiHi != null && message.hasOwnProperty("hiHi"))
+                        if (!$util.isInteger(message.hiHi) && !(message.hiHi && $util.isInteger(message.hiHi.low) && $util.isInteger(message.hiHi.high)))
+                            return "hiHi: integer|Long expected";
+                    return null;
+                };
+
+                /**
+                 * Creates a FieldElement message from a plain object. Also converts values to their respective internal types.
+                 * @function fromObject
+                 * @memberof apibara.starknet.v1alpha2.FieldElement
+                 * @static
+                 * @param {Object.<string,*>} object Plain object
+                 * @returns {apibara.starknet.v1alpha2.FieldElement} FieldElement
+                 */
+                FieldElement.fromObject = function fromObject(object) {
+                    if (object instanceof $root.apibara.starknet.v1alpha2.FieldElement)
+                        return object;
+                    var message = new $root.apibara.starknet.v1alpha2.FieldElement();
+                    if (object.loLo != null)
+                        if ($util.Long)
+                            (message.loLo = $util.Long.fromValue(object.loLo)).unsigned = false;
+                        else if (typeof object.loLo === "string")
+                            message.loLo = parseInt(object.loLo, 10);
+                        else if (typeof object.loLo === "number")
+                            message.loLo = object.loLo;
+                        else if (typeof object.loLo === "object")
+                            message.loLo = new $util.LongBits(object.loLo.low >>> 0, object.loLo.high >>> 0).toNumber();
+                    if (object.loHi != null)
+                        if ($util.Long)
+                            (message.loHi = $util.Long.fromValue(object.loHi)).unsigned = false;
+                        else if (typeof object.loHi === "string")
+                            message.loHi = parseInt(object.loHi, 10);
+                        else if (typeof object.loHi === "number")
+                            message.loHi = object.loHi;
+                        else if (typeof object.loHi === "object")
+                            message.loHi = new $util.LongBits(object.loHi.low >>> 0, object.loHi.high >>> 0).toNumber();
+                    if (object.hiLo != null)
+                        if ($util.Long)
+                            (message.hiLo = $util.Long.fromValue(object.hiLo)).unsigned = false;
+                        else if (typeof object.hiLo === "string")
+                            message.hiLo = parseInt(object.hiLo, 10);
+                        else if (typeof object.hiLo === "number")
+                            message.hiLo = object.hiLo;
+                        else if (typeof object.hiLo === "object")
+                            message.hiLo = new $util.LongBits(object.hiLo.low >>> 0, object.hiLo.high >>> 0).toNumber();
+                    if (object.hiHi != null)
+                        if ($util.Long)
+                            (message.hiHi = $util.Long.fromValue(object.hiHi)).unsigned = false;
+                        else if (typeof object.hiHi === "string")
+                            message.hiHi = parseInt(object.hiHi, 10);
+                        else if (typeof object.hiHi === "number")
+                            message.hiHi = object.hiHi;
+                        else if (typeof object.hiHi === "object")
+                            message.hiHi = new $util.LongBits(object.hiHi.low >>> 0, object.hiHi.high >>> 0).toNumber();
+                    return message;
+                };
+
+                /**
+                 * Creates a plain object from a FieldElement message. Also converts values to other types if specified.
+                 * @function toObject
+                 * @memberof apibara.starknet.v1alpha2.FieldElement
+                 * @static
+                 * @param {apibara.starknet.v1alpha2.FieldElement} message FieldElement
+                 * @param {$protobuf.IConversionOptions} [options] Conversion options
+                 * @returns {Object.<string,*>} Plain object
+                 */
+                FieldElement.toObject = function toObject(message, options) {
+                    if (!options)
+                        options = {};
+                    var object = {};
+                    if (options.defaults) {
+                        if ($util.Long) {
+                            var long = new $util.Long(0, 0, false);
+                            object.loLo = options.longs === String ? long.toString() : options.longs === Number ? long.toNumber() : long;
+                        } else
+                            object.loLo = options.longs === String ? "0" : 0;
+                        if ($util.Long) {
+                            var long = new $util.Long(0, 0, false);
+                            object.loHi = options.longs === String ? long.toString() : options.longs === Number ? long.toNumber() : long;
+                        } else
+                            object.loHi = options.longs === String ? "0" : 0;
+                        if ($util.Long) {
+                            var long = new $util.Long(0, 0, false);
+                            object.hiLo = options.longs === String ? long.toString() : options.longs === Number ? long.toNumber() : long;
+                        } else
+                            object.hiLo = options.longs === String ? "0" : 0;
+                        if ($util.Long) {
+                            var long = new $util.Long(0, 0, false);
+                            object.hiHi = options.longs === String ? long.toString() : options.longs === Number ? long.toNumber() : long;
+                        } else
+                            object.hiHi = options.longs === String ? "0" : 0;
+                    }
+                    if (message.loLo != null && message.hasOwnProperty("loLo"))
+                        if (typeof message.loLo === "number")
+                            object.loLo = options.longs === String ? String(message.loLo) : message.loLo;
+                        else
+                            object.loLo = options.longs === String ? $util.Long.prototype.toString.call(message.loLo) : options.longs === Number ? new $util.LongBits(message.loLo.low >>> 0, message.loLo.high >>> 0).toNumber() : message.loLo;
+                    if (message.loHi != null && message.hasOwnProperty("loHi"))
+                        if (typeof message.loHi === "number")
+                            object.loHi = options.longs === String ? String(message.loHi) : message.loHi;
+                        else
+                            object.loHi = options.longs === String ? $util.Long.prototype.toString.call(message.loHi) : options.longs === Number ? new $util.LongBits(message.loHi.low >>> 0, message.loHi.high >>> 0).toNumber() : message.loHi;
+                    if (message.hiLo != null && message.hasOwnProperty("hiLo"))
+                        if (typeof message.hiLo === "number")
+                            object.hiLo = options.longs === String ? String(message.hiLo) : message.hiLo;
+                        else
+                            object.hiLo = options.longs === String ? $util.Long.prototype.toString.call(message.hiLo) : options.longs === Number ? new $util.LongBits(message.hiLo.low >>> 0, message.hiLo.high >>> 0).toNumber() : message.hiLo;
+                    if (message.hiHi != null && message.hasOwnProperty("hiHi"))
+                        if (typeof message.hiHi === "number")
+                            object.hiHi = options.longs === String ? String(message.hiHi) : message.hiHi;
+                        else
+                            object.hiHi = options.longs === String ? $util.Long.prototype.toString.call(message.hiHi) : options.longs === Number ? new $util.LongBits(message.hiHi.low >>> 0, message.hiHi.high >>> 0).toNumber() : message.hiHi;
+                    return object;
+                };
+
+                /**
+                 * Converts this FieldElement to JSON.
+                 * @function toJSON
+                 * @memberof apibara.starknet.v1alpha2.FieldElement
+                 * @instance
+                 * @returns {Object.<string,*>} JSON object
+                 */
+                FieldElement.prototype.toJSON = function toJSON() {
+                    return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+                };
+
+                /**
+                 * Gets the default type url for FieldElement
+                 * @function getTypeUrl
+                 * @memberof apibara.starknet.v1alpha2.FieldElement
+                 * @static
+                 * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+                 * @returns {string} The default type url
+                 */
+                FieldElement.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
+                    if (typeUrlPrefix === undefined) {
+                        typeUrlPrefix = "type.googleapis.com";
+                    }
+                    return typeUrlPrefix + "/apibara.starknet.v1alpha2.FieldElement";
+                };
+
+                return FieldElement;
+            })();
+
             v1alpha2.Block = (function() {
 
                 /**
@@ -12388,335 +12717,6 @@ $root.apibara = (function() {
                 };
 
                 return NonceUpdate;
-            })();
-
-            v1alpha2.FieldElement = (function() {
-
-                /**
-                 * Properties of a FieldElement.
-                 * @memberof apibara.starknet.v1alpha2
-                 * @interface IFieldElement
-                 * @property {number|Long|null} [loLo] FieldElement loLo
-                 * @property {number|Long|null} [loHi] FieldElement loHi
-                 * @property {number|Long|null} [hiLo] FieldElement hiLo
-                 * @property {number|Long|null} [hiHi] FieldElement hiHi
-                 */
-
-                /**
-                 * Constructs a new FieldElement.
-                 * @memberof apibara.starknet.v1alpha2
-                 * @classdesc Represents a FieldElement.
-                 * @implements IFieldElement
-                 * @constructor
-                 * @param {apibara.starknet.v1alpha2.IFieldElement=} [properties] Properties to set
-                 */
-                function FieldElement(properties) {
-                    if (properties)
-                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                            if (properties[keys[i]] != null)
-                                this[keys[i]] = properties[keys[i]];
-                }
-
-                /**
-                 * FieldElement loLo.
-                 * @member {number|Long} loLo
-                 * @memberof apibara.starknet.v1alpha2.FieldElement
-                 * @instance
-                 */
-                FieldElement.prototype.loLo = $util.Long ? $util.Long.fromBits(0,0,false) : 0;
-
-                /**
-                 * FieldElement loHi.
-                 * @member {number|Long} loHi
-                 * @memberof apibara.starknet.v1alpha2.FieldElement
-                 * @instance
-                 */
-                FieldElement.prototype.loHi = $util.Long ? $util.Long.fromBits(0,0,false) : 0;
-
-                /**
-                 * FieldElement hiLo.
-                 * @member {number|Long} hiLo
-                 * @memberof apibara.starknet.v1alpha2.FieldElement
-                 * @instance
-                 */
-                FieldElement.prototype.hiLo = $util.Long ? $util.Long.fromBits(0,0,false) : 0;
-
-                /**
-                 * FieldElement hiHi.
-                 * @member {number|Long} hiHi
-                 * @memberof apibara.starknet.v1alpha2.FieldElement
-                 * @instance
-                 */
-                FieldElement.prototype.hiHi = $util.Long ? $util.Long.fromBits(0,0,false) : 0;
-
-                /**
-                 * Creates a new FieldElement instance using the specified properties.
-                 * @function create
-                 * @memberof apibara.starknet.v1alpha2.FieldElement
-                 * @static
-                 * @param {apibara.starknet.v1alpha2.IFieldElement=} [properties] Properties to set
-                 * @returns {apibara.starknet.v1alpha2.FieldElement} FieldElement instance
-                 */
-                FieldElement.create = function create(properties) {
-                    return new FieldElement(properties);
-                };
-
-                /**
-                 * Encodes the specified FieldElement message. Does not implicitly {@link apibara.starknet.v1alpha2.FieldElement.verify|verify} messages.
-                 * @function encode
-                 * @memberof apibara.starknet.v1alpha2.FieldElement
-                 * @static
-                 * @param {apibara.starknet.v1alpha2.IFieldElement} message FieldElement message or plain object to encode
-                 * @param {$protobuf.Writer} [writer] Writer to encode to
-                 * @returns {$protobuf.Writer} Writer
-                 */
-                FieldElement.encode = function encode(message, writer) {
-                    if (!writer)
-                        writer = $Writer.create();
-                    if (message.loLo != null && Object.hasOwnProperty.call(message, "loLo"))
-                        writer.uint32(/* id 1, wireType 1 =*/9).fixed64(message.loLo);
-                    if (message.loHi != null && Object.hasOwnProperty.call(message, "loHi"))
-                        writer.uint32(/* id 2, wireType 1 =*/17).fixed64(message.loHi);
-                    if (message.hiLo != null && Object.hasOwnProperty.call(message, "hiLo"))
-                        writer.uint32(/* id 3, wireType 1 =*/25).fixed64(message.hiLo);
-                    if (message.hiHi != null && Object.hasOwnProperty.call(message, "hiHi"))
-                        writer.uint32(/* id 4, wireType 1 =*/33).fixed64(message.hiHi);
-                    return writer;
-                };
-
-                /**
-                 * Encodes the specified FieldElement message, length delimited. Does not implicitly {@link apibara.starknet.v1alpha2.FieldElement.verify|verify} messages.
-                 * @function encodeDelimited
-                 * @memberof apibara.starknet.v1alpha2.FieldElement
-                 * @static
-                 * @param {apibara.starknet.v1alpha2.IFieldElement} message FieldElement message or plain object to encode
-                 * @param {$protobuf.Writer} [writer] Writer to encode to
-                 * @returns {$protobuf.Writer} Writer
-                 */
-                FieldElement.encodeDelimited = function encodeDelimited(message, writer) {
-                    return this.encode(message, writer).ldelim();
-                };
-
-                /**
-                 * Decodes a FieldElement message from the specified reader or buffer.
-                 * @function decode
-                 * @memberof apibara.starknet.v1alpha2.FieldElement
-                 * @static
-                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-                 * @param {number} [length] Message length if known beforehand
-                 * @returns {apibara.starknet.v1alpha2.FieldElement} FieldElement
-                 * @throws {Error} If the payload is not a reader or valid buffer
-                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
-                 */
-                FieldElement.decode = function decode(reader, length) {
-                    if (!(reader instanceof $Reader))
-                        reader = $Reader.create(reader);
-                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.apibara.starknet.v1alpha2.FieldElement();
-                    while (reader.pos < end) {
-                        var tag = reader.uint32();
-                        switch (tag >>> 3) {
-                        case 1: {
-                                message.loLo = reader.fixed64();
-                                break;
-                            }
-                        case 2: {
-                                message.loHi = reader.fixed64();
-                                break;
-                            }
-                        case 3: {
-                                message.hiLo = reader.fixed64();
-                                break;
-                            }
-                        case 4: {
-                                message.hiHi = reader.fixed64();
-                                break;
-                            }
-                        default:
-                            reader.skipType(tag & 7);
-                            break;
-                        }
-                    }
-                    return message;
-                };
-
-                /**
-                 * Decodes a FieldElement message from the specified reader or buffer, length delimited.
-                 * @function decodeDelimited
-                 * @memberof apibara.starknet.v1alpha2.FieldElement
-                 * @static
-                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-                 * @returns {apibara.starknet.v1alpha2.FieldElement} FieldElement
-                 * @throws {Error} If the payload is not a reader or valid buffer
-                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
-                 */
-                FieldElement.decodeDelimited = function decodeDelimited(reader) {
-                    if (!(reader instanceof $Reader))
-                        reader = new $Reader(reader);
-                    return this.decode(reader, reader.uint32());
-                };
-
-                /**
-                 * Verifies a FieldElement message.
-                 * @function verify
-                 * @memberof apibara.starknet.v1alpha2.FieldElement
-                 * @static
-                 * @param {Object.<string,*>} message Plain object to verify
-                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
-                 */
-                FieldElement.verify = function verify(message) {
-                    if (typeof message !== "object" || message === null)
-                        return "object expected";
-                    if (message.loLo != null && message.hasOwnProperty("loLo"))
-                        if (!$util.isInteger(message.loLo) && !(message.loLo && $util.isInteger(message.loLo.low) && $util.isInteger(message.loLo.high)))
-                            return "loLo: integer|Long expected";
-                    if (message.loHi != null && message.hasOwnProperty("loHi"))
-                        if (!$util.isInteger(message.loHi) && !(message.loHi && $util.isInteger(message.loHi.low) && $util.isInteger(message.loHi.high)))
-                            return "loHi: integer|Long expected";
-                    if (message.hiLo != null && message.hasOwnProperty("hiLo"))
-                        if (!$util.isInteger(message.hiLo) && !(message.hiLo && $util.isInteger(message.hiLo.low) && $util.isInteger(message.hiLo.high)))
-                            return "hiLo: integer|Long expected";
-                    if (message.hiHi != null && message.hasOwnProperty("hiHi"))
-                        if (!$util.isInteger(message.hiHi) && !(message.hiHi && $util.isInteger(message.hiHi.low) && $util.isInteger(message.hiHi.high)))
-                            return "hiHi: integer|Long expected";
-                    return null;
-                };
-
-                /**
-                 * Creates a FieldElement message from a plain object. Also converts values to their respective internal types.
-                 * @function fromObject
-                 * @memberof apibara.starknet.v1alpha2.FieldElement
-                 * @static
-                 * @param {Object.<string,*>} object Plain object
-                 * @returns {apibara.starknet.v1alpha2.FieldElement} FieldElement
-                 */
-                FieldElement.fromObject = function fromObject(object) {
-                    if (object instanceof $root.apibara.starknet.v1alpha2.FieldElement)
-                        return object;
-                    var message = new $root.apibara.starknet.v1alpha2.FieldElement();
-                    if (object.loLo != null)
-                        if ($util.Long)
-                            (message.loLo = $util.Long.fromValue(object.loLo)).unsigned = false;
-                        else if (typeof object.loLo === "string")
-                            message.loLo = parseInt(object.loLo, 10);
-                        else if (typeof object.loLo === "number")
-                            message.loLo = object.loLo;
-                        else if (typeof object.loLo === "object")
-                            message.loLo = new $util.LongBits(object.loLo.low >>> 0, object.loLo.high >>> 0).toNumber();
-                    if (object.loHi != null)
-                        if ($util.Long)
-                            (message.loHi = $util.Long.fromValue(object.loHi)).unsigned = false;
-                        else if (typeof object.loHi === "string")
-                            message.loHi = parseInt(object.loHi, 10);
-                        else if (typeof object.loHi === "number")
-                            message.loHi = object.loHi;
-                        else if (typeof object.loHi === "object")
-                            message.loHi = new $util.LongBits(object.loHi.low >>> 0, object.loHi.high >>> 0).toNumber();
-                    if (object.hiLo != null)
-                        if ($util.Long)
-                            (message.hiLo = $util.Long.fromValue(object.hiLo)).unsigned = false;
-                        else if (typeof object.hiLo === "string")
-                            message.hiLo = parseInt(object.hiLo, 10);
-                        else if (typeof object.hiLo === "number")
-                            message.hiLo = object.hiLo;
-                        else if (typeof object.hiLo === "object")
-                            message.hiLo = new $util.LongBits(object.hiLo.low >>> 0, object.hiLo.high >>> 0).toNumber();
-                    if (object.hiHi != null)
-                        if ($util.Long)
-                            (message.hiHi = $util.Long.fromValue(object.hiHi)).unsigned = false;
-                        else if (typeof object.hiHi === "string")
-                            message.hiHi = parseInt(object.hiHi, 10);
-                        else if (typeof object.hiHi === "number")
-                            message.hiHi = object.hiHi;
-                        else if (typeof object.hiHi === "object")
-                            message.hiHi = new $util.LongBits(object.hiHi.low >>> 0, object.hiHi.high >>> 0).toNumber();
-                    return message;
-                };
-
-                /**
-                 * Creates a plain object from a FieldElement message. Also converts values to other types if specified.
-                 * @function toObject
-                 * @memberof apibara.starknet.v1alpha2.FieldElement
-                 * @static
-                 * @param {apibara.starknet.v1alpha2.FieldElement} message FieldElement
-                 * @param {$protobuf.IConversionOptions} [options] Conversion options
-                 * @returns {Object.<string,*>} Plain object
-                 */
-                FieldElement.toObject = function toObject(message, options) {
-                    if (!options)
-                        options = {};
-                    var object = {};
-                    if (options.defaults) {
-                        if ($util.Long) {
-                            var long = new $util.Long(0, 0, false);
-                            object.loLo = options.longs === String ? long.toString() : options.longs === Number ? long.toNumber() : long;
-                        } else
-                            object.loLo = options.longs === String ? "0" : 0;
-                        if ($util.Long) {
-                            var long = new $util.Long(0, 0, false);
-                            object.loHi = options.longs === String ? long.toString() : options.longs === Number ? long.toNumber() : long;
-                        } else
-                            object.loHi = options.longs === String ? "0" : 0;
-                        if ($util.Long) {
-                            var long = new $util.Long(0, 0, false);
-                            object.hiLo = options.longs === String ? long.toString() : options.longs === Number ? long.toNumber() : long;
-                        } else
-                            object.hiLo = options.longs === String ? "0" : 0;
-                        if ($util.Long) {
-                            var long = new $util.Long(0, 0, false);
-                            object.hiHi = options.longs === String ? long.toString() : options.longs === Number ? long.toNumber() : long;
-                        } else
-                            object.hiHi = options.longs === String ? "0" : 0;
-                    }
-                    if (message.loLo != null && message.hasOwnProperty("loLo"))
-                        if (typeof message.loLo === "number")
-                            object.loLo = options.longs === String ? String(message.loLo) : message.loLo;
-                        else
-                            object.loLo = options.longs === String ? $util.Long.prototype.toString.call(message.loLo) : options.longs === Number ? new $util.LongBits(message.loLo.low >>> 0, message.loLo.high >>> 0).toNumber() : message.loLo;
-                    if (message.loHi != null && message.hasOwnProperty("loHi"))
-                        if (typeof message.loHi === "number")
-                            object.loHi = options.longs === String ? String(message.loHi) : message.loHi;
-                        else
-                            object.loHi = options.longs === String ? $util.Long.prototype.toString.call(message.loHi) : options.longs === Number ? new $util.LongBits(message.loHi.low >>> 0, message.loHi.high >>> 0).toNumber() : message.loHi;
-                    if (message.hiLo != null && message.hasOwnProperty("hiLo"))
-                        if (typeof message.hiLo === "number")
-                            object.hiLo = options.longs === String ? String(message.hiLo) : message.hiLo;
-                        else
-                            object.hiLo = options.longs === String ? $util.Long.prototype.toString.call(message.hiLo) : options.longs === Number ? new $util.LongBits(message.hiLo.low >>> 0, message.hiLo.high >>> 0).toNumber() : message.hiLo;
-                    if (message.hiHi != null && message.hasOwnProperty("hiHi"))
-                        if (typeof message.hiHi === "number")
-                            object.hiHi = options.longs === String ? String(message.hiHi) : message.hiHi;
-                        else
-                            object.hiHi = options.longs === String ? $util.Long.prototype.toString.call(message.hiHi) : options.longs === Number ? new $util.LongBits(message.hiHi.low >>> 0, message.hiHi.high >>> 0).toNumber() : message.hiHi;
-                    return object;
-                };
-
-                /**
-                 * Converts this FieldElement to JSON.
-                 * @function toJSON
-                 * @memberof apibara.starknet.v1alpha2.FieldElement
-                 * @instance
-                 * @returns {Object.<string,*>} JSON object
-                 */
-                FieldElement.prototype.toJSON = function toJSON() {
-                    return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
-                };
-
-                /**
-                 * Gets the default type url for FieldElement
-                 * @function getTypeUrl
-                 * @memberof apibara.starknet.v1alpha2.FieldElement
-                 * @static
-                 * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
-                 * @returns {string} The default type url
-                 */
-                FieldElement.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
-                    if (typeUrlPrefix === undefined) {
-                        typeUrlPrefix = "type.googleapis.com";
-                    }
-                    return typeUrlPrefix + "/apibara.starknet.v1alpha2.FieldElement";
-                };
-
-                return FieldElement;
             })();
 
             return v1alpha2;
