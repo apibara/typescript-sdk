@@ -498,6 +498,30 @@ export class StateUpdateFilter implements IEncodable<v1alpha2.IStateUpdateFilter
   }
 
   /**
+   * Includes all declared classes that match the filter.
+   */
+  addDeclaredClass(
+    filterOrBuilder:
+      | IEncodable<v1alpha2.IDeclaredClassFilter>
+      | ((builder: DeclaredClassFilter) => IEncodable<v1alpha2.IDeclaredClassFilter>)
+  ) {
+    this.inner.declaredClasses.push(createFilter(filterOrBuilder, () => new DeclaredClassFilter()))
+    return this
+  }
+
+  /**
+   * Includes all replaced classes that match the filter.
+   */
+  addReplacedClass(
+    filterOrBuilder:
+      | IEncodable<v1alpha2.IReplacedClassFilter>
+      | ((builder: ReplacedClassFilter) => IEncodable<v1alpha2.IReplacedClassFilter>)
+  ) {
+    this.inner.replacedClasses.push(createFilter(filterOrBuilder, () => new ReplacedClassFilter()))
+    return this
+  }
+
+  /**
    * Includes all nonce updates that match the filter.
    */
   addNonceUpdate(
@@ -578,6 +602,62 @@ export class DeployedContractFilter implements IEncodable<v1alpha2.IDeployedCont
   }
 
   encode(): v1alpha2.IDeployedContractFilter {
+    return this.inner
+  }
+}
+
+export class DeclaredClassFilter implements IEncodable<v1alpha2.IDeclaredClassFilter> {
+  private inner: v1alpha2.DeclaredClassFilter
+
+  constructor() {
+    this.inner = new v1alpha2.DeclaredClassFilter()
+  }
+
+  /**
+   * Filter by class hash.
+   */
+  withCompiledClassHash(classHash: v1alpha2.IFieldElement) {
+    this.inner.compiledClassHash = classHash
+    return this
+  }
+
+  /**
+   * Filter by class hash.
+   */
+  withClassHash(hash: v1alpha2.IFieldElement) {
+    this.inner.classHash = hash
+    return this
+  }
+
+  encode(): v1alpha2.IDeclaredClassFilter {
+    return this.inner
+  }
+}
+
+export class ReplacedClassFilter implements IEncodable<v1alpha2.IReplacedClassFilter> {
+  private inner: v1alpha2.ReplacedClassFilter
+
+  constructor() {
+    this.inner = new v1alpha2.ReplacedClassFilter()
+  }
+
+  /**
+   * Filter by contract address.
+   */
+  withContractAddress(address: v1alpha2.IFieldElement) {
+    this.inner.contractAddress = address
+    return this
+  }
+
+  /**
+   * Filter by class hash.
+   */
+  withClassHash(hash: v1alpha2.IFieldElement) {
+    this.inner.classHash = hash
+    return this
+  }
+
+  encode(): v1alpha2.IReplacedClassFilter {
     return this.inner
   }
 }
