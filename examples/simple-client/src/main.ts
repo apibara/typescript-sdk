@@ -52,9 +52,9 @@ async function main() {
   const client = new StreamClient({
     url: 'mainnet.starknet.a5a.ch',
     token: AUTH_TOKEN,
-    clientOptions: {
-      'grpc.max_receive_message_length': 128 * 1_048_576, // 128 MiB
-    },
+    // Can specify client options.
+    // https://grpc.github.io/grpc/core/group__grpc__arg__keys.html
+    clientOptions: {},
   })
 
   // Starting block. Here we specify the block hash but it's not

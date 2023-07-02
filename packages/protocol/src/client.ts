@@ -17,6 +17,9 @@ const StreamService = v1alpha2.protoDescriptor.apibara.node.v1alpha2.Stream
 // Server produces an heartbeat every 30 seconds, so we use 45 seconds as a timeout.
 const MESSAGE_TIMEOUT_MS = 45_000
 
+// Increase the default message length to 128 MiB.
+const DEFAULT_MESSAGE_LENGTH = 128 * 1_048_576 // 128 MiB
+
 export type DataStream = ClientDuplexStream<
   v1alpha2.IStreamDataRequest,
   v1alpha2.IStreamDataResponse
@@ -151,6 +154,7 @@ export class StreamClient {
 
     this.inner = new StreamService(url, credentialsWithMetadata, {
       'grpc.keepalive_timeout_ms': 3_600_000,
+      'grpc.max_receive_message_length': DEFAULT_MESSAGE_LENGTH,
       ...clientOptions,
     })
     this.stream_id = 0
