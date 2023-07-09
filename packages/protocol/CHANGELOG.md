@@ -1,5 +1,11 @@
 # @apibara/protocol
 
+## 0.4.8
+
+### Patch Changes
+
+- [#39](https://github.com/apibara/typescript-sdk/pull/39) [`b8f9240`](https://github.com/apibara/typescript-sdk/commit/b8f9240bb851aa8b0ac35d726fba578ca384e7f4) Thanks [@fracek](https://github.com/fracek)! - Add Cursor helpers to convert to/from javascript objects
+
 ## 0.4.7
 
 ### Patch Changes
