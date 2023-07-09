@@ -5,7 +5,10 @@ import { ProtoGrpcType } from './stream'
 const __NODE_PROTO_PATH = __dirname + '/stream.proto'
 
 // export definitions
-export const packageDefinition = loadSync(__NODE_PROTO_PATH, {})
+export const packageDefinition = loadSync(__NODE_PROTO_PATH, {
+  oneofs: true,
+  defaults: true,
+})
 export const protoDescriptor = loadPackageDefinition(packageDefinition) as unknown as ProtoGrpcType
 
 // re-export all types, use same naming convention as protobufjs
