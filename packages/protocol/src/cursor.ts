@@ -29,11 +29,37 @@ export const Cursor = {
   },
 
   /**
+   * Creates a new cursor from a plain Javascript object.
+   */
+  fromObject({ orderKey, uniqueKey }: ReturnType<typeof _toObject>): ICursor {
+    return {
+      orderKey: Long.fromString(orderKey),
+      uniqueKey: Buffer.from(uniqueKey.slice(2), 'hex'),
+    }
+  },
+
+  /**
    * Returns the cursor string representation.
    */
   toString: (cursor?: ICursor | null): string | undefined => {
     if (!cursor) return
-    let hash = Buffer.from(cursor.uniqueKey).toString('hex')
-    return `${cursor.orderKey.toString()}/0x${hash}`
+    const { orderKey, uniqueKey } = _toObject(cursor)
+    return `${orderKey}/${uniqueKey}`
   },
+
+  /**
+   * Returns the cursor as plain Javascript object.
+   */
+  toObject: (cursor?: ICursor | null): ReturnType<typeof _toObject> | undefined => {
+    if (!cursor) return
+    return _toObject(cursor)
+  },
+}
+
+function _toObject(cursor: ICursor): { orderKey: string; uniqueKey: string } {
+  let hash = Buffer.from(cursor.uniqueKey).toString('hex')
+  return {
+    orderKey: cursor.orderKey.toString(),
+    uniqueKey: `0x${hash}`,
+  }
 }
