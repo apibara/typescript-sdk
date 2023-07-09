@@ -1,5 +1,11 @@
 # @apibara/starknet
 
+## 0.3.0
+
+### Minor Changes
+
+- [#35](https://github.com/apibara/typescript-sdk/pull/35) [`502b3f5`](https://github.com/apibara/typescript-sdk/commit/502b3f582713c4f6d008aaaf9fef3f139ce32332) Thanks [@fracek](https://github.com/fracek)! - Add RPC v0.3 fields
+
 ## 0.2.1
 
 ### Patch Changes

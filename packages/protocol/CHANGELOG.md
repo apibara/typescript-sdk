@@ -1,5 +1,11 @@
 # @apibara/protocol
 
+## 0.4.7
+
+### Patch Changes
+
+- [#38](https://github.com/apibara/typescript-sdk/pull/38) [`a59f20e`](https://github.com/apibara/typescript-sdk/commit/a59f20eea4d651b6b750bd65e5287a80803545c5) Thanks [@fracek](https://github.com/fracek)! - Set virtual oneof field
+
 ## 0.4.6
 
 ### Patch Changes
