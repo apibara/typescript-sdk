@@ -34,17 +34,6 @@ importers:
       turbo: 1.2.16
       typescript: 4.8.4
 
-  examples/pending-data:
-    specifiers:
-      '@apibara/protocol': workspace:*
-      '@apibara/starknet': workspace:*
-      '@types/node': ^18.11.9
-    dependencies:
-      '@apibara/protocol': link:../../packages/protocol
-      '@apibara/starknet': link:../../packages/starknet
-    devDependencies:
-      '@types/node': 18.11.9
-
   examples/reconfigure-filter:
     specifiers:
       '@apibara/protocol': workspace:*
@@ -78,6 +67,9 @@ importers:
     devDependencies:
       '@types/long': 5.0.0
       '@types/node': 18.11.9
+
+  packages/core:
+    specifiers: {}
 
   packages/protocol:
     specifiers:

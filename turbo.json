@@ -4,6 +4,9 @@
     "build": {
       "dependsOn": ["^build"]
     },
+    "@apibara/core#build": {
+      "dependsOn": []
+    },
     "@apibara/protocol#prebuild": {
       "dependsOn": []
     },

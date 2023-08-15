@@ -1,0 +1,19 @@
+{
+  "name": "@apibara/indexer",
+  "version": "0.0.0",
+  "exports": {
+    ".": "./dist/index.js",
+    "./sink/console": "./dist/sink/console.js",
+    "./sink/mongo": "./dist/sink/mongo.js",
+    "./sink/parquet": "./dist/sink/parquet.js",
+    "./sink/postgres": "./dist/sink/postgres.js",
+    "./sink/webhook": "./dist/sink/webhook.js",
+    "./starknet": "./dist/starknet/index.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc"
+  }
+}
