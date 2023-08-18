@@ -1,5 +1,11 @@
 # @apibara/indexer
 
+## 0.1.2
+
+### Patch Changes
+
+- [#46](https://github.com/apibara/typescript-sdk/pull/46) [`aade5c4`](https://github.com/apibara/typescript-sdk/commit/aade5c46da8daec2e3aa7749a5a7d083cca25867) Thanks [@fracek](https://github.com/fracek)! - Publish typescript types
+
 ## 0.1.1
 
 ### Patch Changes
