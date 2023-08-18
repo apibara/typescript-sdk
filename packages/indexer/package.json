@@ -3,16 +3,46 @@
   "version": "0.1.1",
   "type": "module",
   "exports": {
-    ".": "./dist/index.js",
-    "./sink/console": "./dist/sink/console.js",
-    "./sink/mongo": "./dist/sink/mongo.js",
-    "./sink/parquet": "./dist/sink/parquet.js",
-    "./sink/postgres": "./dist/sink/postgres.js",
-    "./sink/webhook": "./dist/sink/webhook.js",
-    "./starknet": "./dist/starknet/index.js"
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./sink/console": {
+      "types": "./dist/sink/console.d.ts",
+      "import": "./dist/sink/console.js",
+      "default": "./dist/sink/console.js"
+    },
+    "./sink/mongo": {
+      "types": "./dist/sink/mongo.d.ts",
+      "import": "./dist/sink/mongo.js",
+      "default": "./dist/sink/mongo.js"
+    },
+    "./sink/parquet": {
+      "types": "./dist/sink/parquet.d.ts",
+      "import": "./dist/sink/parquet.js",
+      "default": "./dist/sink/parquet.js"
+    },
+    "./sink/postgres": {
+      "types": "./dist/sink/postgres.d.ts",
+      "import": "./dist/sink/postgres.js",
+      "default": "./dist/sink/postgres.js"
+    },
+    "./sink/webhook": {
+      "types": "./dist/sink/webhook.d.ts",
+      "import": "./dist/sink/webhook.js",
+      "default": "./dist/sink/webhook.js"
+    },
+    "./starknet": {
+      "types": "./dist/starknet/index.d.ts",
+      "import": "./dist/starknet/index.js",
+      "default": "./dist/starknet/index.js"
+    }
   },
   "files": [
-    "dist"
+    "dist",
+    "src",
+    "README.md"
   ],
   "scripts": {
     "build": "tsc"
