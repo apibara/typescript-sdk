@@ -45,6 +45,14 @@
     "README.md"
   ],
   "scripts": {
-    "build": "tsc"
+    "build": "tsc",
+    "test": "vitest",
+    "test:typecheck": "vitest typecheck"
+  },
+  "devDependencies": {
+    "vitest": "^0.34.3"
+  },
+  "dependencies": {
+    "zod": "^3.22.2"
   }
 }

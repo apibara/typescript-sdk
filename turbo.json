@@ -1,29 +1,11 @@
 {
   "$schema": "https://turborepo.org/schema.json",
   "pipeline": {
+    "prebuild": {
+      "dependsOn": ["^prebuild"]
+    },
     "build": {
-      "dependsOn": ["^build"]
-    },
-    "@apibara/core#build": {
-      "dependsOn": []
-    },
-    "@apibara/protocol#prebuild": {
-      "dependsOn": []
-    },
-    "@apibara/protocol#build": {
-      "dependsOn": ["@apibara/protocol#prebuild"]
-    },
-    "@apibara/starknet#prebuild": {
-      "dependsOn": []
-    },
-    "@apibara/starknet#build": {
-      "dependsOn": ["@apibara/starknet#prebuild"]
-    },
-    "simple-client-example#build": {
-      "dependsOn": ["@apibara/protocol#build", "@apibara/starknet#build"]
-    },
-    "reconfigure-filter-example#build": {
-      "dependsOn": ["@apibara/protocol#build", "@apibara/starknet#build"]
+      "dependsOn": ["^build", "prebuild"]
     },
     "test": {
       "dependsOn": ["build"]

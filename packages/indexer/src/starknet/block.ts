@@ -1,4 +1,4 @@
-export type FieldElement = `0x${string}`
+import { FieldElement } from "./felt";
 
 export type Block = {
   header?: BlockHeader;
