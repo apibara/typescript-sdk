@@ -1,4 +1,4 @@
-import { describe, test, assertType } from "vitest";
+import { assertType, describe, test } from "vitest";
 
 import { Config } from "./config";
 
@@ -14,21 +14,21 @@ describe("Config", () => {
 
   test("with restrictions on network and sink", () => {
     type Network = {
-      network: "test-network",
-      filter: { a: number },
+      network: "test-network";
+      filter: { a: number };
     };
 
     type Sink = {
-      sinkType: "test-sink",
+      sinkType: "test-sink";
       sinkOptions: {
-        b: string,
-      },
+        b: string;
+      };
     };
 
     assertType<Config<Network, Sink>>({
       network: "test-network",
       filter: {
-        a: 1
+        a: 1,
       },
       sinkType: "test-sink",
       sinkOptions: {

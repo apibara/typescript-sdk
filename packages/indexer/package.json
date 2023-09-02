@@ -47,7 +47,10 @@
   "scripts": {
     "build": "tsc",
     "test": "vitest",
-    "test:typecheck": "vitest typecheck"
+    "test:typecheck": "vitest typecheck",
+    "lint": "biome check .",
+    "lint:fix": "pnpm lint --apply",
+    "format": "biome format . --write"
   },
   "devDependencies": {
     "vitest": "^0.34.3"

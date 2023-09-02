@@ -1,31 +1,31 @@
-import { v1alpha2 } from './proto'
-import { TestFilter } from './proto/testing'
-import { StreamDataRequest } from './request'
+import { v1alpha2 } from "./proto";
+import { TestFilter } from "./proto/testing";
+import { StreamDataRequest } from "./request";
 
-describe('RequestBuilder', () => {
-  it('returns the final request', () => {
+describe("RequestBuilder", () => {
+  it("returns the final request", () => {
     const filter = new TestFilter({
       num: 123,
-      text: 'abcdef',
-    })
+      text: "abcdef",
+    });
 
     const request = StreamDataRequest.create()
       .withBatchSize(10)
       .withFilter(TestFilter.encode(filter).finish())
       .withFinality(v1alpha2.DataFinality.DATA_STATUS_FINALIZED)
-      .encode()
+      .encode();
 
-    expect(request.batchSize).toEqual(10)
-    expect(request.filter).toBeInstanceOf(Buffer)
-    expect(request.filter?.length).toEqual(10)
+    expect(request.batchSize).toEqual(10);
+    expect(request.filter).toBeInstanceOf(Buffer);
+    expect(request.filter?.length).toEqual(10);
 
     // make ts happy
-    if (!request.filter || typeof request.filter == 'string') {
-      throw new Error('undefined filter')
+    if (!request.filter || typeof request.filter === "string") {
+      throw new Error("undefined filter");
     }
 
-    const back = TestFilter.decode(request.filter)
-    expect(back.num.toString()).toEqual('123')
-    expect(back.text).toEqual('abcdef')
-  })
-})
+    const back = TestFilter.decode(request.filter);
+    expect(back.num.toString()).toEqual("123");
+    expect(back.text).toEqual("abcdef");
+  });
+});

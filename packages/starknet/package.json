@@ -13,8 +13,9 @@
     "prebuild": "pnpm run protobuf && pnpm run gen-proto",
     "build": "tsc && cp src/proto/generated.d.ts dist/proto/generated.d.ts",
     "test": "jest src",
-    "lint": "eslint src --ext .ts",
-    "lint:fix": "eslint --fix src --ext .ts",
+    "lint": "biome check .",
+    "lint:fix": "pnpm lint --apply",
+    "format": "biome format . --write",
     "protobuf": "mkdir -p dist/proto && cp src/proto/*.proto dist/proto",
     "gen-module": "pbjs -t static-module -w commonjs -o src/proto/generated.js src/proto/*.proto",
     "gen-types": "pbts -o src/proto/generated.d.ts src/proto/generated.js",
@@ -29,10 +30,5 @@
     "@types/long": "^5.0.0",
     "@types/node": "^18.11.9",
     "protobufjs-cli": "^1.0.2"
-  },
-  "eslintConfig": {
-    "ignorePatterns": [
-      "src/proto/generated.d.ts"
-    ]
   }
 }

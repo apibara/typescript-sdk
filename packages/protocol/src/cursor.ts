@@ -1,5 +1,5 @@
-import Long from 'long'
-import { ICursor } from './proto/v1alpha2'
+import Long from "long";
+import { ICursor } from "./proto/v1alpha2";
 
 export const Cursor = {
   /**
@@ -12,7 +12,7 @@ export const Cursor = {
     return {
       orderKey: Long.fromValue(order),
       uniqueKey: new Uint8Array(),
-    }
+    };
   },
 
   /**
@@ -25,7 +25,7 @@ export const Cursor = {
     return {
       orderKey: Long.fromValue(order),
       uniqueKey: unique,
-    }
+    };
   },
 
   /**
@@ -34,32 +34,34 @@ export const Cursor = {
   fromObject({ orderKey, uniqueKey }: ReturnType<typeof _toObject>): ICursor {
     return {
       orderKey: Long.fromString(orderKey),
-      uniqueKey: Buffer.from(uniqueKey.slice(2), 'hex'),
-    }
+      uniqueKey: Buffer.from(uniqueKey.slice(2), "hex"),
+    };
   },
 
   /**
    * Returns the cursor string representation.
    */
   toString: (cursor?: ICursor | null): string | undefined => {
-    if (!cursor) return
-    const { orderKey, uniqueKey } = _toObject(cursor)
-    return `${orderKey}/${uniqueKey}`
+    if (!cursor) return;
+    const { orderKey, uniqueKey } = _toObject(cursor);
+    return `${orderKey}/${uniqueKey}`;
   },
 
   /**
    * Returns the cursor as plain Javascript object.
    */
-  toObject: (cursor?: ICursor | null): ReturnType<typeof _toObject> | undefined => {
-    if (!cursor) return
-    return _toObject(cursor)
+  toObject: (
+    cursor?: ICursor | null,
+  ): ReturnType<typeof _toObject> | undefined => {
+    if (!cursor) return;
+    return _toObject(cursor);
   },
-}
+};
 
 function _toObject(cursor: ICursor): { orderKey: string; uniqueKey: string } {
-  let hash = Buffer.from(cursor.uniqueKey).toString('hex')
+  const hash = Buffer.from(cursor.uniqueKey).toString("hex");
   return {
     orderKey: cursor.orderKey.toString(),
     uniqueKey: `0x${hash}`,
-  }
+  };
 }

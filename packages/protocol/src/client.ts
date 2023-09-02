@@ -5,47 +5,47 @@ import {
   ClientOptions,
   Metadata,
   StatusObject,
-} from '@grpc/grpc-js'
-import { CallMetadataGenerator } from '@grpc/grpc-js/build/src/call-credentials'
-import { v1alpha2 } from './proto'
-import { StreamDataRequest } from './request'
+} from "@grpc/grpc-js";
+import { CallMetadataGenerator } from "@grpc/grpc-js/build/src/call-credentials";
+import { v1alpha2 } from "./proto";
+import { StreamDataRequest } from "./request";
 
-export { ChannelCredentials, StatusObject } from '@grpc/grpc-js'
+export { ChannelCredentials, StatusObject } from "@grpc/grpc-js";
 
-const StreamService = v1alpha2.protoDescriptor.apibara.node.v1alpha2.Stream
+const StreamService = v1alpha2.protoDescriptor.apibara.node.v1alpha2.Stream;
 
 // Server produces an heartbeat every 30 seconds, so we use 45 seconds as a timeout.
-const MESSAGE_TIMEOUT_MS = 45_000
+const MESSAGE_TIMEOUT_MS = 45_000;
 
 // Increase the default message length to 128 MiB.
-const DEFAULT_MESSAGE_LENGTH = 128 * 1_048_576 // 128 MiB
+const DEFAULT_MESSAGE_LENGTH = 128 * 1_048_576; // 128 MiB
 
 export type DataStream = ClientDuplexStream<
   v1alpha2.IStreamDataRequest,
   v1alpha2.IStreamDataResponse
->
+>;
 
 export type ConfigureArgs = {
   /**
    * Stream filter, encoded.
    */
-  filter: Uint8Array
+  filter: Uint8Array;
 
   /**
    * How much data in a single message.
    */
-  batchSize?: number
+  batchSize?: number;
 
   /**
    * Starting cursor. This cursor is stream-specific.
    */
-  cursor?: v1alpha2.ICursor | null
+  cursor?: v1alpha2.ICursor | null;
 
   /**
    * Data finality, e.g. finalized or accepted.
    */
-  finality?: v1alpha2.DataFinality | null
-}
+  finality?: v1alpha2.DataFinality | null;
+};
 
 /**
  * Reconnect callback return value.
@@ -54,7 +54,7 @@ export type OnReconnectResult = {
   /**
    * If `true`, reconnects to the stream.
    */
-  reconnect: boolean
+  reconnect: boolean;
 
   /**
    * Stream configuration used when reconnecting.
@@ -62,66 +62,66 @@ export type OnReconnectResult = {
    * By default, the client uses the last configuration passed to
    * `configure` and updates the `cursor` with the most recent one.
    */
-  args?: ConfigureArgs
-}
+  args?: ConfigureArgs;
+};
 
 /**
  * Reconnect callback.
  */
 export type OnReconnect = (
   err: StatusObject,
-  retryCount: number
-) => Promise<OnReconnectResult> | OnReconnectResult
+  retryCount: number,
+) => Promise<OnReconnectResult> | OnReconnectResult;
 
 export type StreamClientArgs = {
   /**
    * The stream url.
    */
-  url: string
+  url: string;
 
   /**
    * Override Grpc credentials.
    *
    * Use `ChannelCredentials.createInsecure()` to disable SSL.
    */
-  credentials?: ChannelCredentials
+  credentials?: ChannelCredentials;
 
   /**
    * Grpc client options.
    */
-  clientOptions?: ClientOptions
+  clientOptions?: ClientOptions;
 
   /**
    * Authorization bearer token, used to authenticate with the server.
    */
-  token?: string
+  token?: string;
 
   /**
    * Callback to control reconnection after receiving an error from the stream.
    *
    * By default uses `defaultOnReconnect`, which only reconnects on internal grpc errors.
    */
-  onReconnect?: OnReconnect
+  onReconnect?: OnReconnect;
 
   /**
    * Maximum time to wait for a message before timing out, in milliseconds.
    *
    * Defaults to 45 seconds.
    */
-  timeout?: number
-}
+  timeout?: number;
+};
 
 /**
  * A client to configure and stream data.
  */
 export class StreamClient {
-  private readonly inner: v1alpha2.StreamClient
+  private readonly inner: v1alpha2.StreamClient;
 
-  private stream?: DataStream
-  private stream_id: number
-  private onReconnect: OnReconnect
-  private configuration?: ConfigureArgs
-  private timeout: number
+  private stream?: DataStream;
+  private stream_id: number;
+  private onReconnect: OnReconnect;
+  private configuration?: ConfigureArgs;
+  private timeout: number;
 
   /**
    * Create a new `StreamClient`.
@@ -142,24 +142,33 @@ export class StreamClient {
    * }
    * ```
    */
-  constructor({ url, credentials, clientOptions, token, onReconnect, timeout }: StreamClientArgs) {
-    const baseCredentials = credentials ?? ChannelCredentials.createSsl()
+  constructor({
+    url,
+    credentials,
+    clientOptions,
+    token,
+    onReconnect,
+    timeout,
+  }: StreamClientArgs) {
+    const baseCredentials = credentials ?? ChannelCredentials.createSsl();
 
     // only secure credentials can be composed with metadata generators.
     const credentialsWithMetadata = baseCredentials._isSecure()
       ? baseCredentials.compose(
-          CallCredentials.createFromMetadataGenerator(createMetadataGenerator(token))
+          CallCredentials.createFromMetadataGenerator(
+            createMetadataGenerator(token),
+          ),
         )
-      : baseCredentials
+      : baseCredentials;
 
     this.inner = new StreamService(url, credentialsWithMetadata, {
-      'grpc.keepalive_timeout_ms': 3_600_000,
-      'grpc.max_receive_message_length': DEFAULT_MESSAGE_LENGTH,
+      "grpc.keepalive_timeout_ms": 3_600_000,
+      "grpc.max_receive_message_length": DEFAULT_MESSAGE_LENGTH,
       ...clientOptions,
-    })
-    this.stream_id = 0
-    this.onReconnect = onReconnect ?? defaultOnReconnect
-    this.timeout = timeout ?? MESSAGE_TIMEOUT_MS
+    });
+    this.stream_id = 0;
+    this.onReconnect = onReconnect ?? defaultOnReconnect;
+    this.timeout = timeout ?? MESSAGE_TIMEOUT_MS;
   }
 
   /**
@@ -167,86 +176,87 @@ export class StreamClient {
    */
   async *[Symbol.asyncIterator](): AsyncIterator<v1alpha2.IStreamDataResponse> {
     if (!this.configuration) {
-      throw new Error('StreamClient must be configured')
+      throw new Error("StreamClient must be configured");
     }
 
     // connect if not connected.
     if (!this.stream) {
-      this.connect()
-      this._configure(this.configuration)
+      this.connect();
+      this._configure(this.configuration);
     }
 
     while (true) {
-      let retryCount = 1
-      let cursor = null
-      let clock
+      let retryCount = 1;
+      let cursor = null;
+      let clock;
       try {
         // this check is to make ts happy
         if (!this.stream) {
-          throw new Error('Stream disconnected unexpectedly')
+          throw new Error("Stream disconnected unexpectedly");
         }
 
-        const streamIter = this.stream[Symbol.asyncIterator]()
+        const streamIter = this.stream[Symbol.asyncIterator]();
         while (true) {
           const timeout = new Promise((_, reject) => {
             clock = setTimeout(() => {
-              reject(new Error('Stream timed out'))
-            }, this.timeout)
-          })
+              reject(new Error("Stream timed out"));
+            }, this.timeout);
+          });
 
           const message = <IteratorResult<v1alpha2.IStreamDataResponse>>(
             await Promise.race([streamIter.next(), timeout])
-          )
-          const messageTyped = message.value as v1alpha2.IStreamDataResponse
+          );
+          const messageTyped = message.value as v1alpha2.IStreamDataResponse;
 
-          clearTimeout(clock)
+          clearTimeout(clock);
 
           // only return messages if they are with the most recently configured stream
-          if (messageTyped.streamId?.toString() == this.stream_id.toString()) {
+          if (messageTyped.streamId?.toString() === this.stream_id.toString()) {
             // reset retry count on new message
-            retryCount = 1
+            retryCount = 1;
 
             // keep cursor updated for use when reconnecting
             if (messageTyped.data) {
-              cursor = messageTyped.data.cursor
+              cursor = messageTyped.data.cursor;
             } else if (messageTyped.invalidate) {
-              cursor = messageTyped.invalidate.cursor
+              cursor = messageTyped.invalidate.cursor;
             }
 
-            yield messageTyped
+            yield messageTyped;
           }
         }
+        // rome-ignore lint: any is needed for catch
       } catch (err: any) {
-        clearTimeout(clock)
+        clearTimeout(clock);
 
         const isGrpcError =
-          err.hasOwnProperty('code') &&
-          err.hasOwnProperty('details') &&
-          err.hasOwnProperty('metadata')
+          err.hasOwn("code") && err.hasOwn("details") && err.hasOwn("metadata");
 
         // non-grpc error, so just bubble it up
         if (!isGrpcError) {
-          throw err
+          throw err;
         }
 
-        const { reconnect, args } = await Promise.resolve(this.onReconnect(err, retryCount))
-        retryCount += 1
+        const { reconnect, args } = await Promise.resolve(
+          this.onReconnect(err, retryCount),
+        );
+        retryCount += 1;
         if (!reconnect) {
-          throw err
+          throw err;
         }
 
-        this.connect()
+        this.connect();
 
         if (args) {
-          this._configure(args)
+          this._configure(args);
         } else {
           // use same configuration specified by user, restarting from the
           // latest ingested batch.
           const configuration = {
             ...this.configuration,
             cursor: cursor ?? this.configuration.cursor,
-          }
-          this._configure(configuration)
+          };
+          this._configure(configuration);
         }
       }
     }
@@ -260,46 +270,51 @@ export class StreamClient {
    * are old messages in-flight.
    */
   configure(args: ConfigureArgs) {
-    this.configuration = args
-    this._configure(args)
+    this.configuration = args;
+    this._configure(args);
   }
 
   private _configure(args: ConfigureArgs) {
-    const { filter, batchSize, cursor, finality } = args
-    this.stream_id++
+    const { filter, batchSize, cursor, finality } = args;
+    this.stream_id++;
 
     // only send configuration if connected
     if (this.stream) {
-      const builder = StreamDataRequest.create().withStreamId(this.stream_id).withFilter(filter)
+      const builder = StreamDataRequest.create()
+        .withStreamId(this.stream_id)
+        .withFilter(filter);
 
       if (batchSize) {
-        builder.withBatchSize(batchSize)
+        builder.withBatchSize(batchSize);
       }
       if (cursor) {
-        builder.withStartingCursor(cursor)
+        builder.withStartingCursor(cursor);
       }
       if (finality) {
-        builder.withFinality(finality)
+        builder.withFinality(finality);
       }
 
-      const request = builder.encode()
-      this.stream?.write(request)
+      const request = builder.encode();
+      this.stream?.write(request);
     }
   }
 
   private connect() {
-    this.stream = this.inner.streamData()
-    return this
+    this.stream = this.inner.streamData();
+    return this;
   }
 }
 
 /**
  * A `onReconnect` callback that never reconnects.
  */
-export function neverReconnect(_err: StatusObject, _retryCount: number): OnReconnectResult {
+export function neverReconnect(
+  _err: StatusObject,
+  _retryCount: number,
+): OnReconnectResult {
   return {
     reconnect: false,
-  }
+  };
 }
 
 /**
@@ -310,30 +325,30 @@ export function neverReconnect(_err: StatusObject, _retryCount: number): OnRecon
  */
 export async function defaultOnReconnect(
   err: StatusObject,
-  retryCount: number
+  retryCount: number,
 ): Promise<OnReconnectResult> {
-  if (err.code != 13) {
+  if (err.code !== 13) {
     return {
       reconnect: false,
-    }
+    };
   }
 
-  await new Promise((resolve) => setTimeout(resolve, retryCount * 1000))
+  await new Promise((resolve) => setTimeout(resolve, retryCount * 1000));
   return {
     reconnect: retryCount < 5,
-  }
+  };
 }
 
 /*
  * Returns a generator that adds the given `token` to request metadata.
  */
 function createMetadataGenerator(token?: string): CallMetadataGenerator {
-  const metadata = new Metadata()
+  const metadata = new Metadata();
   if (token) {
-    metadata.add('authorization', `bearer ${token}`)
+    metadata.add("authorization", `bearer ${token}`);
   }
 
   return (_options, cb) => {
-    cb(null, metadata)
-  }
+    cb(null, metadata);
+  };
 }

@@ -4,7 +4,7 @@ export type SinkOptions = {
   sinkType: string;
   /** Sink options. */
   sinkOptions: object;
-}
+};
 
 /** Network-specific options. */
 export type NetworkOptions = {
@@ -12,10 +12,13 @@ export type NetworkOptions = {
   network: string;
   /** Data filter. */
   filter: object;
-}
+};
 
 /** Data finality. */
-export type Finality = 'DATA_STATUS_FINALIZED' | 'DATA_STATUS_ACCEPTED' | 'DATA_STATUS_PENDING';
+export type Finality =
+  | "DATA_STATUS_FINALIZED"
+  | "DATA_STATUS_ACCEPTED"
+  | "DATA_STATUS_PENDING";
 
 /** Stream-related options. */
 export type StreamOptions = {
@@ -27,14 +30,18 @@ export type StreamOptions = {
   metadata?: string[];
   /** The Apibara DNA stream auth token. */
   authToken?: string;
-}
+};
 
-export type Config<TNetworkOptions extends NetworkOptions = NetworkOptions, TSink extends SinkOptions = SinkOptions> = TSink & TNetworkOptions & StreamOptions & {
-  /** How many historical blocks to process in a single batch. */
-  batchSize?: number;
-  /** Finality of the data to process. */
-  finality?: Finality;
-  /** Start streaming data from this block. */
-  startingBlock?: number;
-}
-
+export type Config<
+  TNetworkOptions extends NetworkOptions = NetworkOptions,
+  TSink extends SinkOptions = SinkOptions,
+> = TSink &
+  TNetworkOptions &
+  StreamOptions & {
+    /** How many historical blocks to process in a single batch. */
+    batchSize?: number;
+    /** Finality of the data to process. */
+    finality?: Finality;
+    /** Start streaming data from this block. */
+    startingBlock?: number;
+  };

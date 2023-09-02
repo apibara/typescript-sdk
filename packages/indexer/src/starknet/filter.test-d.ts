@@ -1,13 +1,19 @@
 import { assertType, describe, test } from "vitest";
 
-import { EventFilter, Filter, L2ToL1MessageFilter, StateUpdateFilter, TransactionFilter } from "./filter";
 import { FieldElement } from "./felt";
+import {
+  EventFilter,
+  Filter,
+  L2ToL1MessageFilter,
+  StateUpdateFilter,
+  TransactionFilter,
+} from "./filter";
 
-const address = "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7";
-const entryPointSelector = "0x03943907ef0ef6f9d2e2408b05e520a66daaf74293dbf665e5a20b117676170e";
-const calldata = [
-  FieldElement.parse("0x01"), FieldElement.parse("0x02")
-];
+const address =
+  "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7";
+const entryPointSelector =
+  "0x03943907ef0ef6f9d2e2408b05e520a66daaf74293dbf665e5a20b117676170e";
+const calldata = [FieldElement.parse("0x01"), FieldElement.parse("0x02")];
 
 describe("Filter", () => {
   test("all optional", () => {
@@ -27,8 +33,7 @@ describe("TransactionFilter", () => {
   test("only one inner filter", () => {
     // @ts-expect-error - multiple inner filters
     assertType<TransactionFilter>({
-      invokeV0: {
-      },
+      invokeV0: {},
       deployAccount: {},
     });
   });
@@ -128,53 +133,65 @@ describe("StateUpdateFilter", () => {
 
   test("with storage diffs", () => {
     assertType<StateUpdateFilter>({
-      storageDiffs: [{
-        contractAddress: address,
-      }],
+      storageDiffs: [
+        {
+          contractAddress: address,
+        },
+      ],
     });
   });
 
   test("with declared contracts", () => {
     assertType<StateUpdateFilter>({
-      declaredContracts: [{
-        classHash: address,
-      }],
+      declaredContracts: [
+        {
+          classHash: address,
+        },
+      ],
     });
   });
 
   test("with deployed contracts", () => {
     assertType<StateUpdateFilter>({
-      deployedContracts: [{
-        classHash: address,
-        contractAddress: address,
-      }],
+      deployedContracts: [
+        {
+          classHash: address,
+          contractAddress: address,
+        },
+      ],
     });
   });
 
   test("with nonces", () => {
     assertType<StateUpdateFilter>({
-      nonces: [{
-        contractAddress: address,
-        nonce: `0x1`,
-      }],
+      nonces: [
+        {
+          contractAddress: address,
+          nonce: "0x1",
+        },
+      ],
     });
   });
 
   test("with declared classes", () => {
     assertType<StateUpdateFilter>({
-      declaredClasses: [{
-        compiledClassHash: address,
-        classHash: address,
-      }],
+      declaredClasses: [
+        {
+          compiledClassHash: address,
+          classHash: address,
+        },
+      ],
     });
   });
 
   test("with replaced classes", () => {
     assertType<StateUpdateFilter>({
-      replacedClasses: [{
-        contractAddress: address,
-        classHash: address,
-      }],
+      replacedClasses: [
+        {
+          contractAddress: address,
+          classHash: address,
+        },
+      ],
     });
   });
 });

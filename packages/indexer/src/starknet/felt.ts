@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export type FieldElement = `0x${string}`
+export type FieldElement = `0x${string}`;
 
 export const FieldElement = z.string().transform((value, ctx) => {
   const regex = /^0x[0-9a-fA-F]{1,64}$/;
