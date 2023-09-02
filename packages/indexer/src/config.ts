@@ -29,7 +29,7 @@ export type StreamOptions = {
   authToken?: string;
 }
 
-export type Config<TNetworkOptions extends NetworkOptions, TSink extends SinkOptions> = TSink & TNetworkOptions & StreamOptions & {
+export type Config<TNetworkOptions extends NetworkOptions = NetworkOptions, TSink extends SinkOptions = SinkOptions> = TSink & TNetworkOptions & StreamOptions & {
   /** How many historical blocks to process in a single batch. */
   batchSize?: number;
   /** Finality of the data to process. */
