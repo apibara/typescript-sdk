@@ -1,5 +1,15 @@
 # @apibara/indexer
 
+## 0.2.0
+
+### Minor Changes
+
+- [#48](https://github.com/apibara/typescript-sdk/pull/48) [`b54a103`](https://github.com/apibara/typescript-sdk/commit/b54a103321752dccc7aba5988a2dc598b8d7dfc8) Thanks [@fracek](https://github.com/fracek)! - Improve starknet Filter type
+
+### Patch Changes
+
+- [#48](https://github.com/apibara/typescript-sdk/pull/48) [`b54a103`](https://github.com/apibara/typescript-sdk/commit/b54a103321752dccc7aba5988a2dc598b8d7dfc8) Thanks [@fracek](https://github.com/fracek)! - Fix Mongo sink type
+
 ## 0.1.2
 
 ### Patch Changes
