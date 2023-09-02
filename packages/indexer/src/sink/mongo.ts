@@ -1,6 +1,6 @@
 /** MongoDB sink options */
 export type Mongo = {
-  sinkType: 'mongo';
+  sinkType: "mongo";
   sinkOptions: {
     /** MongoDB connection string. */
     connectionString?: string;
@@ -8,5 +8,5 @@ export type Mongo = {
     database?: string;
     /** Target collection name. */
     collectionName?: string;
-  }
-}
+  };
+};

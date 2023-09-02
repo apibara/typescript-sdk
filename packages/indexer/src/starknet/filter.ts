@@ -11,13 +11,12 @@ export type Filter = {
   messages?: L2ToL1MessageFilter[];
   /** Include state updates. */
   stateUpdate?: StateUpdateFilter;
-
-}
+};
 
 export type HeaderFilter = {
   /* If true, only include headers if any other filter matches. */
   weak?: boolean;
-}
+};
 
 export type TransactionFilterCommon = {
   /*** Include reverted transactions. */
@@ -118,14 +117,15 @@ export type DeployAccountTransactionFilter = {
   l1Handler?: never;
 };
 
-export type TransactionFilter = TransactionFilterCommon & (
-  InvokeTransactionV0Filter |
-  InvokeTransactionV1Filter |
-  DeployTransactionFilter |
-  DeclareTransactionFilter |
-  L1HandlerTransactionFilter |
-  DeployAccountTransactionFilter
-);
+export type TransactionFilter = TransactionFilterCommon &
+  (
+    | InvokeTransactionV0Filter
+    | InvokeTransactionV1Filter
+    | DeployTransactionFilter
+    | DeclareTransactionFilter
+    | L1HandlerTransactionFilter
+    | DeployAccountTransactionFilter
+  );
 
 export type EventFilter = {
   /** Filter by contract address. */
@@ -199,4 +199,3 @@ export type ReplacedClassFilter = {
   /** Filter by class hash. */
   classHash?: FieldElement;
 };
-

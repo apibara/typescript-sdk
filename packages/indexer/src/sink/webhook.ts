@@ -1,6 +1,6 @@
 /** Webhook sink options */
 export type Webhook = {
-  sinkType: 'webhook';
+  sinkType: "webhook";
   sinkOptions: {
     /** Target URL. */
     targetUrl?: string;
@@ -8,6 +8,5 @@ export type Webhook = {
     header?: string[];
     /** Send the data returned from the transform function as the request body. */
     raw?: boolean;
-  }
-}
-
+  };
+};

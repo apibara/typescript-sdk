@@ -1,11 +1,11 @@
-import { Message, Field } from 'protobufjs/light'
+import { Field, Message } from "protobufjs/light";
 
 export class TestFilter extends Message<TestFilter> {
-  @Field.d(1, 'uint64')
+  @Field.d(1, "uint64")
   // @ts-ignore
-  public num: number
+  public num: number;
 
-  @Field.d(2, 'string')
+  @Field.d(2, "string")
   // @ts-ignore
-  public text: string
+  public text: string;
 }

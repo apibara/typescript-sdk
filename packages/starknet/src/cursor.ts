@@ -1,6 +1,6 @@
-import Long from 'long'
-import { FieldElement } from './felt'
-import { v1alpha2 } from './proto'
+import Long from "long";
+import { FieldElement } from "./felt";
+import { v1alpha2 } from "./proto";
 
 export const StarkNetCursor = {
   /**
@@ -10,17 +10,23 @@ export const StarkNetCursor = {
     return {
       orderKey: Long.fromValue(number),
       uniqueKey: new Uint8Array(),
-    }
+    };
   },
 
   /**
    * Creates a cursor pointing at the block with the given height and hash.
    */
-  createWithBlockNumberAndHash: (number: string | number | Long, hash: v1alpha2.IFieldElement) => {
-    const uniqueKey = Buffer.from(FieldElement.toHex(hash).replace('0x', ''), 'hex')
+  createWithBlockNumberAndHash: (
+    number: string | number | Long,
+    hash: v1alpha2.IFieldElement,
+  ) => {
+    const uniqueKey = Buffer.from(
+      FieldElement.toHex(hash).replace("0x", ""),
+      "hex",
+    );
     return {
       orderKey: Long.fromValue(number),
       uniqueKey,
-    }
+    };
   },
-}
+};

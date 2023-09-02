@@ -7,6 +7,9 @@
     "build": {
       "dependsOn": ["^build", "prebuild"]
     },
+    "test:typecheck": {
+      "dependsOn": ["build"]
+    },
     "test": {
       "dependsOn": ["build"]
     },
@@ -14,6 +17,9 @@
       "outputs": []
     },
     "lint:fix": {
+      "outputs": []
+    },
+    "format": {
       "outputs": []
     }
   }

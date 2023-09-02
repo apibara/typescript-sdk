@@ -1,6 +1,6 @@
 /** Console sink type. */
 export type Console = {
-  sinkType: 'console';
+  sinkType: "console";
 
   /** Accept any options.
    *
@@ -8,4 +8,4 @@ export type Console = {
    * without having to remove the options from the config file.
    */
   sinkOptions: object;
-}
+};

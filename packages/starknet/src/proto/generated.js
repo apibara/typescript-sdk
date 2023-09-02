@@ -5023,7 +5023,7 @@ $root.apibara = (function() {
                  * @memberof apibara.starknet.v1alpha2.FieldElement
                  * @instance
                  */
-                FieldElement.prototype.loLo = 0;
+                FieldElement.prototype.loLo = $util.Long ? $util.Long.fromBits(0,0,false) : 0;
 
                 /**
                  * FieldElement loHi.
@@ -5031,7 +5031,7 @@ $root.apibara = (function() {
                  * @memberof apibara.starknet.v1alpha2.FieldElement
                  * @instance
                  */
-                FieldElement.prototype.loHi = 0;
+                FieldElement.prototype.loHi = $util.Long ? $util.Long.fromBits(0,0,false) : 0;
 
                 /**
                  * FieldElement hiLo.
@@ -5039,7 +5039,7 @@ $root.apibara = (function() {
                  * @memberof apibara.starknet.v1alpha2.FieldElement
                  * @instance
                  */
-                FieldElement.prototype.hiLo = 0;
+                FieldElement.prototype.hiLo = $util.Long ? $util.Long.fromBits(0,0,false) : 0;
 
                 /**
                  * FieldElement hiHi.
@@ -5047,7 +5047,7 @@ $root.apibara = (function() {
                  * @memberof apibara.starknet.v1alpha2.FieldElement
                  * @instance
                  */
-                FieldElement.prototype.hiHi = 0;
+                FieldElement.prototype.hiHi = $util.Long ? $util.Long.fromBits(0,0,false) : 0;
 
                 /**
                  * Creates a new FieldElement instance using the specified properties.
@@ -5246,10 +5246,26 @@ $root.apibara = (function() {
                         options = {};
                     var object = {};
                     if (options.defaults) {
-                        object.loLo = 0;
-                        object.loHi = 0;
-                        object.hiLo = 0;
-                        object.hiHi = 0;
+                        if ($util.Long) {
+                            var long = new $util.Long(0, 0, false);
+                            object.loLo = options.longs === String ? long.toString() : options.longs === Number ? long.toNumber() : long;
+                        } else
+                            object.loLo = options.longs === String ? "0" : 0;
+                        if ($util.Long) {
+                            var long = new $util.Long(0, 0, false);
+                            object.loHi = options.longs === String ? long.toString() : options.longs === Number ? long.toNumber() : long;
+                        } else
+                            object.loHi = options.longs === String ? "0" : 0;
+                        if ($util.Long) {
+                            var long = new $util.Long(0, 0, false);
+                            object.hiLo = options.longs === String ? long.toString() : options.longs === Number ? long.toNumber() : long;
+                        } else
+                            object.hiLo = options.longs === String ? "0" : 0;
+                        if ($util.Long) {
+                            var long = new $util.Long(0, 0, false);
+                            object.hiHi = options.longs === String ? long.toString() : options.longs === Number ? long.toNumber() : long;
+                        } else
+                            object.hiHi = options.longs === String ? "0" : 0;
                     }
                     if (message.loLo != null && message.hasOwnProperty("loLo"))
                         if (typeof message.loLo === "number")
@@ -5782,7 +5798,7 @@ $root.apibara = (function() {
                  * @memberof apibara.starknet.v1alpha2.BlockHeader
                  * @instance
                  */
-                BlockHeader.prototype.blockNumber = 0;
+                BlockHeader.prototype.blockNumber = $util.Long ? $util.Long.fromBits(0,0,true) : 0;
 
                 /**
                  * BlockHeader sequencerAddress.
@@ -6033,7 +6049,11 @@ $root.apibara = (function() {
                     if (options.defaults) {
                         object.blockHash = null;
                         object.parentBlockHash = null;
-                        object.blockNumber = 0;
+                        if ($util.Long) {
+                            var long = new $util.Long(0, 0, true);
+                            object.blockNumber = options.longs === String ? long.toString() : options.longs === Number ? long.toNumber() : long;
+                        } else
+                            object.blockNumber = options.longs === String ? "0" : 0;
                         object.sequencerAddress = null;
                         object.newRoot = null;
                         object.timestamp = null;
@@ -6840,7 +6860,7 @@ $root.apibara = (function() {
                  * @memberof apibara.starknet.v1alpha2.TransactionMeta
                  * @instance
                  */
-                TransactionMeta.prototype.version = 0;
+                TransactionMeta.prototype.version = $util.Long ? $util.Long.fromBits(0,0,true) : 0;
 
                 /**
                  * Creates a new TransactionMeta instance using the specified properties.
@@ -7066,7 +7086,11 @@ $root.apibara = (function() {
                         object.hash = null;
                         object.maxFee = null;
                         object.nonce = null;
-                        object.version = 0;
+                        if ($util.Long) {
+                            var long = new $util.Long(0, 0, true);
+                            object.version = options.longs === String ? long.toString() : options.longs === Number ? long.toNumber() : long;
+                        } else
+                            object.version = options.longs === String ? "0" : 0;
                     }
                     if (message.hash != null && message.hasOwnProperty("hash"))
                         object.hash = $root.apibara.starknet.v1alpha2.FieldElement.toObject(message.hash, options);
@@ -8807,7 +8831,7 @@ $root.apibara = (function() {
                  * @memberof apibara.starknet.v1alpha2.TransactionReceipt
                  * @instance
                  */
-                TransactionReceipt.prototype.transactionIndex = 0;
+                TransactionReceipt.prototype.transactionIndex = $util.Long ? $util.Long.fromBits(0,0,true) : 0;
 
                 /**
                  * TransactionReceipt actualFee.
@@ -9093,7 +9117,11 @@ $root.apibara = (function() {
                     }
                     if (options.defaults) {
                         object.transactionHash = null;
-                        object.transactionIndex = 0;
+                        if ($util.Long) {
+                            var long = new $util.Long(0, 0, true);
+                            object.transactionIndex = options.longs === String ? long.toString() : options.longs === Number ? long.toNumber() : long;
+                        } else
+                            object.transactionIndex = options.longs === String ? "0" : 0;
                         object.actualFee = null;
                         object.contractAddress = null;
                     }
@@ -9465,7 +9493,7 @@ $root.apibara = (function() {
                  * @memberof apibara.starknet.v1alpha2.L2ToL1Message
                  * @instance
                  */
-                L2ToL1Message.prototype.index = 0;
+                L2ToL1Message.prototype.index = $util.Long ? $util.Long.fromBits(0,0,true) : 0;
 
                 /**
                  * L2ToL1Message fromAddress.
@@ -9681,7 +9709,11 @@ $root.apibara = (function() {
                         object.payload = [];
                     if (options.defaults) {
                         object.toAddress = null;
-                        object.index = 0;
+                        if ($util.Long) {
+                            var long = new $util.Long(0, 0, true);
+                            object.index = options.longs === String ? long.toString() : options.longs === Number ? long.toNumber() : long;
+                        } else
+                            object.index = options.longs === String ? "0" : 0;
                         object.fromAddress = null;
                     }
                     if (message.toAddress != null && message.hasOwnProperty("toAddress"))
@@ -10054,7 +10086,7 @@ $root.apibara = (function() {
                  * @memberof apibara.starknet.v1alpha2.Event
                  * @instance
                  */
-                Event.prototype.index = 0;
+                Event.prototype.index = $util.Long ? $util.Long.fromBits(0,0,true) : 0;
 
                 /**
                  * Creates a new Event instance using the specified properties.
@@ -10276,7 +10308,11 @@ $root.apibara = (function() {
                     }
                     if (options.defaults) {
                         object.fromAddress = null;
-                        object.index = 0;
+                        if ($util.Long) {
+                            var long = new $util.Long(0, 0, true);
+                            object.index = options.longs === String ? long.toString() : options.longs === Number ? long.toNumber() : long;
+                        } else
+                            object.index = options.longs === String ? "0" : 0;
                     }
                     if (message.fromAddress != null && message.hasOwnProperty("fromAddress"))
                         object.fromAddress = $root.apibara.starknet.v1alpha2.FieldElement.toObject(message.fromAddress, options);
@@ -12741,7 +12777,7 @@ $root.google = (function() {
              * @memberof google.protobuf.Timestamp
              * @instance
              */
-            Timestamp.prototype.seconds = 0;
+            Timestamp.prototype.seconds = $util.Long ? $util.Long.fromBits(0,0,false) : 0;
 
             /**
              * Timestamp nanos.
@@ -12905,7 +12941,11 @@ $root.google = (function() {
                     options = {};
                 var object = {};
                 if (options.defaults) {
-                    object.seconds = 0;
+                    if ($util.Long) {
+                        var long = new $util.Long(0, 0, false);
+                        object.seconds = options.longs === String ? long.toString() : options.longs === Number ? long.toNumber() : long;
+                    } else
+                        object.seconds = options.longs === String ? "0" : 0;
                     object.nanos = 0;
                 }
                 if (message.seconds != null && message.hasOwnProperty("seconds"))
