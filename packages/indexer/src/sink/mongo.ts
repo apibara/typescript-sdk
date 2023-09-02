@@ -8,5 +8,7 @@ export type Mongo = {
     database?: string;
     /** Target collection name. */
     collectionName?: string;
+    /** Enable entity mode. */
+    entityMode?: boolean;
   };
 };
