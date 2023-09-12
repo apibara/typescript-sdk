@@ -1,5 +1,11 @@
 # @apibara/indexer
 
+## 0.2.1
+
+### Patch Changes
+
+- [#50](https://github.com/apibara/typescript-sdk/pull/50) [`b65086a`](https://github.com/apibara/typescript-sdk/commit/b65086a3663d40a9c27bae1e5fb7fc0cad79581f) Thanks [@fracek](https://github.com/fracek)! - Fix Starknet Block types
+
 ## 0.2.0
 
 ### Minor Changes
