@@ -434,6 +434,30 @@ export class EventFilter implements IEncodable<v1alpha2.IEventFilter> {
     return this;
   }
 
+  /**
+   * Include events emitted by reverted transactions.
+   */
+  withIncludeReverted(includeReverted: boolean) {
+    this.inner.includeReverted = includeReverted;
+    return this;
+  }
+
+  /**
+   * Include the transaction that emitted the event. Defaults to true.
+   */
+  withIncludeTransaction(includeTransaction: boolean) {
+    this.inner.includeTransaction = includeTransaction;
+    return this;
+  }
+
+  /**
+   * Include the receipt of the transaction that emitted the event. Defaults to true.
+   */
+  withIncludeReceipt(includeReceipt: boolean) {
+    this.inner.includeReceipt = includeReceipt;
+    return this;
+  }
+
   encode(): v1alpha2.IEventFilter {
     return this.inner;
   }

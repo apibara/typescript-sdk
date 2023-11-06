@@ -2892,6 +2892,9 @@ $root.apibara = (function() {
                  * @property {apibara.starknet.v1alpha2.IFieldElement|null} [fromAddress] EventFilter fromAddress
                  * @property {Array.<apibara.starknet.v1alpha2.IFieldElement>|null} [keys] EventFilter keys
                  * @property {Array.<apibara.starknet.v1alpha2.IFieldElement>|null} [data] EventFilter data
+                 * @property {boolean|null} [includeReverted] EventFilter includeReverted
+                 * @property {boolean|null} [includeTransaction] EventFilter includeTransaction
+                 * @property {boolean|null} [includeReceipt] EventFilter includeReceipt
                  */
 
                 /**
@@ -2936,6 +2939,66 @@ $root.apibara = (function() {
                 EventFilter.prototype.data = $util.emptyArray;
 
                 /**
+                 * EventFilter includeReverted.
+                 * @member {boolean|null|undefined} includeReverted
+                 * @memberof apibara.starknet.v1alpha2.EventFilter
+                 * @instance
+                 */
+                EventFilter.prototype.includeReverted = null;
+
+                /**
+                 * EventFilter includeTransaction.
+                 * @member {boolean|null|undefined} includeTransaction
+                 * @memberof apibara.starknet.v1alpha2.EventFilter
+                 * @instance
+                 */
+                EventFilter.prototype.includeTransaction = null;
+
+                /**
+                 * EventFilter includeReceipt.
+                 * @member {boolean|null|undefined} includeReceipt
+                 * @memberof apibara.starknet.v1alpha2.EventFilter
+                 * @instance
+                 */
+                EventFilter.prototype.includeReceipt = null;
+
+                // OneOf field names bound to virtual getters and setters
+                var $oneOfFields;
+
+                /**
+                 * EventFilter _includeReverted.
+                 * @member {"includeReverted"|undefined} _includeReverted
+                 * @memberof apibara.starknet.v1alpha2.EventFilter
+                 * @instance
+                 */
+                Object.defineProperty(EventFilter.prototype, "_includeReverted", {
+                    get: $util.oneOfGetter($oneOfFields = ["includeReverted"]),
+                    set: $util.oneOfSetter($oneOfFields)
+                });
+
+                /**
+                 * EventFilter _includeTransaction.
+                 * @member {"includeTransaction"|undefined} _includeTransaction
+                 * @memberof apibara.starknet.v1alpha2.EventFilter
+                 * @instance
+                 */
+                Object.defineProperty(EventFilter.prototype, "_includeTransaction", {
+                    get: $util.oneOfGetter($oneOfFields = ["includeTransaction"]),
+                    set: $util.oneOfSetter($oneOfFields)
+                });
+
+                /**
+                 * EventFilter _includeReceipt.
+                 * @member {"includeReceipt"|undefined} _includeReceipt
+                 * @memberof apibara.starknet.v1alpha2.EventFilter
+                 * @instance
+                 */
+                Object.defineProperty(EventFilter.prototype, "_includeReceipt", {
+                    get: $util.oneOfGetter($oneOfFields = ["includeReceipt"]),
+                    set: $util.oneOfSetter($oneOfFields)
+                });
+
+                /**
                  * Creates a new EventFilter instance using the specified properties.
                  * @function create
                  * @memberof apibara.starknet.v1alpha2.EventFilter
@@ -2967,6 +3030,12 @@ $root.apibara = (function() {
                     if (message.data != null && message.data.length)
                         for (var i = 0; i < message.data.length; ++i)
                             $root.apibara.starknet.v1alpha2.FieldElement.encode(message.data[i], writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
+                    if (message.includeReverted != null && Object.hasOwnProperty.call(message, "includeReverted"))
+                        writer.uint32(/* id 4, wireType 0 =*/32).bool(message.includeReverted);
+                    if (message.includeTransaction != null && Object.hasOwnProperty.call(message, "includeTransaction"))
+                        writer.uint32(/* id 5, wireType 0 =*/40).bool(message.includeTransaction);
+                    if (message.includeReceipt != null && Object.hasOwnProperty.call(message, "includeReceipt"))
+                        writer.uint32(/* id 6, wireType 0 =*/48).bool(message.includeReceipt);
                     return writer;
                 };
 
@@ -3017,6 +3086,18 @@ $root.apibara = (function() {
                                 message.data.push($root.apibara.starknet.v1alpha2.FieldElement.decode(reader, reader.uint32()));
                                 break;
                             }
+                        case 4: {
+                                message.includeReverted = reader.bool();
+                                break;
+                            }
+                        case 5: {
+                                message.includeTransaction = reader.bool();
+                                break;
+                            }
+                        case 6: {
+                                message.includeReceipt = reader.bool();
+                                break;
+                            }
                         default:
                             reader.skipType(tag & 7);
                             break;
@@ -3052,6 +3133,7 @@ $root.apibara = (function() {
                 EventFilter.verify = function verify(message) {
                     if (typeof message !== "object" || message === null)
                         return "object expected";
+                    var properties = {};
                     if (message.fromAddress != null && message.hasOwnProperty("fromAddress")) {
                         var error = $root.apibara.starknet.v1alpha2.FieldElement.verify(message.fromAddress);
                         if (error)
@@ -3074,6 +3156,21 @@ $root.apibara = (function() {
                             if (error)
                                 return "data." + error;
                         }
+                    }
+                    if (message.includeReverted != null && message.hasOwnProperty("includeReverted")) {
+                        properties._includeReverted = 1;
+                        if (typeof message.includeReverted !== "boolean")
+                            return "includeReverted: boolean expected";
+                    }
+                    if (message.includeTransaction != null && message.hasOwnProperty("includeTransaction")) {
+                        properties._includeTransaction = 1;
+                        if (typeof message.includeTransaction !== "boolean")
+                            return "includeTransaction: boolean expected";
+                    }
+                    if (message.includeReceipt != null && message.hasOwnProperty("includeReceipt")) {
+                        properties._includeReceipt = 1;
+                        if (typeof message.includeReceipt !== "boolean")
+                            return "includeReceipt: boolean expected";
                     }
                     return null;
                 };
@@ -3115,6 +3212,12 @@ $root.apibara = (function() {
                             message.data[i] = $root.apibara.starknet.v1alpha2.FieldElement.fromObject(object.data[i]);
                         }
                     }
+                    if (object.includeReverted != null)
+                        message.includeReverted = Boolean(object.includeReverted);
+                    if (object.includeTransaction != null)
+                        message.includeTransaction = Boolean(object.includeTransaction);
+                    if (object.includeReceipt != null)
+                        message.includeReceipt = Boolean(object.includeReceipt);
                     return message;
                 };
 
@@ -3148,6 +3251,21 @@ $root.apibara = (function() {
                         object.data = [];
                         for (var j = 0; j < message.data.length; ++j)
                             object.data[j] = $root.apibara.starknet.v1alpha2.FieldElement.toObject(message.data[j], options);
+                    }
+                    if (message.includeReverted != null && message.hasOwnProperty("includeReverted")) {
+                        object.includeReverted = message.includeReverted;
+                        if (options.oneofs)
+                            object._includeReverted = "includeReverted";
+                    }
+                    if (message.includeTransaction != null && message.hasOwnProperty("includeTransaction")) {
+                        object.includeTransaction = message.includeTransaction;
+                        if (options.oneofs)
+                            object._includeTransaction = "includeTransaction";
+                    }
+                    if (message.includeReceipt != null && message.hasOwnProperty("includeReceipt")) {
+                        object.includeReceipt = message.includeReceipt;
+                        if (options.oneofs)
+                            object._includeReceipt = "includeReceipt";
                     }
                     return object;
                 };

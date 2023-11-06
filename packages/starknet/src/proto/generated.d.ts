@@ -1113,6 +1113,15 @@ export namespace apibara {
 
                 /** EventFilter data */
                 data?: (apibara.starknet.v1alpha2.IFieldElement[]|null);
+
+                /** EventFilter includeReverted */
+                includeReverted?: (boolean|null);
+
+                /** EventFilter includeTransaction */
+                includeTransaction?: (boolean|null);
+
+                /** EventFilter includeReceipt */
+                includeReceipt?: (boolean|null);
             }
 
             /** Represents an EventFilter. */
@@ -1132,6 +1141,24 @@ export namespace apibara {
 
                 /** EventFilter data. */
                 public data: apibara.starknet.v1alpha2.IFieldElement[];
+
+                /** EventFilter includeReverted. */
+                public includeReverted?: (boolean|null);
+
+                /** EventFilter includeTransaction. */
+                public includeTransaction?: (boolean|null);
+
+                /** EventFilter includeReceipt. */
+                public includeReceipt?: (boolean|null);
+
+                /** EventFilter _includeReverted. */
+                public _includeReverted?: "includeReverted";
+
+                /** EventFilter _includeTransaction. */
+                public _includeTransaction?: "includeTransaction";
+
+                /** EventFilter _includeReceipt. */
+                public _includeReceipt?: "includeReceipt";
 
                 /**
                  * Creates a new EventFilter instance using the specified properties.
