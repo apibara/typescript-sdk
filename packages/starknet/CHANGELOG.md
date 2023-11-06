@@ -1,5 +1,11 @@
 # @apibara/starknet
 
+## 0.3.1
+
+### Patch Changes
+
+- [#52](https://github.com/apibara/typescript-sdk/pull/52) [`bb12db3`](https://github.com/apibara/typescript-sdk/commit/bb12db32098d09e506eaaa12c2eb81f06b285c32) Thanks [@fracek](https://github.com/fracek)! - Add include reverted, transaction and receipt options
+
 ## 0.3.0
 
 ### Minor Changes
