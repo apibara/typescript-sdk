@@ -1,5 +1,11 @@
 # @apibara/indexer
 
+## 0.2.2
+
+### Patch Changes
+
+- [#52](https://github.com/apibara/typescript-sdk/pull/52) [`59bbe52`](https://github.com/apibara/typescript-sdk/commit/59bbe526c1fd2c7d7315a50df02c061f1d87f770) Thanks [@fracek](https://github.com/fracek)! - Add include transaction and receipt option
+
 ## 0.2.1
 
 ### Patch Changes
