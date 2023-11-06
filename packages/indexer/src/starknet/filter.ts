@@ -136,6 +136,10 @@ export type EventFilter = {
   data?: FieldElement[];
   /** Include events from reverted transactions. */
   includeReverted?: boolean;
+  /** Include the transaction that emitted the event. Defaults to true. */
+  includeTransaction?: boolean;
+  /** Include the receipt of the transaction that emitted the event. Defaults to true. */
+  includeReceipt?: boolean;
 };
 
 export type L2ToL1MessageFilter = {
