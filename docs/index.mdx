@@ -37,29 +37,23 @@ data.
 
 We start by installing the `@apibara/protocol` and `@apibara/starknet` packages:
 
-<CodeBlock.Multi>
-  <CodeBlock.Language language="npm">
-    ```npm file=terminal group=install
-    npm add @apibara/protocol @apibara/starknet
-    ```
-  </CodeBlock.Language>
-  <CodeBlock.Language language="yarn">
-    ```yarn file=terminal group=install
-    yarn install @apibara/protocol @apibara/starknet
-    ```
-  </CodeBlock.Language>
-  <CodeBlock.Language language="pnpm">
-    ```pnpm file=terminal group=install
-    pnpm add @apibara/protocol @apibara/starknet
-    ```
-  </CodeBlock.Language>
-</CodeBlock.Multi>
+<CH.Code>
+```console npm
+npm add @apibara/protocol @apibara/starknet
+```
+```console yarn
+yarn install @apibara/protocol @apibara/starknet
+```
+```console pnpm
+pnpm add @apibara/protocol @apibara/starknet
+```
+</CH.Code>
 
 Then we can create a DNA client. If you're using a DNA stream hosted by
 Apibara, you will need to specify an API token. You can create an API token for
 free on [the Apibara website](https://www.apibara.com).
 
-```typescript file=main.ts
+```typescript main.ts
 import { StreamClient } from '@apibara/protocol'
 
 // Grab Apibara DNA token from environment, if any.
@@ -85,7 +79,7 @@ In this example, we create a Starknet filter for all `Transfer` events of the ET
 Together with events, we want to receive block headers and storage changes.
 
 
-```typescript file=main.ts
+```typescript main.ts
 import { StarkNetCursor, Filter, FieldElement, v1alpha2 as starknet } from '@apibara/starknet'
 
 const address = FieldElement.fromBigInt(
@@ -115,7 +109,7 @@ iterator](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-
 that handles low-level details such as reconnecting after disconnect.
 
 
-```typescript file=main.ts
+```typescript main.ts
 const cursor = StarkNetCursor.createWithBlockNumber(1045)
 
 client.configure({
