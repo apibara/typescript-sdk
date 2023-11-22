@@ -17,30 +17,24 @@ package to decode data received by one of the StarkNet streams.
 
 Install the package from [npm](https://www.npmjs.com/package/@apibara/starknet):
 
-<CodeBlock.Multi>
-  <CodeBlock.Language language="npm">
-    ```npm file=terminal group=install
-    npm add @apibara/starknet
-    ```
-  </CodeBlock.Language>
-  <CodeBlock.Language language="yarn">
-    ```yarn file=terminal group=install
-    yarn install @apibara/starknet
-    ```
-  </CodeBlock.Language>
-  <CodeBlock.Language language="pnpm">
-    ```pnpm file=terminal group=install
-    pnpm add @apibara/starknet
-    ```
-  </CodeBlock.Language>
-</CodeBlock.Multi>
+<CH.Code>
+```console npm
+npm add @apibara/starknet
+```
+```console yarn
+yarn install @apibara/starknet
+```
+```console pnpm
+pnpm add @apibara/starknet
+```
+</CH.Code>
 
 
 ## FieldElement
 
 The Apibara stream encodes StarkNet field elements (also known as felts) into 4 uint64 numbers. The SDK provides helper functions to convert from this representation into Javascript's `bigint`.
 
-```typescript file=main.ts
+```typescript main.ts
 import { FieldElement } from '@apibara/starknet'
 
 // converts the encoded value to bigint
@@ -60,7 +54,7 @@ SDK contains an helper module to construct filters.  You can find more about
 filters in the [StarkNet section](/docs/starknet#filter).
 
 
-```typescript file=main.ts
+```typescript main.ts
 import { Filter } from '@apibara/starknet'
 
 const filter = Filter.create()
