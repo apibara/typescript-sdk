@@ -1,49 +1,55 @@
 import { FieldElement } from "./felt";
+import { EventFilter } from "./filter";
+import { EventWithTransaction } from "./block";
+
+import { type Abi, hash } from "starknet";
 
 interface EventFilterParser {
-  eventFilter(name: string): Filter;
-  // eventParser(name: string): ParsedEvent[];
+  eventFilter(name: string): EventFilter;
+  eventParser(name: string): ({ event, transaction }: EventWithTransaction ) => any;
 }
 
-interface Filter {
-  name: string;
-}
-
-interface Event {
-  // Parsed event properties
-  event: any;
-  transaction: any;
-}
-
+// The Contract class implements the EventFilterParser interface.
 export class Contract implements EventFilterParser {
+  // Read-only properties for the contract's address and its ABI.
   readonly contractAddress: FieldElement;
-  readonly contractAbi: any[];
+  readonly contractAbi: Abi;
 
-  constructor(contractAddress: FieldElement, contractAbi: any[]) {
+  // Constructor to initialize a Contract instance with a contract address and ABI.
+  constructor(contractAddress: FieldElement, contractAbi: Abi) {
     this.contractAddress = contractAddress;
     this.contractAbi = contractAbi;
   }
 
-  eventFilter(name: string): Filter {
-    // Check if event exists in ABI
-    const event = this.contractAbi.find((item) => item.name === name);
+  // Method to filter events based on their name from the contract's ABI.
+  eventFilter(name: string): EventFilter {
+    // Find the event in the ABI matching the provided name.
+    const event: EventFilter = this.contractAbi.find((item) => item.name === name);
+    
+    // Throw an error if the event is not found in the ABI
     if (!event) {
       throw new Error(`Event ${name} not found in contract ABI`);
     }
 
-    // Need more clarity on what the DNA filter should look like
-    // Also clarity on the Pedersen hash
-
+    // Return the found event.
     return event;
   }
 
-  eventParser(name: string): ({ event, transaction }: Event) => Event {
-    return ({ event, transaction }: Event): Event => {
-      const newEvent: Event = {
-        event: "Bead Test",
-        transaction: "yoooo!!!",
+  // Method to parse events, given their name, and return a function that processes 
+  // an event and its associated transaction.
+  eventParser(name: string): ({ event, transaction }: EventWithTransaction ) => any {
+    const event = this.eventFilter(name);
+
+    // Need clarity on how to get a transaction from an event.
+
+    return ({ transaction }: EventWithTransaction): any => {
+      // Construct a new object combining the event details with the transaction.
+      const newEvent: any = {
+        event: event,
+        transaction: transaction,
       };
 
+      // Return the combined event and transaction object.
       return newEvent;
     };
   }
