@@ -3,7 +3,6 @@ import { EventFilter } from "./filter";
 
 import { type Abi, EventAbi, hash } from "starknet";
 
-
 // The Contract class implements the EventFilterParser interface.
 export class Contract {
   // Read-only properties for the contract's address and its ABI.
@@ -19,7 +18,7 @@ export class Contract {
   private _findEvent(name: string): EventAbi | undefined {
     // Find the event in the ABI matching the provided name.
     const event: EventAbi | undefined = this.contractAbi.find(
-      (item) => item.type === "event" && item.name === name
+      (item) => item.type === "event" && item.name === name,
     );
 
     return event;
