@@ -1,0 +1,15 @@
+{
+  "name": "starknet-client-example",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "start": "ts-node index.ts"
+  },
+  "dependencies": {
+    "@apibara/protocol": "workspace:*",
+    "@apibara/starknet": "workspace:*"
+  },
+  "devDependencies": {
+    "ts-node": "^10.9.1"
+  }
+}
