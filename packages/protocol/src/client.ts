@@ -210,8 +210,12 @@ export class StreamClient {
 
           clearTimeout(clock);
 
-          // only return messages if they are with the most recently configured stream
-          if (messageTyped.streamId?.toString() === this.stream_id.toString()) {
+          if (messageTyped.message === "heartbeat") {
+            yield messageTyped;
+          } else if (
+            messageTyped.streamId?.toString() === this.stream_id.toString()
+          ) {
+            // only return messages if they are with the most recently configured stream
             // reset retry count on new message
             retryCount = 1;
 
@@ -230,7 +234,9 @@ export class StreamClient {
         clearTimeout(clock);
 
         const isGrpcError =
-          err.hasOwn("code") && err.hasOwn("details") && err.hasOwn("metadata");
+          Object.hasOwn(err, "code") &&
+          Object.hasOwn(err, "details") &&
+          Object.hasOwn(err, "metadata");
 
         // non-grpc error, so just bubble it up
         if (!isGrpcError) {
