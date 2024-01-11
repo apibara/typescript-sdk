@@ -1,5 +1,11 @@
 # @apibara/protocol
 
+## 0.4.9
+
+### Patch Changes
+
+- [#58](https://github.com/apibara/typescript-sdk/pull/58) [`97a7c35685ae015cd06f88576ba4c6dbd37e2f9c`](https://github.com/apibara/typescript-sdk/commit/97a7c35685ae015cd06f88576ba4c6dbd37e2f9c) Thanks [@fracek](https://github.com/fracek)! - Fix stream client to yield heartbeat messages
+
 ## 0.4.8
 
 ### Patch Changes
