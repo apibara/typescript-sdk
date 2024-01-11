@@ -4,10 +4,9 @@ import { StreamDataRequest } from "./request";
 
 describe("RequestBuilder", () => {
   it("returns the final request", () => {
-    const filter = new TestFilter({
-      num: 123,
-      text: "abcdef",
-    });
+    const filter = new TestFilter();
+    filter.num = 123;
+    filter.text = "abcdef";
 
     const request = StreamDataRequest.create()
       .withBatchSize(10)
