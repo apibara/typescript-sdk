@@ -31,7 +31,7 @@ export class Contract {
     this.selectorToEvent = {};
     for (const event of this.abi) {
       if (event.type !== "event") {
-        return;
+        continue;
       }
       this.selectorToEvent[getSelector(event.name)] = event.name;
     }
