@@ -20,7 +20,15 @@ describe("Contract class tests", () => {
 
     expect(filter).toBeDefined();
     expect(filter.fromAddress).toBe(mockContractAddress);
-    // Further assertions can be made based on the expected structure of EventFilter
+    expect(filter.includeReceipt).toBeFalsy();
+  });
+
+  it("overrides some arguments", () => {
+    const contract = new Contract(mockContractAddress, mockContractAbi);
+    const filter = contract.eventFilter("MockEvent", { includeReceipt: true });
+
+    expect(filter).toBeDefined();
+    expect(filter.includeReceipt).toBeTruthy();
   });
 
   it("should throw an error for an invalid event name", () => {

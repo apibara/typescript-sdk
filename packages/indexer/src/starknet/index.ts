@@ -1,5 +1,6 @@
 export * from "./filter";
 export * from "./block";
+export { Contract } from "./parser";
 
 import { Filter } from "./filter";
 

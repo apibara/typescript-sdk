@@ -3,13 +3,12 @@ import { EventFilter } from "./filter";
 
 import { type Abi, EventAbi, hash } from "starknet";
 
-// The Contract class implements the EventFilterParser interface.
+/** Build a stream filter from a contract ABI. */
 export class Contract {
   // Read-only properties for the contract's address and its ABI.
   readonly contractAddress: FieldElement;
   readonly contractAbi: Abi;
 
-  // Constructor to initialize a Contract instance with a contract address and ABI.
   constructor(contractAddress: FieldElement, contractAbi: Abi) {
     this.contractAddress = contractAddress;
     this.contractAbi = contractAbi;
@@ -24,8 +23,14 @@ export class Contract {
     return event;
   }
 
-  // Method to filter events based on their name from the contract's ABI.
-  eventFilter(name: string): EventFilter {
+  /** Filter events based on their name from the contract's ABI. */
+  eventFilter(
+    name: string,
+    opts: Pick<
+      EventFilter,
+      "includeReceipt" | "includeTransaction" | "includeReverted"
+    > = {},
+  ): EventFilter {
     const event = this._findEvent(name);
 
     // Throw an error if the event is not found in the ABI
@@ -37,8 +42,9 @@ export class Contract {
     return {
       fromAddress: this.contractAddress,
       keys: [hash.getSelectorFromName(event.name) as `0x${string}`],
-      includeTransaction: false,
-      includeReceipt: false,
+      includeTransaction: opts.includeTransaction ?? false,
+      includeReceipt: opts.includeReceipt ?? false,
+      includeReverted: opts.includeReverted ?? false,
     };
   }
 }
