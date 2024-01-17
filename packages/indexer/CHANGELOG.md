@@ -1,5 +1,11 @@
 # @apibara/indexer
 
+## 0.2.4
+
+### Patch Changes
+
+- [#62](https://github.com/apibara/typescript-sdk/pull/62) [`39fe427cf763e5b7d273e0ded7be2f68adf447b9`](https://github.com/apibara/typescript-sdk/commit/39fe427cf763e5b7d273e0ded7be2f68adf447b9) Thanks [@fracek](https://github.com/fracek)! - Add method to lookup event name from selector
+
 ## 0.2.3
 
 ### Patch Changes
