@@ -1,5 +1,11 @@
 # @apibara/indexer
 
+## 0.2.3
+
+### Patch Changes
+
+- [#60](https://github.com/apibara/typescript-sdk/pull/60) [`3282cc44c917ce1764ad223282a6f5040d3b89c1`](https://github.com/apibara/typescript-sdk/commit/3282cc44c917ce1764ad223282a6f5040d3b89c1) Thanks [@fracek](https://github.com/fracek)! - Customize Contract event filter
+
 ## 0.2.2
 
 ### Patch Changes
