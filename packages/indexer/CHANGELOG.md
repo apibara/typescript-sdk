@@ -1,5 +1,11 @@
 # @apibara/indexer
 
+## 0.2.5
+
+### Patch Changes
+
+- [#64](https://github.com/apibara/typescript-sdk/pull/64) [`fa3ba914f38c278ad8a9bc74a325914b560856a3`](https://github.com/apibara/typescript-sdk/commit/fa3ba914f38c278ad8a9bc74a325914b560856a3) Thanks [@fracek](https://github.com/fracek)! - Fix bug in lookupEventFromSelector
+
 ## 0.2.4
 
 ### Patch Changes
