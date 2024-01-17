@@ -1,26 +1,40 @@
-import { FieldElement } from "./felt";
-import { EventFilter } from "./filter";
+import { type Abi, EventAbi } from "starknet";
 
-import { type Abi, EventAbi, hash } from "starknet";
+import { FieldElement, getSelector } from "./felt";
+import { EventFilter } from "./filter";
 
 /** Build a stream filter from a contract ABI. */
 export class Contract {
   // Read-only properties for the contract's address and its ABI.
-  readonly contractAddress: FieldElement;
-  readonly contractAbi: Abi;
+  readonly address: FieldElement;
+  readonly abi: Abi;
+
+  private selectorToEvent: Record<FieldElement, string>;
 
   constructor(contractAddress: FieldElement, contractAbi: Abi) {
-    this.contractAddress = contractAddress;
-    this.contractAbi = contractAbi;
+    this.address = contractAddress;
+    this.abi = contractAbi;
+    this.selectorToEvent = {};
+    this._populateSelectorToEvent();
   }
 
   private _findEvent(name: string): EventAbi | undefined {
     // Find the event in the ABI matching the provided name.
-    const event: EventAbi | undefined = this.contractAbi.find(
+    const event: EventAbi | undefined = this.abi.find(
       (item) => item.type === "event" && item.name === name,
     );
 
     return event;
+  }
+
+  private _populateSelectorToEvent(): void {
+    this.selectorToEvent = {};
+    for (const event of this.abi) {
+      if (event.type !== "event") {
+        return;
+      }
+      this.selectorToEvent[getSelector(event.name)] = event.name;
+    }
   }
 
   /** Filter events based on their name from the contract's ABI. */
@@ -40,11 +54,16 @@ export class Contract {
 
     // Return the found event.
     return {
-      fromAddress: this.contractAddress,
-      keys: [hash.getSelectorFromName(event.name) as `0x${string}`],
+      fromAddress: this.address,
+      keys: [getSelector(event.name)],
       includeTransaction: opts.includeTransaction ?? false,
       includeReceipt: opts.includeReceipt ?? false,
       includeReverted: opts.includeReverted ?? false,
     };
+  }
+
+  /** Returns the event name based on its selector. */
+  lookupEventFromSelector(selector: FieldElement): string | undefined {
+    return this.selectorToEvent[selector];
   }
 }
