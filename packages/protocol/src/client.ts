@@ -229,7 +229,7 @@ export class StreamClient {
             yield messageTyped;
           }
         }
-        // rome-ignore lint: any is needed for catch
+        // biome-ignore lint: any is needed for catch
       } catch (err: any) {
         clearTimeout(clock);
 

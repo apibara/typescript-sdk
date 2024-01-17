@@ -3,16 +3,23 @@ import { describe, expect, it } from "vitest";
 import { FieldElement } from "./felt";
 import { EventAbi } from "starknet";
 
-describe("Contract class tests", () => {
+describe("Contract", () => {
   const mockContractAddress: FieldElement = "0x0";
-  const mockEventAbi: EventAbi = {
-    type: "event",
-    name: "MockEvent",
-    kind: "struct",
-    members: [{ name: "param1", type: "felt", kind: "key" }],
-  };
 
-  const mockContractAbi = [mockEventAbi];
+  const mockContractAbi = [
+    {
+      type: "event",
+      name: "MockEvent",
+      kind: "struct",
+      members: [{ name: "param1", type: "felt", kind: "key" }],
+    },
+    {
+      type: "event",
+      name: "AnotherEvent",
+      kind: "struct",
+      members: [{ name: "param1", type: "felt", kind: "key" }],
+    },
+  ];
 
   it("should create an EventFilter for a valid event name", () => {
     const contract = new Contract(mockContractAddress, mockContractAbi);
@@ -29,6 +36,25 @@ describe("Contract class tests", () => {
 
     expect(filter).toBeDefined();
     expect(filter.includeReceipt).toBeTruthy();
+  });
+
+  it("can lookup an event name by its selector", () => {
+    const contract = new Contract(mockContractAddress, mockContractAbi);
+    const filter = contract.eventFilter("AnotherEvent");
+    const eventName = contract.lookupEventFromSelector(
+      filter.keys?.[0] ?? "0x00",
+    );
+
+    expect(eventName).toEqual("AnotherEvent");
+  });
+
+  it("returns undefined if no event matches", () => {
+    const contract = new Contract(mockContractAddress, mockContractAbi);
+    const eventName = contract.lookupEventFromSelector(
+      "0x1234567890123456789012345678901234567890123456789012345678901234",
+    );
+
+    expect(eventName).toBeUndefined();
   });
 
   it("should throw an error for an invalid event name", () => {
