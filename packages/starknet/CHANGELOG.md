@@ -1,5 +1,11 @@
 # @apibara/starknet
 
+## 0.4.0
+
+### Minor Changes
+
+- [#66](https://github.com/apibara/typescript-sdk/pull/66) [`28479332692e6d41a0533dc1ce2362be2a21301c`](https://github.com/apibara/typescript-sdk/commit/28479332692e6d41a0533dc1ce2362be2a21301c) Thanks [@fracek](https://github.com/fracek)! - Add V3 transactions
+
 ## 0.3.1
 
 ### Patch Changes
