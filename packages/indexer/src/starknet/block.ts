@@ -26,6 +26,8 @@ export type BlockHeader = {
   newRoot: FieldElement;
   /** Block production timestamp. */
   timestamp: string;
+  /** Price of L1 gas in the block. */
+  l1GasPrice?: ResourcePrice;
 };
 
 export type TransactionWithReceipt = {
@@ -55,9 +57,12 @@ export type Transaction = TransactionCommon &
   (
     | InvokeTransactionV0
     | InvokeTransactionV1
+    | InvokeTransactionV3
     | DeployTransaction
     | DeclareTransaction
+    | DeclareTransactionV3
     | DeployAccountTransaction
+    | DeployAccountTransactionV3
     | L1HandlerTransaction
   );
 
@@ -76,6 +81,18 @@ export type TransactionMeta = {
   nonce: FieldElement;
   /** Transaction version. */
   version: string;
+  /** Transaction resources. */
+  resourceBounds?: ResourceBoundsMapping;
+  /** Tip to the sequencer. */
+  tip?: number;
+  /** Data passed to the paymaster. */
+  paymasterData?: FieldElement[];
+  /** Account nonce's DA. */
+  nonceDataAvailabilityMode?: DataAvailabilityMode;
+  /** Transaction's DA. */
+  feeDataAvailabilityMode?: DataAvailabilityMode;
+  /** Transaction index in the block. */
+  transactionIndex?: number;
 };
 
 export type InvokeTransactionV0 = {
@@ -88,10 +105,13 @@ export type InvokeTransactionV0 = {
     calldata: FieldElement[];
   };
   invokeV1?: never;
+  invokeV3?: never;
   deploy?: never;
   declare?: never;
+  declareV3?: never;
   l1Handler?: never;
   deployAccount?: never;
+  deployAccountV3?: never;
 };
 
 export type InvokeTransactionV1 = {
@@ -102,10 +122,32 @@ export type InvokeTransactionV1 = {
     calldata: FieldElement[];
   };
   invokeV0?: never;
+  invokeV3?: never;
   deploy?: never;
   declare?: never;
+  declareV3?: never;
   l1Handler?: never;
   deployAccount?: never;
+  deployAccountV3?: never;
+};
+
+export type InvokeTransactionV3 = {
+  invokeV3?: {
+    /** Address of the account sending the transaction. */
+    senderAddress: FieldElement;
+    /** Calldata. */
+    calldata: FieldElement[];
+    /** Data passed to the account deployment. */
+    accountDeploymentData: FieldElement[];
+  };
+  invokeV1?: never;
+  invokeV0?: never;
+  deploy?: never;
+  declare?: never;
+  declareV3?: never;
+  l1Handler?: never;
+  deployAccount?: never;
+  deployAccountV3?: never;
 };
 
 export type DeployTransaction = {
@@ -119,9 +161,12 @@ export type DeployTransaction = {
   };
   invokeV0?: never;
   invokeV1?: never;
+  invokeV3?: never;
   declare?: never;
+  declareV3?: never;
   l1Handler?: never;
   deployAccount?: never;
+  deployAccountV3?: never;
 };
 
 export type DeclareTransaction = {
@@ -133,9 +178,33 @@ export type DeclareTransaction = {
     /** Hash of the cairo assembly resulting from the sierra compilation. */
     compiledClassHash: FieldElement;
   };
+  declareV3?: never;
   invokeV0?: never;
   invokeV1?: never;
+  invokeV3?: never;
   deploy?: never;
+  l1Handler?: never;
+  deployAccount?: never;
+  deployAccountV3?: never;
+};
+
+export type DeclareTransactionV3 = {
+  declareV3?: {
+    /** Class hash. */
+    classHash: FieldElement;
+    /** Address of the account sending the transaction. */
+    senderAddress: FieldElement;
+    /** Hash of the cairo assembly resulting from the sierra compilation. */
+    compiledClassHash: FieldElement;
+    /** Data passed to the account deployment. */
+    accountDeploymentData: FieldElement[];
+  };
+  declare?: never;
+  invokeV0?: never;
+  invokeV1?: never;
+  invokeV3?: never;
+  deploy?: never;
+  deployAccountV3?: never;
   l1Handler?: never;
   deployAccount?: never;
 };
@@ -149,10 +218,32 @@ export type DeployAccountTransaction = {
     /** Hash of the class being deployed. */
     classHash: FieldElement;
   };
+  deployAccountV3?: never;
   invokeV0?: never;
   invokeV1?: never;
+  invokeV3?: never;
   deploy?: never;
   declare?: never;
+  declareV3?: never;
+  l1Handler?: never;
+};
+
+export type DeployAccountTransactionV3 = {
+  deployAccountV3?: {
+    /** Constructor calldata. */
+    constructorCalldata: FieldElement[];
+    /** Salt used when computing the contract's address. */
+    contractAddressSalt: FieldElement;
+    /** Hash of the class being deployed. */
+    classHash: FieldElement;
+  };
+  deployAccount?: never;
+  invokeV0?: never;
+  invokeV1?: never;
+  invokeV3?: never;
+  deploy?: never;
+  declare?: never;
+  declareV3?: never;
   l1Handler?: never;
 };
 
@@ -167,8 +258,10 @@ export type L1HandlerTransaction = {
   };
   invokeV0?: never;
   invokeV1?: never;
+  invokeV3?: never;
   deploy?: never;
   declare?: never;
+  declareV3?: never;
   deployAccount?: never;
 };
 
@@ -288,3 +381,25 @@ export type NonceUpdate = {
   /** New nonce. */
   nonce: FieldElement;
 };
+
+export type ResourcePrice = {
+  /** Price in fri (10^-18 strk). */
+  priceInFri: FieldElement;
+  /** Price in wei (10^-18 eth). */
+  priceInWei: FieldElement;
+};
+
+export type ResourceBoundsMapping = {
+  l1Gas: ResourceBounds;
+  l2Gas: ResourceBounds;
+};
+
+export type ResourceBounds = {
+  maxAmount: number;
+  maxPricePerUnit: { low: number; high: number };
+};
+
+export type DataAvailabilityMode =
+  | "DATA_AVAILABILITY_MODE_UNSPECIFIED"
+  | "DATA_AVAILABILITY_MODE_L2"
+  | "DATA_AVAILABILITY_MODE_L1";

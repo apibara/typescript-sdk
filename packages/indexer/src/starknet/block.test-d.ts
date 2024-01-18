@@ -1,6 +1,6 @@
 import { assertType, describe, test } from "vitest";
 
-import { Block, BlockHeader, Transaction } from "./block";
+import { Block, BlockHeader, Transaction, TransactionMeta } from "./block";
 import { FieldElement } from "./felt";
 
 const address =
@@ -8,7 +8,7 @@ const address =
 const entryPointSelector =
   "0x03943907ef0ef6f9d2e2408b05e520a66daaf74293dbf665e5a20b117676170e";
 const calldata = [FieldElement.parse("0x01"), FieldElement.parse("0x02")];
-const meta = {
+const meta: TransactionMeta = {
   hash: FieldElement.parse("0x01"),
   maxFee: FieldElement.parse("0x02"),
   signature: [FieldElement.parse("0x03")],
