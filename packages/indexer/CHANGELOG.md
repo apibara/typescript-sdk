@@ -1,5 +1,11 @@
 # @apibara/indexer
 
+## 0.3.0
+
+### Minor Changes
+
+- [#66](https://github.com/apibara/typescript-sdk/pull/66) [`448f74c30088784726c3a8e6efa3f34966e4b424`](https://github.com/apibara/typescript-sdk/commit/448f74c30088784726c3a8e6efa3f34966e4b424) Thanks [@fracek](https://github.com/fracek)! - Add V3 transaction types
+
 ## 0.2.5
 
 ### Patch Changes
