@@ -2106,6 +2106,9 @@ export namespace apibara {
 
                 /** Block l2ToL1Messages */
                 l2ToL1Messages?: (apibara.starknet.v1alpha2.IL2ToL1MessageWithTransaction[]|null);
+
+                /** Block empty */
+                empty?: (boolean|null);
             }
 
             /** Represents a Block. */
@@ -2134,6 +2137,9 @@ export namespace apibara {
 
                 /** Block l2ToL1Messages. */
                 public l2ToL1Messages: apibara.starknet.v1alpha2.IL2ToL1MessageWithTransaction[];
+
+                /** Block empty. */
+                public empty: boolean;
 
                 /**
                  * Creates a new Block instance using the specified properties.
@@ -2233,6 +2239,12 @@ export namespace apibara {
 
                 /** BlockHeader timestamp */
                 timestamp?: (google.protobuf.ITimestamp|null);
+
+                /** BlockHeader starknetVersion */
+                starknetVersion?: (string|null);
+
+                /** BlockHeader l1GasPrice */
+                l1GasPrice?: (apibara.starknet.v1alpha2.IResourcePrice|null);
             }
 
             /** Represents a BlockHeader. */
@@ -2261,6 +2273,12 @@ export namespace apibara {
 
                 /** BlockHeader timestamp. */
                 public timestamp?: (google.protobuf.ITimestamp|null);
+
+                /** BlockHeader starknetVersion. */
+                public starknetVersion: string;
+
+                /** BlockHeader l1GasPrice. */
+                public l1GasPrice?: (apibara.starknet.v1alpha2.IResourcePrice|null);
 
                 /**
                  * Creates a new BlockHeader instance using the specified properties.
@@ -2475,6 +2493,15 @@ export namespace apibara {
 
                 /** Transaction deployAccount */
                 deployAccount?: (apibara.starknet.v1alpha2.IDeployAccountTransaction|null);
+
+                /** Transaction deployAccountV3 */
+                deployAccountV3?: (apibara.starknet.v1alpha2.IDeployAccountTransactionV3|null);
+
+                /** Transaction invokeV3 */
+                invokeV3?: (apibara.starknet.v1alpha2.IInvokeTransactionV3|null);
+
+                /** Transaction declareV3 */
+                declareV3?: (apibara.starknet.v1alpha2.IDeclareTransactionV3|null);
             }
 
             /** Represents a Transaction. */
@@ -2507,8 +2534,17 @@ export namespace apibara {
                 /** Transaction deployAccount. */
                 public deployAccount?: (apibara.starknet.v1alpha2.IDeployAccountTransaction|null);
 
+                /** Transaction deployAccountV3. */
+                public deployAccountV3?: (apibara.starknet.v1alpha2.IDeployAccountTransactionV3|null);
+
+                /** Transaction invokeV3. */
+                public invokeV3?: (apibara.starknet.v1alpha2.IInvokeTransactionV3|null);
+
+                /** Transaction declareV3. */
+                public declareV3?: (apibara.starknet.v1alpha2.IDeclareTransactionV3|null);
+
                 /** Transaction transaction. */
-                public transaction?: ("invokeV0"|"invokeV1"|"deploy"|"declare"|"l1Handler"|"deployAccount");
+                public transaction?: ("invokeV0"|"invokeV1"|"deploy"|"declare"|"l1Handler"|"deployAccount"|"deployAccountV3"|"invokeV3"|"declareV3");
 
                 /**
                  * Creates a new Transaction instance using the specified properties.
@@ -2605,6 +2641,24 @@ export namespace apibara {
 
                 /** TransactionMeta version */
                 version?: (number|Long|null);
+
+                /** TransactionMeta resourceBounds */
+                resourceBounds?: (apibara.starknet.v1alpha2.IResourceBoundsMapping|null);
+
+                /** TransactionMeta tip */
+                tip?: (number|Long|null);
+
+                /** TransactionMeta paymasterData */
+                paymasterData?: (apibara.starknet.v1alpha2.IFieldElement[]|null);
+
+                /** TransactionMeta nonceDataAvailabilityMode */
+                nonceDataAvailabilityMode?: (apibara.starknet.v1alpha2.DataAvailabilityMode|null);
+
+                /** TransactionMeta feeDataAvailabilityMode */
+                feeDataAvailabilityMode?: (apibara.starknet.v1alpha2.DataAvailabilityMode|null);
+
+                /** TransactionMeta transactionIndex */
+                transactionIndex?: (number|Long|null);
             }
 
             /** Represents a TransactionMeta. */
@@ -2630,6 +2684,24 @@ export namespace apibara {
 
                 /** TransactionMeta version. */
                 public version: (number|Long);
+
+                /** TransactionMeta resourceBounds. */
+                public resourceBounds?: (apibara.starknet.v1alpha2.IResourceBoundsMapping|null);
+
+                /** TransactionMeta tip. */
+                public tip: (number|Long);
+
+                /** TransactionMeta paymasterData. */
+                public paymasterData: apibara.starknet.v1alpha2.IFieldElement[];
+
+                /** TransactionMeta nonceDataAvailabilityMode. */
+                public nonceDataAvailabilityMode: apibara.starknet.v1alpha2.DataAvailabilityMode;
+
+                /** TransactionMeta feeDataAvailabilityMode. */
+                public feeDataAvailabilityMode: apibara.starknet.v1alpha2.DataAvailabilityMode;
+
+                /** TransactionMeta transactionIndex. */
+                public transactionIndex: (number|Long);
 
                 /**
                  * Creates a new TransactionMeta instance using the specified properties.
@@ -2921,6 +2993,115 @@ export namespace apibara {
                 public static getTypeUrl(typeUrlPrefix?: string): string;
             }
 
+            /** Properties of an InvokeTransactionV3. */
+            interface IInvokeTransactionV3 {
+
+                /** InvokeTransactionV3 senderAddress */
+                senderAddress?: (apibara.starknet.v1alpha2.IFieldElement|null);
+
+                /** InvokeTransactionV3 calldata */
+                calldata?: (apibara.starknet.v1alpha2.IFieldElement[]|null);
+
+                /** InvokeTransactionV3 accountDeploymentData */
+                accountDeploymentData?: (apibara.starknet.v1alpha2.IFieldElement[]|null);
+            }
+
+            /** Represents an InvokeTransactionV3. */
+            class InvokeTransactionV3 implements IInvokeTransactionV3 {
+
+                /**
+                 * Constructs a new InvokeTransactionV3.
+                 * @param [properties] Properties to set
+                 */
+                constructor(properties?: apibara.starknet.v1alpha2.IInvokeTransactionV3);
+
+                /** InvokeTransactionV3 senderAddress. */
+                public senderAddress?: (apibara.starknet.v1alpha2.IFieldElement|null);
+
+                /** InvokeTransactionV3 calldata. */
+                public calldata: apibara.starknet.v1alpha2.IFieldElement[];
+
+                /** InvokeTransactionV3 accountDeploymentData. */
+                public accountDeploymentData: apibara.starknet.v1alpha2.IFieldElement[];
+
+                /**
+                 * Creates a new InvokeTransactionV3 instance using the specified properties.
+                 * @param [properties] Properties to set
+                 * @returns InvokeTransactionV3 instance
+                 */
+                public static create(properties?: apibara.starknet.v1alpha2.IInvokeTransactionV3): apibara.starknet.v1alpha2.InvokeTransactionV3;
+
+                /**
+                 * Encodes the specified InvokeTransactionV3 message. Does not implicitly {@link apibara.starknet.v1alpha2.InvokeTransactionV3.verify|verify} messages.
+                 * @param message InvokeTransactionV3 message or plain object to encode
+                 * @param [writer] Writer to encode to
+                 * @returns Writer
+                 */
+                public static encode(message: apibara.starknet.v1alpha2.IInvokeTransactionV3, writer?: $protobuf.Writer): $protobuf.Writer;
+
+                /**
+                 * Encodes the specified InvokeTransactionV3 message, length delimited. Does not implicitly {@link apibara.starknet.v1alpha2.InvokeTransactionV3.verify|verify} messages.
+                 * @param message InvokeTransactionV3 message or plain object to encode
+                 * @param [writer] Writer to encode to
+                 * @returns Writer
+                 */
+                public static encodeDelimited(message: apibara.starknet.v1alpha2.IInvokeTransactionV3, writer?: $protobuf.Writer): $protobuf.Writer;
+
+                /**
+                 * Decodes an InvokeTransactionV3 message from the specified reader or buffer.
+                 * @param reader Reader or buffer to decode from
+                 * @param [length] Message length if known beforehand
+                 * @returns InvokeTransactionV3
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): apibara.starknet.v1alpha2.InvokeTransactionV3;
+
+                /**
+                 * Decodes an InvokeTransactionV3 message from the specified reader or buffer, length delimited.
+                 * @param reader Reader or buffer to decode from
+                 * @returns InvokeTransactionV3
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): apibara.starknet.v1alpha2.InvokeTransactionV3;
+
+                /**
+                 * Verifies an InvokeTransactionV3 message.
+                 * @param message Plain object to verify
+                 * @returns `null` if valid, otherwise the reason why it is not
+                 */
+                public static verify(message: { [k: string]: any }): (string|null);
+
+                /**
+                 * Creates an InvokeTransactionV3 message from a plain object. Also converts values to their respective internal types.
+                 * @param object Plain object
+                 * @returns InvokeTransactionV3
+                 */
+                public static fromObject(object: { [k: string]: any }): apibara.starknet.v1alpha2.InvokeTransactionV3;
+
+                /**
+                 * Creates a plain object from an InvokeTransactionV3 message. Also converts values to other types if specified.
+                 * @param message InvokeTransactionV3
+                 * @param [options] Conversion options
+                 * @returns Plain object
+                 */
+                public static toObject(message: apibara.starknet.v1alpha2.InvokeTransactionV3, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+                /**
+                 * Converts this InvokeTransactionV3 to JSON.
+                 * @returns JSON object
+                 */
+                public toJSON(): { [k: string]: any };
+
+                /**
+                 * Gets the default type url for InvokeTransactionV3
+                 * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+                 * @returns The default type url
+                 */
+                public static getTypeUrl(typeUrlPrefix?: string): string;
+            }
+
             /** Properties of a DeployTransaction. */
             interface IDeployTransaction {
 
@@ -3133,6 +3314,121 @@ export namespace apibara {
 
                 /**
                  * Gets the default type url for DeclareTransaction
+                 * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+                 * @returns The default type url
+                 */
+                public static getTypeUrl(typeUrlPrefix?: string): string;
+            }
+
+            /** Properties of a DeclareTransactionV3. */
+            interface IDeclareTransactionV3 {
+
+                /** DeclareTransactionV3 classHash */
+                classHash?: (apibara.starknet.v1alpha2.IFieldElement|null);
+
+                /** DeclareTransactionV3 senderAddress */
+                senderAddress?: (apibara.starknet.v1alpha2.IFieldElement|null);
+
+                /** DeclareTransactionV3 compiledClassHash */
+                compiledClassHash?: (apibara.starknet.v1alpha2.IFieldElement|null);
+
+                /** DeclareTransactionV3 accountDeploymentData */
+                accountDeploymentData?: (apibara.starknet.v1alpha2.IFieldElement[]|null);
+            }
+
+            /** Represents a DeclareTransactionV3. */
+            class DeclareTransactionV3 implements IDeclareTransactionV3 {
+
+                /**
+                 * Constructs a new DeclareTransactionV3.
+                 * @param [properties] Properties to set
+                 */
+                constructor(properties?: apibara.starknet.v1alpha2.IDeclareTransactionV3);
+
+                /** DeclareTransactionV3 classHash. */
+                public classHash?: (apibara.starknet.v1alpha2.IFieldElement|null);
+
+                /** DeclareTransactionV3 senderAddress. */
+                public senderAddress?: (apibara.starknet.v1alpha2.IFieldElement|null);
+
+                /** DeclareTransactionV3 compiledClassHash. */
+                public compiledClassHash?: (apibara.starknet.v1alpha2.IFieldElement|null);
+
+                /** DeclareTransactionV3 accountDeploymentData. */
+                public accountDeploymentData: apibara.starknet.v1alpha2.IFieldElement[];
+
+                /**
+                 * Creates a new DeclareTransactionV3 instance using the specified properties.
+                 * @param [properties] Properties to set
+                 * @returns DeclareTransactionV3 instance
+                 */
+                public static create(properties?: apibara.starknet.v1alpha2.IDeclareTransactionV3): apibara.starknet.v1alpha2.DeclareTransactionV3;
+
+                /**
+                 * Encodes the specified DeclareTransactionV3 message. Does not implicitly {@link apibara.starknet.v1alpha2.DeclareTransactionV3.verify|verify} messages.
+                 * @param message DeclareTransactionV3 message or plain object to encode
+                 * @param [writer] Writer to encode to
+                 * @returns Writer
+                 */
+                public static encode(message: apibara.starknet.v1alpha2.IDeclareTransactionV3, writer?: $protobuf.Writer): $protobuf.Writer;
+
+                /**
+                 * Encodes the specified DeclareTransactionV3 message, length delimited. Does not implicitly {@link apibara.starknet.v1alpha2.DeclareTransactionV3.verify|verify} messages.
+                 * @param message DeclareTransactionV3 message or plain object to encode
+                 * @param [writer] Writer to encode to
+                 * @returns Writer
+                 */
+                public static encodeDelimited(message: apibara.starknet.v1alpha2.IDeclareTransactionV3, writer?: $protobuf.Writer): $protobuf.Writer;
+
+                /**
+                 * Decodes a DeclareTransactionV3 message from the specified reader or buffer.
+                 * @param reader Reader or buffer to decode from
+                 * @param [length] Message length if known beforehand
+                 * @returns DeclareTransactionV3
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): apibara.starknet.v1alpha2.DeclareTransactionV3;
+
+                /**
+                 * Decodes a DeclareTransactionV3 message from the specified reader or buffer, length delimited.
+                 * @param reader Reader or buffer to decode from
+                 * @returns DeclareTransactionV3
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): apibara.starknet.v1alpha2.DeclareTransactionV3;
+
+                /**
+                 * Verifies a DeclareTransactionV3 message.
+                 * @param message Plain object to verify
+                 * @returns `null` if valid, otherwise the reason why it is not
+                 */
+                public static verify(message: { [k: string]: any }): (string|null);
+
+                /**
+                 * Creates a DeclareTransactionV3 message from a plain object. Also converts values to their respective internal types.
+                 * @param object Plain object
+                 * @returns DeclareTransactionV3
+                 */
+                public static fromObject(object: { [k: string]: any }): apibara.starknet.v1alpha2.DeclareTransactionV3;
+
+                /**
+                 * Creates a plain object from a DeclareTransactionV3 message. Also converts values to other types if specified.
+                 * @param message DeclareTransactionV3
+                 * @param [options] Conversion options
+                 * @returns Plain object
+                 */
+                public static toObject(message: apibara.starknet.v1alpha2.DeclareTransactionV3, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+                /**
+                 * Converts this DeclareTransactionV3 to JSON.
+                 * @returns JSON object
+                 */
+                public toJSON(): { [k: string]: any };
+
+                /**
+                 * Gets the default type url for DeclareTransactionV3
                  * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
                  * @returns The default type url
                  */
@@ -3357,6 +3653,122 @@ export namespace apibara {
                 public static getTypeUrl(typeUrlPrefix?: string): string;
             }
 
+            /** Properties of a DeployAccountTransactionV3. */
+            interface IDeployAccountTransactionV3 {
+
+                /** DeployAccountTransactionV3 constructorCalldata */
+                constructorCalldata?: (apibara.starknet.v1alpha2.IFieldElement[]|null);
+
+                /** DeployAccountTransactionV3 contractAddressSalt */
+                contractAddressSalt?: (apibara.starknet.v1alpha2.IFieldElement|null);
+
+                /** DeployAccountTransactionV3 classHash */
+                classHash?: (apibara.starknet.v1alpha2.IFieldElement|null);
+            }
+
+            /** Represents a DeployAccountTransactionV3. */
+            class DeployAccountTransactionV3 implements IDeployAccountTransactionV3 {
+
+                /**
+                 * Constructs a new DeployAccountTransactionV3.
+                 * @param [properties] Properties to set
+                 */
+                constructor(properties?: apibara.starknet.v1alpha2.IDeployAccountTransactionV3);
+
+                /** DeployAccountTransactionV3 constructorCalldata. */
+                public constructorCalldata: apibara.starknet.v1alpha2.IFieldElement[];
+
+                /** DeployAccountTransactionV3 contractAddressSalt. */
+                public contractAddressSalt?: (apibara.starknet.v1alpha2.IFieldElement|null);
+
+                /** DeployAccountTransactionV3 classHash. */
+                public classHash?: (apibara.starknet.v1alpha2.IFieldElement|null);
+
+                /**
+                 * Creates a new DeployAccountTransactionV3 instance using the specified properties.
+                 * @param [properties] Properties to set
+                 * @returns DeployAccountTransactionV3 instance
+                 */
+                public static create(properties?: apibara.starknet.v1alpha2.IDeployAccountTransactionV3): apibara.starknet.v1alpha2.DeployAccountTransactionV3;
+
+                /**
+                 * Encodes the specified DeployAccountTransactionV3 message. Does not implicitly {@link apibara.starknet.v1alpha2.DeployAccountTransactionV3.verify|verify} messages.
+                 * @param message DeployAccountTransactionV3 message or plain object to encode
+                 * @param [writer] Writer to encode to
+                 * @returns Writer
+                 */
+                public static encode(message: apibara.starknet.v1alpha2.IDeployAccountTransactionV3, writer?: $protobuf.Writer): $protobuf.Writer;
+
+                /**
+                 * Encodes the specified DeployAccountTransactionV3 message, length delimited. Does not implicitly {@link apibara.starknet.v1alpha2.DeployAccountTransactionV3.verify|verify} messages.
+                 * @param message DeployAccountTransactionV3 message or plain object to encode
+                 * @param [writer] Writer to encode to
+                 * @returns Writer
+                 */
+                public static encodeDelimited(message: apibara.starknet.v1alpha2.IDeployAccountTransactionV3, writer?: $protobuf.Writer): $protobuf.Writer;
+
+                /**
+                 * Decodes a DeployAccountTransactionV3 message from the specified reader or buffer.
+                 * @param reader Reader or buffer to decode from
+                 * @param [length] Message length if known beforehand
+                 * @returns DeployAccountTransactionV3
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): apibara.starknet.v1alpha2.DeployAccountTransactionV3;
+
+                /**
+                 * Decodes a DeployAccountTransactionV3 message from the specified reader or buffer, length delimited.
+                 * @param reader Reader or buffer to decode from
+                 * @returns DeployAccountTransactionV3
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): apibara.starknet.v1alpha2.DeployAccountTransactionV3;
+
+                /**
+                 * Verifies a DeployAccountTransactionV3 message.
+                 * @param message Plain object to verify
+                 * @returns `null` if valid, otherwise the reason why it is not
+                 */
+                public static verify(message: { [k: string]: any }): (string|null);
+
+                /**
+                 * Creates a DeployAccountTransactionV3 message from a plain object. Also converts values to their respective internal types.
+                 * @param object Plain object
+                 * @returns DeployAccountTransactionV3
+                 */
+                public static fromObject(object: { [k: string]: any }): apibara.starknet.v1alpha2.DeployAccountTransactionV3;
+
+                /**
+                 * Creates a plain object from a DeployAccountTransactionV3 message. Also converts values to other types if specified.
+                 * @param message DeployAccountTransactionV3
+                 * @param [options] Conversion options
+                 * @returns Plain object
+                 */
+                public static toObject(message: apibara.starknet.v1alpha2.DeployAccountTransactionV3, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+                /**
+                 * Converts this DeployAccountTransactionV3 to JSON.
+                 * @returns JSON object
+                 */
+                public toJSON(): { [k: string]: any };
+
+                /**
+                 * Gets the default type url for DeployAccountTransactionV3
+                 * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+                 * @returns The default type url
+                 */
+                public static getTypeUrl(typeUrlPrefix?: string): string;
+            }
+
+            /** ExecutionStatus enum. */
+            enum ExecutionStatus {
+                EXECUTION_STATUS_UNSPECIFIED = 0,
+                EXECUTION_STATUS_SUCCEEDED = 1,
+                EXECUTION_STATUS_REVERTED = 2
+            }
+
             /** Properties of a TransactionReceipt. */
             interface ITransactionReceipt {
 
@@ -3377,6 +3789,15 @@ export namespace apibara {
 
                 /** TransactionReceipt contractAddress */
                 contractAddress?: (apibara.starknet.v1alpha2.IFieldElement|null);
+
+                /** TransactionReceipt executionStatus */
+                executionStatus?: (apibara.starknet.v1alpha2.ExecutionStatus|null);
+
+                /** TransactionReceipt revertReason */
+                revertReason?: (string|null);
+
+                /** TransactionReceipt actualFeePaid */
+                actualFeePaid?: (apibara.starknet.v1alpha2.IFeePayment|null);
             }
 
             /** Represents a TransactionReceipt. */
@@ -3405,6 +3826,15 @@ export namespace apibara {
 
                 /** TransactionReceipt contractAddress. */
                 public contractAddress?: (apibara.starknet.v1alpha2.IFieldElement|null);
+
+                /** TransactionReceipt executionStatus. */
+                public executionStatus: apibara.starknet.v1alpha2.ExecutionStatus;
+
+                /** TransactionReceipt revertReason. */
+                public revertReason: string;
+
+                /** TransactionReceipt actualFeePaid. */
+                public actualFeePaid?: (apibara.starknet.v1alpha2.IFeePayment|null);
 
                 /**
                  * Creates a new TransactionReceipt instance using the specified properties.
@@ -4881,6 +5311,535 @@ export namespace apibara {
                  * @returns The default type url
                  */
                 public static getTypeUrl(typeUrlPrefix?: string): string;
+            }
+
+            /** Properties of a ResourcePrice. */
+            interface IResourcePrice {
+
+                /** ResourcePrice priceInFri */
+                priceInFri?: (apibara.starknet.v1alpha2.IFieldElement|null);
+
+                /** ResourcePrice priceInWei */
+                priceInWei?: (apibara.starknet.v1alpha2.IFieldElement|null);
+            }
+
+            /** Represents a ResourcePrice. */
+            class ResourcePrice implements IResourcePrice {
+
+                /**
+                 * Constructs a new ResourcePrice.
+                 * @param [properties] Properties to set
+                 */
+                constructor(properties?: apibara.starknet.v1alpha2.IResourcePrice);
+
+                /** ResourcePrice priceInFri. */
+                public priceInFri?: (apibara.starknet.v1alpha2.IFieldElement|null);
+
+                /** ResourcePrice priceInWei. */
+                public priceInWei?: (apibara.starknet.v1alpha2.IFieldElement|null);
+
+                /**
+                 * Creates a new ResourcePrice instance using the specified properties.
+                 * @param [properties] Properties to set
+                 * @returns ResourcePrice instance
+                 */
+                public static create(properties?: apibara.starknet.v1alpha2.IResourcePrice): apibara.starknet.v1alpha2.ResourcePrice;
+
+                /**
+                 * Encodes the specified ResourcePrice message. Does not implicitly {@link apibara.starknet.v1alpha2.ResourcePrice.verify|verify} messages.
+                 * @param message ResourcePrice message or plain object to encode
+                 * @param [writer] Writer to encode to
+                 * @returns Writer
+                 */
+                public static encode(message: apibara.starknet.v1alpha2.IResourcePrice, writer?: $protobuf.Writer): $protobuf.Writer;
+
+                /**
+                 * Encodes the specified ResourcePrice message, length delimited. Does not implicitly {@link apibara.starknet.v1alpha2.ResourcePrice.verify|verify} messages.
+                 * @param message ResourcePrice message or plain object to encode
+                 * @param [writer] Writer to encode to
+                 * @returns Writer
+                 */
+                public static encodeDelimited(message: apibara.starknet.v1alpha2.IResourcePrice, writer?: $protobuf.Writer): $protobuf.Writer;
+
+                /**
+                 * Decodes a ResourcePrice message from the specified reader or buffer.
+                 * @param reader Reader or buffer to decode from
+                 * @param [length] Message length if known beforehand
+                 * @returns ResourcePrice
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): apibara.starknet.v1alpha2.ResourcePrice;
+
+                /**
+                 * Decodes a ResourcePrice message from the specified reader or buffer, length delimited.
+                 * @param reader Reader or buffer to decode from
+                 * @returns ResourcePrice
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): apibara.starknet.v1alpha2.ResourcePrice;
+
+                /**
+                 * Verifies a ResourcePrice message.
+                 * @param message Plain object to verify
+                 * @returns `null` if valid, otherwise the reason why it is not
+                 */
+                public static verify(message: { [k: string]: any }): (string|null);
+
+                /**
+                 * Creates a ResourcePrice message from a plain object. Also converts values to their respective internal types.
+                 * @param object Plain object
+                 * @returns ResourcePrice
+                 */
+                public static fromObject(object: { [k: string]: any }): apibara.starknet.v1alpha2.ResourcePrice;
+
+                /**
+                 * Creates a plain object from a ResourcePrice message. Also converts values to other types if specified.
+                 * @param message ResourcePrice
+                 * @param [options] Conversion options
+                 * @returns Plain object
+                 */
+                public static toObject(message: apibara.starknet.v1alpha2.ResourcePrice, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+                /**
+                 * Converts this ResourcePrice to JSON.
+                 * @returns JSON object
+                 */
+                public toJSON(): { [k: string]: any };
+
+                /**
+                 * Gets the default type url for ResourcePrice
+                 * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+                 * @returns The default type url
+                 */
+                public static getTypeUrl(typeUrlPrefix?: string): string;
+            }
+
+            /** Properties of a FeePayment. */
+            interface IFeePayment {
+
+                /** FeePayment amount */
+                amount?: (apibara.starknet.v1alpha2.IFieldElement|null);
+
+                /** FeePayment unit */
+                unit?: (apibara.starknet.v1alpha2.PriceUnit|null);
+            }
+
+            /** Represents a FeePayment. */
+            class FeePayment implements IFeePayment {
+
+                /**
+                 * Constructs a new FeePayment.
+                 * @param [properties] Properties to set
+                 */
+                constructor(properties?: apibara.starknet.v1alpha2.IFeePayment);
+
+                /** FeePayment amount. */
+                public amount?: (apibara.starknet.v1alpha2.IFieldElement|null);
+
+                /** FeePayment unit. */
+                public unit: apibara.starknet.v1alpha2.PriceUnit;
+
+                /**
+                 * Creates a new FeePayment instance using the specified properties.
+                 * @param [properties] Properties to set
+                 * @returns FeePayment instance
+                 */
+                public static create(properties?: apibara.starknet.v1alpha2.IFeePayment): apibara.starknet.v1alpha2.FeePayment;
+
+                /**
+                 * Encodes the specified FeePayment message. Does not implicitly {@link apibara.starknet.v1alpha2.FeePayment.verify|verify} messages.
+                 * @param message FeePayment message or plain object to encode
+                 * @param [writer] Writer to encode to
+                 * @returns Writer
+                 */
+                public static encode(message: apibara.starknet.v1alpha2.IFeePayment, writer?: $protobuf.Writer): $protobuf.Writer;
+
+                /**
+                 * Encodes the specified FeePayment message, length delimited. Does not implicitly {@link apibara.starknet.v1alpha2.FeePayment.verify|verify} messages.
+                 * @param message FeePayment message or plain object to encode
+                 * @param [writer] Writer to encode to
+                 * @returns Writer
+                 */
+                public static encodeDelimited(message: apibara.starknet.v1alpha2.IFeePayment, writer?: $protobuf.Writer): $protobuf.Writer;
+
+                /**
+                 * Decodes a FeePayment message from the specified reader or buffer.
+                 * @param reader Reader or buffer to decode from
+                 * @param [length] Message length if known beforehand
+                 * @returns FeePayment
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): apibara.starknet.v1alpha2.FeePayment;
+
+                /**
+                 * Decodes a FeePayment message from the specified reader or buffer, length delimited.
+                 * @param reader Reader or buffer to decode from
+                 * @returns FeePayment
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): apibara.starknet.v1alpha2.FeePayment;
+
+                /**
+                 * Verifies a FeePayment message.
+                 * @param message Plain object to verify
+                 * @returns `null` if valid, otherwise the reason why it is not
+                 */
+                public static verify(message: { [k: string]: any }): (string|null);
+
+                /**
+                 * Creates a FeePayment message from a plain object. Also converts values to their respective internal types.
+                 * @param object Plain object
+                 * @returns FeePayment
+                 */
+                public static fromObject(object: { [k: string]: any }): apibara.starknet.v1alpha2.FeePayment;
+
+                /**
+                 * Creates a plain object from a FeePayment message. Also converts values to other types if specified.
+                 * @param message FeePayment
+                 * @param [options] Conversion options
+                 * @returns Plain object
+                 */
+                public static toObject(message: apibara.starknet.v1alpha2.FeePayment, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+                /**
+                 * Converts this FeePayment to JSON.
+                 * @returns JSON object
+                 */
+                public toJSON(): { [k: string]: any };
+
+                /**
+                 * Gets the default type url for FeePayment
+                 * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+                 * @returns The default type url
+                 */
+                public static getTypeUrl(typeUrlPrefix?: string): string;
+            }
+
+            /** PriceUnit enum. */
+            enum PriceUnit {
+                PRICE_UNIT_UNSPECIFIED = 0,
+                PRICE_UNIT_WEI = 1,
+                PRICE_UNIT_FRI = 2
+            }
+
+            /** Properties of a ResourceBoundsMapping. */
+            interface IResourceBoundsMapping {
+
+                /** ResourceBoundsMapping l1Gas */
+                l1Gas?: (apibara.starknet.v1alpha2.IResourceBounds|null);
+
+                /** ResourceBoundsMapping l2Gas */
+                l2Gas?: (apibara.starknet.v1alpha2.IResourceBounds|null);
+            }
+
+            /** Represents a ResourceBoundsMapping. */
+            class ResourceBoundsMapping implements IResourceBoundsMapping {
+
+                /**
+                 * Constructs a new ResourceBoundsMapping.
+                 * @param [properties] Properties to set
+                 */
+                constructor(properties?: apibara.starknet.v1alpha2.IResourceBoundsMapping);
+
+                /** ResourceBoundsMapping l1Gas. */
+                public l1Gas?: (apibara.starknet.v1alpha2.IResourceBounds|null);
+
+                /** ResourceBoundsMapping l2Gas. */
+                public l2Gas?: (apibara.starknet.v1alpha2.IResourceBounds|null);
+
+                /**
+                 * Creates a new ResourceBoundsMapping instance using the specified properties.
+                 * @param [properties] Properties to set
+                 * @returns ResourceBoundsMapping instance
+                 */
+                public static create(properties?: apibara.starknet.v1alpha2.IResourceBoundsMapping): apibara.starknet.v1alpha2.ResourceBoundsMapping;
+
+                /**
+                 * Encodes the specified ResourceBoundsMapping message. Does not implicitly {@link apibara.starknet.v1alpha2.ResourceBoundsMapping.verify|verify} messages.
+                 * @param message ResourceBoundsMapping message or plain object to encode
+                 * @param [writer] Writer to encode to
+                 * @returns Writer
+                 */
+                public static encode(message: apibara.starknet.v1alpha2.IResourceBoundsMapping, writer?: $protobuf.Writer): $protobuf.Writer;
+
+                /**
+                 * Encodes the specified ResourceBoundsMapping message, length delimited. Does not implicitly {@link apibara.starknet.v1alpha2.ResourceBoundsMapping.verify|verify} messages.
+                 * @param message ResourceBoundsMapping message or plain object to encode
+                 * @param [writer] Writer to encode to
+                 * @returns Writer
+                 */
+                public static encodeDelimited(message: apibara.starknet.v1alpha2.IResourceBoundsMapping, writer?: $protobuf.Writer): $protobuf.Writer;
+
+                /**
+                 * Decodes a ResourceBoundsMapping message from the specified reader or buffer.
+                 * @param reader Reader or buffer to decode from
+                 * @param [length] Message length if known beforehand
+                 * @returns ResourceBoundsMapping
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): apibara.starknet.v1alpha2.ResourceBoundsMapping;
+
+                /**
+                 * Decodes a ResourceBoundsMapping message from the specified reader or buffer, length delimited.
+                 * @param reader Reader or buffer to decode from
+                 * @returns ResourceBoundsMapping
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): apibara.starknet.v1alpha2.ResourceBoundsMapping;
+
+                /**
+                 * Verifies a ResourceBoundsMapping message.
+                 * @param message Plain object to verify
+                 * @returns `null` if valid, otherwise the reason why it is not
+                 */
+                public static verify(message: { [k: string]: any }): (string|null);
+
+                /**
+                 * Creates a ResourceBoundsMapping message from a plain object. Also converts values to their respective internal types.
+                 * @param object Plain object
+                 * @returns ResourceBoundsMapping
+                 */
+                public static fromObject(object: { [k: string]: any }): apibara.starknet.v1alpha2.ResourceBoundsMapping;
+
+                /**
+                 * Creates a plain object from a ResourceBoundsMapping message. Also converts values to other types if specified.
+                 * @param message ResourceBoundsMapping
+                 * @param [options] Conversion options
+                 * @returns Plain object
+                 */
+                public static toObject(message: apibara.starknet.v1alpha2.ResourceBoundsMapping, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+                /**
+                 * Converts this ResourceBoundsMapping to JSON.
+                 * @returns JSON object
+                 */
+                public toJSON(): { [k: string]: any };
+
+                /**
+                 * Gets the default type url for ResourceBoundsMapping
+                 * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+                 * @returns The default type url
+                 */
+                public static getTypeUrl(typeUrlPrefix?: string): string;
+            }
+
+            /** Properties of a ResourceBounds. */
+            interface IResourceBounds {
+
+                /** ResourceBounds maxAmount */
+                maxAmount?: (number|Long|null);
+
+                /** The max price per unit of resource. */
+                maxPricePerUnit?: (apibara.starknet.v1alpha2.IUint128|null);
+            }
+
+            /** Represents a ResourceBounds. */
+            class ResourceBounds implements IResourceBounds {
+
+                /**
+                 * Constructs a new ResourceBounds.
+                 * @param [properties] Properties to set
+                 */
+                constructor(properties?: apibara.starknet.v1alpha2.IResourceBounds);
+
+                /** ResourceBounds maxAmount. */
+                public maxAmount: (number|Long);
+
+                /** The max price per unit of resource. */
+                public maxPricePerUnit?: (apibara.starknet.v1alpha2.IUint128|null);
+
+                /**
+                 * Creates a new ResourceBounds instance using the specified properties.
+                 * @param [properties] Properties to set
+                 * @returns ResourceBounds instance
+                 */
+                public static create(properties?: apibara.starknet.v1alpha2.IResourceBounds): apibara.starknet.v1alpha2.ResourceBounds;
+
+                /**
+                 * Encodes the specified ResourceBounds message. Does not implicitly {@link apibara.starknet.v1alpha2.ResourceBounds.verify|verify} messages.
+                 * @param message ResourceBounds message or plain object to encode
+                 * @param [writer] Writer to encode to
+                 * @returns Writer
+                 */
+                public static encode(message: apibara.starknet.v1alpha2.IResourceBounds, writer?: $protobuf.Writer): $protobuf.Writer;
+
+                /**
+                 * Encodes the specified ResourceBounds message, length delimited. Does not implicitly {@link apibara.starknet.v1alpha2.ResourceBounds.verify|verify} messages.
+                 * @param message ResourceBounds message or plain object to encode
+                 * @param [writer] Writer to encode to
+                 * @returns Writer
+                 */
+                public static encodeDelimited(message: apibara.starknet.v1alpha2.IResourceBounds, writer?: $protobuf.Writer): $protobuf.Writer;
+
+                /**
+                 * Decodes a ResourceBounds message from the specified reader or buffer.
+                 * @param reader Reader or buffer to decode from
+                 * @param [length] Message length if known beforehand
+                 * @returns ResourceBounds
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): apibara.starknet.v1alpha2.ResourceBounds;
+
+                /**
+                 * Decodes a ResourceBounds message from the specified reader or buffer, length delimited.
+                 * @param reader Reader or buffer to decode from
+                 * @returns ResourceBounds
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): apibara.starknet.v1alpha2.ResourceBounds;
+
+                /**
+                 * Verifies a ResourceBounds message.
+                 * @param message Plain object to verify
+                 * @returns `null` if valid, otherwise the reason why it is not
+                 */
+                public static verify(message: { [k: string]: any }): (string|null);
+
+                /**
+                 * Creates a ResourceBounds message from a plain object. Also converts values to their respective internal types.
+                 * @param object Plain object
+                 * @returns ResourceBounds
+                 */
+                public static fromObject(object: { [k: string]: any }): apibara.starknet.v1alpha2.ResourceBounds;
+
+                /**
+                 * Creates a plain object from a ResourceBounds message. Also converts values to other types if specified.
+                 * @param message ResourceBounds
+                 * @param [options] Conversion options
+                 * @returns Plain object
+                 */
+                public static toObject(message: apibara.starknet.v1alpha2.ResourceBounds, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+                /**
+                 * Converts this ResourceBounds to JSON.
+                 * @returns JSON object
+                 */
+                public toJSON(): { [k: string]: any };
+
+                /**
+                 * Gets the default type url for ResourceBounds
+                 * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+                 * @returns The default type url
+                 */
+                public static getTypeUrl(typeUrlPrefix?: string): string;
+            }
+
+            /** Properties of an Uint128. */
+            interface IUint128 {
+
+                /** Uint128 low */
+                low?: (number|Long|null);
+
+                /** Uint128 high */
+                high?: (number|Long|null);
+            }
+
+            /** Represents an Uint128. */
+            class Uint128 implements IUint128 {
+
+                /**
+                 * Constructs a new Uint128.
+                 * @param [properties] Properties to set
+                 */
+                constructor(properties?: apibara.starknet.v1alpha2.IUint128);
+
+                /** Uint128 low. */
+                public low: (number|Long);
+
+                /** Uint128 high. */
+                public high: (number|Long);
+
+                /**
+                 * Creates a new Uint128 instance using the specified properties.
+                 * @param [properties] Properties to set
+                 * @returns Uint128 instance
+                 */
+                public static create(properties?: apibara.starknet.v1alpha2.IUint128): apibara.starknet.v1alpha2.Uint128;
+
+                /**
+                 * Encodes the specified Uint128 message. Does not implicitly {@link apibara.starknet.v1alpha2.Uint128.verify|verify} messages.
+                 * @param message Uint128 message or plain object to encode
+                 * @param [writer] Writer to encode to
+                 * @returns Writer
+                 */
+                public static encode(message: apibara.starknet.v1alpha2.IUint128, writer?: $protobuf.Writer): $protobuf.Writer;
+
+                /**
+                 * Encodes the specified Uint128 message, length delimited. Does not implicitly {@link apibara.starknet.v1alpha2.Uint128.verify|verify} messages.
+                 * @param message Uint128 message or plain object to encode
+                 * @param [writer] Writer to encode to
+                 * @returns Writer
+                 */
+                public static encodeDelimited(message: apibara.starknet.v1alpha2.IUint128, writer?: $protobuf.Writer): $protobuf.Writer;
+
+                /**
+                 * Decodes an Uint128 message from the specified reader or buffer.
+                 * @param reader Reader or buffer to decode from
+                 * @param [length] Message length if known beforehand
+                 * @returns Uint128
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): apibara.starknet.v1alpha2.Uint128;
+
+                /**
+                 * Decodes an Uint128 message from the specified reader or buffer, length delimited.
+                 * @param reader Reader or buffer to decode from
+                 * @returns Uint128
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): apibara.starknet.v1alpha2.Uint128;
+
+                /**
+                 * Verifies an Uint128 message.
+                 * @param message Plain object to verify
+                 * @returns `null` if valid, otherwise the reason why it is not
+                 */
+                public static verify(message: { [k: string]: any }): (string|null);
+
+                /**
+                 * Creates an Uint128 message from a plain object. Also converts values to their respective internal types.
+                 * @param object Plain object
+                 * @returns Uint128
+                 */
+                public static fromObject(object: { [k: string]: any }): apibara.starknet.v1alpha2.Uint128;
+
+                /**
+                 * Creates a plain object from an Uint128 message. Also converts values to other types if specified.
+                 * @param message Uint128
+                 * @param [options] Conversion options
+                 * @returns Plain object
+                 */
+                public static toObject(message: apibara.starknet.v1alpha2.Uint128, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+                /**
+                 * Converts this Uint128 to JSON.
+                 * @returns JSON object
+                 */
+                public toJSON(): { [k: string]: any };
+
+                /**
+                 * Gets the default type url for Uint128
+                 * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+                 * @returns The default type url
+                 */
+                public static getTypeUrl(typeUrlPrefix?: string): string;
+            }
+
+            /** DataAvailabilityMode enum. */
+            enum DataAvailabilityMode {
+                DATA_AVAILABILITY_MODE_UNSPECIFIED = 0,
+                DATA_AVAILABILITY_MODE_L1 = 1,
+                DATA_AVAILABILITY_MODE_L2 = 2
             }
         }
     }
