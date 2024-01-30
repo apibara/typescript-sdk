@@ -291,7 +291,7 @@ export type ExecutionStatus =
 
 export type Event = {
   /** Event index. */
-  index: number;
+  index?: number;
   /** Contract address. */
   fromAddress: FieldElement;
   /** Event selector. */
@@ -302,7 +302,7 @@ export type Event = {
 
 export type L2ToL1Message = {
   /** Message index. */
-  index: number;
+  index?: number;
   /** L2 sender address. */
   fromAddress: FieldElement;
   /** L1 target address. */
