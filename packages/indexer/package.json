@@ -56,7 +56,8 @@
     "vitest": "^0.34.3"
   },
   "dependencies": {
-    "starknet": "^5.24.3",
+    "abi-wan-kanabi": "^2.2.0",
+    "starknet": "6.0.0-beta.13",
     "zod": "^3.22.2"
   }
 }
