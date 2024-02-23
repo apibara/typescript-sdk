@@ -1,5 +1,11 @@
 # @apibara/indexer
 
+## 0.3.1
+
+### Patch Changes
+
+- [#69](https://github.com/apibara/typescript-sdk/pull/69) [`c62d304bf8e6bcd5db7583b9378349a9c13bc0bf`](https://github.com/apibara/typescript-sdk/commit/c62d304bf8e6bcd5db7583b9378349a9c13bc0bf) Thanks [@fracek](https://github.com/fracek)! - Make all fields nullable
+
 ## 0.3.0
 
 ### Minor Changes
