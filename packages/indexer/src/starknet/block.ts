@@ -1,19 +1,19 @@
 import { FieldElement } from "./felt";
 
-export type Block = {
+export type Block = Partial<{
   /** Block header. */
-  header?: BlockHeader;
+  header: BlockHeader;
   /** Transactions. */
-  transactions?: TransactionWithReceipt[];
+  transactions: TransactionWithReceipt[];
   /** Events. */
-  events?: EventWithTransaction[];
+  events: EventWithTransaction[];
   /** Messages from L2 to L1. */
-  l2ToL1Messages?: L2ToL1MessageWithTransaction[];
+  l2ToL1Messages: L2ToL1MessageWithTransaction[];
   /** State update. */
-  stateUpdate?: StateUpdate;
-};
+  stateUpdate: StateUpdate;
+}>;
 
-export type BlockHeader = {
+export type BlockHeader = Partial<{
   /** Block hash. */
   blockHash: FieldElement;
   /** Parent block hash. */
@@ -27,8 +27,8 @@ export type BlockHeader = {
   /** Block production timestamp. */
   timestamp: string;
   /** Price of L1 gas in the block. */
-  l1GasPrice?: ResourcePrice;
-};
+  l1GasPrice: ResourcePrice;
+}>;
 
 export type TransactionWithReceipt = {
   /** Transaction. */
@@ -70,7 +70,7 @@ export type TransactionCommon = {
   meta: TransactionMeta;
 };
 
-export type TransactionMeta = {
+export type TransactionMeta = Partial<{
   /** Transaction hash. */
   hash: FieldElement;
   /** Maximum fee. */
@@ -93,17 +93,17 @@ export type TransactionMeta = {
   feeDataAvailabilityMode?: DataAvailabilityMode;
   /** Transaction index in the block. */
   transactionIndex?: number;
-};
+}>;
 
 export type InvokeTransactionV0 = {
-  invokeV0?: {
+  invokeV0?: Partial<{
     /** Target contract address. */
     contractAddress: FieldElement;
     /** Selector of the function being invoked. */
     entryPointSelector: FieldElement;
     /** Calldata. */
     calldata: FieldElement[];
-  };
+  }>;
   invokeV1?: never;
   invokeV3?: never;
   deploy?: never;
@@ -115,12 +115,12 @@ export type InvokeTransactionV0 = {
 };
 
 export type InvokeTransactionV1 = {
-  invokeV1?: {
+  invokeV1?: Partial<{
     /** Address of the account sending the transaction. */
     senderAddress: FieldElement;
     /** Calldata. */
     calldata: FieldElement[];
-  };
+  }>;
   invokeV0?: never;
   invokeV3?: never;
   deploy?: never;
@@ -132,14 +132,14 @@ export type InvokeTransactionV1 = {
 };
 
 export type InvokeTransactionV3 = {
-  invokeV3?: {
+  invokeV3?: Partial<{
     /** Address of the account sending the transaction. */
     senderAddress: FieldElement;
     /** Calldata. */
     calldata: FieldElement[];
     /** Data passed to the account deployment. */
     accountDeploymentData: FieldElement[];
-  };
+  }>;
   invokeV1?: never;
   invokeV0?: never;
   deploy?: never;
@@ -151,14 +151,14 @@ export type InvokeTransactionV3 = {
 };
 
 export type DeployTransaction = {
-  deploy?: {
+  deploy?: Partial<{
     /** Constructor calldata. */
     constructorCalldata: FieldElement[];
     /** Salt used when computing the contract's address. */
     contractAddressSalt: FieldElement;
     /** Hash of the class being deployed. */
     classHash: FieldElement;
-  };
+  }>;
   invokeV0?: never;
   invokeV1?: never;
   invokeV3?: never;
@@ -170,14 +170,14 @@ export type DeployTransaction = {
 };
 
 export type DeclareTransaction = {
-  declare?: {
+  declare?: Partial<{
     /** Class hash. */
     classHash: FieldElement;
     /** Address of the account sending the transaction. */
     senderAddress: FieldElement;
     /** Hash of the cairo assembly resulting from the sierra compilation. */
     compiledClassHash: FieldElement;
-  };
+  }>;
   declareV3?: never;
   invokeV0?: never;
   invokeV1?: never;
@@ -189,7 +189,7 @@ export type DeclareTransaction = {
 };
 
 export type DeclareTransactionV3 = {
-  declareV3?: {
+  declareV3?: Partial<{
     /** Class hash. */
     classHash: FieldElement;
     /** Address of the account sending the transaction. */
@@ -198,7 +198,7 @@ export type DeclareTransactionV3 = {
     compiledClassHash: FieldElement;
     /** Data passed to the account deployment. */
     accountDeploymentData: FieldElement[];
-  };
+  }>;
   declare?: never;
   invokeV0?: never;
   invokeV1?: never;
@@ -210,14 +210,14 @@ export type DeclareTransactionV3 = {
 };
 
 export type DeployAccountTransaction = {
-  deployAccount?: {
+  deployAccount?: Partial<{
     /** Constructor calldata. */
     constructorCalldata: FieldElement[];
     /** Salt used when computing the contract's address. */
     contractAddressSalt: FieldElement;
     /** Hash of the class being deployed. */
     classHash: FieldElement;
-  };
+  }>;
   deployAccountV3?: never;
   invokeV0?: never;
   invokeV1?: never;
@@ -229,14 +229,14 @@ export type DeployAccountTransaction = {
 };
 
 export type DeployAccountTransactionV3 = {
-  deployAccountV3?: {
+  deployAccountV3?: Partial<{
     /** Constructor calldata. */
     constructorCalldata: FieldElement[];
     /** Salt used when computing the contract's address. */
     contractAddressSalt: FieldElement;
     /** Hash of the class being deployed. */
     classHash: FieldElement;
-  };
+  }>;
   deployAccount?: never;
   invokeV0?: never;
   invokeV1?: never;
@@ -248,14 +248,14 @@ export type DeployAccountTransactionV3 = {
 };
 
 export type L1HandlerTransaction = {
-  l1Handler?: {
+  l1Handler?: Partial<{
     /** Target contract address. */
     contractAddress: FieldElement;
     /** Selector of the function being invoked. */
     entryPointSelector: FieldElement;
     /** Calldata. */
     calldata: FieldElement[];
-  };
+  }>;
   invokeV0?: never;
   invokeV1?: never;
   invokeV3?: never;
@@ -265,7 +265,7 @@ export type L1HandlerTransaction = {
   deployAccount?: never;
 };
 
-export type TransactionReceipt = {
+export type TransactionReceipt = Partial<{
   /** Transaction status. */
   executionStatus: ExecutionStatus;
   /** Transaction hash. */
@@ -282,14 +282,14 @@ export type TransactionReceipt = {
   events: Event[];
   /** Revert reason. */
   revertReason?: string;
-};
+}>;
 
 export type ExecutionStatus =
   | "EXECUTION_STATUS_UNSPECIFIED"
   | "EXECUTION_STATUS_SUCCEEDED"
   | "EXECUTION_STATUS_REVERTED";
 
-export type Event = {
+export type Event = Partial<{
   /** Event index. */
   index: number;
   /** Contract address. */
@@ -298,9 +298,9 @@ export type Event = {
   keys: FieldElement[];
   /** Event data. */
   data: FieldElement[];
-};
+}>;
 
-export type L2ToL1Message = {
+export type L2ToL1Message = Partial<{
   /** Message index. */
   index: number;
   /** L2 sender address. */
@@ -309,18 +309,18 @@ export type L2ToL1Message = {
   toAddress: FieldElement;
   /** Calldata. */
   payload: FieldElement[];
-};
+}>;
 
-export type StateUpdate = {
+export type StateUpdate = Partial<{
   /** New state root. */
   newRoot: FieldElement;
   /** Old state root. */
   oldRoot: FieldElement;
   /** State diff. */
   stateDiff: StateDiff;
-};
+}>;
 
-export type StateDiff = {
+export type StateDiff = Partial<{
   /** Changes in storage. */
   storageDiffs: StorageDiff[];
   /** Declared contracts. */
@@ -333,71 +333,71 @@ export type StateDiff = {
   declaredClasses: DeclaredClass[];
   /** Classes replaced. */
   replacedClasses: ReplacedClass[];
-};
+}>;
 
-export type StorageDiff = {
+export type StorageDiff = Partial<{
   /** Contract address. */
   contractAddress: FieldElement;
   /** Changes in storage. */
   storageEntries: StorageEntry[];
-};
+}>;
 
-export type StorageEntry = {
+export type StorageEntry = Partial<{
   /** Storage key. */
   key: FieldElement;
   /** New storage value. */
   value: FieldElement;
-};
+}>;
 
-export type DeclaredContract = {
+export type DeclaredContract = Partial<{
   /** Class hash. */
   classHash: FieldElement;
-};
+}>;
 
-export type DeclaredClass = {
+export type DeclaredClass = Partial<{
   /** Class hash. */
   classHash: FieldElement;
   /** Compiled class hash. */
   compiledClassHash: FieldElement;
-};
+}>;
 
-export type ReplacedClass = {
+export type ReplacedClass = Partial<{
   /** Contract address. */
   contractAddress: FieldElement;
   /** Class hash. */
   classHash: FieldElement;
-};
+}>;
 
-export type DeployedContract = {
+export type DeployedContract = Partial<{
   /** Contract address. */
   contractAddress: FieldElement;
   /** Class hash. */
   classHash: FieldElement;
-};
+}>;
 
-export type NonceUpdate = {
+export type NonceUpdate = Partial<{
   /** Contract address. */
   contractAddress: FieldElement;
   /** New nonce. */
   nonce: FieldElement;
-};
+}>;
 
-export type ResourcePrice = {
+export type ResourcePrice = Partial<{
   /** Price in fri (10^-18 strk). */
   priceInFri: FieldElement;
   /** Price in wei (10^-18 eth). */
   priceInWei: FieldElement;
-};
+}>;
 
-export type ResourceBoundsMapping = {
+export type ResourceBoundsMapping = Partial<{
   l1Gas: ResourceBounds;
   l2Gas: ResourceBounds;
-};
+}>;
 
-export type ResourceBounds = {
+export type ResourceBounds = Partial<{
   maxAmount: number;
-  maxPricePerUnit: { low: number; high: number };
-};
+  maxPricePerUnit: Partial<{ low: number; high: number }>;
+}>;
 
 export type DataAvailabilityMode =
   | "DATA_AVAILABILITY_MODE_UNSPECIFIED"
