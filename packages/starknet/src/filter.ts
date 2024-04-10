@@ -771,7 +771,7 @@ function createFilter<T, B>(
   filterOrBuilder: IEncodable<T> | ((builder: B) => IEncodable<T>),
   mk: () => B,
 ) {
-  let filter;
+  let filter: IEncodable<T>;
   if (typeof filterOrBuilder === "function") {
     filter = filterOrBuilder(mk());
   } else {

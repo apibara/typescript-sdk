@@ -1,4 +1,4 @@
-import { FieldElement } from "./felt";
+import type { FieldElement } from "./felt";
 
 export type Filter = {
   /** Header information. */

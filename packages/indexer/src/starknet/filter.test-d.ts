@@ -1,7 +1,7 @@
 import { assertType, describe, test } from "vitest";
 
 import { FieldElement } from "./felt";
-import {
+import type {
   EventFilter,
   Filter,
   L2ToL1MessageFilter,

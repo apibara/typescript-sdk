@@ -1,6 +1,6 @@
 import { assertType, describe, test } from "vitest";
 
-import { Config } from "./config";
+import type { Config } from "./config";
 
 describe("Config", () => {
   test("without any network or sink type", () => {

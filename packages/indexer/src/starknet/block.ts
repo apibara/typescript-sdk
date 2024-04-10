@@ -1,4 +1,4 @@
-import { FieldElement } from "./felt";
+import type { FieldElement } from "./felt";
 
 export type Block = Partial<{
   /** Block header. */

@@ -39,11 +39,7 @@
       "default": "./dist/starknet/index.js"
     }
   },
-  "files": [
-    "dist",
-    "src",
-    "README.md"
-  ],
+  "files": ["dist", "src", "README.md"],
   "scripts": {
     "build": "tsc",
     "test": "vitest",
