@@ -27,7 +27,11 @@ export type BlockHeader = Partial<{
   /** Block production timestamp. */
   timestamp: string;
   /** Price of L1 gas in the block. */
-  l1GasPrice: ResourcePrice;
+  l1GasPrice?: ResourcePrice;
+  /** Price of L1 data gas in the block. */
+  l1DataGasPrice?: ResourcePrice;
+  /** L1 data availability mode. */
+  l1DataAvailabilityMode?: L1DataAvailabilityMode;
 }>;
 
 export type TransactionWithReceipt = {
@@ -281,13 +285,66 @@ export type TransactionReceipt = Partial<{
   /** Events. */
   events: Event[];
   /** Revert reason. */
-  revertReason?: string;
+  revertReason: string;
+  /** Fee paid. */
+  actualFeePaid: FeePayment;
+  /** Resources consumed by the transaction. */
+  executionResources: ExecutionResources;
 }>;
 
 export type ExecutionStatus =
   | "EXECUTION_STATUS_UNSPECIFIED"
   | "EXECUTION_STATUS_SUCCEEDED"
   | "EXECUTION_STATUS_REVERTED";
+
+export type FeePayment = Partial<{
+  /** Amount paid. */
+  amount: FieldElement;
+  /** Unit of the amount. */
+  unit: PriceUnit;
+}>;
+
+export type ExecutionResources = Partial<{
+  /** Computation resources. */
+  computation: ComputationResources;
+  /** Data availability resources. */
+  dataAvailability: DataAvailabilityResources;
+}>;
+
+export type ComputationResources = Partial<{
+  /** The gas consumed by this transaction's data, 0 if it uses data gas for DA. */
+  l1Gas: number;
+  /** The data gas consumed by this transaction's data, 0 if it uses gas for DA. */
+  l1DataGas: number;
+}>;
+
+export type DataAvailabilityResources = Partial<{
+  /** The number of Cairo steps used. */
+  steps: number;
+  /** The number of unused memory cells. */
+  memoryHoles: number;
+  /** The number of RANGE_CHECK builtin instances. */
+  rangeCheckBuiltinApplications: number;
+  /** The number of Pedersen builtin instances. */
+  pedersenBuiltinApplications: number;
+  /** The number of Poseidon builtin instances. */
+  poseidonBuiltinApplications: number;
+  /** The number of EC_OP builtin instances. */
+  ecOpBuiltinApplications: number;
+  /** The number of ECDSA builtin instances. */
+  ecdsaBuiltinApplications: number;
+  /** The number of BITWISE builtin instances. */
+  bitwiseBuiltinApplications: number;
+  /** The number of KECCAK builtin instances. */
+  keccakBuiltinApplications: number;
+  /** The number of accesses to the segment arena. */
+  segmentArenaBuiltin: number;
+}>;
+
+export type PriceUnit =
+  | "PRICE_UNIT_UNSPECIFIED"
+  | "PRICE_UNIT_FRI"
+  | "PRICE_UNIT_WEI";
 
 export type Event = Partial<{
   /** Event index. */
@@ -403,3 +460,8 @@ export type DataAvailabilityMode =
   | "DATA_AVAILABILITY_MODE_UNSPECIFIED"
   | "DATA_AVAILABILITY_MODE_L2"
   | "DATA_AVAILABILITY_MODE_L1";
+
+export type L1DataAvailabilityMode =
+  | "L1_DATA_AVAILABILITY_MODE_UNSPECIFIED"
+  | "L1_DATA_AVAILABILITY_MODE_BLOB"
+  | "L1_DATA_AVAILABILITY_MODE_CALLDATA";
