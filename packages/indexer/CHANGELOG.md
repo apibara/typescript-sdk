@@ -1,5 +1,11 @@
 # @apibara/indexer
 
+## 0.4.0
+
+### Minor Changes
+
+- [#71](https://github.com/apibara/typescript-sdk/pull/71) [`267120a54b084e5a18ff112b044776ccba97353f`](https://github.com/apibara/typescript-sdk/commit/267120a54b084e5a18ff112b044776ccba97353f) Thanks [@fracek](https://github.com/fracek)! - Update Starknet type definitions
+
 ## 0.3.1
 
 ### Patch Changes

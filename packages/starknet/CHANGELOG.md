@@ -1,5 +1,11 @@
 # @apibara/starknet
 
+## 0.5.0
+
+### Minor Changes
+
+- [#71](https://github.com/apibara/typescript-sdk/pull/71) [`aecc9c8fc1eed7056fbb16103409ef4dbeb861fd`](https://github.com/apibara/typescript-sdk/commit/aecc9c8fc1eed7056fbb16103409ef4dbeb861fd) Thanks [@fracek](https://github.com/fracek)! - Update Starknet definitions
+
 ## 0.4.0
 
 ### Minor Changes

@@ -1,5 +1,12 @@
 # starknet-client-example
 
+## 0.0.3
+
+### Patch Changes
+
+- Updated dependencies [[`aecc9c8fc1eed7056fbb16103409ef4dbeb861fd`](https://github.com/apibara/typescript-sdk/commit/aecc9c8fc1eed7056fbb16103409ef4dbeb861fd)]:
+  - @apibara/starknet@0.5.0
+
 ## 0.0.2
 
 ### Patch Changes
