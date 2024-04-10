@@ -1,5 +1,5 @@
 import Long from "long";
-import { ICursor } from "./proto/v1alpha2";
+import type { ICursor } from "./proto/v1alpha2";
 
 export const Cursor = {
   /**

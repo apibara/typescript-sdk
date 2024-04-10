@@ -1,12 +1,12 @@
 import {
   CallCredentials,
   ChannelCredentials,
-  ClientDuplexStream,
-  ClientOptions,
+  type ClientDuplexStream,
+  type ClientOptions,
   Metadata,
-  StatusObject,
+  type StatusObject,
 } from "@grpc/grpc-js";
-import { CallMetadataGenerator } from "@grpc/grpc-js/build/src/call-credentials";
+import type { CallMetadataGenerator } from "@grpc/grpc-js/build/src/call-credentials";
 import { v1alpha2 } from "./proto";
 import { StreamDataRequest } from "./request";
 
@@ -188,7 +188,7 @@ export class StreamClient {
     while (true) {
       let retryCount = 1;
       let cursor = null;
-      let clock;
+      let clock: string | number | NodeJS.Timeout | undefined;
       try {
         // this check is to make ts happy
         if (!this.stream) {

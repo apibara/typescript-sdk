@@ -1,5 +1,5 @@
-import Long from "long";
-import { v1alpha2 } from "./proto";
+import type Long from "long";
+import type { v1alpha2 } from "./proto";
 
 export const StreamDataRequest = {
   /**

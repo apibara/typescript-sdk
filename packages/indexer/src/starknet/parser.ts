@@ -1,7 +1,7 @@
-import { type Abi, EventAbi } from "starknet";
+import type { Abi, EventAbi } from "starknet";
 
-import { FieldElement, getSelector } from "./felt";
-import { EventFilter } from "./filter";
+import { type FieldElement, getSelector } from "./felt";
+import type { EventFilter } from "./filter";
 
 /** Build a stream filter from a contract ABI. */
 export class Contract {

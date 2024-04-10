@@ -1,6 +1,6 @@
 import Long from "long";
 import { FieldElement } from "./felt";
-import { v1alpha2 } from "./proto";
+import type { v1alpha2 } from "./proto";
 
 export const StarkNetCursor = {
   /**

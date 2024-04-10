@@ -1,6 +1,6 @@
 import { assertType, describe, test } from "vitest";
 
-import { Block, BlockHeader, Transaction, TransactionMeta } from "./block";
+import type { Block, BlockHeader, Transaction, TransactionMeta } from "./block";
 import { FieldElement } from "./felt";
 
 const address =

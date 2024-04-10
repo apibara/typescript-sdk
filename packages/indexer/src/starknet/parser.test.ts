@@ -1,6 +1,6 @@
 import { Contract } from "./parser";
 import { describe, expect, it } from "vitest";
-import { FieldElement } from "./felt";
+import type { FieldElement } from "./felt";
 import { EventAbi } from "starknet";
 
 describe("Contract", () => {

@@ -1,6 +1,6 @@
 import { assertType, describe, test } from "vitest";
 
-import { Console } from "./console";
+import type { Console } from "./console";
 
 describe("Console", () => {
   test("accepts any option", () => {
