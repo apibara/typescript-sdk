@@ -5141,7 +5141,7 @@ $root.apibara = (function() {
                  * @memberof apibara.starknet.v1alpha2.FieldElement
                  * @instance
                  */
-                FieldElement.prototype.loLo = 0;
+                FieldElement.prototype.loLo = $util.Long ? $util.Long.fromBits(0,0,false) : 0;
 
                 /**
                  * FieldElement loHi.
@@ -5149,7 +5149,7 @@ $root.apibara = (function() {
                  * @memberof apibara.starknet.v1alpha2.FieldElement
                  * @instance
                  */
-                FieldElement.prototype.loHi = 0;
+                FieldElement.prototype.loHi = $util.Long ? $util.Long.fromBits(0,0,false) : 0;
 
                 /**
                  * FieldElement hiLo.
@@ -5157,7 +5157,7 @@ $root.apibara = (function() {
                  * @memberof apibara.starknet.v1alpha2.FieldElement
                  * @instance
                  */
-                FieldElement.prototype.hiLo = 0;
+                FieldElement.prototype.hiLo = $util.Long ? $util.Long.fromBits(0,0,false) : 0;
 
                 /**
                  * FieldElement hiHi.
@@ -5165,7 +5165,7 @@ $root.apibara = (function() {
                  * @memberof apibara.starknet.v1alpha2.FieldElement
                  * @instance
                  */
-                FieldElement.prototype.hiHi = 0;
+                FieldElement.prototype.hiHi = $util.Long ? $util.Long.fromBits(0,0,false) : 0;
 
                 /**
                  * Creates a new FieldElement instance using the specified properties.
@@ -5364,10 +5364,26 @@ $root.apibara = (function() {
                         options = {};
                     var object = {};
                     if (options.defaults) {
-                        object.loLo = 0;
-                        object.loHi = 0;
-                        object.hiLo = 0;
-                        object.hiHi = 0;
+                        if ($util.Long) {
+                            var long = new $util.Long(0, 0, false);
+                            object.loLo = options.longs === String ? long.toString() : options.longs === Number ? long.toNumber() : long;
+                        } else
+                            object.loLo = options.longs === String ? "0" : 0;
+                        if ($util.Long) {
+                            var long = new $util.Long(0, 0, false);
+                            object.loHi = options.longs === String ? long.toString() : options.longs === Number ? long.toNumber() : long;
+                        } else
+                            object.loHi = options.longs === String ? "0" : 0;
+                        if ($util.Long) {
+                            var long = new $util.Long(0, 0, false);
+                            object.hiLo = options.longs === String ? long.toString() : options.longs === Number ? long.toNumber() : long;
+                        } else
+                            object.hiLo = options.longs === String ? "0" : 0;
+                        if ($util.Long) {
+                            var long = new $util.Long(0, 0, false);
+                            object.hiHi = options.longs === String ? long.toString() : options.longs === Number ? long.toNumber() : long;
+                        } else
+                            object.hiHi = options.longs === String ? "0" : 0;
                     }
                     if (message.loLo != null && message.hasOwnProperty("loLo"))
                         if (typeof message.loLo === "number")
@@ -5886,6 +5902,8 @@ $root.apibara = (function() {
                  * @property {google.protobuf.ITimestamp|null} [timestamp] BlockHeader timestamp
                  * @property {string|null} [starknetVersion] BlockHeader starknetVersion
                  * @property {apibara.starknet.v1alpha2.IResourcePrice|null} [l1GasPrice] BlockHeader l1GasPrice
+                 * @property {apibara.starknet.v1alpha2.IResourcePrice|null} [l1DataGasPrice] BlockHeader l1DataGasPrice
+                 * @property {apibara.starknet.v1alpha2.L1DataAvailabilityMode|null} [l1DataAvailabilityMode] BlockHeader l1DataAvailabilityMode
                  */
 
                 /**
@@ -5925,7 +5943,7 @@ $root.apibara = (function() {
                  * @memberof apibara.starknet.v1alpha2.BlockHeader
                  * @instance
                  */
-                BlockHeader.prototype.blockNumber = 0;
+                BlockHeader.prototype.blockNumber = $util.Long ? $util.Long.fromBits(0,0,true) : 0;
 
                 /**
                  * BlockHeader sequencerAddress.
@@ -5968,6 +5986,22 @@ $root.apibara = (function() {
                 BlockHeader.prototype.l1GasPrice = null;
 
                 /**
+                 * BlockHeader l1DataGasPrice.
+                 * @member {apibara.starknet.v1alpha2.IResourcePrice|null|undefined} l1DataGasPrice
+                 * @memberof apibara.starknet.v1alpha2.BlockHeader
+                 * @instance
+                 */
+                BlockHeader.prototype.l1DataGasPrice = null;
+
+                /**
+                 * BlockHeader l1DataAvailabilityMode.
+                 * @member {apibara.starknet.v1alpha2.L1DataAvailabilityMode} l1DataAvailabilityMode
+                 * @memberof apibara.starknet.v1alpha2.BlockHeader
+                 * @instance
+                 */
+                BlockHeader.prototype.l1DataAvailabilityMode = 0;
+
+                /**
                  * Creates a new BlockHeader instance using the specified properties.
                  * @function create
                  * @memberof apibara.starknet.v1alpha2.BlockHeader
@@ -6007,6 +6041,10 @@ $root.apibara = (function() {
                         writer.uint32(/* id 7, wireType 2 =*/58).string(message.starknetVersion);
                     if (message.l1GasPrice != null && Object.hasOwnProperty.call(message, "l1GasPrice"))
                         $root.apibara.starknet.v1alpha2.ResourcePrice.encode(message.l1GasPrice, writer.uint32(/* id 8, wireType 2 =*/66).fork()).ldelim();
+                    if (message.l1DataGasPrice != null && Object.hasOwnProperty.call(message, "l1DataGasPrice"))
+                        $root.apibara.starknet.v1alpha2.ResourcePrice.encode(message.l1DataGasPrice, writer.uint32(/* id 9, wireType 2 =*/74).fork()).ldelim();
+                    if (message.l1DataAvailabilityMode != null && Object.hasOwnProperty.call(message, "l1DataAvailabilityMode"))
+                        writer.uint32(/* id 10, wireType 0 =*/80).int32(message.l1DataAvailabilityMode);
                     return writer;
                 };
 
@@ -6071,6 +6109,14 @@ $root.apibara = (function() {
                             }
                         case 8: {
                                 message.l1GasPrice = $root.apibara.starknet.v1alpha2.ResourcePrice.decode(reader, reader.uint32());
+                                break;
+                            }
+                        case 9: {
+                                message.l1DataGasPrice = $root.apibara.starknet.v1alpha2.ResourcePrice.decode(reader, reader.uint32());
+                                break;
+                            }
+                        case 10: {
+                                message.l1DataAvailabilityMode = reader.int32();
                                 break;
                             }
                         default:
@@ -6144,6 +6190,20 @@ $root.apibara = (function() {
                         if (error)
                             return "l1GasPrice." + error;
                     }
+                    if (message.l1DataGasPrice != null && message.hasOwnProperty("l1DataGasPrice")) {
+                        var error = $root.apibara.starknet.v1alpha2.ResourcePrice.verify(message.l1DataGasPrice);
+                        if (error)
+                            return "l1DataGasPrice." + error;
+                    }
+                    if (message.l1DataAvailabilityMode != null && message.hasOwnProperty("l1DataAvailabilityMode"))
+                        switch (message.l1DataAvailabilityMode) {
+                        default:
+                            return "l1DataAvailabilityMode: enum value expected";
+                        case 0:
+                        case 1:
+                        case 2:
+                            break;
+                        }
                     return null;
                 };
 
@@ -6200,6 +6260,31 @@ $root.apibara = (function() {
                             throw TypeError(".apibara.starknet.v1alpha2.BlockHeader.l1GasPrice: object expected");
                         message.l1GasPrice = $root.apibara.starknet.v1alpha2.ResourcePrice.fromObject(object.l1GasPrice);
                     }
+                    if (object.l1DataGasPrice != null) {
+                        if (typeof object.l1DataGasPrice !== "object")
+                            throw TypeError(".apibara.starknet.v1alpha2.BlockHeader.l1DataGasPrice: object expected");
+                        message.l1DataGasPrice = $root.apibara.starknet.v1alpha2.ResourcePrice.fromObject(object.l1DataGasPrice);
+                    }
+                    switch (object.l1DataAvailabilityMode) {
+                    default:
+                        if (typeof object.l1DataAvailabilityMode === "number") {
+                            message.l1DataAvailabilityMode = object.l1DataAvailabilityMode;
+                            break;
+                        }
+                        break;
+                    case "L1_DATA_AVAILABILITY_MODE_UNSPECIFIED":
+                    case 0:
+                        message.l1DataAvailabilityMode = 0;
+                        break;
+                    case "L1_DATA_AVAILABILITY_MODE_BLOB":
+                    case 1:
+                        message.l1DataAvailabilityMode = 1;
+                        break;
+                    case "L1_DATA_AVAILABILITY_MODE_CALLDATA":
+                    case 2:
+                        message.l1DataAvailabilityMode = 2;
+                        break;
+                    }
                     return message;
                 };
 
@@ -6219,12 +6304,18 @@ $root.apibara = (function() {
                     if (options.defaults) {
                         object.blockHash = null;
                         object.parentBlockHash = null;
-                        object.blockNumber = 0;
+                        if ($util.Long) {
+                            var long = new $util.Long(0, 0, true);
+                            object.blockNumber = options.longs === String ? long.toString() : options.longs === Number ? long.toNumber() : long;
+                        } else
+                            object.blockNumber = options.longs === String ? "0" : 0;
                         object.sequencerAddress = null;
                         object.newRoot = null;
                         object.timestamp = null;
                         object.starknetVersion = "";
                         object.l1GasPrice = null;
+                        object.l1DataGasPrice = null;
+                        object.l1DataAvailabilityMode = options.enums === String ? "L1_DATA_AVAILABILITY_MODE_UNSPECIFIED" : 0;
                     }
                     if (message.blockHash != null && message.hasOwnProperty("blockHash"))
                         object.blockHash = $root.apibara.starknet.v1alpha2.FieldElement.toObject(message.blockHash, options);
@@ -6245,6 +6336,10 @@ $root.apibara = (function() {
                         object.starknetVersion = message.starknetVersion;
                     if (message.l1GasPrice != null && message.hasOwnProperty("l1GasPrice"))
                         object.l1GasPrice = $root.apibara.starknet.v1alpha2.ResourcePrice.toObject(message.l1GasPrice, options);
+                    if (message.l1DataGasPrice != null && message.hasOwnProperty("l1DataGasPrice"))
+                        object.l1DataGasPrice = $root.apibara.starknet.v1alpha2.ResourcePrice.toObject(message.l1DataGasPrice, options);
+                    if (message.l1DataAvailabilityMode != null && message.hasOwnProperty("l1DataAvailabilityMode"))
+                        object.l1DataAvailabilityMode = options.enums === String ? $root.apibara.starknet.v1alpha2.L1DataAvailabilityMode[message.l1DataAvailabilityMode] === undefined ? message.l1DataAvailabilityMode : $root.apibara.starknet.v1alpha2.L1DataAvailabilityMode[message.l1DataAvailabilityMode] : message.l1DataAvailabilityMode;
                     return object;
                 };
 
@@ -6275,6 +6370,22 @@ $root.apibara = (function() {
                 };
 
                 return BlockHeader;
+            })();
+
+            /**
+             * L1DataAvailabilityMode enum.
+             * @name apibara.starknet.v1alpha2.L1DataAvailabilityMode
+             * @enum {number}
+             * @property {number} L1_DATA_AVAILABILITY_MODE_UNSPECIFIED=0 L1_DATA_AVAILABILITY_MODE_UNSPECIFIED value
+             * @property {number} L1_DATA_AVAILABILITY_MODE_BLOB=1 L1_DATA_AVAILABILITY_MODE_BLOB value
+             * @property {number} L1_DATA_AVAILABILITY_MODE_CALLDATA=2 L1_DATA_AVAILABILITY_MODE_CALLDATA value
+             */
+            v1alpha2.L1DataAvailabilityMode = (function() {
+                var valuesById = {}, values = Object.create(valuesById);
+                values[valuesById[0] = "L1_DATA_AVAILABILITY_MODE_UNSPECIFIED"] = 0;
+                values[valuesById[1] = "L1_DATA_AVAILABILITY_MODE_BLOB"] = 1;
+                values[valuesById[2] = "L1_DATA_AVAILABILITY_MODE_CALLDATA"] = 2;
+                return values;
             })();
 
             /**
@@ -7144,7 +7255,7 @@ $root.apibara = (function() {
                  * @memberof apibara.starknet.v1alpha2.TransactionMeta
                  * @instance
                  */
-                TransactionMeta.prototype.version = 0;
+                TransactionMeta.prototype.version = $util.Long ? $util.Long.fromBits(0,0,true) : 0;
 
                 /**
                  * TransactionMeta resourceBounds.
@@ -7160,7 +7271,7 @@ $root.apibara = (function() {
                  * @memberof apibara.starknet.v1alpha2.TransactionMeta
                  * @instance
                  */
-                TransactionMeta.prototype.tip = 0;
+                TransactionMeta.prototype.tip = $util.Long ? $util.Long.fromBits(0,0,true) : 0;
 
                 /**
                  * TransactionMeta paymasterData.
@@ -7192,7 +7303,7 @@ $root.apibara = (function() {
                  * @memberof apibara.starknet.v1alpha2.TransactionMeta
                  * @instance
                  */
-                TransactionMeta.prototype.transactionIndex = 0;
+                TransactionMeta.prototype.transactionIndex = $util.Long ? $util.Long.fromBits(0,0,true) : 0;
 
                 /**
                  * Creates a new TransactionMeta instance using the specified properties.
@@ -7570,12 +7681,24 @@ $root.apibara = (function() {
                         object.hash = null;
                         object.maxFee = null;
                         object.nonce = null;
-                        object.version = 0;
+                        if ($util.Long) {
+                            var long = new $util.Long(0, 0, true);
+                            object.version = options.longs === String ? long.toString() : options.longs === Number ? long.toNumber() : long;
+                        } else
+                            object.version = options.longs === String ? "0" : 0;
                         object.resourceBounds = null;
-                        object.tip = 0;
+                        if ($util.Long) {
+                            var long = new $util.Long(0, 0, true);
+                            object.tip = options.longs === String ? long.toString() : options.longs === Number ? long.toNumber() : long;
+                        } else
+                            object.tip = options.longs === String ? "0" : 0;
                         object.nonceDataAvailabilityMode = options.enums === String ? "DATA_AVAILABILITY_MODE_UNSPECIFIED" : 0;
                         object.feeDataAvailabilityMode = options.enums === String ? "DATA_AVAILABILITY_MODE_UNSPECIFIED" : 0;
-                        object.transactionIndex = 0;
+                        if ($util.Long) {
+                            var long = new $util.Long(0, 0, true);
+                            object.transactionIndex = options.longs === String ? long.toString() : options.longs === Number ? long.toNumber() : long;
+                        } else
+                            object.transactionIndex = options.longs === String ? "0" : 0;
                     }
                     if (message.hash != null && message.hasOwnProperty("hash"))
                         object.hash = $root.apibara.starknet.v1alpha2.FieldElement.toObject(message.hash, options);
@@ -10213,6 +10336,7 @@ $root.apibara = (function() {
                  * @property {apibara.starknet.v1alpha2.ExecutionStatus|null} [executionStatus] TransactionReceipt executionStatus
                  * @property {string|null} [revertReason] TransactionReceipt revertReason
                  * @property {apibara.starknet.v1alpha2.IFeePayment|null} [actualFeePaid] TransactionReceipt actualFeePaid
+                 * @property {apibara.starknet.v1alpha2.IExecutionResources|null} [executionResources] TransactionReceipt executionResources
                  */
 
                 /**
@@ -10246,7 +10370,7 @@ $root.apibara = (function() {
                  * @memberof apibara.starknet.v1alpha2.TransactionReceipt
                  * @instance
                  */
-                TransactionReceipt.prototype.transactionIndex = 0;
+                TransactionReceipt.prototype.transactionIndex = $util.Long ? $util.Long.fromBits(0,0,true) : 0;
 
                 /**
                  * TransactionReceipt actualFee.
@@ -10305,6 +10429,14 @@ $root.apibara = (function() {
                 TransactionReceipt.prototype.actualFeePaid = null;
 
                 /**
+                 * TransactionReceipt executionResources.
+                 * @member {apibara.starknet.v1alpha2.IExecutionResources|null|undefined} executionResources
+                 * @memberof apibara.starknet.v1alpha2.TransactionReceipt
+                 * @instance
+                 */
+                TransactionReceipt.prototype.executionResources = null;
+
+                /**
                  * Creates a new TransactionReceipt instance using the specified properties.
                  * @function create
                  * @memberof apibara.starknet.v1alpha2.TransactionReceipt
@@ -10348,6 +10480,8 @@ $root.apibara = (function() {
                         writer.uint32(/* id 8, wireType 2 =*/66).string(message.revertReason);
                     if (message.actualFeePaid != null && Object.hasOwnProperty.call(message, "actualFeePaid"))
                         $root.apibara.starknet.v1alpha2.FeePayment.encode(message.actualFeePaid, writer.uint32(/* id 9, wireType 2 =*/74).fork()).ldelim();
+                    if (message.executionResources != null && Object.hasOwnProperty.call(message, "executionResources"))
+                        $root.apibara.starknet.v1alpha2.ExecutionResources.encode(message.executionResources, writer.uint32(/* id 10, wireType 2 =*/82).fork()).ldelim();
                     return writer;
                 };
 
@@ -10420,6 +10554,10 @@ $root.apibara = (function() {
                             }
                         case 9: {
                                 message.actualFeePaid = $root.apibara.starknet.v1alpha2.FeePayment.decode(reader, reader.uint32());
+                                break;
+                            }
+                        case 10: {
+                                message.executionResources = $root.apibara.starknet.v1alpha2.ExecutionResources.decode(reader, reader.uint32());
                                 break;
                             }
                         default:
@@ -10510,6 +10648,11 @@ $root.apibara = (function() {
                         if (error)
                             return "actualFeePaid." + error;
                     }
+                    if (message.executionResources != null && message.hasOwnProperty("executionResources")) {
+                        var error = $root.apibara.starknet.v1alpha2.ExecutionResources.verify(message.executionResources);
+                        if (error)
+                            return "executionResources." + error;
+                    }
                     return null;
                 };
 
@@ -10596,6 +10739,11 @@ $root.apibara = (function() {
                             throw TypeError(".apibara.starknet.v1alpha2.TransactionReceipt.actualFeePaid: object expected");
                         message.actualFeePaid = $root.apibara.starknet.v1alpha2.FeePayment.fromObject(object.actualFeePaid);
                     }
+                    if (object.executionResources != null) {
+                        if (typeof object.executionResources !== "object")
+                            throw TypeError(".apibara.starknet.v1alpha2.TransactionReceipt.executionResources: object expected");
+                        message.executionResources = $root.apibara.starknet.v1alpha2.ExecutionResources.fromObject(object.executionResources);
+                    }
                     return message;
                 };
 
@@ -10618,12 +10766,17 @@ $root.apibara = (function() {
                     }
                     if (options.defaults) {
                         object.transactionHash = null;
-                        object.transactionIndex = 0;
+                        if ($util.Long) {
+                            var long = new $util.Long(0, 0, true);
+                            object.transactionIndex = options.longs === String ? long.toString() : options.longs === Number ? long.toNumber() : long;
+                        } else
+                            object.transactionIndex = options.longs === String ? "0" : 0;
                         object.actualFee = null;
                         object.contractAddress = null;
                         object.executionStatus = options.enums === String ? "EXECUTION_STATUS_UNSPECIFIED" : 0;
                         object.revertReason = "";
                         object.actualFeePaid = null;
+                        object.executionResources = null;
                     }
                     if (message.transactionHash != null && message.hasOwnProperty("transactionHash"))
                         object.transactionHash = $root.apibara.starknet.v1alpha2.FieldElement.toObject(message.transactionHash, options);
@@ -10652,6 +10805,8 @@ $root.apibara = (function() {
                         object.revertReason = message.revertReason;
                     if (message.actualFeePaid != null && message.hasOwnProperty("actualFeePaid"))
                         object.actualFeePaid = $root.apibara.starknet.v1alpha2.FeePayment.toObject(message.actualFeePaid, options);
+                    if (message.executionResources != null && message.hasOwnProperty("executionResources"))
+                        object.executionResources = $root.apibara.starknet.v1alpha2.ExecutionResources.toObject(message.executionResources, options);
                     return object;
                 };
 
@@ -10999,7 +11154,7 @@ $root.apibara = (function() {
                  * @memberof apibara.starknet.v1alpha2.L2ToL1Message
                  * @instance
                  */
-                L2ToL1Message.prototype.index = 0;
+                L2ToL1Message.prototype.index = $util.Long ? $util.Long.fromBits(0,0,true) : 0;
 
                 /**
                  * L2ToL1Message fromAddress.
@@ -11215,7 +11370,11 @@ $root.apibara = (function() {
                         object.payload = [];
                     if (options.defaults) {
                         object.toAddress = null;
-                        object.index = 0;
+                        if ($util.Long) {
+                            var long = new $util.Long(0, 0, true);
+                            object.index = options.longs === String ? long.toString() : options.longs === Number ? long.toNumber() : long;
+                        } else
+                            object.index = options.longs === String ? "0" : 0;
                         object.fromAddress = null;
                     }
                     if (message.toAddress != null && message.hasOwnProperty("toAddress"))
@@ -11588,7 +11747,7 @@ $root.apibara = (function() {
                  * @memberof apibara.starknet.v1alpha2.Event
                  * @instance
                  */
-                Event.prototype.index = 0;
+                Event.prototype.index = $util.Long ? $util.Long.fromBits(0,0,true) : 0;
 
                 /**
                  * Creates a new Event instance using the specified properties.
@@ -11810,7 +11969,11 @@ $root.apibara = (function() {
                     }
                     if (options.defaults) {
                         object.fromAddress = null;
-                        object.index = 0;
+                        if ($util.Long) {
+                            var long = new $util.Long(0, 0, true);
+                            object.index = options.longs === String ? long.toString() : options.longs === Number ? long.toNumber() : long;
+                        } else
+                            object.index = options.longs === String ? "0" : 0;
                     }
                     if (message.fromAddress != null && message.hasOwnProperty("fromAddress"))
                         object.fromAddress = $root.apibara.starknet.v1alpha2.FieldElement.toObject(message.fromAddress, options);
@@ -14726,6 +14889,1049 @@ $root.apibara = (function() {
                 return values;
             })();
 
+            v1alpha2.ExecutionResources = (function() {
+
+                /**
+                 * Properties of an ExecutionResources.
+                 * @memberof apibara.starknet.v1alpha2
+                 * @interface IExecutionResources
+                 * @property {apibara.starknet.v1alpha2.IComputationResources|null} [computation] ExecutionResources computation
+                 * @property {apibara.starknet.v1alpha2.IDataAvailabilityResources|null} [dataAvailability] ExecutionResources dataAvailability
+                 */
+
+                /**
+                 * Constructs a new ExecutionResources.
+                 * @memberof apibara.starknet.v1alpha2
+                 * @classdesc Represents an ExecutionResources.
+                 * @implements IExecutionResources
+                 * @constructor
+                 * @param {apibara.starknet.v1alpha2.IExecutionResources=} [properties] Properties to set
+                 */
+                function ExecutionResources(properties) {
+                    if (properties)
+                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                            if (properties[keys[i]] != null)
+                                this[keys[i]] = properties[keys[i]];
+                }
+
+                /**
+                 * ExecutionResources computation.
+                 * @member {apibara.starknet.v1alpha2.IComputationResources|null|undefined} computation
+                 * @memberof apibara.starknet.v1alpha2.ExecutionResources
+                 * @instance
+                 */
+                ExecutionResources.prototype.computation = null;
+
+                /**
+                 * ExecutionResources dataAvailability.
+                 * @member {apibara.starknet.v1alpha2.IDataAvailabilityResources|null|undefined} dataAvailability
+                 * @memberof apibara.starknet.v1alpha2.ExecutionResources
+                 * @instance
+                 */
+                ExecutionResources.prototype.dataAvailability = null;
+
+                /**
+                 * Creates a new ExecutionResources instance using the specified properties.
+                 * @function create
+                 * @memberof apibara.starknet.v1alpha2.ExecutionResources
+                 * @static
+                 * @param {apibara.starknet.v1alpha2.IExecutionResources=} [properties] Properties to set
+                 * @returns {apibara.starknet.v1alpha2.ExecutionResources} ExecutionResources instance
+                 */
+                ExecutionResources.create = function create(properties) {
+                    return new ExecutionResources(properties);
+                };
+
+                /**
+                 * Encodes the specified ExecutionResources message. Does not implicitly {@link apibara.starknet.v1alpha2.ExecutionResources.verify|verify} messages.
+                 * @function encode
+                 * @memberof apibara.starknet.v1alpha2.ExecutionResources
+                 * @static
+                 * @param {apibara.starknet.v1alpha2.IExecutionResources} message ExecutionResources message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                ExecutionResources.encode = function encode(message, writer) {
+                    if (!writer)
+                        writer = $Writer.create();
+                    if (message.computation != null && Object.hasOwnProperty.call(message, "computation"))
+                        $root.apibara.starknet.v1alpha2.ComputationResources.encode(message.computation, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+                    if (message.dataAvailability != null && Object.hasOwnProperty.call(message, "dataAvailability"))
+                        $root.apibara.starknet.v1alpha2.DataAvailabilityResources.encode(message.dataAvailability, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
+                    return writer;
+                };
+
+                /**
+                 * Encodes the specified ExecutionResources message, length delimited. Does not implicitly {@link apibara.starknet.v1alpha2.ExecutionResources.verify|verify} messages.
+                 * @function encodeDelimited
+                 * @memberof apibara.starknet.v1alpha2.ExecutionResources
+                 * @static
+                 * @param {apibara.starknet.v1alpha2.IExecutionResources} message ExecutionResources message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                ExecutionResources.encodeDelimited = function encodeDelimited(message, writer) {
+                    return this.encode(message, writer).ldelim();
+                };
+
+                /**
+                 * Decodes an ExecutionResources message from the specified reader or buffer.
+                 * @function decode
+                 * @memberof apibara.starknet.v1alpha2.ExecutionResources
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @param {number} [length] Message length if known beforehand
+                 * @returns {apibara.starknet.v1alpha2.ExecutionResources} ExecutionResources
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                ExecutionResources.decode = function decode(reader, length) {
+                    if (!(reader instanceof $Reader))
+                        reader = $Reader.create(reader);
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.apibara.starknet.v1alpha2.ExecutionResources();
+                    while (reader.pos < end) {
+                        var tag = reader.uint32();
+                        switch (tag >>> 3) {
+                        case 1: {
+                                message.computation = $root.apibara.starknet.v1alpha2.ComputationResources.decode(reader, reader.uint32());
+                                break;
+                            }
+                        case 2: {
+                                message.dataAvailability = $root.apibara.starknet.v1alpha2.DataAvailabilityResources.decode(reader, reader.uint32());
+                                break;
+                            }
+                        default:
+                            reader.skipType(tag & 7);
+                            break;
+                        }
+                    }
+                    return message;
+                };
+
+                /**
+                 * Decodes an ExecutionResources message from the specified reader or buffer, length delimited.
+                 * @function decodeDelimited
+                 * @memberof apibara.starknet.v1alpha2.ExecutionResources
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @returns {apibara.starknet.v1alpha2.ExecutionResources} ExecutionResources
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                ExecutionResources.decodeDelimited = function decodeDelimited(reader) {
+                    if (!(reader instanceof $Reader))
+                        reader = new $Reader(reader);
+                    return this.decode(reader, reader.uint32());
+                };
+
+                /**
+                 * Verifies an ExecutionResources message.
+                 * @function verify
+                 * @memberof apibara.starknet.v1alpha2.ExecutionResources
+                 * @static
+                 * @param {Object.<string,*>} message Plain object to verify
+                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
+                 */
+                ExecutionResources.verify = function verify(message) {
+                    if (typeof message !== "object" || message === null)
+                        return "object expected";
+                    if (message.computation != null && message.hasOwnProperty("computation")) {
+                        var error = $root.apibara.starknet.v1alpha2.ComputationResources.verify(message.computation);
+                        if (error)
+                            return "computation." + error;
+                    }
+                    if (message.dataAvailability != null && message.hasOwnProperty("dataAvailability")) {
+                        var error = $root.apibara.starknet.v1alpha2.DataAvailabilityResources.verify(message.dataAvailability);
+                        if (error)
+                            return "dataAvailability." + error;
+                    }
+                    return null;
+                };
+
+                /**
+                 * Creates an ExecutionResources message from a plain object. Also converts values to their respective internal types.
+                 * @function fromObject
+                 * @memberof apibara.starknet.v1alpha2.ExecutionResources
+                 * @static
+                 * @param {Object.<string,*>} object Plain object
+                 * @returns {apibara.starknet.v1alpha2.ExecutionResources} ExecutionResources
+                 */
+                ExecutionResources.fromObject = function fromObject(object) {
+                    if (object instanceof $root.apibara.starknet.v1alpha2.ExecutionResources)
+                        return object;
+                    var message = new $root.apibara.starknet.v1alpha2.ExecutionResources();
+                    if (object.computation != null) {
+                        if (typeof object.computation !== "object")
+                            throw TypeError(".apibara.starknet.v1alpha2.ExecutionResources.computation: object expected");
+                        message.computation = $root.apibara.starknet.v1alpha2.ComputationResources.fromObject(object.computation);
+                    }
+                    if (object.dataAvailability != null) {
+                        if (typeof object.dataAvailability !== "object")
+                            throw TypeError(".apibara.starknet.v1alpha2.ExecutionResources.dataAvailability: object expected");
+                        message.dataAvailability = $root.apibara.starknet.v1alpha2.DataAvailabilityResources.fromObject(object.dataAvailability);
+                    }
+                    return message;
+                };
+
+                /**
+                 * Creates a plain object from an ExecutionResources message. Also converts values to other types if specified.
+                 * @function toObject
+                 * @memberof apibara.starknet.v1alpha2.ExecutionResources
+                 * @static
+                 * @param {apibara.starknet.v1alpha2.ExecutionResources} message ExecutionResources
+                 * @param {$protobuf.IConversionOptions} [options] Conversion options
+                 * @returns {Object.<string,*>} Plain object
+                 */
+                ExecutionResources.toObject = function toObject(message, options) {
+                    if (!options)
+                        options = {};
+                    var object = {};
+                    if (options.defaults) {
+                        object.computation = null;
+                        object.dataAvailability = null;
+                    }
+                    if (message.computation != null && message.hasOwnProperty("computation"))
+                        object.computation = $root.apibara.starknet.v1alpha2.ComputationResources.toObject(message.computation, options);
+                    if (message.dataAvailability != null && message.hasOwnProperty("dataAvailability"))
+                        object.dataAvailability = $root.apibara.starknet.v1alpha2.DataAvailabilityResources.toObject(message.dataAvailability, options);
+                    return object;
+                };
+
+                /**
+                 * Converts this ExecutionResources to JSON.
+                 * @function toJSON
+                 * @memberof apibara.starknet.v1alpha2.ExecutionResources
+                 * @instance
+                 * @returns {Object.<string,*>} JSON object
+                 */
+                ExecutionResources.prototype.toJSON = function toJSON() {
+                    return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+                };
+
+                /**
+                 * Gets the default type url for ExecutionResources
+                 * @function getTypeUrl
+                 * @memberof apibara.starknet.v1alpha2.ExecutionResources
+                 * @static
+                 * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+                 * @returns {string} The default type url
+                 */
+                ExecutionResources.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
+                    if (typeUrlPrefix === undefined) {
+                        typeUrlPrefix = "type.googleapis.com";
+                    }
+                    return typeUrlPrefix + "/apibara.starknet.v1alpha2.ExecutionResources";
+                };
+
+                return ExecutionResources;
+            })();
+
+            v1alpha2.ComputationResources = (function() {
+
+                /**
+                 * Properties of a ComputationResources.
+                 * @memberof apibara.starknet.v1alpha2
+                 * @interface IComputationResources
+                 * @property {number|Long|null} [steps] ComputationResources steps
+                 * @property {number|Long|null} [memoryHoles] ComputationResources memoryHoles
+                 * @property {number|Long|null} [rangeCheckBuiltinApplications] ComputationResources rangeCheckBuiltinApplications
+                 * @property {number|Long|null} [pedersenBuiltinApplications] ComputationResources pedersenBuiltinApplications
+                 * @property {number|Long|null} [poseidonBuiltinApplications] ComputationResources poseidonBuiltinApplications
+                 * @property {number|Long|null} [ecOpBuiltinApplications] ComputationResources ecOpBuiltinApplications
+                 * @property {number|Long|null} [ecdsaBuiltinApplications] ComputationResources ecdsaBuiltinApplications
+                 * @property {number|Long|null} [bitwiseBuiltinApplications] ComputationResources bitwiseBuiltinApplications
+                 * @property {number|Long|null} [keccakBuiltinApplications] ComputationResources keccakBuiltinApplications
+                 * @property {number|Long|null} [segmentArenaBuiltin] ComputationResources segmentArenaBuiltin
+                 */
+
+                /**
+                 * Constructs a new ComputationResources.
+                 * @memberof apibara.starknet.v1alpha2
+                 * @classdesc Represents a ComputationResources.
+                 * @implements IComputationResources
+                 * @constructor
+                 * @param {apibara.starknet.v1alpha2.IComputationResources=} [properties] Properties to set
+                 */
+                function ComputationResources(properties) {
+                    if (properties)
+                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                            if (properties[keys[i]] != null)
+                                this[keys[i]] = properties[keys[i]];
+                }
+
+                /**
+                 * ComputationResources steps.
+                 * @member {number|Long} steps
+                 * @memberof apibara.starknet.v1alpha2.ComputationResources
+                 * @instance
+                 */
+                ComputationResources.prototype.steps = $util.Long ? $util.Long.fromBits(0,0,true) : 0;
+
+                /**
+                 * ComputationResources memoryHoles.
+                 * @member {number|Long} memoryHoles
+                 * @memberof apibara.starknet.v1alpha2.ComputationResources
+                 * @instance
+                 */
+                ComputationResources.prototype.memoryHoles = $util.Long ? $util.Long.fromBits(0,0,true) : 0;
+
+                /**
+                 * ComputationResources rangeCheckBuiltinApplications.
+                 * @member {number|Long} rangeCheckBuiltinApplications
+                 * @memberof apibara.starknet.v1alpha2.ComputationResources
+                 * @instance
+                 */
+                ComputationResources.prototype.rangeCheckBuiltinApplications = $util.Long ? $util.Long.fromBits(0,0,true) : 0;
+
+                /**
+                 * ComputationResources pedersenBuiltinApplications.
+                 * @member {number|Long} pedersenBuiltinApplications
+                 * @memberof apibara.starknet.v1alpha2.ComputationResources
+                 * @instance
+                 */
+                ComputationResources.prototype.pedersenBuiltinApplications = $util.Long ? $util.Long.fromBits(0,0,true) : 0;
+
+                /**
+                 * ComputationResources poseidonBuiltinApplications.
+                 * @member {number|Long} poseidonBuiltinApplications
+                 * @memberof apibara.starknet.v1alpha2.ComputationResources
+                 * @instance
+                 */
+                ComputationResources.prototype.poseidonBuiltinApplications = $util.Long ? $util.Long.fromBits(0,0,true) : 0;
+
+                /**
+                 * ComputationResources ecOpBuiltinApplications.
+                 * @member {number|Long} ecOpBuiltinApplications
+                 * @memberof apibara.starknet.v1alpha2.ComputationResources
+                 * @instance
+                 */
+                ComputationResources.prototype.ecOpBuiltinApplications = $util.Long ? $util.Long.fromBits(0,0,true) : 0;
+
+                /**
+                 * ComputationResources ecdsaBuiltinApplications.
+                 * @member {number|Long} ecdsaBuiltinApplications
+                 * @memberof apibara.starknet.v1alpha2.ComputationResources
+                 * @instance
+                 */
+                ComputationResources.prototype.ecdsaBuiltinApplications = $util.Long ? $util.Long.fromBits(0,0,true) : 0;
+
+                /**
+                 * ComputationResources bitwiseBuiltinApplications.
+                 * @member {number|Long} bitwiseBuiltinApplications
+                 * @memberof apibara.starknet.v1alpha2.ComputationResources
+                 * @instance
+                 */
+                ComputationResources.prototype.bitwiseBuiltinApplications = $util.Long ? $util.Long.fromBits(0,0,true) : 0;
+
+                /**
+                 * ComputationResources keccakBuiltinApplications.
+                 * @member {number|Long} keccakBuiltinApplications
+                 * @memberof apibara.starknet.v1alpha2.ComputationResources
+                 * @instance
+                 */
+                ComputationResources.prototype.keccakBuiltinApplications = $util.Long ? $util.Long.fromBits(0,0,true) : 0;
+
+                /**
+                 * ComputationResources segmentArenaBuiltin.
+                 * @member {number|Long} segmentArenaBuiltin
+                 * @memberof apibara.starknet.v1alpha2.ComputationResources
+                 * @instance
+                 */
+                ComputationResources.prototype.segmentArenaBuiltin = $util.Long ? $util.Long.fromBits(0,0,true) : 0;
+
+                /**
+                 * Creates a new ComputationResources instance using the specified properties.
+                 * @function create
+                 * @memberof apibara.starknet.v1alpha2.ComputationResources
+                 * @static
+                 * @param {apibara.starknet.v1alpha2.IComputationResources=} [properties] Properties to set
+                 * @returns {apibara.starknet.v1alpha2.ComputationResources} ComputationResources instance
+                 */
+                ComputationResources.create = function create(properties) {
+                    return new ComputationResources(properties);
+                };
+
+                /**
+                 * Encodes the specified ComputationResources message. Does not implicitly {@link apibara.starknet.v1alpha2.ComputationResources.verify|verify} messages.
+                 * @function encode
+                 * @memberof apibara.starknet.v1alpha2.ComputationResources
+                 * @static
+                 * @param {apibara.starknet.v1alpha2.IComputationResources} message ComputationResources message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                ComputationResources.encode = function encode(message, writer) {
+                    if (!writer)
+                        writer = $Writer.create();
+                    if (message.steps != null && Object.hasOwnProperty.call(message, "steps"))
+                        writer.uint32(/* id 1, wireType 0 =*/8).uint64(message.steps);
+                    if (message.memoryHoles != null && Object.hasOwnProperty.call(message, "memoryHoles"))
+                        writer.uint32(/* id 2, wireType 0 =*/16).uint64(message.memoryHoles);
+                    if (message.rangeCheckBuiltinApplications != null && Object.hasOwnProperty.call(message, "rangeCheckBuiltinApplications"))
+                        writer.uint32(/* id 3, wireType 0 =*/24).uint64(message.rangeCheckBuiltinApplications);
+                    if (message.pedersenBuiltinApplications != null && Object.hasOwnProperty.call(message, "pedersenBuiltinApplications"))
+                        writer.uint32(/* id 4, wireType 0 =*/32).uint64(message.pedersenBuiltinApplications);
+                    if (message.poseidonBuiltinApplications != null && Object.hasOwnProperty.call(message, "poseidonBuiltinApplications"))
+                        writer.uint32(/* id 5, wireType 0 =*/40).uint64(message.poseidonBuiltinApplications);
+                    if (message.ecOpBuiltinApplications != null && Object.hasOwnProperty.call(message, "ecOpBuiltinApplications"))
+                        writer.uint32(/* id 6, wireType 0 =*/48).uint64(message.ecOpBuiltinApplications);
+                    if (message.ecdsaBuiltinApplications != null && Object.hasOwnProperty.call(message, "ecdsaBuiltinApplications"))
+                        writer.uint32(/* id 7, wireType 0 =*/56).uint64(message.ecdsaBuiltinApplications);
+                    if (message.bitwiseBuiltinApplications != null && Object.hasOwnProperty.call(message, "bitwiseBuiltinApplications"))
+                        writer.uint32(/* id 8, wireType 0 =*/64).uint64(message.bitwiseBuiltinApplications);
+                    if (message.keccakBuiltinApplications != null && Object.hasOwnProperty.call(message, "keccakBuiltinApplications"))
+                        writer.uint32(/* id 9, wireType 0 =*/72).uint64(message.keccakBuiltinApplications);
+                    if (message.segmentArenaBuiltin != null && Object.hasOwnProperty.call(message, "segmentArenaBuiltin"))
+                        writer.uint32(/* id 10, wireType 0 =*/80).uint64(message.segmentArenaBuiltin);
+                    return writer;
+                };
+
+                /**
+                 * Encodes the specified ComputationResources message, length delimited. Does not implicitly {@link apibara.starknet.v1alpha2.ComputationResources.verify|verify} messages.
+                 * @function encodeDelimited
+                 * @memberof apibara.starknet.v1alpha2.ComputationResources
+                 * @static
+                 * @param {apibara.starknet.v1alpha2.IComputationResources} message ComputationResources message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                ComputationResources.encodeDelimited = function encodeDelimited(message, writer) {
+                    return this.encode(message, writer).ldelim();
+                };
+
+                /**
+                 * Decodes a ComputationResources message from the specified reader or buffer.
+                 * @function decode
+                 * @memberof apibara.starknet.v1alpha2.ComputationResources
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @param {number} [length] Message length if known beforehand
+                 * @returns {apibara.starknet.v1alpha2.ComputationResources} ComputationResources
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                ComputationResources.decode = function decode(reader, length) {
+                    if (!(reader instanceof $Reader))
+                        reader = $Reader.create(reader);
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.apibara.starknet.v1alpha2.ComputationResources();
+                    while (reader.pos < end) {
+                        var tag = reader.uint32();
+                        switch (tag >>> 3) {
+                        case 1: {
+                                message.steps = reader.uint64();
+                                break;
+                            }
+                        case 2: {
+                                message.memoryHoles = reader.uint64();
+                                break;
+                            }
+                        case 3: {
+                                message.rangeCheckBuiltinApplications = reader.uint64();
+                                break;
+                            }
+                        case 4: {
+                                message.pedersenBuiltinApplications = reader.uint64();
+                                break;
+                            }
+                        case 5: {
+                                message.poseidonBuiltinApplications = reader.uint64();
+                                break;
+                            }
+                        case 6: {
+                                message.ecOpBuiltinApplications = reader.uint64();
+                                break;
+                            }
+                        case 7: {
+                                message.ecdsaBuiltinApplications = reader.uint64();
+                                break;
+                            }
+                        case 8: {
+                                message.bitwiseBuiltinApplications = reader.uint64();
+                                break;
+                            }
+                        case 9: {
+                                message.keccakBuiltinApplications = reader.uint64();
+                                break;
+                            }
+                        case 10: {
+                                message.segmentArenaBuiltin = reader.uint64();
+                                break;
+                            }
+                        default:
+                            reader.skipType(tag & 7);
+                            break;
+                        }
+                    }
+                    return message;
+                };
+
+                /**
+                 * Decodes a ComputationResources message from the specified reader or buffer, length delimited.
+                 * @function decodeDelimited
+                 * @memberof apibara.starknet.v1alpha2.ComputationResources
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @returns {apibara.starknet.v1alpha2.ComputationResources} ComputationResources
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                ComputationResources.decodeDelimited = function decodeDelimited(reader) {
+                    if (!(reader instanceof $Reader))
+                        reader = new $Reader(reader);
+                    return this.decode(reader, reader.uint32());
+                };
+
+                /**
+                 * Verifies a ComputationResources message.
+                 * @function verify
+                 * @memberof apibara.starknet.v1alpha2.ComputationResources
+                 * @static
+                 * @param {Object.<string,*>} message Plain object to verify
+                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
+                 */
+                ComputationResources.verify = function verify(message) {
+                    if (typeof message !== "object" || message === null)
+                        return "object expected";
+                    if (message.steps != null && message.hasOwnProperty("steps"))
+                        if (!$util.isInteger(message.steps) && !(message.steps && $util.isInteger(message.steps.low) && $util.isInteger(message.steps.high)))
+                            return "steps: integer|Long expected";
+                    if (message.memoryHoles != null && message.hasOwnProperty("memoryHoles"))
+                        if (!$util.isInteger(message.memoryHoles) && !(message.memoryHoles && $util.isInteger(message.memoryHoles.low) && $util.isInteger(message.memoryHoles.high)))
+                            return "memoryHoles: integer|Long expected";
+                    if (message.rangeCheckBuiltinApplications != null && message.hasOwnProperty("rangeCheckBuiltinApplications"))
+                        if (!$util.isInteger(message.rangeCheckBuiltinApplications) && !(message.rangeCheckBuiltinApplications && $util.isInteger(message.rangeCheckBuiltinApplications.low) && $util.isInteger(message.rangeCheckBuiltinApplications.high)))
+                            return "rangeCheckBuiltinApplications: integer|Long expected";
+                    if (message.pedersenBuiltinApplications != null && message.hasOwnProperty("pedersenBuiltinApplications"))
+                        if (!$util.isInteger(message.pedersenBuiltinApplications) && !(message.pedersenBuiltinApplications && $util.isInteger(message.pedersenBuiltinApplications.low) && $util.isInteger(message.pedersenBuiltinApplications.high)))
+                            return "pedersenBuiltinApplications: integer|Long expected";
+                    if (message.poseidonBuiltinApplications != null && message.hasOwnProperty("poseidonBuiltinApplications"))
+                        if (!$util.isInteger(message.poseidonBuiltinApplications) && !(message.poseidonBuiltinApplications && $util.isInteger(message.poseidonBuiltinApplications.low) && $util.isInteger(message.poseidonBuiltinApplications.high)))
+                            return "poseidonBuiltinApplications: integer|Long expected";
+                    if (message.ecOpBuiltinApplications != null && message.hasOwnProperty("ecOpBuiltinApplications"))
+                        if (!$util.isInteger(message.ecOpBuiltinApplications) && !(message.ecOpBuiltinApplications && $util.isInteger(message.ecOpBuiltinApplications.low) && $util.isInteger(message.ecOpBuiltinApplications.high)))
+                            return "ecOpBuiltinApplications: integer|Long expected";
+                    if (message.ecdsaBuiltinApplications != null && message.hasOwnProperty("ecdsaBuiltinApplications"))
+                        if (!$util.isInteger(message.ecdsaBuiltinApplications) && !(message.ecdsaBuiltinApplications && $util.isInteger(message.ecdsaBuiltinApplications.low) && $util.isInteger(message.ecdsaBuiltinApplications.high)))
+                            return "ecdsaBuiltinApplications: integer|Long expected";
+                    if (message.bitwiseBuiltinApplications != null && message.hasOwnProperty("bitwiseBuiltinApplications"))
+                        if (!$util.isInteger(message.bitwiseBuiltinApplications) && !(message.bitwiseBuiltinApplications && $util.isInteger(message.bitwiseBuiltinApplications.low) && $util.isInteger(message.bitwiseBuiltinApplications.high)))
+                            return "bitwiseBuiltinApplications: integer|Long expected";
+                    if (message.keccakBuiltinApplications != null && message.hasOwnProperty("keccakBuiltinApplications"))
+                        if (!$util.isInteger(message.keccakBuiltinApplications) && !(message.keccakBuiltinApplications && $util.isInteger(message.keccakBuiltinApplications.low) && $util.isInteger(message.keccakBuiltinApplications.high)))
+                            return "keccakBuiltinApplications: integer|Long expected";
+                    if (message.segmentArenaBuiltin != null && message.hasOwnProperty("segmentArenaBuiltin"))
+                        if (!$util.isInteger(message.segmentArenaBuiltin) && !(message.segmentArenaBuiltin && $util.isInteger(message.segmentArenaBuiltin.low) && $util.isInteger(message.segmentArenaBuiltin.high)))
+                            return "segmentArenaBuiltin: integer|Long expected";
+                    return null;
+                };
+
+                /**
+                 * Creates a ComputationResources message from a plain object. Also converts values to their respective internal types.
+                 * @function fromObject
+                 * @memberof apibara.starknet.v1alpha2.ComputationResources
+                 * @static
+                 * @param {Object.<string,*>} object Plain object
+                 * @returns {apibara.starknet.v1alpha2.ComputationResources} ComputationResources
+                 */
+                ComputationResources.fromObject = function fromObject(object) {
+                    if (object instanceof $root.apibara.starknet.v1alpha2.ComputationResources)
+                        return object;
+                    var message = new $root.apibara.starknet.v1alpha2.ComputationResources();
+                    if (object.steps != null)
+                        if ($util.Long)
+                            (message.steps = $util.Long.fromValue(object.steps)).unsigned = true;
+                        else if (typeof object.steps === "string")
+                            message.steps = parseInt(object.steps, 10);
+                        else if (typeof object.steps === "number")
+                            message.steps = object.steps;
+                        else if (typeof object.steps === "object")
+                            message.steps = new $util.LongBits(object.steps.low >>> 0, object.steps.high >>> 0).toNumber(true);
+                    if (object.memoryHoles != null)
+                        if ($util.Long)
+                            (message.memoryHoles = $util.Long.fromValue(object.memoryHoles)).unsigned = true;
+                        else if (typeof object.memoryHoles === "string")
+                            message.memoryHoles = parseInt(object.memoryHoles, 10);
+                        else if (typeof object.memoryHoles === "number")
+                            message.memoryHoles = object.memoryHoles;
+                        else if (typeof object.memoryHoles === "object")
+                            message.memoryHoles = new $util.LongBits(object.memoryHoles.low >>> 0, object.memoryHoles.high >>> 0).toNumber(true);
+                    if (object.rangeCheckBuiltinApplications != null)
+                        if ($util.Long)
+                            (message.rangeCheckBuiltinApplications = $util.Long.fromValue(object.rangeCheckBuiltinApplications)).unsigned = true;
+                        else if (typeof object.rangeCheckBuiltinApplications === "string")
+                            message.rangeCheckBuiltinApplications = parseInt(object.rangeCheckBuiltinApplications, 10);
+                        else if (typeof object.rangeCheckBuiltinApplications === "number")
+                            message.rangeCheckBuiltinApplications = object.rangeCheckBuiltinApplications;
+                        else if (typeof object.rangeCheckBuiltinApplications === "object")
+                            message.rangeCheckBuiltinApplications = new $util.LongBits(object.rangeCheckBuiltinApplications.low >>> 0, object.rangeCheckBuiltinApplications.high >>> 0).toNumber(true);
+                    if (object.pedersenBuiltinApplications != null)
+                        if ($util.Long)
+                            (message.pedersenBuiltinApplications = $util.Long.fromValue(object.pedersenBuiltinApplications)).unsigned = true;
+                        else if (typeof object.pedersenBuiltinApplications === "string")
+                            message.pedersenBuiltinApplications = parseInt(object.pedersenBuiltinApplications, 10);
+                        else if (typeof object.pedersenBuiltinApplications === "number")
+                            message.pedersenBuiltinApplications = object.pedersenBuiltinApplications;
+                        else if (typeof object.pedersenBuiltinApplications === "object")
+                            message.pedersenBuiltinApplications = new $util.LongBits(object.pedersenBuiltinApplications.low >>> 0, object.pedersenBuiltinApplications.high >>> 0).toNumber(true);
+                    if (object.poseidonBuiltinApplications != null)
+                        if ($util.Long)
+                            (message.poseidonBuiltinApplications = $util.Long.fromValue(object.poseidonBuiltinApplications)).unsigned = true;
+                        else if (typeof object.poseidonBuiltinApplications === "string")
+                            message.poseidonBuiltinApplications = parseInt(object.poseidonBuiltinApplications, 10);
+                        else if (typeof object.poseidonBuiltinApplications === "number")
+                            message.poseidonBuiltinApplications = object.poseidonBuiltinApplications;
+                        else if (typeof object.poseidonBuiltinApplications === "object")
+                            message.poseidonBuiltinApplications = new $util.LongBits(object.poseidonBuiltinApplications.low >>> 0, object.poseidonBuiltinApplications.high >>> 0).toNumber(true);
+                    if (object.ecOpBuiltinApplications != null)
+                        if ($util.Long)
+                            (message.ecOpBuiltinApplications = $util.Long.fromValue(object.ecOpBuiltinApplications)).unsigned = true;
+                        else if (typeof object.ecOpBuiltinApplications === "string")
+                            message.ecOpBuiltinApplications = parseInt(object.ecOpBuiltinApplications, 10);
+                        else if (typeof object.ecOpBuiltinApplications === "number")
+                            message.ecOpBuiltinApplications = object.ecOpBuiltinApplications;
+                        else if (typeof object.ecOpBuiltinApplications === "object")
+                            message.ecOpBuiltinApplications = new $util.LongBits(object.ecOpBuiltinApplications.low >>> 0, object.ecOpBuiltinApplications.high >>> 0).toNumber(true);
+                    if (object.ecdsaBuiltinApplications != null)
+                        if ($util.Long)
+                            (message.ecdsaBuiltinApplications = $util.Long.fromValue(object.ecdsaBuiltinApplications)).unsigned = true;
+                        else if (typeof object.ecdsaBuiltinApplications === "string")
+                            message.ecdsaBuiltinApplications = parseInt(object.ecdsaBuiltinApplications, 10);
+                        else if (typeof object.ecdsaBuiltinApplications === "number")
+                            message.ecdsaBuiltinApplications = object.ecdsaBuiltinApplications;
+                        else if (typeof object.ecdsaBuiltinApplications === "object")
+                            message.ecdsaBuiltinApplications = new $util.LongBits(object.ecdsaBuiltinApplications.low >>> 0, object.ecdsaBuiltinApplications.high >>> 0).toNumber(true);
+                    if (object.bitwiseBuiltinApplications != null)
+                        if ($util.Long)
+                            (message.bitwiseBuiltinApplications = $util.Long.fromValue(object.bitwiseBuiltinApplications)).unsigned = true;
+                        else if (typeof object.bitwiseBuiltinApplications === "string")
+                            message.bitwiseBuiltinApplications = parseInt(object.bitwiseBuiltinApplications, 10);
+                        else if (typeof object.bitwiseBuiltinApplications === "number")
+                            message.bitwiseBuiltinApplications = object.bitwiseBuiltinApplications;
+                        else if (typeof object.bitwiseBuiltinApplications === "object")
+                            message.bitwiseBuiltinApplications = new $util.LongBits(object.bitwiseBuiltinApplications.low >>> 0, object.bitwiseBuiltinApplications.high >>> 0).toNumber(true);
+                    if (object.keccakBuiltinApplications != null)
+                        if ($util.Long)
+                            (message.keccakBuiltinApplications = $util.Long.fromValue(object.keccakBuiltinApplications)).unsigned = true;
+                        else if (typeof object.keccakBuiltinApplications === "string")
+                            message.keccakBuiltinApplications = parseInt(object.keccakBuiltinApplications, 10);
+                        else if (typeof object.keccakBuiltinApplications === "number")
+                            message.keccakBuiltinApplications = object.keccakBuiltinApplications;
+                        else if (typeof object.keccakBuiltinApplications === "object")
+                            message.keccakBuiltinApplications = new $util.LongBits(object.keccakBuiltinApplications.low >>> 0, object.keccakBuiltinApplications.high >>> 0).toNumber(true);
+                    if (object.segmentArenaBuiltin != null)
+                        if ($util.Long)
+                            (message.segmentArenaBuiltin = $util.Long.fromValue(object.segmentArenaBuiltin)).unsigned = true;
+                        else if (typeof object.segmentArenaBuiltin === "string")
+                            message.segmentArenaBuiltin = parseInt(object.segmentArenaBuiltin, 10);
+                        else if (typeof object.segmentArenaBuiltin === "number")
+                            message.segmentArenaBuiltin = object.segmentArenaBuiltin;
+                        else if (typeof object.segmentArenaBuiltin === "object")
+                            message.segmentArenaBuiltin = new $util.LongBits(object.segmentArenaBuiltin.low >>> 0, object.segmentArenaBuiltin.high >>> 0).toNumber(true);
+                    return message;
+                };
+
+                /**
+                 * Creates a plain object from a ComputationResources message. Also converts values to other types if specified.
+                 * @function toObject
+                 * @memberof apibara.starknet.v1alpha2.ComputationResources
+                 * @static
+                 * @param {apibara.starknet.v1alpha2.ComputationResources} message ComputationResources
+                 * @param {$protobuf.IConversionOptions} [options] Conversion options
+                 * @returns {Object.<string,*>} Plain object
+                 */
+                ComputationResources.toObject = function toObject(message, options) {
+                    if (!options)
+                        options = {};
+                    var object = {};
+                    if (options.defaults) {
+                        if ($util.Long) {
+                            var long = new $util.Long(0, 0, true);
+                            object.steps = options.longs === String ? long.toString() : options.longs === Number ? long.toNumber() : long;
+                        } else
+                            object.steps = options.longs === String ? "0" : 0;
+                        if ($util.Long) {
+                            var long = new $util.Long(0, 0, true);
+                            object.memoryHoles = options.longs === String ? long.toString() : options.longs === Number ? long.toNumber() : long;
+                        } else
+                            object.memoryHoles = options.longs === String ? "0" : 0;
+                        if ($util.Long) {
+                            var long = new $util.Long(0, 0, true);
+                            object.rangeCheckBuiltinApplications = options.longs === String ? long.toString() : options.longs === Number ? long.toNumber() : long;
+                        } else
+                            object.rangeCheckBuiltinApplications = options.longs === String ? "0" : 0;
+                        if ($util.Long) {
+                            var long = new $util.Long(0, 0, true);
+                            object.pedersenBuiltinApplications = options.longs === String ? long.toString() : options.longs === Number ? long.toNumber() : long;
+                        } else
+                            object.pedersenBuiltinApplications = options.longs === String ? "0" : 0;
+                        if ($util.Long) {
+                            var long = new $util.Long(0, 0, true);
+                            object.poseidonBuiltinApplications = options.longs === String ? long.toString() : options.longs === Number ? long.toNumber() : long;
+                        } else
+                            object.poseidonBuiltinApplications = options.longs === String ? "0" : 0;
+                        if ($util.Long) {
+                            var long = new $util.Long(0, 0, true);
+                            object.ecOpBuiltinApplications = options.longs === String ? long.toString() : options.longs === Number ? long.toNumber() : long;
+                        } else
+                            object.ecOpBuiltinApplications = options.longs === String ? "0" : 0;
+                        if ($util.Long) {
+                            var long = new $util.Long(0, 0, true);
+                            object.ecdsaBuiltinApplications = options.longs === String ? long.toString() : options.longs === Number ? long.toNumber() : long;
+                        } else
+                            object.ecdsaBuiltinApplications = options.longs === String ? "0" : 0;
+                        if ($util.Long) {
+                            var long = new $util.Long(0, 0, true);
+                            object.bitwiseBuiltinApplications = options.longs === String ? long.toString() : options.longs === Number ? long.toNumber() : long;
+                        } else
+                            object.bitwiseBuiltinApplications = options.longs === String ? "0" : 0;
+                        if ($util.Long) {
+                            var long = new $util.Long(0, 0, true);
+                            object.keccakBuiltinApplications = options.longs === String ? long.toString() : options.longs === Number ? long.toNumber() : long;
+                        } else
+                            object.keccakBuiltinApplications = options.longs === String ? "0" : 0;
+                        if ($util.Long) {
+                            var long = new $util.Long(0, 0, true);
+                            object.segmentArenaBuiltin = options.longs === String ? long.toString() : options.longs === Number ? long.toNumber() : long;
+                        } else
+                            object.segmentArenaBuiltin = options.longs === String ? "0" : 0;
+                    }
+                    if (message.steps != null && message.hasOwnProperty("steps"))
+                        if (typeof message.steps === "number")
+                            object.steps = options.longs === String ? String(message.steps) : message.steps;
+                        else
+                            object.steps = options.longs === String ? $util.Long.prototype.toString.call(message.steps) : options.longs === Number ? new $util.LongBits(message.steps.low >>> 0, message.steps.high >>> 0).toNumber(true) : message.steps;
+                    if (message.memoryHoles != null && message.hasOwnProperty("memoryHoles"))
+                        if (typeof message.memoryHoles === "number")
+                            object.memoryHoles = options.longs === String ? String(message.memoryHoles) : message.memoryHoles;
+                        else
+                            object.memoryHoles = options.longs === String ? $util.Long.prototype.toString.call(message.memoryHoles) : options.longs === Number ? new $util.LongBits(message.memoryHoles.low >>> 0, message.memoryHoles.high >>> 0).toNumber(true) : message.memoryHoles;
+                    if (message.rangeCheckBuiltinApplications != null && message.hasOwnProperty("rangeCheckBuiltinApplications"))
+                        if (typeof message.rangeCheckBuiltinApplications === "number")
+                            object.rangeCheckBuiltinApplications = options.longs === String ? String(message.rangeCheckBuiltinApplications) : message.rangeCheckBuiltinApplications;
+                        else
+                            object.rangeCheckBuiltinApplications = options.longs === String ? $util.Long.prototype.toString.call(message.rangeCheckBuiltinApplications) : options.longs === Number ? new $util.LongBits(message.rangeCheckBuiltinApplications.low >>> 0, message.rangeCheckBuiltinApplications.high >>> 0).toNumber(true) : message.rangeCheckBuiltinApplications;
+                    if (message.pedersenBuiltinApplications != null && message.hasOwnProperty("pedersenBuiltinApplications"))
+                        if (typeof message.pedersenBuiltinApplications === "number")
+                            object.pedersenBuiltinApplications = options.longs === String ? String(message.pedersenBuiltinApplications) : message.pedersenBuiltinApplications;
+                        else
+                            object.pedersenBuiltinApplications = options.longs === String ? $util.Long.prototype.toString.call(message.pedersenBuiltinApplications) : options.longs === Number ? new $util.LongBits(message.pedersenBuiltinApplications.low >>> 0, message.pedersenBuiltinApplications.high >>> 0).toNumber(true) : message.pedersenBuiltinApplications;
+                    if (message.poseidonBuiltinApplications != null && message.hasOwnProperty("poseidonBuiltinApplications"))
+                        if (typeof message.poseidonBuiltinApplications === "number")
+                            object.poseidonBuiltinApplications = options.longs === String ? String(message.poseidonBuiltinApplications) : message.poseidonBuiltinApplications;
+                        else
+                            object.poseidonBuiltinApplications = options.longs === String ? $util.Long.prototype.toString.call(message.poseidonBuiltinApplications) : options.longs === Number ? new $util.LongBits(message.poseidonBuiltinApplications.low >>> 0, message.poseidonBuiltinApplications.high >>> 0).toNumber(true) : message.poseidonBuiltinApplications;
+                    if (message.ecOpBuiltinApplications != null && message.hasOwnProperty("ecOpBuiltinApplications"))
+                        if (typeof message.ecOpBuiltinApplications === "number")
+                            object.ecOpBuiltinApplications = options.longs === String ? String(message.ecOpBuiltinApplications) : message.ecOpBuiltinApplications;
+                        else
+                            object.ecOpBuiltinApplications = options.longs === String ? $util.Long.prototype.toString.call(message.ecOpBuiltinApplications) : options.longs === Number ? new $util.LongBits(message.ecOpBuiltinApplications.low >>> 0, message.ecOpBuiltinApplications.high >>> 0).toNumber(true) : message.ecOpBuiltinApplications;
+                    if (message.ecdsaBuiltinApplications != null && message.hasOwnProperty("ecdsaBuiltinApplications"))
+                        if (typeof message.ecdsaBuiltinApplications === "number")
+                            object.ecdsaBuiltinApplications = options.longs === String ? String(message.ecdsaBuiltinApplications) : message.ecdsaBuiltinApplications;
+                        else
+                            object.ecdsaBuiltinApplications = options.longs === String ? $util.Long.prototype.toString.call(message.ecdsaBuiltinApplications) : options.longs === Number ? new $util.LongBits(message.ecdsaBuiltinApplications.low >>> 0, message.ecdsaBuiltinApplications.high >>> 0).toNumber(true) : message.ecdsaBuiltinApplications;
+                    if (message.bitwiseBuiltinApplications != null && message.hasOwnProperty("bitwiseBuiltinApplications"))
+                        if (typeof message.bitwiseBuiltinApplications === "number")
+                            object.bitwiseBuiltinApplications = options.longs === String ? String(message.bitwiseBuiltinApplications) : message.bitwiseBuiltinApplications;
+                        else
+                            object.bitwiseBuiltinApplications = options.longs === String ? $util.Long.prototype.toString.call(message.bitwiseBuiltinApplications) : options.longs === Number ? new $util.LongBits(message.bitwiseBuiltinApplications.low >>> 0, message.bitwiseBuiltinApplications.high >>> 0).toNumber(true) : message.bitwiseBuiltinApplications;
+                    if (message.keccakBuiltinApplications != null && message.hasOwnProperty("keccakBuiltinApplications"))
+                        if (typeof message.keccakBuiltinApplications === "number")
+                            object.keccakBuiltinApplications = options.longs === String ? String(message.keccakBuiltinApplications) : message.keccakBuiltinApplications;
+                        else
+                            object.keccakBuiltinApplications = options.longs === String ? $util.Long.prototype.toString.call(message.keccakBuiltinApplications) : options.longs === Number ? new $util.LongBits(message.keccakBuiltinApplications.low >>> 0, message.keccakBuiltinApplications.high >>> 0).toNumber(true) : message.keccakBuiltinApplications;
+                    if (message.segmentArenaBuiltin != null && message.hasOwnProperty("segmentArenaBuiltin"))
+                        if (typeof message.segmentArenaBuiltin === "number")
+                            object.segmentArenaBuiltin = options.longs === String ? String(message.segmentArenaBuiltin) : message.segmentArenaBuiltin;
+                        else
+                            object.segmentArenaBuiltin = options.longs === String ? $util.Long.prototype.toString.call(message.segmentArenaBuiltin) : options.longs === Number ? new $util.LongBits(message.segmentArenaBuiltin.low >>> 0, message.segmentArenaBuiltin.high >>> 0).toNumber(true) : message.segmentArenaBuiltin;
+                    return object;
+                };
+
+                /**
+                 * Converts this ComputationResources to JSON.
+                 * @function toJSON
+                 * @memberof apibara.starknet.v1alpha2.ComputationResources
+                 * @instance
+                 * @returns {Object.<string,*>} JSON object
+                 */
+                ComputationResources.prototype.toJSON = function toJSON() {
+                    return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+                };
+
+                /**
+                 * Gets the default type url for ComputationResources
+                 * @function getTypeUrl
+                 * @memberof apibara.starknet.v1alpha2.ComputationResources
+                 * @static
+                 * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+                 * @returns {string} The default type url
+                 */
+                ComputationResources.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
+                    if (typeUrlPrefix === undefined) {
+                        typeUrlPrefix = "type.googleapis.com";
+                    }
+                    return typeUrlPrefix + "/apibara.starknet.v1alpha2.ComputationResources";
+                };
+
+                return ComputationResources;
+            })();
+
+            v1alpha2.DataAvailabilityResources = (function() {
+
+                /**
+                 * Properties of a DataAvailabilityResources.
+                 * @memberof apibara.starknet.v1alpha2
+                 * @interface IDataAvailabilityResources
+                 * @property {number|Long|null} [l1Gas] DataAvailabilityResources l1Gas
+                 * @property {number|Long|null} [l1DataGas] DataAvailabilityResources l1DataGas
+                 */
+
+                /**
+                 * Constructs a new DataAvailabilityResources.
+                 * @memberof apibara.starknet.v1alpha2
+                 * @classdesc Represents a DataAvailabilityResources.
+                 * @implements IDataAvailabilityResources
+                 * @constructor
+                 * @param {apibara.starknet.v1alpha2.IDataAvailabilityResources=} [properties] Properties to set
+                 */
+                function DataAvailabilityResources(properties) {
+                    if (properties)
+                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                            if (properties[keys[i]] != null)
+                                this[keys[i]] = properties[keys[i]];
+                }
+
+                /**
+                 * DataAvailabilityResources l1Gas.
+                 * @member {number|Long} l1Gas
+                 * @memberof apibara.starknet.v1alpha2.DataAvailabilityResources
+                 * @instance
+                 */
+                DataAvailabilityResources.prototype.l1Gas = $util.Long ? $util.Long.fromBits(0,0,true) : 0;
+
+                /**
+                 * DataAvailabilityResources l1DataGas.
+                 * @member {number|Long} l1DataGas
+                 * @memberof apibara.starknet.v1alpha2.DataAvailabilityResources
+                 * @instance
+                 */
+                DataAvailabilityResources.prototype.l1DataGas = $util.Long ? $util.Long.fromBits(0,0,true) : 0;
+
+                /**
+                 * Creates a new DataAvailabilityResources instance using the specified properties.
+                 * @function create
+                 * @memberof apibara.starknet.v1alpha2.DataAvailabilityResources
+                 * @static
+                 * @param {apibara.starknet.v1alpha2.IDataAvailabilityResources=} [properties] Properties to set
+                 * @returns {apibara.starknet.v1alpha2.DataAvailabilityResources} DataAvailabilityResources instance
+                 */
+                DataAvailabilityResources.create = function create(properties) {
+                    return new DataAvailabilityResources(properties);
+                };
+
+                /**
+                 * Encodes the specified DataAvailabilityResources message. Does not implicitly {@link apibara.starknet.v1alpha2.DataAvailabilityResources.verify|verify} messages.
+                 * @function encode
+                 * @memberof apibara.starknet.v1alpha2.DataAvailabilityResources
+                 * @static
+                 * @param {apibara.starknet.v1alpha2.IDataAvailabilityResources} message DataAvailabilityResources message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                DataAvailabilityResources.encode = function encode(message, writer) {
+                    if (!writer)
+                        writer = $Writer.create();
+                    if (message.l1Gas != null && Object.hasOwnProperty.call(message, "l1Gas"))
+                        writer.uint32(/* id 1, wireType 0 =*/8).uint64(message.l1Gas);
+                    if (message.l1DataGas != null && Object.hasOwnProperty.call(message, "l1DataGas"))
+                        writer.uint32(/* id 2, wireType 0 =*/16).uint64(message.l1DataGas);
+                    return writer;
+                };
+
+                /**
+                 * Encodes the specified DataAvailabilityResources message, length delimited. Does not implicitly {@link apibara.starknet.v1alpha2.DataAvailabilityResources.verify|verify} messages.
+                 * @function encodeDelimited
+                 * @memberof apibara.starknet.v1alpha2.DataAvailabilityResources
+                 * @static
+                 * @param {apibara.starknet.v1alpha2.IDataAvailabilityResources} message DataAvailabilityResources message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                DataAvailabilityResources.encodeDelimited = function encodeDelimited(message, writer) {
+                    return this.encode(message, writer).ldelim();
+                };
+
+                /**
+                 * Decodes a DataAvailabilityResources message from the specified reader or buffer.
+                 * @function decode
+                 * @memberof apibara.starknet.v1alpha2.DataAvailabilityResources
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @param {number} [length] Message length if known beforehand
+                 * @returns {apibara.starknet.v1alpha2.DataAvailabilityResources} DataAvailabilityResources
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                DataAvailabilityResources.decode = function decode(reader, length) {
+                    if (!(reader instanceof $Reader))
+                        reader = $Reader.create(reader);
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.apibara.starknet.v1alpha2.DataAvailabilityResources();
+                    while (reader.pos < end) {
+                        var tag = reader.uint32();
+                        switch (tag >>> 3) {
+                        case 1: {
+                                message.l1Gas = reader.uint64();
+                                break;
+                            }
+                        case 2: {
+                                message.l1DataGas = reader.uint64();
+                                break;
+                            }
+                        default:
+                            reader.skipType(tag & 7);
+                            break;
+                        }
+                    }
+                    return message;
+                };
+
+                /**
+                 * Decodes a DataAvailabilityResources message from the specified reader or buffer, length delimited.
+                 * @function decodeDelimited
+                 * @memberof apibara.starknet.v1alpha2.DataAvailabilityResources
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @returns {apibara.starknet.v1alpha2.DataAvailabilityResources} DataAvailabilityResources
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                DataAvailabilityResources.decodeDelimited = function decodeDelimited(reader) {
+                    if (!(reader instanceof $Reader))
+                        reader = new $Reader(reader);
+                    return this.decode(reader, reader.uint32());
+                };
+
+                /**
+                 * Verifies a DataAvailabilityResources message.
+                 * @function verify
+                 * @memberof apibara.starknet.v1alpha2.DataAvailabilityResources
+                 * @static
+                 * @param {Object.<string,*>} message Plain object to verify
+                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
+                 */
+                DataAvailabilityResources.verify = function verify(message) {
+                    if (typeof message !== "object" || message === null)
+                        return "object expected";
+                    if (message.l1Gas != null && message.hasOwnProperty("l1Gas"))
+                        if (!$util.isInteger(message.l1Gas) && !(message.l1Gas && $util.isInteger(message.l1Gas.low) && $util.isInteger(message.l1Gas.high)))
+                            return "l1Gas: integer|Long expected";
+                    if (message.l1DataGas != null && message.hasOwnProperty("l1DataGas"))
+                        if (!$util.isInteger(message.l1DataGas) && !(message.l1DataGas && $util.isInteger(message.l1DataGas.low) && $util.isInteger(message.l1DataGas.high)))
+                            return "l1DataGas: integer|Long expected";
+                    return null;
+                };
+
+                /**
+                 * Creates a DataAvailabilityResources message from a plain object. Also converts values to their respective internal types.
+                 * @function fromObject
+                 * @memberof apibara.starknet.v1alpha2.DataAvailabilityResources
+                 * @static
+                 * @param {Object.<string,*>} object Plain object
+                 * @returns {apibara.starknet.v1alpha2.DataAvailabilityResources} DataAvailabilityResources
+                 */
+                DataAvailabilityResources.fromObject = function fromObject(object) {
+                    if (object instanceof $root.apibara.starknet.v1alpha2.DataAvailabilityResources)
+                        return object;
+                    var message = new $root.apibara.starknet.v1alpha2.DataAvailabilityResources();
+                    if (object.l1Gas != null)
+                        if ($util.Long)
+                            (message.l1Gas = $util.Long.fromValue(object.l1Gas)).unsigned = true;
+                        else if (typeof object.l1Gas === "string")
+                            message.l1Gas = parseInt(object.l1Gas, 10);
+                        else if (typeof object.l1Gas === "number")
+                            message.l1Gas = object.l1Gas;
+                        else if (typeof object.l1Gas === "object")
+                            message.l1Gas = new $util.LongBits(object.l1Gas.low >>> 0, object.l1Gas.high >>> 0).toNumber(true);
+                    if (object.l1DataGas != null)
+                        if ($util.Long)
+                            (message.l1DataGas = $util.Long.fromValue(object.l1DataGas)).unsigned = true;
+                        else if (typeof object.l1DataGas === "string")
+                            message.l1DataGas = parseInt(object.l1DataGas, 10);
+                        else if (typeof object.l1DataGas === "number")
+                            message.l1DataGas = object.l1DataGas;
+                        else if (typeof object.l1DataGas === "object")
+                            message.l1DataGas = new $util.LongBits(object.l1DataGas.low >>> 0, object.l1DataGas.high >>> 0).toNumber(true);
+                    return message;
+                };
+
+                /**
+                 * Creates a plain object from a DataAvailabilityResources message. Also converts values to other types if specified.
+                 * @function toObject
+                 * @memberof apibara.starknet.v1alpha2.DataAvailabilityResources
+                 * @static
+                 * @param {apibara.starknet.v1alpha2.DataAvailabilityResources} message DataAvailabilityResources
+                 * @param {$protobuf.IConversionOptions} [options] Conversion options
+                 * @returns {Object.<string,*>} Plain object
+                 */
+                DataAvailabilityResources.toObject = function toObject(message, options) {
+                    if (!options)
+                        options = {};
+                    var object = {};
+                    if (options.defaults) {
+                        if ($util.Long) {
+                            var long = new $util.Long(0, 0, true);
+                            object.l1Gas = options.longs === String ? long.toString() : options.longs === Number ? long.toNumber() : long;
+                        } else
+                            object.l1Gas = options.longs === String ? "0" : 0;
+                        if ($util.Long) {
+                            var long = new $util.Long(0, 0, true);
+                            object.l1DataGas = options.longs === String ? long.toString() : options.longs === Number ? long.toNumber() : long;
+                        } else
+                            object.l1DataGas = options.longs === String ? "0" : 0;
+                    }
+                    if (message.l1Gas != null && message.hasOwnProperty("l1Gas"))
+                        if (typeof message.l1Gas === "number")
+                            object.l1Gas = options.longs === String ? String(message.l1Gas) : message.l1Gas;
+                        else
+                            object.l1Gas = options.longs === String ? $util.Long.prototype.toString.call(message.l1Gas) : options.longs === Number ? new $util.LongBits(message.l1Gas.low >>> 0, message.l1Gas.high >>> 0).toNumber(true) : message.l1Gas;
+                    if (message.l1DataGas != null && message.hasOwnProperty("l1DataGas"))
+                        if (typeof message.l1DataGas === "number")
+                            object.l1DataGas = options.longs === String ? String(message.l1DataGas) : message.l1DataGas;
+                        else
+                            object.l1DataGas = options.longs === String ? $util.Long.prototype.toString.call(message.l1DataGas) : options.longs === Number ? new $util.LongBits(message.l1DataGas.low >>> 0, message.l1DataGas.high >>> 0).toNumber(true) : message.l1DataGas;
+                    return object;
+                };
+
+                /**
+                 * Converts this DataAvailabilityResources to JSON.
+                 * @function toJSON
+                 * @memberof apibara.starknet.v1alpha2.DataAvailabilityResources
+                 * @instance
+                 * @returns {Object.<string,*>} JSON object
+                 */
+                DataAvailabilityResources.prototype.toJSON = function toJSON() {
+                    return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+                };
+
+                /**
+                 * Gets the default type url for DataAvailabilityResources
+                 * @function getTypeUrl
+                 * @memberof apibara.starknet.v1alpha2.DataAvailabilityResources
+                 * @static
+                 * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+                 * @returns {string} The default type url
+                 */
+                DataAvailabilityResources.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
+                    if (typeUrlPrefix === undefined) {
+                        typeUrlPrefix = "type.googleapis.com";
+                    }
+                    return typeUrlPrefix + "/apibara.starknet.v1alpha2.DataAvailabilityResources";
+                };
+
+                return DataAvailabilityResources;
+            })();
+
             v1alpha2.ResourceBoundsMapping = (function() {
 
                 /**
@@ -14994,7 +16200,7 @@ $root.apibara = (function() {
                  * @memberof apibara.starknet.v1alpha2.ResourceBounds
                  * @instance
                  */
-                ResourceBounds.prototype.maxAmount = 0;
+                ResourceBounds.prototype.maxAmount = $util.Long ? $util.Long.fromBits(0,0,true) : 0;
 
                 /**
                  * The max price per unit of resource.
@@ -15163,7 +16369,11 @@ $root.apibara = (function() {
                         options = {};
                     var object = {};
                     if (options.defaults) {
-                        object.maxAmount = 0;
+                        if ($util.Long) {
+                            var long = new $util.Long(0, 0, true);
+                            object.maxAmount = options.longs === String ? long.toString() : options.longs === Number ? long.toNumber() : long;
+                        } else
+                            object.maxAmount = options.longs === String ? "0" : 0;
                         object.maxPricePerUnit = null;
                     }
                     if (message.maxAmount != null && message.hasOwnProperty("maxAmount"))
@@ -15236,7 +16446,7 @@ $root.apibara = (function() {
                  * @memberof apibara.starknet.v1alpha2.Uint128
                  * @instance
                  */
-                Uint128.prototype.low = 0;
+                Uint128.prototype.low = $util.Long ? $util.Long.fromBits(0,0,true) : 0;
 
                 /**
                  * Uint128 high.
@@ -15244,7 +16454,7 @@ $root.apibara = (function() {
                  * @memberof apibara.starknet.v1alpha2.Uint128
                  * @instance
                  */
-                Uint128.prototype.high = 0;
+                Uint128.prototype.high = $util.Long ? $util.Long.fromBits(0,0,true) : 0;
 
                 /**
                  * Creates a new Uint128 instance using the specified properties.
@@ -15407,8 +16617,16 @@ $root.apibara = (function() {
                         options = {};
                     var object = {};
                     if (options.defaults) {
-                        object.low = 0;
-                        object.high = 0;
+                        if ($util.Long) {
+                            var long = new $util.Long(0, 0, true);
+                            object.low = options.longs === String ? long.toString() : options.longs === Number ? long.toNumber() : long;
+                        } else
+                            object.low = options.longs === String ? "0" : 0;
+                        if ($util.Long) {
+                            var long = new $util.Long(0, 0, true);
+                            object.high = options.longs === String ? long.toString() : options.longs === Number ? long.toNumber() : long;
+                        } else
+                            object.high = options.longs === String ? "0" : 0;
                     }
                     if (message.low != null && message.hasOwnProperty("low"))
                         if (typeof message.low === "number")
@@ -15526,7 +16744,7 @@ $root.google = (function() {
              * @memberof google.protobuf.Timestamp
              * @instance
              */
-            Timestamp.prototype.seconds = 0;
+            Timestamp.prototype.seconds = $util.Long ? $util.Long.fromBits(0,0,false) : 0;
 
             /**
              * Timestamp nanos.
@@ -15690,7 +16908,11 @@ $root.google = (function() {
                     options = {};
                 var object = {};
                 if (options.defaults) {
-                    object.seconds = 0;
+                    if ($util.Long) {
+                        var long = new $util.Long(0, 0, false);
+                        object.seconds = options.longs === String ? long.toString() : options.longs === Number ? long.toNumber() : long;
+                    } else
+                        object.seconds = options.longs === String ? "0" : 0;
                     object.nanos = 0;
                 }
                 if (message.seconds != null && message.hasOwnProperty("seconds"))

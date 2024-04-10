@@ -2245,6 +2245,12 @@ export namespace apibara {
 
                 /** BlockHeader l1GasPrice */
                 l1GasPrice?: (apibara.starknet.v1alpha2.IResourcePrice|null);
+
+                /** BlockHeader l1DataGasPrice */
+                l1DataGasPrice?: (apibara.starknet.v1alpha2.IResourcePrice|null);
+
+                /** BlockHeader l1DataAvailabilityMode */
+                l1DataAvailabilityMode?: (apibara.starknet.v1alpha2.L1DataAvailabilityMode|null);
             }
 
             /** Represents a BlockHeader. */
@@ -2279,6 +2285,12 @@ export namespace apibara {
 
                 /** BlockHeader l1GasPrice. */
                 public l1GasPrice?: (apibara.starknet.v1alpha2.IResourcePrice|null);
+
+                /** BlockHeader l1DataGasPrice. */
+                public l1DataGasPrice?: (apibara.starknet.v1alpha2.IResourcePrice|null);
+
+                /** BlockHeader l1DataAvailabilityMode. */
+                public l1DataAvailabilityMode: apibara.starknet.v1alpha2.L1DataAvailabilityMode;
 
                 /**
                  * Creates a new BlockHeader instance using the specified properties.
@@ -2356,6 +2368,13 @@ export namespace apibara {
                  * @returns The default type url
                  */
                 public static getTypeUrl(typeUrlPrefix?: string): string;
+            }
+
+            /** L1DataAvailabilityMode enum. */
+            enum L1DataAvailabilityMode {
+                L1_DATA_AVAILABILITY_MODE_UNSPECIFIED = 0,
+                L1_DATA_AVAILABILITY_MODE_BLOB = 1,
+                L1_DATA_AVAILABILITY_MODE_CALLDATA = 2
             }
 
             /** BlockStatus enum. */
@@ -3798,6 +3817,9 @@ export namespace apibara {
 
                 /** TransactionReceipt actualFeePaid */
                 actualFeePaid?: (apibara.starknet.v1alpha2.IFeePayment|null);
+
+                /** TransactionReceipt executionResources */
+                executionResources?: (apibara.starknet.v1alpha2.IExecutionResources|null);
             }
 
             /** Represents a TransactionReceipt. */
@@ -3835,6 +3857,9 @@ export namespace apibara {
 
                 /** TransactionReceipt actualFeePaid. */
                 public actualFeePaid?: (apibara.starknet.v1alpha2.IFeePayment|null);
+
+                /** TransactionReceipt executionResources. */
+                public executionResources?: (apibara.starknet.v1alpha2.IExecutionResources|null);
 
                 /**
                  * Creates a new TransactionReceipt instance using the specified properties.
@@ -5524,6 +5549,363 @@ export namespace apibara {
                 PRICE_UNIT_UNSPECIFIED = 0,
                 PRICE_UNIT_WEI = 1,
                 PRICE_UNIT_FRI = 2
+            }
+
+            /** Properties of an ExecutionResources. */
+            interface IExecutionResources {
+
+                /** ExecutionResources computation */
+                computation?: (apibara.starknet.v1alpha2.IComputationResources|null);
+
+                /** ExecutionResources dataAvailability */
+                dataAvailability?: (apibara.starknet.v1alpha2.IDataAvailabilityResources|null);
+            }
+
+            /** Represents an ExecutionResources. */
+            class ExecutionResources implements IExecutionResources {
+
+                /**
+                 * Constructs a new ExecutionResources.
+                 * @param [properties] Properties to set
+                 */
+                constructor(properties?: apibara.starknet.v1alpha2.IExecutionResources);
+
+                /** ExecutionResources computation. */
+                public computation?: (apibara.starknet.v1alpha2.IComputationResources|null);
+
+                /** ExecutionResources dataAvailability. */
+                public dataAvailability?: (apibara.starknet.v1alpha2.IDataAvailabilityResources|null);
+
+                /**
+                 * Creates a new ExecutionResources instance using the specified properties.
+                 * @param [properties] Properties to set
+                 * @returns ExecutionResources instance
+                 */
+                public static create(properties?: apibara.starknet.v1alpha2.IExecutionResources): apibara.starknet.v1alpha2.ExecutionResources;
+
+                /**
+                 * Encodes the specified ExecutionResources message. Does not implicitly {@link apibara.starknet.v1alpha2.ExecutionResources.verify|verify} messages.
+                 * @param message ExecutionResources message or plain object to encode
+                 * @param [writer] Writer to encode to
+                 * @returns Writer
+                 */
+                public static encode(message: apibara.starknet.v1alpha2.IExecutionResources, writer?: $protobuf.Writer): $protobuf.Writer;
+
+                /**
+                 * Encodes the specified ExecutionResources message, length delimited. Does not implicitly {@link apibara.starknet.v1alpha2.ExecutionResources.verify|verify} messages.
+                 * @param message ExecutionResources message or plain object to encode
+                 * @param [writer] Writer to encode to
+                 * @returns Writer
+                 */
+                public static encodeDelimited(message: apibara.starknet.v1alpha2.IExecutionResources, writer?: $protobuf.Writer): $protobuf.Writer;
+
+                /**
+                 * Decodes an ExecutionResources message from the specified reader or buffer.
+                 * @param reader Reader or buffer to decode from
+                 * @param [length] Message length if known beforehand
+                 * @returns ExecutionResources
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): apibara.starknet.v1alpha2.ExecutionResources;
+
+                /**
+                 * Decodes an ExecutionResources message from the specified reader or buffer, length delimited.
+                 * @param reader Reader or buffer to decode from
+                 * @returns ExecutionResources
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): apibara.starknet.v1alpha2.ExecutionResources;
+
+                /**
+                 * Verifies an ExecutionResources message.
+                 * @param message Plain object to verify
+                 * @returns `null` if valid, otherwise the reason why it is not
+                 */
+                public static verify(message: { [k: string]: any }): (string|null);
+
+                /**
+                 * Creates an ExecutionResources message from a plain object. Also converts values to their respective internal types.
+                 * @param object Plain object
+                 * @returns ExecutionResources
+                 */
+                public static fromObject(object: { [k: string]: any }): apibara.starknet.v1alpha2.ExecutionResources;
+
+                /**
+                 * Creates a plain object from an ExecutionResources message. Also converts values to other types if specified.
+                 * @param message ExecutionResources
+                 * @param [options] Conversion options
+                 * @returns Plain object
+                 */
+                public static toObject(message: apibara.starknet.v1alpha2.ExecutionResources, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+                /**
+                 * Converts this ExecutionResources to JSON.
+                 * @returns JSON object
+                 */
+                public toJSON(): { [k: string]: any };
+
+                /**
+                 * Gets the default type url for ExecutionResources
+                 * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+                 * @returns The default type url
+                 */
+                public static getTypeUrl(typeUrlPrefix?: string): string;
+            }
+
+            /** Properties of a ComputationResources. */
+            interface IComputationResources {
+
+                /** ComputationResources steps */
+                steps?: (number|Long|null);
+
+                /** ComputationResources memoryHoles */
+                memoryHoles?: (number|Long|null);
+
+                /** ComputationResources rangeCheckBuiltinApplications */
+                rangeCheckBuiltinApplications?: (number|Long|null);
+
+                /** ComputationResources pedersenBuiltinApplications */
+                pedersenBuiltinApplications?: (number|Long|null);
+
+                /** ComputationResources poseidonBuiltinApplications */
+                poseidonBuiltinApplications?: (number|Long|null);
+
+                /** ComputationResources ecOpBuiltinApplications */
+                ecOpBuiltinApplications?: (number|Long|null);
+
+                /** ComputationResources ecdsaBuiltinApplications */
+                ecdsaBuiltinApplications?: (number|Long|null);
+
+                /** ComputationResources bitwiseBuiltinApplications */
+                bitwiseBuiltinApplications?: (number|Long|null);
+
+                /** ComputationResources keccakBuiltinApplications */
+                keccakBuiltinApplications?: (number|Long|null);
+
+                /** ComputationResources segmentArenaBuiltin */
+                segmentArenaBuiltin?: (number|Long|null);
+            }
+
+            /** Represents a ComputationResources. */
+            class ComputationResources implements IComputationResources {
+
+                /**
+                 * Constructs a new ComputationResources.
+                 * @param [properties] Properties to set
+                 */
+                constructor(properties?: apibara.starknet.v1alpha2.IComputationResources);
+
+                /** ComputationResources steps. */
+                public steps: (number|Long);
+
+                /** ComputationResources memoryHoles. */
+                public memoryHoles: (number|Long);
+
+                /** ComputationResources rangeCheckBuiltinApplications. */
+                public rangeCheckBuiltinApplications: (number|Long);
+
+                /** ComputationResources pedersenBuiltinApplications. */
+                public pedersenBuiltinApplications: (number|Long);
+
+                /** ComputationResources poseidonBuiltinApplications. */
+                public poseidonBuiltinApplications: (number|Long);
+
+                /** ComputationResources ecOpBuiltinApplications. */
+                public ecOpBuiltinApplications: (number|Long);
+
+                /** ComputationResources ecdsaBuiltinApplications. */
+                public ecdsaBuiltinApplications: (number|Long);
+
+                /** ComputationResources bitwiseBuiltinApplications. */
+                public bitwiseBuiltinApplications: (number|Long);
+
+                /** ComputationResources keccakBuiltinApplications. */
+                public keccakBuiltinApplications: (number|Long);
+
+                /** ComputationResources segmentArenaBuiltin. */
+                public segmentArenaBuiltin: (number|Long);
+
+                /**
+                 * Creates a new ComputationResources instance using the specified properties.
+                 * @param [properties] Properties to set
+                 * @returns ComputationResources instance
+                 */
+                public static create(properties?: apibara.starknet.v1alpha2.IComputationResources): apibara.starknet.v1alpha2.ComputationResources;
+
+                /**
+                 * Encodes the specified ComputationResources message. Does not implicitly {@link apibara.starknet.v1alpha2.ComputationResources.verify|verify} messages.
+                 * @param message ComputationResources message or plain object to encode
+                 * @param [writer] Writer to encode to
+                 * @returns Writer
+                 */
+                public static encode(message: apibara.starknet.v1alpha2.IComputationResources, writer?: $protobuf.Writer): $protobuf.Writer;
+
+                /**
+                 * Encodes the specified ComputationResources message, length delimited. Does not implicitly {@link apibara.starknet.v1alpha2.ComputationResources.verify|verify} messages.
+                 * @param message ComputationResources message or plain object to encode
+                 * @param [writer] Writer to encode to
+                 * @returns Writer
+                 */
+                public static encodeDelimited(message: apibara.starknet.v1alpha2.IComputationResources, writer?: $protobuf.Writer): $protobuf.Writer;
+
+                /**
+                 * Decodes a ComputationResources message from the specified reader or buffer.
+                 * @param reader Reader or buffer to decode from
+                 * @param [length] Message length if known beforehand
+                 * @returns ComputationResources
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): apibara.starknet.v1alpha2.ComputationResources;
+
+                /**
+                 * Decodes a ComputationResources message from the specified reader or buffer, length delimited.
+                 * @param reader Reader or buffer to decode from
+                 * @returns ComputationResources
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): apibara.starknet.v1alpha2.ComputationResources;
+
+                /**
+                 * Verifies a ComputationResources message.
+                 * @param message Plain object to verify
+                 * @returns `null` if valid, otherwise the reason why it is not
+                 */
+                public static verify(message: { [k: string]: any }): (string|null);
+
+                /**
+                 * Creates a ComputationResources message from a plain object. Also converts values to their respective internal types.
+                 * @param object Plain object
+                 * @returns ComputationResources
+                 */
+                public static fromObject(object: { [k: string]: any }): apibara.starknet.v1alpha2.ComputationResources;
+
+                /**
+                 * Creates a plain object from a ComputationResources message. Also converts values to other types if specified.
+                 * @param message ComputationResources
+                 * @param [options] Conversion options
+                 * @returns Plain object
+                 */
+                public static toObject(message: apibara.starknet.v1alpha2.ComputationResources, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+                /**
+                 * Converts this ComputationResources to JSON.
+                 * @returns JSON object
+                 */
+                public toJSON(): { [k: string]: any };
+
+                /**
+                 * Gets the default type url for ComputationResources
+                 * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+                 * @returns The default type url
+                 */
+                public static getTypeUrl(typeUrlPrefix?: string): string;
+            }
+
+            /** Properties of a DataAvailabilityResources. */
+            interface IDataAvailabilityResources {
+
+                /** DataAvailabilityResources l1Gas */
+                l1Gas?: (number|Long|null);
+
+                /** DataAvailabilityResources l1DataGas */
+                l1DataGas?: (number|Long|null);
+            }
+
+            /** Represents a DataAvailabilityResources. */
+            class DataAvailabilityResources implements IDataAvailabilityResources {
+
+                /**
+                 * Constructs a new DataAvailabilityResources.
+                 * @param [properties] Properties to set
+                 */
+                constructor(properties?: apibara.starknet.v1alpha2.IDataAvailabilityResources);
+
+                /** DataAvailabilityResources l1Gas. */
+                public l1Gas: (number|Long);
+
+                /** DataAvailabilityResources l1DataGas. */
+                public l1DataGas: (number|Long);
+
+                /**
+                 * Creates a new DataAvailabilityResources instance using the specified properties.
+                 * @param [properties] Properties to set
+                 * @returns DataAvailabilityResources instance
+                 */
+                public static create(properties?: apibara.starknet.v1alpha2.IDataAvailabilityResources): apibara.starknet.v1alpha2.DataAvailabilityResources;
+
+                /**
+                 * Encodes the specified DataAvailabilityResources message. Does not implicitly {@link apibara.starknet.v1alpha2.DataAvailabilityResources.verify|verify} messages.
+                 * @param message DataAvailabilityResources message or plain object to encode
+                 * @param [writer] Writer to encode to
+                 * @returns Writer
+                 */
+                public static encode(message: apibara.starknet.v1alpha2.IDataAvailabilityResources, writer?: $protobuf.Writer): $protobuf.Writer;
+
+                /**
+                 * Encodes the specified DataAvailabilityResources message, length delimited. Does not implicitly {@link apibara.starknet.v1alpha2.DataAvailabilityResources.verify|verify} messages.
+                 * @param message DataAvailabilityResources message or plain object to encode
+                 * @param [writer] Writer to encode to
+                 * @returns Writer
+                 */
+                public static encodeDelimited(message: apibara.starknet.v1alpha2.IDataAvailabilityResources, writer?: $protobuf.Writer): $protobuf.Writer;
+
+                /**
+                 * Decodes a DataAvailabilityResources message from the specified reader or buffer.
+                 * @param reader Reader or buffer to decode from
+                 * @param [length] Message length if known beforehand
+                 * @returns DataAvailabilityResources
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): apibara.starknet.v1alpha2.DataAvailabilityResources;
+
+                /**
+                 * Decodes a DataAvailabilityResources message from the specified reader or buffer, length delimited.
+                 * @param reader Reader or buffer to decode from
+                 * @returns DataAvailabilityResources
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): apibara.starknet.v1alpha2.DataAvailabilityResources;
+
+                /**
+                 * Verifies a DataAvailabilityResources message.
+                 * @param message Plain object to verify
+                 * @returns `null` if valid, otherwise the reason why it is not
+                 */
+                public static verify(message: { [k: string]: any }): (string|null);
+
+                /**
+                 * Creates a DataAvailabilityResources message from a plain object. Also converts values to their respective internal types.
+                 * @param object Plain object
+                 * @returns DataAvailabilityResources
+                 */
+                public static fromObject(object: { [k: string]: any }): apibara.starknet.v1alpha2.DataAvailabilityResources;
+
+                /**
+                 * Creates a plain object from a DataAvailabilityResources message. Also converts values to other types if specified.
+                 * @param message DataAvailabilityResources
+                 * @param [options] Conversion options
+                 * @returns Plain object
+                 */
+                public static toObject(message: apibara.starknet.v1alpha2.DataAvailabilityResources, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+                /**
+                 * Converts this DataAvailabilityResources to JSON.
+                 * @returns JSON object
+                 */
+                public toJSON(): { [k: string]: any };
+
+                /**
+                 * Gets the default type url for DataAvailabilityResources
+                 * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+                 * @returns The default type url
+                 */
+                public static getTypeUrl(typeUrlPrefix?: string): string;
             }
 
             /** Properties of a ResourceBoundsMapping. */
