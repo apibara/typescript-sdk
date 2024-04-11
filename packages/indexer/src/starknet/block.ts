@@ -26,6 +26,8 @@ export type BlockHeader = Partial<{
   newRoot: FieldElement;
   /** Block production timestamp. */
   timestamp: string;
+  /** Starknet version. */
+  starknetVersion: string;
   /** Price of L1 gas in the block. */
   l1GasPrice?: ResourcePrice;
   /** Price of L1 data gas in the block. */
@@ -311,14 +313,14 @@ export type ExecutionResources = Partial<{
   dataAvailability: DataAvailabilityResources;
 }>;
 
-export type ComputationResources = Partial<{
+export type DataAvailabilityResources = Partial<{
   /** The gas consumed by this transaction's data, 0 if it uses data gas for DA. */
   l1Gas: number;
   /** The data gas consumed by this transaction's data, 0 if it uses gas for DA. */
   l1DataGas: number;
 }>;
 
-export type DataAvailabilityResources = Partial<{
+export type ComputationResources = Partial<{
   /** The number of Cairo steps used. */
   steps: number;
   /** The number of unused memory cells. */
