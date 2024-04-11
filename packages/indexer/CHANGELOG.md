@@ -1,5 +1,11 @@
 # @apibara/indexer
 
+## 0.4.1
+
+### Patch Changes
+
+- [#73](https://github.com/apibara/typescript-sdk/pull/73) [`4520e1e4b5d16ea63877f2adea9f2fa7c2ec74e6`](https://github.com/apibara/typescript-sdk/commit/4520e1e4b5d16ea63877f2adea9f2fa7c2ec74e6) Thanks [@fracek](https://github.com/fracek)! - Fix execution resources types
+
 ## 0.4.0
 
 ### Minor Changes
