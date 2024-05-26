@@ -8,4 +8,5 @@ plugins:
   - useExactTypes=false
   - forceLong=bigint
   - esModuleInterop=true
+  - removeEnumPrefix=true
   - oneof=unions

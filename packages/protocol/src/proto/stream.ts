@@ -15,13 +15,13 @@ export const protobufPackage = "dna.v2.stream";
 
 /** Data finality. */
 export enum DataFinality {
-  DATA_FINALITY_UNKNOWN = 0,
-  /** DATA_FINALITY_PENDING - Data was received, but is not part of the canonical chain yet. */
-  DATA_FINALITY_PENDING = 1,
-  /** DATA_FINALITY_ACCEPTED - Data is now part of the canonical chain, but could still be invalidated. */
-  DATA_FINALITY_ACCEPTED = 2,
-  /** DATA_FINALITY_FINALIZED - Data is finalized and cannot be invalidated. */
-  DATA_FINALITY_FINALIZED = 3,
+  UNKNOWN = 0,
+  /** PENDING - Data was received, but is not part of the canonical chain yet. */
+  PENDING = 1,
+  /** ACCEPTED - Data is now part of the canonical chain, but could still be invalidated. */
+  ACCEPTED = 2,
+  /** FINALIZED - Data is finalized and cannot be invalidated. */
+  FINALIZED = 3,
   UNRECOGNIZED = -1,
 }
 
@@ -29,16 +29,16 @@ export function dataFinalityFromJSON(object: any): DataFinality {
   switch (object) {
     case 0:
     case "DATA_FINALITY_UNKNOWN":
-      return DataFinality.DATA_FINALITY_UNKNOWN;
+      return DataFinality.UNKNOWN;
     case 1:
     case "DATA_FINALITY_PENDING":
-      return DataFinality.DATA_FINALITY_PENDING;
+      return DataFinality.PENDING;
     case 2:
     case "DATA_FINALITY_ACCEPTED":
-      return DataFinality.DATA_FINALITY_ACCEPTED;
+      return DataFinality.ACCEPTED;
     case 3:
     case "DATA_FINALITY_FINALIZED":
-      return DataFinality.DATA_FINALITY_FINALIZED;
+      return DataFinality.FINALIZED;
     case -1:
     case "UNRECOGNIZED":
     default:
@@ -48,13 +48,13 @@ export function dataFinalityFromJSON(object: any): DataFinality {
 
 export function dataFinalityToJSON(object: DataFinality): string {
   switch (object) {
-    case DataFinality.DATA_FINALITY_UNKNOWN:
+    case DataFinality.UNKNOWN:
       return "DATA_FINALITY_UNKNOWN";
-    case DataFinality.DATA_FINALITY_PENDING:
+    case DataFinality.PENDING:
       return "DATA_FINALITY_PENDING";
-    case DataFinality.DATA_FINALITY_ACCEPTED:
+    case DataFinality.ACCEPTED:
       return "DATA_FINALITY_ACCEPTED";
-    case DataFinality.DATA_FINALITY_FINALIZED:
+    case DataFinality.FINALIZED:
       return "DATA_FINALITY_FINALIZED";
     case DataFinality.UNRECOGNIZED:
     default:
