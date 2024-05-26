@@ -1,5 +1,5 @@
 {
-  "name": "@apibara/protocol",
+  "name": "@apibara/evm",
   "version": "2.0.0",
   "type": "module",
   "source": "src/index.ts",
@@ -29,7 +29,6 @@
   },
   "dependencies": {
     "long": "^5.2.1",
-    "nice-grpc": "^2.1.8",
     "nice-grpc-common": "^2.0.2",
     "protobufjs": "^7.1.2"
   }
