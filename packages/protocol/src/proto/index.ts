@@ -1,1 +1,2 @@
-export * as v1alpha2 from "./v1alpha2";
+export * as common from "./common";
+export * as stream from "./stream";

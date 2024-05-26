@@ -1,29 +1,35 @@
 {
   "name": "@apibara/protocol",
-  "version": "0.4.9",
+  "version": "2.0.0",
+  "type": "module",
   "source": "src/index.ts",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
   "files": ["dist", "src", "README.md"],
+  "main": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "default": "./dist/index.mjs"
+    }
+  },
   "scripts": {
-    "prebuild": "pnpm run protobuf && pnpm run gen-types",
-    "build": "tsc",
-    "test": "jest src/",
+    "build": "pnpm build:proto && unbuild",
+    "build:proto": "buf generate proto",
     "lint": "biome check .",
     "lint:fix": "pnpm lint --apply",
-    "format": "biome format . --write",
-    "protobuf": "mkdir -p dist/proto && cp src/proto/*.proto dist/proto",
-    "gen-types": "proto-loader-gen-types --bytes=Array --longs=Long --enums=String --defaults --oneofs --grpcLib=@grpc/grpc-js --outDir=src/proto src/proto/*.proto"
-  },
-  "dependencies": {
-    "@grpc/grpc-js": "^1.7.3",
-    "@grpc/proto-loader": "^0.7.3",
-    "google-protobuf": "^3.21.2",
-    "long": "^5.2.1",
-    "protobufjs": "^7.1.2"
+    "format": "biome format . --write"
   },
   "devDependencies": {
+    "@bufbuild/buf": "^1.32.1",
     "@types/long": "^5.0.0",
-    "@types/node": "^18.11.9"
+    "@types/node": "^20.12.12",
+    "typescript": "^5.4.5",
+    "unbuild": "^2.0.0"
+  },
+  "dependencies": {
+    "long": "^5.2.1",
+    "nice-grpc-common": "^2.0.2",
+    "protobufjs": "^7.1.2"
   }
 }
