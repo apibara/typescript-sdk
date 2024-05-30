@@ -1,46 +1,17 @@
+import type { Encodable } from "@apibara/protocol";
 import { Address, B256 } from "./common";
 import * as proto from "./proto";
 
-export type Filter = {
-  header?: HeaderFilter;
-  logs?: LogFilter[];
+export type FilterConfig = {
+  header?: HeaderFilterConfig;
+  logs?: LogFilterConfig[];
 };
 
-export const Filter = {
-  encode(filter: Filter): Uint8Array {
-    const message = Filter.fromJSON(filter);
-    return proto.filter.Filter.encode(message).finish();
-  },
-
-  fromJSON(message: Filter): proto.filter.Filter {
-    const header = message.header
-      ? HeaderFilter.fromJSON(message.header)
-      : undefined;
-
-    const logs = (message.logs ?? []).map(LogFilter.fromJSON);
-
-    return {
-      header,
-      logs,
-      withdrawals: [],
-      transactions: [],
-    };
-  },
-};
-
-export type HeaderFilter = {
+export type HeaderFilterConfig = {
   always?: boolean;
 };
 
-export const HeaderFilter = {
-  fromJSON(message: HeaderFilter): proto.filter.HeaderFilter {
-    return {
-      always: message.always,
-    };
-  },
-};
-
-export type LogFilter = {
+export type LogFilterConfig = {
   address?: Address;
   topics?: (B256 | null)[];
 
@@ -49,24 +20,64 @@ export type LogFilter = {
   includeReceipt?: boolean;
 };
 
-export const LogFilter = {
-  fromJSON(message: LogFilter): proto.filter.LogFilter {
-    const address = message.address
-      ? Address.fromJSON(message.address)
+export function filter(config: FilterConfig) {
+  return new Filter(config);
+}
+
+export class Filter implements Encodable {
+  constructor(private _: FilterConfig = {}) {}
+
+  toProto(): proto.filter.Filter {
+    const header = this._.header
+      ? new HeaderFilter(this._.header).toProto()
       : undefined;
 
-    const topics = (message.topics ?? []).map((topic) => {
+    const logs = (this._.logs ?? []).map((log) => new LogFilter(log).toProto());
+
+    return {
+      header,
+      logs,
+      withdrawals: [],
+      transactions: [],
+    };
+  }
+
+  encode(): Uint8Array {
+    const message = this.toProto();
+    return proto.filter.Filter.encode(message).finish();
+  }
+}
+
+export class HeaderFilter {
+  constructor(private _: HeaderFilterConfig = {}) {}
+
+  toProto(): proto.filter.HeaderFilter {
+    return {
+      always: this._.always,
+    };
+  }
+}
+
+export class LogFilter {
+  constructor(private _: LogFilterConfig) {}
+
+  toProto(): proto.filter.LogFilter {
+    const address = this._.address
+      ? Address.toProto(this._.address)
+      : undefined;
+
+    const topics = (this._.topics ?? []).map((topic) => {
       if (topic === null) return { value: undefined };
-      const value = B256.fromJSON(topic);
+      const value = B256.toProto(topic);
       return { value };
     });
 
     return {
       address,
       topics,
-      strict: message.strict,
-      includeTransaction: message.includeTransaction,
-      includeReceipt: message.includeReceipt,
+      strict: this._.strict,
+      includeTransaction: this._.includeTransaction,
+      includeReceipt: this._.includeReceipt,
     };
-  },
-};
+  }
+}

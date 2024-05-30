@@ -1,9 +1,9 @@
 import { runMain, defineCommand } from "citty";
 import consola from "consola";
 import { encodeEventTopics, parseAbi } from "viem";
-import { Filter, proto } from "@apibara/evm";
+import { Filter, BlockDecoder } from "@apibara/evm";
 import {
-  DnaStreamClient,
+  type DnaStreamClient,
   DnaStreamDefinition,
   Cursor,
   StreamDataRequest,
@@ -38,10 +38,10 @@ const command = defineCommand({
     const client: DnaStreamClient = createClient(DnaStreamDefinition, channel);
 
     const response = await client.status({});
-    const head = Cursor.toJSON(response.currentHead!);
+    const head = Cursor.fromProto(response.currentHead!);
     consola.info(`EVM stream head=${head.orderKey} hash=${head.uniqueKey}`);
 
-    const filter: Filter = {
+    const filter = new Filter({
       logs: [
         {
           strict: true,
@@ -52,25 +52,28 @@ const command = defineCommand({
           }),
         },
       ],
-    };
+    });
 
-    const request: StreamDataRequest = {
-      startingCursor: {
-        orderKey: 5_000_000n,
-      },
-      finality: DataFinality.ACCEPTED,
-      filter: [Filter.encode(filter)],
-    };
+    const request = new StreamDataRequest(
+      new Cursor(5_000_000n),
+      DataFinality.ACCEPTED,
+      [filter],
+    );
 
-    const stream = client.streamData(StreamDataRequest.fromJSON(request));
+    const stream = client.streamData(request.toProto());
     for await (const message of stream) {
       switch (message?.message?.$case) {
         case "data": {
           const endCursor = message.message.data.endCursor;
+          // consola.log("Received data", endCursor?.orderKey);
           const blockData = message.message.data.data[0];
-          const block = proto.data.Block.decode(blockData);
-          // console.log("Received data", block.header?.number, block.transactions?.length ?? 0);
-          console.log(block.header?.number!);
+          const block = BlockDecoder.decode(blockData);
+          const { header, logs } = block;
+          consola.info(header);
+          for (const log of logs ?? []) {
+            consola.log(log);
+          }
+          // console.log(block.header?.number!);
           break;
         }
         default: {

@@ -1,55 +1,48 @@
 import { hexToBytes, toHex } from "viem";
+import { Schema } from "@effect/schema";
+import type { ParseOptions } from "@effect/schema/AST";
 
 import * as proto from "./proto";
 
-export type Bytes = `0x${string}`;
+export const Bytes = Schema.TemplateLiteral(
+  Schema.Literal("0x"),
+  Schema.String,
+);
 
-export type Cursor = {
-  orderKey: bigint;
-  uniqueKey?: Bytes;
-};
-
-export const Cursor = {
-  toJSON(message: proto.common.Cursor): Cursor {
-    const uniqueKey =
-      message.uniqueKey.length > 0 ? toHex(message.uniqueKey) : undefined;
-    return {
-      orderKey: message.orderKey ?? 0n,
-      uniqueKey,
-    };
+const BytesFromUint8Array = Schema.transform(Schema.Uint8ArrayFromSelf, Bytes, {
+  encode(value) {
+    return hexToBytes(value);
   },
-
-  fromJSON(cursor: Cursor): proto.common.Cursor {
-    const uniqueKey = cursor.uniqueKey
-      ? hexToBytes(cursor.uniqueKey)
-      : new Uint8Array(0);
-
-    return {
-      orderKey: cursor.orderKey,
-      uniqueKey,
-    };
+  decode(value) {
+    return toHex(value);
   },
-};
+});
 
-export type StatusRequest = {};
+export interface ProtoMessage<TProto> {
+  toProto(options?: ParseOptions): TProto;
+}
 
-export type StatusResponse = {
-  currentHead?: Cursor;
-  lastIngested?: Cursor;
-};
+export class Cursor
+  extends Schema.Class<Cursor>("Cursor")({
+    orderKey: Schema.BigIntFromSelf,
+    uniqueKey: Schema.optional(BytesFromUint8Array),
+  })
+  implements ProtoMessage<proto.common.Cursor>
+{
+  toProto(options?: ParseOptions) {
+    return Schema.encodeSync(Cursor)(
+      this,
+      options,
+    ) as unknown as proto.common.Cursor;
+  }
 
-export const StatusResponse = {
-  toJSON(message: proto.common.StatusResponse): StatusResponse {
-    const currentHead = message.currentHead
-      ? Cursor.toJSON(message.currentHead)
-      : undefined;
-    const lastIngested = message.lastIngested
-      ? Cursor.toJSON(message.lastIngested)
-      : undefined;
+  toBytes() {
+    return proto.common.Cursor.encode(this.toProto()).finish();
+  }
 
-    return {
-      currentHead,
-      lastIngested,
-    };
-  },
-};
+  static fromProto = Schema.decodeSync(Cursor);
+
+  static fromBytes(bytes: Uint8Array) {
+    return Cursor.fromProto(proto.common.Cursor.decode(bytes));
+  }
+}

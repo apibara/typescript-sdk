@@ -16,6 +16,7 @@
   "scripts": {
     "build": "pnpm build:proto && unbuild",
     "build:proto": "buf generate proto",
+    "test": "vitest",
     "lint": "biome check .",
     "lint:fix": "pnpm lint --apply",
     "format": "biome format . --write"
@@ -25,9 +26,11 @@
     "@types/long": "^5.0.0",
     "@types/node": "^20.12.12",
     "typescript": "^5.4.5",
-    "unbuild": "^2.0.0"
+    "unbuild": "^2.0.0",
+    "vitest": "^1.6.0"
   },
   "dependencies": {
+    "@effect/schema": "^0.67.14",
     "long": "^5.2.1",
     "nice-grpc": "^2.1.8",
     "nice-grpc-common": "^2.0.2",

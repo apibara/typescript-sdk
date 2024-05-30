@@ -5,6 +5,7 @@
     "declarationDir": "dist",
     "noEmit": false,
     "rootDir": "src",
+    "exactOptionalPropertyTypes": true,
     "types": ["node"]
   },
   "include": ["src/"]
