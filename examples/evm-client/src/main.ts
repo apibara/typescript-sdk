@@ -1,13 +1,15 @@
 import { runMain, defineCommand } from "citty";
 import consola from "consola";
 import { encodeEventTopics, parseAbi } from "viem";
-import { Filter, BlockDecoder } from "@apibara/evm";
+// import { Filter, BlockDecoder } from "@apibara/evm";
 import {
   type DnaStreamClient,
   DnaStreamDefinition,
   Cursor,
-  StreamDataRequest,
-  DataFinality,
+  StatusRequest,
+  StatusResponse,
+  // StreamDataRequest,
+  // DataFinality,
 } from "@apibara/protocol";
 import { createChannel, createClient } from "nice-grpc";
 
@@ -37,7 +39,10 @@ const command = defineCommand({
     const channel = createChannel(args.stream);
     const client: DnaStreamClient = createClient(DnaStreamDefinition, channel);
 
-    const response = await client.status({});
+    const responseProto = await client.status(new StatusRequest().toProto());
+    const response = StatusResponse.fromProto(responseProto);
+    console.log(response);
+    /*
     const head = Cursor.fromProto(response.currentHead!);
     consola.info(`EVM stream head=${head.orderKey} hash=${head.uniqueKey}`);
 
@@ -81,6 +86,7 @@ const command = defineCommand({
         }
       }
     }
+    */
   },
 });
 
