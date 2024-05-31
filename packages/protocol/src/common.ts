@@ -1,20 +1,33 @@
 import { hexToBytes, toHex } from "viem";
+import { Option } from "effect";
 import { Schema } from "@effect/schema";
 import type { ParseOptions } from "@effect/schema/AST";
+
+import * as proto from "./proto";
 
 export const Bytes = Schema.TemplateLiteral(
   Schema.Literal("0x"),
   Schema.String,
 );
 
-const BytesFromUint8Array = Schema.transform(Schema.Uint8ArrayFromSelf, Bytes, {
-  encode(value) {
-    return hexToBytes(value);
+const BytesFromUint8Array = Schema.requiredToOptional(
+  Schema.Uint8ArrayFromSelf,
+  Bytes,
+  {
+    encode(value) {
+      return value.pipe(
+        Option.map(hexToBytes),
+        Option.getOrElse(() => new Uint8Array(0)),
+      );
+    },
+    decode(value) {
+      if (value.length === 0) {
+        return Option.none();
+      }
+      return Option.some(toHex(value));
+    },
   },
-  decode(value) {
-    return toHex(value);
-  },
-});
+);
 
 export interface ProtoMessage<TProto> {
   toProto(options?: ParseOptions): TProto;
@@ -22,19 +35,19 @@ export interface ProtoMessage<TProto> {
 
 export class Cursor extends Schema.Class<Cursor>("Cursor")({
   orderKey: Schema.BigIntFromSelf,
-  uniqueKey: Schema.optional(BytesFromUint8Array),
+  uniqueKey: BytesFromUint8Array,
 }) {
   toProto(options?: ParseOptions) {
     return Schema.encodeSync(Cursor)(this, options);
   }
 
-  // toBytes() {
-  //   return proto.common.Cursor.encode(this.toProto()).finish();
-  // }
+  toBytes() {
+    return proto.common.Cursor.encode(this.toProto()).finish();
+  }
 
   static fromProto = Schema.decodeSync(Cursor);
 
-  // static fromBytes(bytes: Uint8Array) {
-  //   return Cursor.fromProto(proto.common.Cursor.decode(bytes));
-  // }
+  static fromBytes(bytes: Uint8Array) {
+    return Cursor.fromProto(proto.common.Cursor.decode(bytes));
+  }
 }

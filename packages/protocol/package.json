@@ -22,19 +22,20 @@
     "format": "biome format . --write"
   },
   "devDependencies": {
-    "@bufbuild/buf": "^1.32.1",
+    "@bufbuild/buf": "^1.32.2",
     "@types/long": "^5.0.0",
-    "@types/node": "^20.12.12",
+    "@types/node": "^20.12.13",
     "typescript": "^5.4.5",
     "unbuild": "^2.0.0",
     "vitest": "^1.6.0"
   },
   "dependencies": {
-    "@effect/schema": "^0.67.14",
-    "long": "^5.2.1",
+    "@effect/schema": "^0.67.15",
+    "effect": "^3.2.6",
+    "long": "^5.2.3",
     "nice-grpc": "^2.1.8",
     "nice-grpc-common": "^2.0.2",
-    "protobufjs": "^7.1.2",
-    "viem": "^2.12.4"
+    "protobufjs": "^7.3.0",
+    "viem": "^2.13.2"
   }
 }
