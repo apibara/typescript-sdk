@@ -29,9 +29,10 @@ const BytesFromUint8Array = Schema.requiredToOptional(
   },
 );
 
-export interface ProtoMessage<TProto> {
-  toProto(options?: ParseOptions): TProto;
-}
+export const CursorMessage = Schema.Struct({
+  orderKey: Schema.BigIntFromSelf,
+  uniqueKey: Schema.Uint8ArrayFromSelf,
+});
 
 export class Cursor extends Schema.Class<Cursor>("Cursor")({
   orderKey: Schema.BigIntFromSelf,

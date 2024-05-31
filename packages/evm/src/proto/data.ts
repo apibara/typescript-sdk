@@ -17,272 +17,272 @@ export const protobufPackage = "evm.v2";
 /** Requested data, grouped by block. */
 export interface Block {
   /** The header. */
-  header:
+  readonly header?:
     | BlockHeader
     | undefined;
   /** List of withdrawals. */
-  withdrawals: Withdrawal[];
+  readonly withdrawals: readonly Withdrawal[];
   /** List of transactions. */
-  transactions: Transaction[];
+  readonly transactions: readonly Transaction[];
   /** List of receipts. */
-  receipts: TransactionReceipt[];
+  readonly receipts: readonly TransactionReceipt[];
   /** List of logs. */
-  logs: Log[];
+  readonly logs: readonly Log[];
 }
 
 /** Block header. */
 export interface BlockHeader {
   /** Block number. */
-  number: bigint;
+  readonly number: bigint;
   /** Hash of the block. */
-  hash:
+  readonly hash?:
     | B256
     | undefined;
   /** Hash of the parent block. */
-  parentHash:
+  readonly parentHash?:
     | B256
     | undefined;
   /** Hash of the uncles. */
-  unclesHash:
+  readonly unclesHash?:
     | B256
     | undefined;
   /** Author of the block. */
-  miner:
+  readonly miner?:
     | Address
     | undefined;
   /** State root hash. */
-  stateRoot:
+  readonly stateRoot?:
     | B256
     | undefined;
   /** Transactions root hash. */
-  transactionsRoot:
+  readonly transactionsRoot?:
     | B256
     | undefined;
   /** Receipts root hash. */
-  receiptsRoot:
+  readonly receiptsRoot?:
     | B256
     | undefined;
   /** Logs bloom. */
-  logsBloom:
+  readonly logsBloom?:
     | Bloom
     | undefined;
   /** Difficulty. */
-  difficulty:
+  readonly difficulty?:
     | U256
     | undefined;
   /** Gas limit. */
-  gasLimit:
+  readonly gasLimit?:
     | U256
     | undefined;
   /** Gas used. */
-  gasUsed:
+  readonly gasUsed?:
     | U256
     | undefined;
   /** Timestamp. */
-  timestamp:
+  readonly timestamp?:
     | Date
     | undefined;
   /** Extra data. */
-  extraData:
+  readonly extraData?:
     | HexData
     | undefined;
   /** Mix hash. */
-  mixHash:
+  readonly mixHash?:
     | B256
     | undefined;
   /** Nonce. */
-  nonce: bigint;
+  readonly nonce: bigint;
   /** Base fee per unit of gas. */
-  baseFeePerGas:
+  readonly baseFeePerGas?:
     | U256
     | undefined;
   /** Withdrawals root hash. */
-  withdrawalsRoot:
+  readonly withdrawalsRoot?:
     | B256
     | undefined;
   /** Total difficulty. */
-  totalDifficulty:
+  readonly totalDifficulty?:
     | U256
     | undefined;
   /** Uncles' hashes. */
-  uncles: B256[];
+  readonly uncles: readonly B256[];
   /** The size of this block in bytes. */
-  size:
+  readonly size?:
     | U256
     | undefined;
   /** Blob gas used. */
-  blobGasUsed: bigint;
+  readonly blobGasUsed: bigint;
   /** Excess blob gas. */
-  excessBlobGas: bigint;
+  readonly excessBlobGas: bigint;
   /** Parent beacon block root. */
-  parentBeaconBlockRoot: B256 | undefined;
+  readonly parentBeaconBlockRoot?: B256 | undefined;
 }
 
 /** A validator's withdrawal from the consensus layer. */
 export interface Withdrawal {
   /** Increasing index of the withdrawal. */
-  index: bigint;
+  readonly index: bigint;
   /** Index of the validator. */
-  validatorIndex: bigint;
+  readonly validatorIndex: bigint;
   /** Withdrawal index in the block. */
-  withdrawalIndex: bigint;
+  readonly withdrawalIndex: bigint;
   /** Target address of the withdrawal. */
-  address:
+  readonly address?:
     | Address
     | undefined;
   /** Value of the withdrawal, in gwei. */
-  amount: U256 | undefined;
+  readonly amount?: U256 | undefined;
 }
 
 export interface Transaction {
   /** Transaction hash. */
-  hash:
+  readonly hash?:
     | B256
     | undefined;
   /** Nonce. */
-  nonce: bigint;
+  readonly nonce: bigint;
   /** Transaction index in the block. */
-  transactionIndex: bigint;
+  readonly transactionIndex: bigint;
   /** Sender. */
-  from:
+  readonly from?:
     | Address
     | undefined;
   /** Recipient. */
-  to:
+  readonly to?:
     | Address
     | undefined;
   /** Amount of wei transferred. */
-  value:
+  readonly value?:
     | U256
     | undefined;
   /** Gas price. */
-  gasPrice:
+  readonly gasPrice?:
     | U128
     | undefined;
   /** Gas amount. */
-  gas:
+  readonly gas?:
     | U256
     | undefined;
   /** Max base fee per gas the sender is willing to pay. */
-  maxFeePerGas:
+  readonly maxFeePerGas?:
     | U128
     | undefined;
   /** Miner's tip. */
-  maxPriorityFeePerGas:
+  readonly maxPriorityFeePerGas?:
     | U128
     | undefined;
   /** Data. */
-  input:
+  readonly input?:
     | HexData
     | undefined;
   /** The signature's r,s,v,yParity values. */
-  signature:
+  readonly signature?:
     | Signature
     | undefined;
   /** Chain ID. */
-  chainId: bigint;
+  readonly chainId: bigint;
   /** EIP-2930 access list. */
-  accessList: AccessListItem[];
+  readonly accessList: readonly AccessListItem[];
   /** EIP-2718 transaction type. */
-  transactionType: bigint;
+  readonly transactionType: bigint;
   /** EIP-4844 max gas fee per blob. */
-  maxFeePerBlobGas:
+  readonly maxFeePerBlobGas?:
     | U128
     | undefined;
   /** EIP-4844 blob hashes. */
-  blobVersionedHashes: B256[];
+  readonly blobVersionedHashes: readonly B256[];
 }
 
 export interface TransactionReceipt {
   /** Transaction hash. */
-  transactionHash:
+  readonly transactionHash?:
     | B256
     | undefined;
   /** Index of the transaction in the block. */
-  transactionIndex: bigint;
+  readonly transactionIndex: bigint;
   /** Cumulative gas used in the block after this transaction has been executed. */
-  cumulativeGasUsed:
+  readonly cumulativeGasUsed?:
     | U256
     | undefined;
   /** Gas used by this transaction. */
-  gasUsed:
+  readonly gasUsed?:
     | U256
     | undefined;
   /** The price paid by the transaction. */
-  effectiveGasPrice:
+  readonly effectiveGasPrice?:
     | U128
     | undefined;
   /** Sender. */
-  from:
+  readonly from?:
     | Address
     | undefined;
   /** Recipient, if any. */
-  to:
+  readonly to?:
     | Address
     | undefined;
   /** Contract address created, if any. */
-  contractAddress:
+  readonly contractAddress?:
     | Address
     | undefined;
   /** Logs bloom. */
-  logsBloom:
+  readonly logsBloom?:
     | Bloom
     | undefined;
   /** Either 1 (success) or 0 (failure). */
-  statusCode: bigint;
+  readonly statusCode: bigint;
   /** EIP-2718 transaction type. */
-  transactionType: bigint;
+  readonly transactionType: bigint;
   /** EIP-4844 blob gas used. */
-  blobGasUsed:
+  readonly blobGasUsed?:
     | U128
     | undefined;
   /** EIP-4844 blob gas paid by the transaction. */
-  blobGasPrice: U128 | undefined;
+  readonly blobGasPrice?: U128 | undefined;
 }
 
 export interface Log {
   /** Address of the contract that emitted the log. */
-  address:
+  readonly address?:
     | Address
     | undefined;
   /** Log topics. */
-  topics: B256[];
+  readonly topics: readonly B256[];
   /** Additional data. */
-  data:
+  readonly data?:
     | HexData
     | undefined;
   /** Index of the log in the block. */
-  logIndex: bigint;
+  readonly logIndex: bigint;
   /** Index of the transaction that emitted the log. */
-  transactionIndex: bigint;
+  readonly transactionIndex: bigint;
   /** Hash of the transaction that emitted the log. */
-  transactionHash: B256 | undefined;
+  readonly transactionHash?: B256 | undefined;
 }
 
 export interface Signature {
   /** The signature's r value. */
-  r:
+  readonly r?:
     | U256
     | undefined;
   /** The signature's s value. */
-  s:
+  readonly s?:
     | U256
     | undefined;
   /** The signature's v value. */
-  v:
+  readonly v?:
     | U256
     | undefined;
   /** The signature's parity byte. */
-  yParity: boolean;
+  readonly yParity: boolean;
 }
 
 export interface AccessListItem {
   /** Account address to be loaded at the start of the transaction. */
-  address:
+  readonly address?:
     | Address
     | undefined;
   /** Storage keys to be loaded at the start of the transaction. */
-  storageKeys: B256[];
+  readonly storageKeys: readonly B256[];
 }
 
 function createBaseBlock(): Block {
@@ -312,7 +312,7 @@ export const Block = {
   decode(input: _m0.Reader | Uint8Array, length?: number): Block {
     const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseBlock();
+    const message = createBaseBlock() as any;
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -400,7 +400,7 @@ export const Block = {
     return Block.fromPartial(base ?? {});
   },
   fromPartial(object: DeepPartial<Block>): Block {
-    const message = createBaseBlock();
+    const message = createBaseBlock() as any;
     message.header = (object.header !== undefined && object.header !== null)
       ? BlockHeader.fromPartial(object.header)
       : undefined;
@@ -533,7 +533,7 @@ export const BlockHeader = {
   decode(input: _m0.Reader | Uint8Array, length?: number): BlockHeader {
     const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseBlockHeader();
+    const message = createBaseBlockHeader() as any;
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -826,7 +826,7 @@ export const BlockHeader = {
     return BlockHeader.fromPartial(base ?? {});
   },
   fromPartial(object: DeepPartial<BlockHeader>): BlockHeader {
-    const message = createBaseBlockHeader();
+    const message = createBaseBlockHeader() as any;
     message.number = object.number ?? BigInt("0");
     message.hash = (object.hash !== undefined && object.hash !== null) ? B256.fromPartial(object.hash) : undefined;
     message.parentHash = (object.parentHash !== undefined && object.parentHash !== null)
@@ -930,7 +930,7 @@ export const Withdrawal = {
   decode(input: _m0.Reader | Uint8Array, length?: number): Withdrawal {
     const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseWithdrawal();
+    const message = createBaseWithdrawal() as any;
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -1012,7 +1012,7 @@ export const Withdrawal = {
     return Withdrawal.fromPartial(base ?? {});
   },
   fromPartial(object: DeepPartial<Withdrawal>): Withdrawal {
-    const message = createBaseWithdrawal();
+    const message = createBaseWithdrawal() as any;
     message.index = object.index ?? BigInt("0");
     message.validatorIndex = object.validatorIndex ?? BigInt("0");
     message.withdrawalIndex = object.withdrawalIndex ?? BigInt("0");
@@ -1119,7 +1119,7 @@ export const Transaction = {
   decode(input: _m0.Reader | Uint8Array, length?: number): Transaction {
     const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseTransaction();
+    const message = createBaseTransaction() as any;
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -1337,7 +1337,7 @@ export const Transaction = {
     return Transaction.fromPartial(base ?? {});
   },
   fromPartial(object: DeepPartial<Transaction>): Transaction {
-    const message = createBaseTransaction();
+    const message = createBaseTransaction() as any;
     message.hash = (object.hash !== undefined && object.hash !== null) ? B256.fromPartial(object.hash) : undefined;
     message.nonce = object.nonce ?? BigInt("0");
     message.transactionIndex = object.transactionIndex ?? BigInt("0");
@@ -1445,7 +1445,7 @@ export const TransactionReceipt = {
   decode(input: _m0.Reader | Uint8Array, length?: number): TransactionReceipt {
     const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseTransactionReceipt();
+    const message = createBaseTransactionReceipt() as any;
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -1615,7 +1615,7 @@ export const TransactionReceipt = {
     return TransactionReceipt.fromPartial(base ?? {});
   },
   fromPartial(object: DeepPartial<TransactionReceipt>): TransactionReceipt {
-    const message = createBaseTransactionReceipt();
+    const message = createBaseTransactionReceipt() as any;
     message.transactionHash = (object.transactionHash !== undefined && object.transactionHash !== null)
       ? B256.fromPartial(object.transactionHash)
       : undefined;
@@ -1692,7 +1692,7 @@ export const Log = {
   decode(input: _m0.Reader | Uint8Array, length?: number): Log {
     const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseLog();
+    const message = createBaseLog() as any;
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -1785,7 +1785,7 @@ export const Log = {
     return Log.fromPartial(base ?? {});
   },
   fromPartial(object: DeepPartial<Log>): Log {
-    const message = createBaseLog();
+    const message = createBaseLog() as any;
     message.address = (object.address !== undefined && object.address !== null)
       ? Address.fromPartial(object.address)
       : undefined;
@@ -1824,7 +1824,7 @@ export const Signature = {
   decode(input: _m0.Reader | Uint8Array, length?: number): Signature {
     const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseSignature();
+    const message = createBaseSignature() as any;
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -1895,7 +1895,7 @@ export const Signature = {
     return Signature.fromPartial(base ?? {});
   },
   fromPartial(object: DeepPartial<Signature>): Signature {
-    const message = createBaseSignature();
+    const message = createBaseSignature() as any;
     message.r = (object.r !== undefined && object.r !== null) ? U256.fromPartial(object.r) : undefined;
     message.s = (object.s !== undefined && object.s !== null) ? U256.fromPartial(object.s) : undefined;
     message.v = (object.v !== undefined && object.v !== null) ? U256.fromPartial(object.v) : undefined;
@@ -1922,7 +1922,7 @@ export const AccessListItem = {
   decode(input: _m0.Reader | Uint8Array, length?: number): AccessListItem {
     const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseAccessListItem();
+    const message = createBaseAccessListItem() as any;
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -1973,7 +1973,7 @@ export const AccessListItem = {
     return AccessListItem.fromPartial(base ?? {});
   },
   fromPartial(object: DeepPartial<AccessListItem>): AccessListItem {
-    const message = createBaseAccessListItem();
+    const message = createBaseAccessListItem() as any;
     message.address = (object.address !== undefined && object.address !== null)
       ? Address.fromPartial(object.address)
       : undefined;
@@ -1987,7 +1987,8 @@ type Builtin = Date | Function | Uint8Array | string | number | boolean | bigint
 export type DeepPartial<T> = T extends Builtin ? T
   : T extends globalThis.Array<infer U> ? globalThis.Array<DeepPartial<U>>
   : T extends ReadonlyArray<infer U> ? ReadonlyArray<DeepPartial<U>>
-  : T extends { $case: string } ? { [K in keyof Omit<T, "$case">]?: DeepPartial<T[K]> } & { $case: T["$case"] }
+  : T extends { readonly $case: string }
+    ? { [K in keyof Omit<T, "$case">]?: DeepPartial<T[K]> } & { readonly $case: T["$case"] }
   : T extends {} ? { [K in keyof T]?: DeepPartial<T[K]> }
   : Partial<T>;
 

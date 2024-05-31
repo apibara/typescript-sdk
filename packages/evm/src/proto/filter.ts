@@ -15,75 +15,75 @@ export const protobufPackage = "evm.v2";
 
 export interface Filter {
   /** Include header. */
-  header:
+  readonly header?:
     | HeaderFilter
     | undefined;
   /** Filter withdrawals. */
-  withdrawals: WithdrawalFilter[];
+  readonly withdrawals: readonly WithdrawalFilter[];
   /** Filter transactions. */
-  transactions: TransactionFilter[];
+  readonly transactions: readonly TransactionFilter[];
   /** Filter logs. */
-  logs: LogFilter[];
+  readonly logs: readonly LogFilter[];
 }
 
 export interface HeaderFilter {
   /** Always include header data. Defaults to `false`. */
-  always?: boolean | undefined;
+  readonly always?: boolean | undefined;
 }
 
 export interface WithdrawalFilter {
   /** Filter based on the validator index. */
-  validatorIndex?:
+  readonly validatorIndex?:
     | bigint
     | undefined;
   /** Filter based on the withdrawal's target address. */
-  address: Address | undefined;
+  readonly address?: Address | undefined;
 }
 
 export interface TransactionFilter {
   /** Filter based on the transaction's sender address. */
-  from:
+  readonly from?:
     | Address
     | undefined;
   /** Filter based on the transaction's recipient address. */
-  to:
+  readonly to?:
     | Address
     | undefined;
   /** Flag to request the transaction's receipt. Defaults to `false`. */
-  includeReceipt?:
+  readonly includeReceipt?:
     | boolean
     | undefined;
   /** Flag to request the transaction's logs. Defaults to `false`. */
-  includeLogs?: boolean | undefined;
+  readonly includeLogs?: boolean | undefined;
 }
 
 export interface LogFilter {
   /** Filter based on the log's contract address. */
-  address:
+  readonly address?:
     | Address
     | undefined;
   /** Filter based on the log's topics. */
-  topics: Topic[];
+  readonly topics: readonly Topic[];
   /**
    * Only returns logs with topics of exactly the same length as the filter.
    *
    * Defaults to `false`.
    */
-  strict?:
+  readonly strict?:
     | boolean
     | undefined;
   /** Flag to request the log's transaction. Defaults to `false`. */
-  includeTransaction?:
+  readonly includeTransaction?:
     | boolean
     | undefined;
   /** Flag to request the log's receipt. Defaults to `false`. */
-  includeReceipt?: boolean | undefined;
+  readonly includeReceipt?: boolean | undefined;
 }
 
 /** Topic filter. */
 export interface Topic {
   /** Topic value. Leave empty to match any topic. */
-  value: B256 | undefined;
+  readonly value?: B256 | undefined;
 }
 
 function createBaseFilter(): Filter {
@@ -110,7 +110,7 @@ export const Filter = {
   decode(input: _m0.Reader | Uint8Array, length?: number): Filter {
     const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseFilter();
+    const message = createBaseFilter() as any;
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -185,7 +185,7 @@ export const Filter = {
     return Filter.fromPartial(base ?? {});
   },
   fromPartial(object: DeepPartial<Filter>): Filter {
-    const message = createBaseFilter();
+    const message = createBaseFilter() as any;
     message.header = (object.header !== undefined && object.header !== null)
       ? HeaderFilter.fromPartial(object.header)
       : undefined;
@@ -211,7 +211,7 @@ export const HeaderFilter = {
   decode(input: _m0.Reader | Uint8Array, length?: number): HeaderFilter {
     const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseHeaderFilter();
+    const message = createBaseHeaderFilter() as any;
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -247,7 +247,7 @@ export const HeaderFilter = {
     return HeaderFilter.fromPartial(base ?? {});
   },
   fromPartial(object: DeepPartial<HeaderFilter>): HeaderFilter {
-    const message = createBaseHeaderFilter();
+    const message = createBaseHeaderFilter() as any;
     message.always = object.always ?? undefined;
     return message;
   },
@@ -274,7 +274,7 @@ export const WithdrawalFilter = {
   decode(input: _m0.Reader | Uint8Array, length?: number): WithdrawalFilter {
     const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseWithdrawalFilter();
+    const message = createBaseWithdrawalFilter() as any;
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -323,7 +323,7 @@ export const WithdrawalFilter = {
     return WithdrawalFilter.fromPartial(base ?? {});
   },
   fromPartial(object: DeepPartial<WithdrawalFilter>): WithdrawalFilter {
-    const message = createBaseWithdrawalFilter();
+    const message = createBaseWithdrawalFilter() as any;
     message.validatorIndex = object.validatorIndex ?? undefined;
     message.address = (object.address !== undefined && object.address !== null)
       ? Address.fromPartial(object.address)
@@ -356,7 +356,7 @@ export const TransactionFilter = {
   decode(input: _m0.Reader | Uint8Array, length?: number): TransactionFilter {
     const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseTransactionFilter();
+    const message = createBaseTransactionFilter() as any;
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -427,7 +427,7 @@ export const TransactionFilter = {
     return TransactionFilter.fromPartial(base ?? {});
   },
   fromPartial(object: DeepPartial<TransactionFilter>): TransactionFilter {
-    const message = createBaseTransactionFilter();
+    const message = createBaseTransactionFilter() as any;
     message.from = (object.from !== undefined && object.from !== null) ? Address.fromPartial(object.from) : undefined;
     message.to = (object.to !== undefined && object.to !== null) ? Address.fromPartial(object.to) : undefined;
     message.includeReceipt = object.includeReceipt ?? undefined;
@@ -469,7 +469,7 @@ export const LogFilter = {
   decode(input: _m0.Reader | Uint8Array, length?: number): LogFilter {
     const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseLogFilter();
+    const message = createBaseLogFilter() as any;
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -551,7 +551,7 @@ export const LogFilter = {
     return LogFilter.fromPartial(base ?? {});
   },
   fromPartial(object: DeepPartial<LogFilter>): LogFilter {
-    const message = createBaseLogFilter();
+    const message = createBaseLogFilter() as any;
     message.address = (object.address !== undefined && object.address !== null)
       ? Address.fromPartial(object.address)
       : undefined;
@@ -578,7 +578,7 @@ export const Topic = {
   decode(input: _m0.Reader | Uint8Array, length?: number): Topic {
     const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseTopic();
+    const message = createBaseTopic() as any;
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -614,7 +614,7 @@ export const Topic = {
     return Topic.fromPartial(base ?? {});
   },
   fromPartial(object: DeepPartial<Topic>): Topic {
-    const message = createBaseTopic();
+    const message = createBaseTopic() as any;
     message.value = (object.value !== undefined && object.value !== null) ? B256.fromPartial(object.value) : undefined;
     return message;
   },
@@ -625,7 +625,8 @@ type Builtin = Date | Function | Uint8Array | string | number | boolean | bigint
 export type DeepPartial<T> = T extends Builtin ? T
   : T extends globalThis.Array<infer U> ? globalThis.Array<DeepPartial<U>>
   : T extends ReadonlyArray<infer U> ? ReadonlyArray<DeepPartial<U>>
-  : T extends { $case: string } ? { [K in keyof Omit<T, "$case">]?: DeepPartial<T[K]> } & { $case: T["$case"] }
+  : T extends { readonly $case: string }
+    ? { [K in keyof Omit<T, "$case">]?: DeepPartial<T[K]> } & { readonly $case: T["$case"] }
   : T extends {} ? { [K in keyof T]?: DeepPartial<T[K]> }
   : Partial<T>;
 

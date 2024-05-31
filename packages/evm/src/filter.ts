@@ -1,6 +1,9 @@
-import { Schema } from "@effect/schema";
-import { AddressFromMessage, B256FromMessage } from "./common";
+import { Schema, TreeFormatter } from "@effect/schema";
 import { ParseOptions } from "@effect/schema/AST";
+
+import { AddressFromMessage, B256FromMessage } from "./common";
+
+import * as proto from "./proto";
 
 export const HeaderFilter = Schema.Struct({
   always: Schema.optional(Schema.Boolean),
@@ -36,7 +39,7 @@ export const TopicFromMessage = Schema.transform(
 
 export const LogFilter = Schema.Struct({
   address: Schema.optional(AddressFromMessage),
-  topics: Schema.optional(Schema.Array(TopicFromMessage)),
+  topics: Schema.Array(TopicFromMessage),
 
   strict: Schema.optional(Schema.Boolean),
   includeTransaction: Schema.optional(Schema.Boolean),
@@ -45,12 +48,35 @@ export const LogFilter = Schema.Struct({
 
 export type LogFilter = typeof LogFilter.Type;
 
+export const WithdrawalFilter = Schema.Struct({
+  validatorIndex: Schema.optional(Schema.BigIntFromSelf),
+  address: Schema.optional(AddressFromMessage),
+});
+
+export type WithdrawalFilter = typeof WithdrawalFilter.Type;
+
+export const TransactionFilter = Schema.Struct({
+  from: Schema.optional(AddressFromMessage),
+  to: Schema.optional(AddressFromMessage),
+
+  includeReceipt: Schema.optional(Schema.Boolean),
+  includeLogs: Schema.optional(Schema.Boolean),
+});
+
+export type TransactionFilter = typeof TransactionFilter.Type;
+
 export class Filter extends Schema.Class<Filter>("Filter")({
   header: Schema.optional(HeaderFilter),
   logs: Schema.Array(LogFilter),
+  withdrawals: Schema.Array(WithdrawalFilter),
+  transactions: Schema.Array(TransactionFilter),
 }) {
   toProto(options?: ParseOptions) {
     return Schema.encodeSync(Filter)(this, options);
+  }
+
+  encode() {
+    return proto.filter.Filter.encode(this.toProto()).finish();
   }
 
   static fromProto = Schema.decodeSync(Filter);

@@ -1,12 +1,14 @@
 version: v2
 plugins:
-- remote: buf.build/community/stephenh-ts-proto:v1.176.0
-  out: src/proto/
-  opt:
-  - outputServices=nice-grpc
-  - outputServices=generic-definitions
-  - useExactTypes=false
-  - forceLong=bigint
-  - esModuleInterop=true
-  - oneof=unions
-  - useDate=true
+  - remote: buf.build/community/stephenh-ts-proto:v1.176.0
+    out: src/proto/
+    opt:
+      - outputServices=nice-grpc
+      - outputServices=generic-definitions
+      - useExactTypes=false
+      - useOptionals=messages
+      - useReadonlyTypes=true
+      - forceLong=bigint
+      - esModuleInterop=true
+      - oneof=unions
+      - useDate=true

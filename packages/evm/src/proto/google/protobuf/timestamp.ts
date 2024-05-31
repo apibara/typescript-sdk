@@ -107,14 +107,14 @@ export interface Timestamp {
    * 1970-01-01T00:00:00Z. Must be from 0001-01-01T00:00:00Z to
    * 9999-12-31T23:59:59Z inclusive.
    */
-  seconds: bigint;
+  readonly seconds: bigint;
   /**
    * Non-negative fractions of a second at nanosecond resolution. Negative
    * second values with fractions must still have non-negative nanos values
    * that count forward in time. Must be from 0 to 999,999,999
    * inclusive.
    */
-  nanos: number;
+  readonly nanos: number;
 }
 
 function createBaseTimestamp(): Timestamp {
@@ -138,7 +138,7 @@ export const Timestamp = {
   decode(input: _m0.Reader | Uint8Array, length?: number): Timestamp {
     const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseTimestamp();
+    const message = createBaseTimestamp() as any;
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -187,7 +187,7 @@ export const Timestamp = {
     return Timestamp.fromPartial(base ?? {});
   },
   fromPartial(object: DeepPartial<Timestamp>): Timestamp {
-    const message = createBaseTimestamp();
+    const message = createBaseTimestamp() as any;
     message.seconds = object.seconds ?? BigInt("0");
     message.nanos = object.nanos ?? 0;
     return message;
@@ -199,7 +199,8 @@ type Builtin = Date | Function | Uint8Array | string | number | boolean | bigint
 export type DeepPartial<T> = T extends Builtin ? T
   : T extends globalThis.Array<infer U> ? globalThis.Array<DeepPartial<U>>
   : T extends ReadonlyArray<infer U> ? ReadonlyArray<DeepPartial<U>>
-  : T extends { $case: string } ? { [K in keyof Omit<T, "$case">]?: DeepPartial<T[K]> } & { $case: T["$case"] }
+  : T extends { readonly $case: string }
+    ? { [K in keyof Omit<T, "$case">]?: DeepPartial<T[K]> } & { readonly $case: T["$case"] }
   : T extends {} ? { [K in keyof T]?: DeepPartial<T[K]> }
   : Partial<T>;
 

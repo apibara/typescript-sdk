@@ -65,34 +65,34 @@ export function dataFinalityToJSON(object: DataFinality): string {
 /** Request data to be streamed. */
 export interface StreamDataRequest {
   /** Cursor to start streaming from. */
-  startingCursor:
+  readonly startingCursor?:
     | Cursor
     | undefined;
   /**
    * Return data with the specified finality.
    * If not specified, defaults to `DATA_FINALITY_ACCEPTED`.
    */
-  finality?:
+  readonly finality?:
     | DataFinality
     | undefined;
   /** Filters used to generate data. */
-  filter: Uint8Array[];
+  readonly filter: readonly Uint8Array[];
 }
 
 /** Contains a piece of streamed data. */
 export interface StreamDataResponse {
-  message?:
-    | { $case: "data"; data: Data }
-    | { $case: "invalidate"; invalidate: Invalidate }
-    | { $case: "heartbeat"; heartbeat: Heartbeat }
-    | { $case: "systemMessage"; systemMessage: SystemMessage }
+  readonly message?:
+    | { readonly $case: "data"; readonly data: Data }
+    | { readonly $case: "invalidate"; readonly invalidate: Invalidate }
+    | { readonly $case: "heartbeat"; readonly heartbeat: Heartbeat }
+    | { readonly $case: "systemMessage"; readonly systemMessage: SystemMessage }
     | undefined;
 }
 
 /** Invalidate data after the given cursor. */
 export interface Invalidate {
   /** The cursor of the message before the now invalid data. */
-  cursor: Cursor | undefined;
+  readonly cursor?: Cursor | undefined;
 }
 
 /**
@@ -106,17 +106,17 @@ export interface Invalidate {
  */
 export interface Data {
   /** Cursor that generated this block of data. */
-  cursor:
+  readonly cursor?:
     | Cursor
     | undefined;
   /** Block cursor. Use this cursor to resume the stream. */
-  endCursor:
+  readonly endCursor?:
     | Cursor
     | undefined;
   /** The finality status of the block. */
-  finality: DataFinality;
+  readonly finality: DataFinality;
   /** The block data. */
-  data: Uint8Array[];
+  readonly data: readonly Uint8Array[];
 }
 
 /** Sent to clients to check if stream is still connected. */
@@ -125,7 +125,10 @@ export interface Heartbeat {
 
 /** Message from the server to the client. */
 export interface SystemMessage {
-  output?: { $case: "stdout"; stdout: string } | { $case: "stderr"; stderr: string } | undefined;
+  readonly output?: { readonly $case: "stdout"; readonly stdout: string } | {
+    readonly $case: "stderr";
+    readonly stderr: string;
+  } | undefined;
 }
 
 function createBaseStreamDataRequest(): StreamDataRequest {
@@ -149,7 +152,7 @@ export const StreamDataRequest = {
   decode(input: _m0.Reader | Uint8Array, length?: number): StreamDataRequest {
     const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseStreamDataRequest();
+    const message = createBaseStreamDataRequest() as any;
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -209,7 +212,7 @@ export const StreamDataRequest = {
     return StreamDataRequest.fromPartial(base ?? {});
   },
   fromPartial(object: DeepPartial<StreamDataRequest>): StreamDataRequest {
-    const message = createBaseStreamDataRequest();
+    const message = createBaseStreamDataRequest() as any;
     message.startingCursor = (object.startingCursor !== undefined && object.startingCursor !== null)
       ? Cursor.fromPartial(object.startingCursor)
       : undefined;
@@ -245,7 +248,7 @@ export const StreamDataResponse = {
   decode(input: _m0.Reader | Uint8Array, length?: number): StreamDataResponse {
     const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseStreamDataResponse();
+    const message = createBaseStreamDataResponse() as any;
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -321,7 +324,7 @@ export const StreamDataResponse = {
     return StreamDataResponse.fromPartial(base ?? {});
   },
   fromPartial(object: DeepPartial<StreamDataResponse>): StreamDataResponse {
-    const message = createBaseStreamDataResponse();
+    const message = createBaseStreamDataResponse() as any;
     if (object.message?.$case === "data" && object.message?.data !== undefined && object.message?.data !== null) {
       message.message = { $case: "data", data: Data.fromPartial(object.message.data) };
     }
@@ -368,7 +371,7 @@ export const Invalidate = {
   decode(input: _m0.Reader | Uint8Array, length?: number): Invalidate {
     const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseInvalidate();
+    const message = createBaseInvalidate() as any;
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -404,7 +407,7 @@ export const Invalidate = {
     return Invalidate.fromPartial(base ?? {});
   },
   fromPartial(object: DeepPartial<Invalidate>): Invalidate {
-    const message = createBaseInvalidate();
+    const message = createBaseInvalidate() as any;
     message.cursor = (object.cursor !== undefined && object.cursor !== null)
       ? Cursor.fromPartial(object.cursor)
       : undefined;
@@ -436,7 +439,7 @@ export const Data = {
   decode(input: _m0.Reader | Uint8Array, length?: number): Data {
     const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseData();
+    const message = createBaseData() as any;
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -507,7 +510,7 @@ export const Data = {
     return Data.fromPartial(base ?? {});
   },
   fromPartial(object: DeepPartial<Data>): Data {
-    const message = createBaseData();
+    const message = createBaseData() as any;
     message.cursor = (object.cursor !== undefined && object.cursor !== null)
       ? Cursor.fromPartial(object.cursor)
       : undefined;
@@ -532,7 +535,7 @@ export const Heartbeat = {
   decode(input: _m0.Reader | Uint8Array, length?: number): Heartbeat {
     const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseHeartbeat();
+    const message = createBaseHeartbeat() as any;
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -558,7 +561,7 @@ export const Heartbeat = {
     return Heartbeat.fromPartial(base ?? {});
   },
   fromPartial(_: DeepPartial<Heartbeat>): Heartbeat {
-    const message = createBaseHeartbeat();
+    const message = createBaseHeartbeat() as any;
     return message;
   },
 };
@@ -583,7 +586,7 @@ export const SystemMessage = {
   decode(input: _m0.Reader | Uint8Array, length?: number): SystemMessage {
     const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseSystemMessage();
+    const message = createBaseSystemMessage() as any;
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -635,7 +638,7 @@ export const SystemMessage = {
     return SystemMessage.fromPartial(base ?? {});
   },
   fromPartial(object: DeepPartial<SystemMessage>): SystemMessage {
-    const message = createBaseSystemMessage();
+    const message = createBaseSystemMessage() as any;
     if (object.output?.$case === "stdout" && object.output?.stdout !== undefined && object.output?.stdout !== null) {
       message.output = { $case: "stdout", stdout: object.output.stdout };
     }
@@ -722,7 +725,8 @@ type Builtin = Date | Function | Uint8Array | string | number | boolean | bigint
 export type DeepPartial<T> = T extends Builtin ? T
   : T extends globalThis.Array<infer U> ? globalThis.Array<DeepPartial<U>>
   : T extends ReadonlyArray<infer U> ? ReadonlyArray<DeepPartial<U>>
-  : T extends { $case: string } ? { [K in keyof Omit<T, "$case">]?: DeepPartial<T[K]> } & { $case: T["$case"] }
+  : T extends { readonly $case: string }
+    ? { [K in keyof Omit<T, "$case">]?: DeepPartial<T[K]> } & { readonly $case: T["$case"] }
   : T extends {} ? { [K in keyof T]?: DeepPartial<T[K]> }
   : Partial<T>;
 

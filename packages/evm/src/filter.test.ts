@@ -9,7 +9,7 @@ const abi = parseAbi([
 
 describe("Filter", () => {
   it("all filters are optional", () => {
-    const filter = new Filter({ logs: [] });
+    const filter = new Filter({ logs: [], withdrawals: [], transactions: [] });
 
     expect(filter.header).toBeUndefined();
     expect(filter.logs).toHaveLength(0);
@@ -21,6 +21,8 @@ describe("Filter", () => {
 
   it("accepts logs filter", () => {
     const filter = new Filter({
+      withdrawals: [],
+      transactions: [],
       logs: [
         {
           address: "0x123456789012",

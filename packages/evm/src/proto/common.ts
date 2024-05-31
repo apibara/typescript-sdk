@@ -16,41 +16,41 @@ export const protobufPackage = "evm.v2";
  * As a separate type so that the API is clearer.
  */
 export interface Address {
-  loLo: bigint;
-  loHi: bigint;
-  hi: number;
+  readonly loLo: bigint;
+  readonly loHi: bigint;
+  readonly hi: number;
 }
 
 /** A bloom filter of 256 bytes. */
 export interface Bloom {
-  value: Uint8Array;
+  readonly value: Uint8Array;
 }
 
 /** Unsigned integer of 128 bits. */
 export interface U128 {
-  lo: bigint;
-  hi: bigint;
+  readonly lo: bigint;
+  readonly hi: bigint;
 }
 
 /** Unsigned integer of 256 bits. */
 export interface U256 {
-  loLo: bigint;
-  loHi: bigint;
-  hiLo: bigint;
-  hiHi: bigint;
+  readonly loLo: bigint;
+  readonly loHi: bigint;
+  readonly hiLo: bigint;
+  readonly hiHi: bigint;
 }
 
 /** Byte array of 256 bits. */
 export interface B256 {
-  loLo: bigint;
-  loHi: bigint;
-  hiLo: bigint;
-  hiHi: bigint;
+  readonly loLo: bigint;
+  readonly loHi: bigint;
+  readonly hiLo: bigint;
+  readonly hiHi: bigint;
 }
 
 /** / Arbitrary data that should be hex-encoded. */
 export interface HexData {
-  value: Uint8Array;
+  readonly value: Uint8Array;
 }
 
 function createBaseAddress(): Address {
@@ -80,7 +80,7 @@ export const Address = {
   decode(input: _m0.Reader | Uint8Array, length?: number): Address {
     const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseAddress();
+    const message = createBaseAddress() as any;
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -140,7 +140,7 @@ export const Address = {
     return Address.fromPartial(base ?? {});
   },
   fromPartial(object: DeepPartial<Address>): Address {
-    const message = createBaseAddress();
+    const message = createBaseAddress() as any;
     message.loLo = object.loLo ?? BigInt("0");
     message.loHi = object.loHi ?? BigInt("0");
     message.hi = object.hi ?? 0;
@@ -163,7 +163,7 @@ export const Bloom = {
   decode(input: _m0.Reader | Uint8Array, length?: number): Bloom {
     const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseBloom();
+    const message = createBaseBloom() as any;
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -199,7 +199,7 @@ export const Bloom = {
     return Bloom.fromPartial(base ?? {});
   },
   fromPartial(object: DeepPartial<Bloom>): Bloom {
-    const message = createBaseBloom();
+    const message = createBaseBloom() as any;
     message.value = object.value ?? new Uint8Array(0);
     return message;
   },
@@ -229,7 +229,7 @@ export const U128 = {
   decode(input: _m0.Reader | Uint8Array, length?: number): U128 {
     const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseU128();
+    const message = createBaseU128() as any;
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -278,7 +278,7 @@ export const U128 = {
     return U128.fromPartial(base ?? {});
   },
   fromPartial(object: DeepPartial<U128>): U128 {
-    const message = createBaseU128();
+    const message = createBaseU128() as any;
     message.lo = object.lo ?? BigInt("0");
     message.hi = object.hi ?? BigInt("0");
     return message;
@@ -321,7 +321,7 @@ export const U256 = {
   decode(input: _m0.Reader | Uint8Array, length?: number): U256 {
     const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseU256();
+    const message = createBaseU256() as any;
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -392,7 +392,7 @@ export const U256 = {
     return U256.fromPartial(base ?? {});
   },
   fromPartial(object: DeepPartial<U256>): U256 {
-    const message = createBaseU256();
+    const message = createBaseU256() as any;
     message.loLo = object.loLo ?? BigInt("0");
     message.loHi = object.loHi ?? BigInt("0");
     message.hiLo = object.hiLo ?? BigInt("0");
@@ -437,7 +437,7 @@ export const B256 = {
   decode(input: _m0.Reader | Uint8Array, length?: number): B256 {
     const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseB256();
+    const message = createBaseB256() as any;
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -508,7 +508,7 @@ export const B256 = {
     return B256.fromPartial(base ?? {});
   },
   fromPartial(object: DeepPartial<B256>): B256 {
-    const message = createBaseB256();
+    const message = createBaseB256() as any;
     message.loLo = object.loLo ?? BigInt("0");
     message.loHi = object.loHi ?? BigInt("0");
     message.hiLo = object.hiLo ?? BigInt("0");
@@ -532,7 +532,7 @@ export const HexData = {
   decode(input: _m0.Reader | Uint8Array, length?: number): HexData {
     const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseHexData();
+    const message = createBaseHexData() as any;
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -568,7 +568,7 @@ export const HexData = {
     return HexData.fromPartial(base ?? {});
   },
   fromPartial(object: DeepPartial<HexData>): HexData {
-    const message = createBaseHexData();
+    const message = createBaseHexData() as any;
     message.value = object.value ?? new Uint8Array(0);
     return message;
   },
@@ -604,7 +604,8 @@ type Builtin = Date | Function | Uint8Array | string | number | boolean | bigint
 export type DeepPartial<T> = T extends Builtin ? T
   : T extends globalThis.Array<infer U> ? globalThis.Array<DeepPartial<U>>
   : T extends ReadonlyArray<infer U> ? ReadonlyArray<DeepPartial<U>>
-  : T extends { $case: string } ? { [K in keyof Omit<T, "$case">]?: DeepPartial<T[K]> } & { $case: T["$case"] }
+  : T extends { readonly $case: string }
+    ? { [K in keyof Omit<T, "$case">]?: DeepPartial<T[K]> } & { readonly $case: T["$case"] }
   : T extends {} ? { [K in keyof T]?: DeepPartial<T[K]> }
   : Partial<T>;
 

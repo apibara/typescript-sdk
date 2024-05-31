@@ -13,9 +13,9 @@ export const protobufPackage = "dna.v2.common";
 /** A cursor over the stream content. */
 export interface Cursor {
   /** Key used for ordering messages in the stream. */
-  orderKey: bigint;
+  readonly orderKey: bigint;
   /** Key used to discriminate branches in the stream. */
-  uniqueKey: Uint8Array;
+  readonly uniqueKey: Uint8Array;
 }
 
 /** Request for the `Status` method. */
@@ -25,11 +25,11 @@ export interface StatusRequest {
 /** Response for the `Status` method. */
 export interface StatusResponse {
   /** The current head of the chain. */
-  currentHead:
+  readonly currentHead?:
     | Cursor
     | undefined;
   /** The last cursor that was ingested by the node. */
-  lastIngested: Cursor | undefined;
+  readonly lastIngested?: Cursor | undefined;
 }
 
 function createBaseCursor(): Cursor {
@@ -53,7 +53,7 @@ export const Cursor = {
   decode(input: _m0.Reader | Uint8Array, length?: number): Cursor {
     const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseCursor();
+    const message = createBaseCursor() as any;
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -102,7 +102,7 @@ export const Cursor = {
     return Cursor.fromPartial(base ?? {});
   },
   fromPartial(object: DeepPartial<Cursor>): Cursor {
-    const message = createBaseCursor();
+    const message = createBaseCursor() as any;
     message.orderKey = object.orderKey ?? BigInt("0");
     message.uniqueKey = object.uniqueKey ?? new Uint8Array(0);
     return message;
@@ -121,7 +121,7 @@ export const StatusRequest = {
   decode(input: _m0.Reader | Uint8Array, length?: number): StatusRequest {
     const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseStatusRequest();
+    const message = createBaseStatusRequest() as any;
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -147,7 +147,7 @@ export const StatusRequest = {
     return StatusRequest.fromPartial(base ?? {});
   },
   fromPartial(_: DeepPartial<StatusRequest>): StatusRequest {
-    const message = createBaseStatusRequest();
+    const message = createBaseStatusRequest() as any;
     return message;
   },
 };
@@ -170,7 +170,7 @@ export const StatusResponse = {
   decode(input: _m0.Reader | Uint8Array, length?: number): StatusResponse {
     const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseStatusResponse();
+    const message = createBaseStatusResponse() as any;
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -219,7 +219,7 @@ export const StatusResponse = {
     return StatusResponse.fromPartial(base ?? {});
   },
   fromPartial(object: DeepPartial<StatusResponse>): StatusResponse {
-    const message = createBaseStatusResponse();
+    const message = createBaseStatusResponse() as any;
     message.currentHead = (object.currentHead !== undefined && object.currentHead !== null)
       ? Cursor.fromPartial(object.currentHead)
       : undefined;
@@ -260,7 +260,8 @@ type Builtin = Date | Function | Uint8Array | string | number | boolean | bigint
 export type DeepPartial<T> = T extends Builtin ? T
   : T extends globalThis.Array<infer U> ? globalThis.Array<DeepPartial<U>>
   : T extends ReadonlyArray<infer U> ? ReadonlyArray<DeepPartial<U>>
-  : T extends { $case: string } ? { [K in keyof Omit<T, "$case">]?: DeepPartial<T[K]> } & { $case: T["$case"] }
+  : T extends { readonly $case: string }
+    ? { [K in keyof Omit<T, "$case">]?: DeepPartial<T[K]> } & { readonly $case: T["$case"] }
   : T extends {} ? { [K in keyof T]?: DeepPartial<T[K]> }
   : Partial<T>;
 

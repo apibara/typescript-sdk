@@ -1,16 +1,12 @@
 import { runMain, defineCommand } from "citty";
 import consola from "consola";
 import { encodeEventTopics, parseAbi } from "viem";
-// import { Filter, BlockDecoder } from "@apibara/evm";
+import { Filter, blockFromBytes } from "@apibara/evm";
 import {
-  // type DnaStreamClient,
-  // DnaStreamDefinition,
   Cursor,
-  StatusRequest,
-  StatusResponse,
+  DataFinality,
+  StreamDataRequest,
   createClient,
-  // StreamDataRequest,
-  // DataFinality,
 } from "@apibara/protocol";
 import { createChannel } from "nice-grpc";
 
@@ -42,11 +38,15 @@ const command = defineCommand({
 
     const response = await client.status();
     console.log(response);
-    /*
-    const head = Cursor.fromProto(response.currentHead!);
-    consola.info(`EVM stream head=${head.orderKey} hash=${head.uniqueKey}`);
 
     const filter = new Filter({
+      header: {
+        always: true,
+      },
+      transactions: [],
+      withdrawals: [],
+      logs: [],
+      /*
       logs: [
         {
           strict: true,
@@ -57,7 +57,31 @@ const command = defineCommand({
           }),
         },
       ],
+      */
     });
+
+    const request = new StreamDataRequest({
+      finality: "accepted",
+      startingCursor: new Cursor({
+        orderKey: 5_000_000n,
+      }),
+      filter: [filter.encode()],
+    });
+
+    // console.log(request.toProto());
+    for await (const message of client.streamData(request)) {
+      if (message._tag === "data") {
+        console.log("data", message.endCursor);
+        for (const data of message.data) {
+          const block = blockFromBytes(data);
+          console.log(block);
+        }
+      }
+    }
+
+    /*
+    const head = Cursor.fromProto(response.currentHead!);
+    consola.info(`EVM stream head=${head.orderKey} hash=${head.uniqueKey}`);
 
     const request = new StreamDataRequest(
       new Cursor(5_000_000n),
