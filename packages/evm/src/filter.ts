@@ -1,83 +1,57 @@
-import type { Encodable } from "@apibara/protocol";
-import { Address, B256 } from "./common";
-import * as proto from "./proto";
+import { Schema } from "@effect/schema";
+import { AddressFromMessage, B256FromMessage } from "./common";
+import { ParseOptions } from "@effect/schema/AST";
 
-export type FilterConfig = {
-  header?: HeaderFilterConfig;
-  logs?: LogFilterConfig[];
-};
+export const HeaderFilter = Schema.Struct({
+  always: Schema.optional(Schema.Boolean),
+});
 
-export type HeaderFilterConfig = {
-  always?: boolean;
-};
+export type HeaderFilter = typeof HeaderFilter.Type;
 
-export type LogFilterConfig = {
-  address?: Address;
-  topics?: (B256 | null)[];
+export const Topic = Schema.Struct({
+  value: Schema.UndefinedOr(B256FromMessage),
+});
 
-  strict?: boolean;
-  includeTransaction?: boolean;
-  includeReceipt?: boolean;
-};
+const encodeTopic = Schema.encodeSync(B256FromMessage);
+const decodeTopic = Schema.decodeSync(B256FromMessage);
 
-export function filter(config: FilterConfig) {
-  return new Filter(config);
-}
+export const TopicFromMessage = Schema.transform(
+  Topic,
+  Schema.NullOr(B256FromMessage),
+  {
+    encode(value) {
+      if (value === null) {
+        return { value: undefined };
+      }
+      return { value: decodeTopic(value) };
+    },
+    decode(value) {
+      if (value.value === undefined) {
+        return null;
+      }
+      return encodeTopic(value.value);
+    },
+  },
+);
 
-export class Filter implements Encodable {
-  constructor(private _: FilterConfig = {}) {}
+export const LogFilter = Schema.Struct({
+  address: Schema.optional(AddressFromMessage),
+  topics: Schema.optional(Schema.Array(TopicFromMessage)),
 
-  toProto(): proto.filter.Filter {
-    const header = this._.header
-      ? new HeaderFilter(this._.header).toProto()
-      : undefined;
+  strict: Schema.optional(Schema.Boolean),
+  includeTransaction: Schema.optional(Schema.Boolean),
+  includeReceipt: Schema.optional(Schema.Boolean),
+});
 
-    const logs = (this._.logs ?? []).map((log) => new LogFilter(log).toProto());
+export type LogFilter = typeof LogFilter.Type;
 
-    return {
-      header,
-      logs,
-      withdrawals: [],
-      transactions: [],
-    };
+export class Filter extends Schema.Class<Filter>("Filter")({
+  header: Schema.optional(HeaderFilter),
+  logs: Schema.Array(LogFilter),
+}) {
+  toProto(options?: ParseOptions) {
+    return Schema.encodeSync(Filter)(this, options);
   }
 
-  encode(): Uint8Array {
-    const message = this.toProto();
-    return proto.filter.Filter.encode(message).finish();
-  }
-}
-
-export class HeaderFilter {
-  constructor(private _: HeaderFilterConfig = {}) {}
-
-  toProto(): proto.filter.HeaderFilter {
-    return {
-      always: this._.always,
-    };
-  }
-}
-
-export class LogFilter {
-  constructor(private _: LogFilterConfig) {}
-
-  toProto(): proto.filter.LogFilter {
-    const address = this._.address
-      ? Address.toProto(this._.address)
-      : undefined;
-
-    const topics = (this._.topics ?? []).map((topic) => {
-      if (topic === null) return { value: undefined };
-      const value = B256.toProto(topic);
-      return { value };
-    });
-
-    return {
-      address,
-      topics,
-      strict: this._.strict,
-      includeTransaction: this._.includeTransaction,
-      includeReceipt: this._.includeReceipt,
-    };
-  }
+  static fromProto = Schema.decodeSync(Filter);
 }

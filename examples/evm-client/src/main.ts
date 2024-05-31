@@ -3,15 +3,16 @@ import consola from "consola";
 import { encodeEventTopics, parseAbi } from "viem";
 // import { Filter, BlockDecoder } from "@apibara/evm";
 import {
-  type DnaStreamClient,
-  DnaStreamDefinition,
+  // type DnaStreamClient,
+  // DnaStreamDefinition,
   Cursor,
   StatusRequest,
   StatusResponse,
+  createClient,
   // StreamDataRequest,
   // DataFinality,
 } from "@apibara/protocol";
-import { createChannel, createClient } from "nice-grpc";
+import { createChannel } from "nice-grpc";
 
 const abi = parseAbi([
   "event Transfer(address indexed from, address indexed to, uint256 value)",
@@ -37,10 +38,9 @@ const command = defineCommand({
   async run({ args }) {
     consola.info("Connecting to EVM stream", args.stream);
     const channel = createChannel(args.stream);
-    const client: DnaStreamClient = createClient(DnaStreamDefinition, channel);
+    const client = createClient(channel);
 
-    const responseProto = await client.status(new StatusRequest().toProto());
-    const response = StatusResponse.fromProto(responseProto);
+    const response = await client.status();
     console.log(response);
     /*
     const head = Cursor.fromProto(response.currentHead!);
