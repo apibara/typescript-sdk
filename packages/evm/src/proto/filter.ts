@@ -19,11 +19,15 @@ export interface Filter {
     | HeaderFilter
     | undefined;
   /** Filter withdrawals. */
-  readonly withdrawals: readonly WithdrawalFilter[];
+  readonly withdrawals?:
+    | readonly WithdrawalFilter[]
+    | undefined;
   /** Filter transactions. */
-  readonly transactions: readonly TransactionFilter[];
+  readonly transactions?:
+    | readonly TransactionFilter[]
+    | undefined;
   /** Filter logs. */
-  readonly logs: readonly LogFilter[];
+  readonly logs?: readonly LogFilter[] | undefined;
 }
 
 export interface HeaderFilter {
@@ -63,7 +67,9 @@ export interface LogFilter {
     | Address
     | undefined;
   /** Filter based on the log's topics. */
-  readonly topics: readonly Topic[];
+  readonly topics?:
+    | readonly Topic[]
+    | undefined;
   /**
    * Only returns logs with topics of exactly the same length as the filter.
    *
@@ -95,14 +101,20 @@ export const Filter = {
     if (message.header !== undefined) {
       HeaderFilter.encode(message.header, writer.uint32(10).fork()).ldelim();
     }
-    for (const v of message.withdrawals) {
-      WithdrawalFilter.encode(v!, writer.uint32(18).fork()).ldelim();
+    if (message.withdrawals !== undefined && message.withdrawals.length !== 0) {
+      for (const v of message.withdrawals) {
+        WithdrawalFilter.encode(v!, writer.uint32(18).fork()).ldelim();
+      }
     }
-    for (const v of message.transactions) {
-      TransactionFilter.encode(v!, writer.uint32(26).fork()).ldelim();
+    if (message.transactions !== undefined && message.transactions.length !== 0) {
+      for (const v of message.transactions) {
+        TransactionFilter.encode(v!, writer.uint32(26).fork()).ldelim();
+      }
     }
-    for (const v of message.logs) {
-      LogFilter.encode(v!, writer.uint32(34).fork()).ldelim();
+    if (message.logs !== undefined && message.logs.length !== 0) {
+      for (const v of message.logs) {
+        LogFilter.encode(v!, writer.uint32(34).fork()).ldelim();
+      }
     }
     return writer;
   },
@@ -126,21 +138,21 @@ export const Filter = {
             break;
           }
 
-          message.withdrawals.push(WithdrawalFilter.decode(reader, reader.uint32()));
+          message.withdrawals!.push(WithdrawalFilter.decode(reader, reader.uint32()));
           continue;
         case 3:
           if (tag !== 26) {
             break;
           }
 
-          message.transactions.push(TransactionFilter.decode(reader, reader.uint32()));
+          message.transactions!.push(TransactionFilter.decode(reader, reader.uint32()));
           continue;
         case 4:
           if (tag !== 34) {
             break;
           }
 
-          message.logs.push(LogFilter.decode(reader, reader.uint32()));
+          message.logs!.push(LogFilter.decode(reader, reader.uint32()));
           continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
@@ -451,8 +463,10 @@ export const LogFilter = {
     if (message.address !== undefined) {
       Address.encode(message.address, writer.uint32(10).fork()).ldelim();
     }
-    for (const v of message.topics) {
-      Topic.encode(v!, writer.uint32(18).fork()).ldelim();
+    if (message.topics !== undefined && message.topics.length !== 0) {
+      for (const v of message.topics) {
+        Topic.encode(v!, writer.uint32(18).fork()).ldelim();
+      }
     }
     if (message.strict !== undefined) {
       writer.uint32(24).bool(message.strict);
@@ -485,7 +499,7 @@ export const LogFilter = {
             break;
           }
 
-          message.topics.push(Topic.decode(reader, reader.uint32()));
+          message.topics!.push(Topic.decode(reader, reader.uint32()));
           continue;
         case 3:
           if (tag !== 24) {

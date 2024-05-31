@@ -1,16 +1,19 @@
 import { describe, expect, it } from "vitest";
 
-import { Cursor } from "./common";
-import { StatusRequest, StatusResponse } from "./status";
+import {
+  StatusResponse,
+  statusRequestFromProto,
+  statusRequestToProto,
+  statusResponseFromProto,
+  statusResponseToProto,
+} from "./status";
 
 describe("StatusRequest", () => {
   describe("proto", () => {
     it("should encode and decode", () => {
-      const request = new StatusRequest();
-
-      const proto = request.toProto();
-      const back = StatusRequest.fromProto(proto);
-      expect(back).toEqual(request);
+      const proto = statusRequestToProto({});
+      const back = statusRequestFromProto(proto);
+      expect(back).toEqual({});
     });
   });
 });
@@ -18,18 +21,18 @@ describe("StatusRequest", () => {
 describe("StatusResponse", () => {
   describe("proto", () => {
     it("should encode and decode", () => {
-      const request = new StatusResponse({
-        currentHead: new Cursor({
+      const response = StatusResponse.make({
+        currentHead: {
           orderKey: 123n,
-        }),
-        lastIngested: new Cursor({
+        },
+        lastIngested: {
           orderKey: 123n,
-        }),
+        },
       });
 
-      const proto = request.toProto();
-      const back = StatusResponse.fromProto(proto);
-      expect(back).toEqual(request);
+      const proto = statusResponseToProto(response);
+      const back = statusResponseFromProto(proto);
+      expect(back).toEqual(response);
     });
   });
 });

@@ -1,5 +1,6 @@
 import { Schema } from "@effect/schema";
 
+/*
 import { AddressFromMessage, B256, B256FromMessage } from "./common";
 import * as proto from "./proto";
 
@@ -88,3 +89,4 @@ export const BlockFromBytes = Schema.transform(
 );
 
 export const blockFromBytes = Schema.encodeSync(BlockFromBytes);
+*/

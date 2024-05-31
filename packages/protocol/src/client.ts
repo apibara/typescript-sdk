@@ -6,16 +6,15 @@ import {
   NormalizedServiceDefinition,
   createClient as grpcCreateClient,
 } from "nice-grpc";
+import { Schema } from "@effect/schema";
 
 import * as proto from "./proto";
 
-import { StatusRequest, StatusResponse } from "./status";
 import {
-  StreamDataRequest,
-  StreamDataResponse,
-  StreamDataResponseFromMessage,
-} from "./stream";
-import { Schema } from "@effect/schema";
+  StatusRequest,
+  statusRequestToProto,
+  statusResponseFromProto,
+} from "./status";
 
 export function createClient(
   channel: Channel,
@@ -36,18 +35,19 @@ export class Client {
 
   async status(request?: StatusRequest, options?: CallOptions) {
     const response = await this.client.status(
-      request?.toProto() ?? {},
+      statusRequestToProto(request ?? {}),
       options,
     );
-    return StatusResponse.fromProto(response);
+    return statusResponseFromProto(response);
   }
 
-  streamData(request: StreamDataRequest, options?: CallOptions) {
-    const it = this.client.streamData(request.toProto(), options);
-    return new StreamDataIterable(it);
-  }
+  // streamData(request: StreamDataRequest, options?: CallOptions) {
+  //   const it = this.client.streamData(request.toProto(), options);
+  //   return new StreamDataIterable(it);
+  // }
 }
 
+/*
 export class StreamDataIterable {
   constructor(private it: AsyncIterable<proto.stream.StreamDataResponse>) {}
 
@@ -71,3 +71,5 @@ export class StreamDataIterable {
     };
   }
 }
+
+*/

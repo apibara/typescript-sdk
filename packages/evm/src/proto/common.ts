@@ -16,41 +16,41 @@ export const protobufPackage = "evm.v2";
  * As a separate type so that the API is clearer.
  */
 export interface Address {
-  readonly loLo: bigint;
-  readonly loHi: bigint;
-  readonly hi: number;
+  readonly loLo?: bigint | undefined;
+  readonly loHi?: bigint | undefined;
+  readonly hi?: number | undefined;
 }
 
 /** A bloom filter of 256 bytes. */
 export interface Bloom {
-  readonly value: Uint8Array;
+  readonly value?: Uint8Array | undefined;
 }
 
 /** Unsigned integer of 128 bits. */
 export interface U128 {
-  readonly lo: bigint;
-  readonly hi: bigint;
+  readonly lo?: bigint | undefined;
+  readonly hi?: bigint | undefined;
 }
 
 /** Unsigned integer of 256 bits. */
 export interface U256 {
-  readonly loLo: bigint;
-  readonly loHi: bigint;
-  readonly hiLo: bigint;
-  readonly hiHi: bigint;
+  readonly loLo?: bigint | undefined;
+  readonly loHi?: bigint | undefined;
+  readonly hiLo?: bigint | undefined;
+  readonly hiHi?: bigint | undefined;
 }
 
 /** Byte array of 256 bits. */
 export interface B256 {
-  readonly loLo: bigint;
-  readonly loHi: bigint;
-  readonly hiLo: bigint;
-  readonly hiHi: bigint;
+  readonly loLo?: bigint | undefined;
+  readonly loHi?: bigint | undefined;
+  readonly hiLo?: bigint | undefined;
+  readonly hiHi?: bigint | undefined;
 }
 
 /** / Arbitrary data that should be hex-encoded. */
 export interface HexData {
-  readonly value: Uint8Array;
+  readonly value?: Uint8Array | undefined;
 }
 
 function createBaseAddress(): Address {
@@ -59,19 +59,19 @@ function createBaseAddress(): Address {
 
 export const Address = {
   encode(message: Address, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.loLo !== BigInt("0")) {
+    if (message.loLo !== undefined && message.loLo !== BigInt("0")) {
       if (BigInt.asUintN(64, message.loLo) !== message.loLo) {
         throw new globalThis.Error("value provided for field message.loLo of type fixed64 too large");
       }
       writer.uint32(9).fixed64(message.loLo.toString());
     }
-    if (message.loHi !== BigInt("0")) {
+    if (message.loHi !== undefined && message.loHi !== BigInt("0")) {
       if (BigInt.asUintN(64, message.loHi) !== message.loHi) {
         throw new globalThis.Error("value provided for field message.loHi of type fixed64 too large");
       }
       writer.uint32(17).fixed64(message.loHi.toString());
     }
-    if (message.hi !== 0) {
+    if (message.hi !== undefined && message.hi !== 0) {
       writer.uint32(29).fixed32(message.hi);
     }
     return writer;
@@ -124,13 +124,13 @@ export const Address = {
 
   toJSON(message: Address): unknown {
     const obj: any = {};
-    if (message.loLo !== BigInt("0")) {
+    if (message.loLo !== undefined && message.loLo !== BigInt("0")) {
       obj.loLo = message.loLo.toString();
     }
-    if (message.loHi !== BigInt("0")) {
+    if (message.loHi !== undefined && message.loHi !== BigInt("0")) {
       obj.loHi = message.loHi.toString();
     }
-    if (message.hi !== 0) {
+    if (message.hi !== undefined && message.hi !== 0) {
       obj.hi = Math.round(message.hi);
     }
     return obj;
@@ -154,7 +154,7 @@ function createBaseBloom(): Bloom {
 
 export const Bloom = {
   encode(message: Bloom, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.value.length !== 0) {
+    if (message.value !== undefined && message.value.length !== 0) {
       writer.uint32(10).bytes(message.value);
     }
     return writer;
@@ -189,7 +189,7 @@ export const Bloom = {
 
   toJSON(message: Bloom): unknown {
     const obj: any = {};
-    if (message.value.length !== 0) {
+    if (message.value !== undefined && message.value.length !== 0) {
       obj.value = base64FromBytes(message.value);
     }
     return obj;
@@ -211,13 +211,13 @@ function createBaseU128(): U128 {
 
 export const U128 = {
   encode(message: U128, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.lo !== BigInt("0")) {
+    if (message.lo !== undefined && message.lo !== BigInt("0")) {
       if (BigInt.asUintN(64, message.lo) !== message.lo) {
         throw new globalThis.Error("value provided for field message.lo of type fixed64 too large");
       }
       writer.uint32(9).fixed64(message.lo.toString());
     }
-    if (message.hi !== BigInt("0")) {
+    if (message.hi !== undefined && message.hi !== BigInt("0")) {
       if (BigInt.asUintN(64, message.hi) !== message.hi) {
         throw new globalThis.Error("value provided for field message.hi of type fixed64 too large");
       }
@@ -265,10 +265,10 @@ export const U128 = {
 
   toJSON(message: U128): unknown {
     const obj: any = {};
-    if (message.lo !== BigInt("0")) {
+    if (message.lo !== undefined && message.lo !== BigInt("0")) {
       obj.lo = message.lo.toString();
     }
-    if (message.hi !== BigInt("0")) {
+    if (message.hi !== undefined && message.hi !== BigInt("0")) {
       obj.hi = message.hi.toString();
     }
     return obj;
@@ -291,25 +291,25 @@ function createBaseU256(): U256 {
 
 export const U256 = {
   encode(message: U256, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.loLo !== BigInt("0")) {
+    if (message.loLo !== undefined && message.loLo !== BigInt("0")) {
       if (BigInt.asUintN(64, message.loLo) !== message.loLo) {
         throw new globalThis.Error("value provided for field message.loLo of type fixed64 too large");
       }
       writer.uint32(9).fixed64(message.loLo.toString());
     }
-    if (message.loHi !== BigInt("0")) {
+    if (message.loHi !== undefined && message.loHi !== BigInt("0")) {
       if (BigInt.asUintN(64, message.loHi) !== message.loHi) {
         throw new globalThis.Error("value provided for field message.loHi of type fixed64 too large");
       }
       writer.uint32(17).fixed64(message.loHi.toString());
     }
-    if (message.hiLo !== BigInt("0")) {
+    if (message.hiLo !== undefined && message.hiLo !== BigInt("0")) {
       if (BigInt.asUintN(64, message.hiLo) !== message.hiLo) {
         throw new globalThis.Error("value provided for field message.hiLo of type fixed64 too large");
       }
       writer.uint32(25).fixed64(message.hiLo.toString());
     }
-    if (message.hiHi !== BigInt("0")) {
+    if (message.hiHi !== undefined && message.hiHi !== BigInt("0")) {
       if (BigInt.asUintN(64, message.hiHi) !== message.hiHi) {
         throw new globalThis.Error("value provided for field message.hiHi of type fixed64 too large");
       }
@@ -373,16 +373,16 @@ export const U256 = {
 
   toJSON(message: U256): unknown {
     const obj: any = {};
-    if (message.loLo !== BigInt("0")) {
+    if (message.loLo !== undefined && message.loLo !== BigInt("0")) {
       obj.loLo = message.loLo.toString();
     }
-    if (message.loHi !== BigInt("0")) {
+    if (message.loHi !== undefined && message.loHi !== BigInt("0")) {
       obj.loHi = message.loHi.toString();
     }
-    if (message.hiLo !== BigInt("0")) {
+    if (message.hiLo !== undefined && message.hiLo !== BigInt("0")) {
       obj.hiLo = message.hiLo.toString();
     }
-    if (message.hiHi !== BigInt("0")) {
+    if (message.hiHi !== undefined && message.hiHi !== BigInt("0")) {
       obj.hiHi = message.hiHi.toString();
     }
     return obj;
@@ -407,25 +407,25 @@ function createBaseB256(): B256 {
 
 export const B256 = {
   encode(message: B256, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.loLo !== BigInt("0")) {
+    if (message.loLo !== undefined && message.loLo !== BigInt("0")) {
       if (BigInt.asUintN(64, message.loLo) !== message.loLo) {
         throw new globalThis.Error("value provided for field message.loLo of type fixed64 too large");
       }
       writer.uint32(9).fixed64(message.loLo.toString());
     }
-    if (message.loHi !== BigInt("0")) {
+    if (message.loHi !== undefined && message.loHi !== BigInt("0")) {
       if (BigInt.asUintN(64, message.loHi) !== message.loHi) {
         throw new globalThis.Error("value provided for field message.loHi of type fixed64 too large");
       }
       writer.uint32(17).fixed64(message.loHi.toString());
     }
-    if (message.hiLo !== BigInt("0")) {
+    if (message.hiLo !== undefined && message.hiLo !== BigInt("0")) {
       if (BigInt.asUintN(64, message.hiLo) !== message.hiLo) {
         throw new globalThis.Error("value provided for field message.hiLo of type fixed64 too large");
       }
       writer.uint32(25).fixed64(message.hiLo.toString());
     }
-    if (message.hiHi !== BigInt("0")) {
+    if (message.hiHi !== undefined && message.hiHi !== BigInt("0")) {
       if (BigInt.asUintN(64, message.hiHi) !== message.hiHi) {
         throw new globalThis.Error("value provided for field message.hiHi of type fixed64 too large");
       }
@@ -489,16 +489,16 @@ export const B256 = {
 
   toJSON(message: B256): unknown {
     const obj: any = {};
-    if (message.loLo !== BigInt("0")) {
+    if (message.loLo !== undefined && message.loLo !== BigInt("0")) {
       obj.loLo = message.loLo.toString();
     }
-    if (message.loHi !== BigInt("0")) {
+    if (message.loHi !== undefined && message.loHi !== BigInt("0")) {
       obj.loHi = message.loHi.toString();
     }
-    if (message.hiLo !== BigInt("0")) {
+    if (message.hiLo !== undefined && message.hiLo !== BigInt("0")) {
       obj.hiLo = message.hiLo.toString();
     }
-    if (message.hiHi !== BigInt("0")) {
+    if (message.hiHi !== undefined && message.hiHi !== BigInt("0")) {
       obj.hiHi = message.hiHi.toString();
     }
     return obj;
@@ -523,7 +523,7 @@ function createBaseHexData(): HexData {
 
 export const HexData = {
   encode(message: HexData, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.value.length !== 0) {
+    if (message.value !== undefined && message.value.length !== 0) {
       writer.uint32(10).bytes(message.value);
     }
     return writer;
@@ -558,7 +558,7 @@ export const HexData = {
 
   toJSON(message: HexData): unknown {
     const obj: any = {};
-    if (message.value.length !== 0) {
+    if (message.value !== undefined && message.value.length !== 0) {
       obj.value = base64FromBytes(message.value);
     }
     return obj;

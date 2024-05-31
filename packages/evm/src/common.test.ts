@@ -3,11 +3,11 @@ import { describe, it, expect } from "vitest";
 import { pad } from "viem";
 import { Schema } from "@effect/schema";
 
-import { AddressFromMessage, B256FromMessage } from "./common";
+import { Address, B256 } from "./common";
 
 describe("Address", () => {
-  const encode = Schema.encodeSync(AddressFromMessage);
-  const decode = Schema.decodeSync(AddressFromMessage);
+  const encode = Schema.encodeSync(Address);
+  const decode = Schema.decodeSync(Address);
 
   it("should convert to and from proto", () => {
     const address = "0xcafe0000cafe";
@@ -24,8 +24,8 @@ describe("Address", () => {
 });
 
 describe("B256", () => {
-  const encode = Schema.encodeSync(B256FromMessage);
-  const decode = Schema.decodeSync(B256FromMessage);
+  const encode = Schema.encodeSync(B256);
+  const decode = Schema.decodeSync(B256);
 
   it("should convert to and from proto", () => {
     const value = "0xcafe1111cafe";

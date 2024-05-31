@@ -1,54 +1,63 @@
 import { hexToBytes, toHex } from "viem";
 import { Option } from "effect";
 import { Schema } from "@effect/schema";
-import type { ParseOptions } from "@effect/schema/AST";
 
 import * as proto from "./proto";
 
+/** Bytes encoded as a 0x-prefixed hex string. */
 export const Bytes = Schema.TemplateLiteral(
   Schema.Literal("0x"),
   Schema.String,
 );
 
+export type Bytes = typeof Bytes.Type;
+
 const BytesFromUint8Array = Schema.requiredToOptional(
   Schema.Uint8ArrayFromSelf,
   Bytes,
   {
-    encode(value) {
-      return value.pipe(
-        Option.map(hexToBytes),
-        Option.getOrElse(() => new Uint8Array(0)),
-      );
-    },
     decode(value) {
       if (value.length === 0) {
         return Option.none();
       }
       return Option.some(toHex(value));
     },
+    encode(value) {
+      return value.pipe(
+        Option.map(hexToBytes),
+        Option.getOrElse(() => new Uint8Array(0)),
+      );
+    },
   },
 );
 
-export const CursorMessage = Schema.Struct({
+/** Represent a position in the stream. */
+export const Cursor = Schema.Struct({
+  /** The block number. */
   orderKey: Schema.BigIntFromSelf,
-  uniqueKey: Schema.Uint8ArrayFromSelf,
+  /** The block hash, if any. */
+  uniqueKey: BytesFromUint8Array,
 });
 
-export class Cursor extends Schema.Class<Cursor>("Cursor")({
-  orderKey: Schema.BigIntFromSelf,
-  uniqueKey: BytesFromUint8Array,
-}) {
-  toProto(options?: ParseOptions) {
-    return Schema.encodeSync(Cursor)(this, options);
-  }
+/** The Cursor protobuf representation. */
+export type CursorProto = typeof Cursor.Encoded;
+export type Cursor = typeof Cursor.Type;
 
-  toBytes() {
-    return proto.common.Cursor.encode(this.toProto()).finish();
-  }
+export const cursorToProto = Schema.encodeSync(Cursor);
+export const cursorFromProto = Schema.decodeSync(Cursor);
 
-  static fromProto = Schema.decodeSync(Cursor);
+export const CursorFromBytes = Schema.transform(
+  Schema.Uint8ArrayFromSelf,
+  Cursor,
+  {
+    decode(value) {
+      return proto.common.Cursor.decode(value);
+    },
+    encode(value) {
+      return proto.common.Cursor.encode(value).finish();
+    },
+  },
+);
 
-  static fromBytes(bytes: Uint8Array) {
-    return Cursor.fromProto(proto.common.Cursor.decode(bytes));
-  }
-}
+export const cursorToBytes = Schema.encodeSync(CursorFromBytes);
+export const cursorFromBytes = Schema.decodeSync(CursorFromBytes);

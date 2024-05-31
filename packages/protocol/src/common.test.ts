@@ -1,49 +1,55 @@
 import { describe, expect, it } from "vitest";
-import { Cursor } from "./common";
+import {
+  Cursor,
+  cursorFromBytes,
+  cursorFromProto,
+  cursorToBytes,
+  cursorToProto,
+} from "./common";
 
 describe("Cursor", () => {
   describe("proto", () => {
     it("should encode and decode (with uniqueKey)", () => {
-      const cursor = new Cursor({
+      const cursor = Cursor.make({
         orderKey: 123n,
-        uniqueKey: "0xdeadbeef",
+        uniqueKey: "0xcafecafe",
       });
 
-      const proto = cursor.toProto();
-      const back = Cursor.fromProto(proto);
+      const proto = cursorToProto(cursor);
+      const back = cursorFromProto(proto);
       expect(back).toEqual(cursor);
     });
 
     it("should encode and decode (without uniqueKey)", () => {
-      const cursor = new Cursor({
+      const cursor = Cursor.make({
         orderKey: 123n,
       });
 
-      const proto = cursor.toProto();
-      const back = Cursor.fromProto(proto);
+      const proto = cursorToProto(cursor);
+      const back = cursorFromProto(proto);
       expect(back).toEqual(cursor);
     });
   });
 
   describe("bytes", () => {
     it("should encode and decode (with uniqueKey)", () => {
-      const cursor = new Cursor({
+      const cursor = Cursor.make({
         orderKey: 123n,
-        uniqueKey: "0xdeadbeef",
+        uniqueKey: "0xcafecafe",
       });
 
-      const bytes = cursor.toBytes();
-      const back = Cursor.fromBytes(bytes);
+      const proto = cursorToProto(cursor);
+      const back = cursorFromProto(proto);
       expect(back).toEqual(cursor);
     });
 
     it("should encode and decode (without uniqueKey)", () => {
-      const cursor = new Cursor({
+      const cursor = Cursor.make({
         orderKey: 123n,
       });
 
-      const bytes = cursor.toBytes();
-      const back = Cursor.fromBytes(bytes);
+      const proto = cursorToProto(cursor);
+      const back = cursorFromProto(proto);
       expect(back).toEqual(cursor);
     });
   });

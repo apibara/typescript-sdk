@@ -21,19 +21,27 @@ export interface Block {
     | BlockHeader
     | undefined;
   /** List of withdrawals. */
-  readonly withdrawals: readonly Withdrawal[];
+  readonly withdrawals?:
+    | readonly Withdrawal[]
+    | undefined;
   /** List of transactions. */
-  readonly transactions: readonly Transaction[];
+  readonly transactions?:
+    | readonly Transaction[]
+    | undefined;
   /** List of receipts. */
-  readonly receipts: readonly TransactionReceipt[];
+  readonly receipts?:
+    | readonly TransactionReceipt[]
+    | undefined;
   /** List of logs. */
-  readonly logs: readonly Log[];
+  readonly logs?: readonly Log[] | undefined;
 }
 
 /** Block header. */
 export interface BlockHeader {
   /** Block number. */
-  readonly number: bigint;
+  readonly number?:
+    | bigint
+    | undefined;
   /** Hash of the block. */
   readonly hash?:
     | B256
@@ -91,7 +99,9 @@ export interface BlockHeader {
     | B256
     | undefined;
   /** Nonce. */
-  readonly nonce: bigint;
+  readonly nonce?:
+    | bigint
+    | undefined;
   /** Base fee per unit of gas. */
   readonly baseFeePerGas?:
     | U256
@@ -105,15 +115,21 @@ export interface BlockHeader {
     | U256
     | undefined;
   /** Uncles' hashes. */
-  readonly uncles: readonly B256[];
+  readonly uncles?:
+    | readonly B256[]
+    | undefined;
   /** The size of this block in bytes. */
   readonly size?:
     | U256
     | undefined;
   /** Blob gas used. */
-  readonly blobGasUsed: bigint;
+  readonly blobGasUsed?:
+    | bigint
+    | undefined;
   /** Excess blob gas. */
-  readonly excessBlobGas: bigint;
+  readonly excessBlobGas?:
+    | bigint
+    | undefined;
   /** Parent beacon block root. */
   readonly parentBeaconBlockRoot?: B256 | undefined;
 }
@@ -121,11 +137,17 @@ export interface BlockHeader {
 /** A validator's withdrawal from the consensus layer. */
 export interface Withdrawal {
   /** Increasing index of the withdrawal. */
-  readonly index: bigint;
+  readonly index?:
+    | bigint
+    | undefined;
   /** Index of the validator. */
-  readonly validatorIndex: bigint;
+  readonly validatorIndex?:
+    | bigint
+    | undefined;
   /** Withdrawal index in the block. */
-  readonly withdrawalIndex: bigint;
+  readonly withdrawalIndex?:
+    | bigint
+    | undefined;
   /** Target address of the withdrawal. */
   readonly address?:
     | Address
@@ -140,9 +162,13 @@ export interface Transaction {
     | B256
     | undefined;
   /** Nonce. */
-  readonly nonce: bigint;
+  readonly nonce?:
+    | bigint
+    | undefined;
   /** Transaction index in the block. */
-  readonly transactionIndex: bigint;
+  readonly transactionIndex?:
+    | bigint
+    | undefined;
   /** Sender. */
   readonly from?:
     | Address
@@ -180,17 +206,23 @@ export interface Transaction {
     | Signature
     | undefined;
   /** Chain ID. */
-  readonly chainId: bigint;
+  readonly chainId?:
+    | bigint
+    | undefined;
   /** EIP-2930 access list. */
-  readonly accessList: readonly AccessListItem[];
+  readonly accessList?:
+    | readonly AccessListItem[]
+    | undefined;
   /** EIP-2718 transaction type. */
-  readonly transactionType: bigint;
+  readonly transactionType?:
+    | bigint
+    | undefined;
   /** EIP-4844 max gas fee per blob. */
   readonly maxFeePerBlobGas?:
     | U128
     | undefined;
   /** EIP-4844 blob hashes. */
-  readonly blobVersionedHashes: readonly B256[];
+  readonly blobVersionedHashes?: readonly B256[] | undefined;
 }
 
 export interface TransactionReceipt {
@@ -199,7 +231,9 @@ export interface TransactionReceipt {
     | B256
     | undefined;
   /** Index of the transaction in the block. */
-  readonly transactionIndex: bigint;
+  readonly transactionIndex?:
+    | bigint
+    | undefined;
   /** Cumulative gas used in the block after this transaction has been executed. */
   readonly cumulativeGasUsed?:
     | U256
@@ -229,9 +263,13 @@ export interface TransactionReceipt {
     | Bloom
     | undefined;
   /** Either 1 (success) or 0 (failure). */
-  readonly statusCode: bigint;
+  readonly statusCode?:
+    | bigint
+    | undefined;
   /** EIP-2718 transaction type. */
-  readonly transactionType: bigint;
+  readonly transactionType?:
+    | bigint
+    | undefined;
   /** EIP-4844 blob gas used. */
   readonly blobGasUsed?:
     | U128
@@ -246,15 +284,21 @@ export interface Log {
     | Address
     | undefined;
   /** Log topics. */
-  readonly topics: readonly B256[];
+  readonly topics?:
+    | readonly B256[]
+    | undefined;
   /** Additional data. */
   readonly data?:
     | HexData
     | undefined;
   /** Index of the log in the block. */
-  readonly logIndex: bigint;
+  readonly logIndex?:
+    | bigint
+    | undefined;
   /** Index of the transaction that emitted the log. */
-  readonly transactionIndex: bigint;
+  readonly transactionIndex?:
+    | bigint
+    | undefined;
   /** Hash of the transaction that emitted the log. */
   readonly transactionHash?: B256 | undefined;
 }
@@ -273,7 +317,7 @@ export interface Signature {
     | U256
     | undefined;
   /** The signature's parity byte. */
-  readonly yParity: boolean;
+  readonly yParity?: boolean | undefined;
 }
 
 export interface AccessListItem {
@@ -282,7 +326,7 @@ export interface AccessListItem {
     | Address
     | undefined;
   /** Storage keys to be loaded at the start of the transaction. */
-  readonly storageKeys: readonly B256[];
+  readonly storageKeys?: readonly B256[] | undefined;
 }
 
 function createBaseBlock(): Block {
@@ -294,17 +338,25 @@ export const Block = {
     if (message.header !== undefined) {
       BlockHeader.encode(message.header, writer.uint32(10).fork()).ldelim();
     }
-    for (const v of message.withdrawals) {
-      Withdrawal.encode(v!, writer.uint32(18).fork()).ldelim();
+    if (message.withdrawals !== undefined && message.withdrawals.length !== 0) {
+      for (const v of message.withdrawals) {
+        Withdrawal.encode(v!, writer.uint32(18).fork()).ldelim();
+      }
     }
-    for (const v of message.transactions) {
-      Transaction.encode(v!, writer.uint32(26).fork()).ldelim();
+    if (message.transactions !== undefined && message.transactions.length !== 0) {
+      for (const v of message.transactions) {
+        Transaction.encode(v!, writer.uint32(26).fork()).ldelim();
+      }
     }
-    for (const v of message.receipts) {
-      TransactionReceipt.encode(v!, writer.uint32(34).fork()).ldelim();
+    if (message.receipts !== undefined && message.receipts.length !== 0) {
+      for (const v of message.receipts) {
+        TransactionReceipt.encode(v!, writer.uint32(34).fork()).ldelim();
+      }
     }
-    for (const v of message.logs) {
-      Log.encode(v!, writer.uint32(42).fork()).ldelim();
+    if (message.logs !== undefined && message.logs.length !== 0) {
+      for (const v of message.logs) {
+        Log.encode(v!, writer.uint32(42).fork()).ldelim();
+      }
     }
     return writer;
   },
@@ -328,28 +380,28 @@ export const Block = {
             break;
           }
 
-          message.withdrawals.push(Withdrawal.decode(reader, reader.uint32()));
+          message.withdrawals!.push(Withdrawal.decode(reader, reader.uint32()));
           continue;
         case 3:
           if (tag !== 26) {
             break;
           }
 
-          message.transactions.push(Transaction.decode(reader, reader.uint32()));
+          message.transactions!.push(Transaction.decode(reader, reader.uint32()));
           continue;
         case 4:
           if (tag !== 34) {
             break;
           }
 
-          message.receipts.push(TransactionReceipt.decode(reader, reader.uint32()));
+          message.receipts!.push(TransactionReceipt.decode(reader, reader.uint32()));
           continue;
         case 5:
           if (tag !== 42) {
             break;
           }
 
-          message.logs.push(Log.decode(reader, reader.uint32()));
+          message.logs!.push(Log.decode(reader, reader.uint32()));
           continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
@@ -443,7 +495,7 @@ function createBaseBlockHeader(): BlockHeader {
 
 export const BlockHeader = {
   encode(message: BlockHeader, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.number !== BigInt("0")) {
+    if (message.number !== undefined && message.number !== BigInt("0")) {
       if (BigInt.asUintN(64, message.number) !== message.number) {
         throw new globalThis.Error("value provided for field message.number of type uint64 too large");
       }
@@ -491,7 +543,7 @@ export const BlockHeader = {
     if (message.mixHash !== undefined) {
       B256.encode(message.mixHash, writer.uint32(122).fork()).ldelim();
     }
-    if (message.nonce !== BigInt("0")) {
+    if (message.nonce !== undefined && message.nonce !== BigInt("0")) {
       if (BigInt.asUintN(64, message.nonce) !== message.nonce) {
         throw new globalThis.Error("value provided for field message.nonce of type uint64 too large");
       }
@@ -506,19 +558,21 @@ export const BlockHeader = {
     if (message.totalDifficulty !== undefined) {
       U256.encode(message.totalDifficulty, writer.uint32(154).fork()).ldelim();
     }
-    for (const v of message.uncles) {
-      B256.encode(v!, writer.uint32(162).fork()).ldelim();
+    if (message.uncles !== undefined && message.uncles.length !== 0) {
+      for (const v of message.uncles) {
+        B256.encode(v!, writer.uint32(162).fork()).ldelim();
+      }
     }
     if (message.size !== undefined) {
       U256.encode(message.size, writer.uint32(170).fork()).ldelim();
     }
-    if (message.blobGasUsed !== BigInt("0")) {
+    if (message.blobGasUsed !== undefined && message.blobGasUsed !== BigInt("0")) {
       if (BigInt.asUintN(64, message.blobGasUsed) !== message.blobGasUsed) {
         throw new globalThis.Error("value provided for field message.blobGasUsed of type uint64 too large");
       }
       writer.uint32(176).uint64(message.blobGasUsed.toString());
     }
-    if (message.excessBlobGas !== BigInt("0")) {
+    if (message.excessBlobGas !== undefined && message.excessBlobGas !== BigInt("0")) {
       if (BigInt.asUintN(64, message.excessBlobGas) !== message.excessBlobGas) {
         throw new globalThis.Error("value provided for field message.excessBlobGas of type uint64 too large");
       }
@@ -675,7 +729,7 @@ export const BlockHeader = {
             break;
           }
 
-          message.uncles.push(B256.decode(reader, reader.uint32()));
+          message.uncles!.push(B256.decode(reader, reader.uint32()));
           continue;
         case 21:
           if (tag !== 170) {
@@ -747,7 +801,7 @@ export const BlockHeader = {
 
   toJSON(message: BlockHeader): unknown {
     const obj: any = {};
-    if (message.number !== BigInt("0")) {
+    if (message.number !== undefined && message.number !== BigInt("0")) {
       obj.number = message.number.toString();
     }
     if (message.hash !== undefined) {
@@ -792,7 +846,7 @@ export const BlockHeader = {
     if (message.mixHash !== undefined) {
       obj.mixHash = B256.toJSON(message.mixHash);
     }
-    if (message.nonce !== BigInt("0")) {
+    if (message.nonce !== undefined && message.nonce !== BigInt("0")) {
       obj.nonce = message.nonce.toString();
     }
     if (message.baseFeePerGas !== undefined) {
@@ -810,10 +864,10 @@ export const BlockHeader = {
     if (message.size !== undefined) {
       obj.size = U256.toJSON(message.size);
     }
-    if (message.blobGasUsed !== BigInt("0")) {
+    if (message.blobGasUsed !== undefined && message.blobGasUsed !== BigInt("0")) {
       obj.blobGasUsed = message.blobGasUsed.toString();
     }
-    if (message.excessBlobGas !== BigInt("0")) {
+    if (message.excessBlobGas !== undefined && message.excessBlobGas !== BigInt("0")) {
       obj.excessBlobGas = message.excessBlobGas.toString();
     }
     if (message.parentBeaconBlockRoot !== undefined) {
@@ -900,19 +954,19 @@ function createBaseWithdrawal(): Withdrawal {
 
 export const Withdrawal = {
   encode(message: Withdrawal, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.index !== BigInt("0")) {
+    if (message.index !== undefined && message.index !== BigInt("0")) {
       if (BigInt.asUintN(64, message.index) !== message.index) {
         throw new globalThis.Error("value provided for field message.index of type uint64 too large");
       }
       writer.uint32(8).uint64(message.index.toString());
     }
-    if (message.validatorIndex !== BigInt("0")) {
+    if (message.validatorIndex !== undefined && message.validatorIndex !== BigInt("0")) {
       if (BigInt.asUintN(64, message.validatorIndex) !== message.validatorIndex) {
         throw new globalThis.Error("value provided for field message.validatorIndex of type uint64 too large");
       }
       writer.uint32(16).uint64(message.validatorIndex.toString());
     }
-    if (message.withdrawalIndex !== BigInt("0")) {
+    if (message.withdrawalIndex !== undefined && message.withdrawalIndex !== BigInt("0")) {
       if (BigInt.asUintN(64, message.withdrawalIndex) !== message.withdrawalIndex) {
         throw new globalThis.Error("value provided for field message.withdrawalIndex of type uint64 too large");
       }
@@ -990,13 +1044,13 @@ export const Withdrawal = {
 
   toJSON(message: Withdrawal): unknown {
     const obj: any = {};
-    if (message.index !== BigInt("0")) {
+    if (message.index !== undefined && message.index !== BigInt("0")) {
       obj.index = message.index.toString();
     }
-    if (message.validatorIndex !== BigInt("0")) {
+    if (message.validatorIndex !== undefined && message.validatorIndex !== BigInt("0")) {
       obj.validatorIndex = message.validatorIndex.toString();
     }
-    if (message.withdrawalIndex !== BigInt("0")) {
+    if (message.withdrawalIndex !== undefined && message.withdrawalIndex !== BigInt("0")) {
       obj.withdrawalIndex = message.withdrawalIndex.toString();
     }
     if (message.address !== undefined) {
@@ -1053,13 +1107,13 @@ export const Transaction = {
     if (message.hash !== undefined) {
       B256.encode(message.hash, writer.uint32(10).fork()).ldelim();
     }
-    if (message.nonce !== BigInt("0")) {
+    if (message.nonce !== undefined && message.nonce !== BigInt("0")) {
       if (BigInt.asUintN(64, message.nonce) !== message.nonce) {
         throw new globalThis.Error("value provided for field message.nonce of type uint64 too large");
       }
       writer.uint32(16).uint64(message.nonce.toString());
     }
-    if (message.transactionIndex !== BigInt("0")) {
+    if (message.transactionIndex !== undefined && message.transactionIndex !== BigInt("0")) {
       if (BigInt.asUintN(64, message.transactionIndex) !== message.transactionIndex) {
         throw new globalThis.Error("value provided for field message.transactionIndex of type uint64 too large");
       }
@@ -1092,16 +1146,18 @@ export const Transaction = {
     if (message.signature !== undefined) {
       Signature.encode(message.signature, writer.uint32(98).fork()).ldelim();
     }
-    if (message.chainId !== BigInt("0")) {
+    if (message.chainId !== undefined && message.chainId !== BigInt("0")) {
       if (BigInt.asUintN(64, message.chainId) !== message.chainId) {
         throw new globalThis.Error("value provided for field message.chainId of type uint64 too large");
       }
       writer.uint32(104).uint64(message.chainId.toString());
     }
-    for (const v of message.accessList) {
-      AccessListItem.encode(v!, writer.uint32(114).fork()).ldelim();
+    if (message.accessList !== undefined && message.accessList.length !== 0) {
+      for (const v of message.accessList) {
+        AccessListItem.encode(v!, writer.uint32(114).fork()).ldelim();
+      }
     }
-    if (message.transactionType !== BigInt("0")) {
+    if (message.transactionType !== undefined && message.transactionType !== BigInt("0")) {
       if (BigInt.asUintN(64, message.transactionType) !== message.transactionType) {
         throw new globalThis.Error("value provided for field message.transactionType of type uint64 too large");
       }
@@ -1110,8 +1166,10 @@ export const Transaction = {
     if (message.maxFeePerBlobGas !== undefined) {
       U128.encode(message.maxFeePerBlobGas, writer.uint32(130).fork()).ldelim();
     }
-    for (const v of message.blobVersionedHashes) {
-      B256.encode(v!, writer.uint32(138).fork()).ldelim();
+    if (message.blobVersionedHashes !== undefined && message.blobVersionedHashes.length !== 0) {
+      for (const v of message.blobVersionedHashes) {
+        B256.encode(v!, writer.uint32(138).fork()).ldelim();
+      }
     }
     return writer;
   },
@@ -1219,7 +1277,7 @@ export const Transaction = {
             break;
           }
 
-          message.accessList.push(AccessListItem.decode(reader, reader.uint32()));
+          message.accessList!.push(AccessListItem.decode(reader, reader.uint32()));
           continue;
         case 15:
           if (tag !== 120) {
@@ -1240,7 +1298,7 @@ export const Transaction = {
             break;
           }
 
-          message.blobVersionedHashes.push(B256.decode(reader, reader.uint32()));
+          message.blobVersionedHashes!.push(B256.decode(reader, reader.uint32()));
           continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
@@ -1282,10 +1340,10 @@ export const Transaction = {
     if (message.hash !== undefined) {
       obj.hash = B256.toJSON(message.hash);
     }
-    if (message.nonce !== BigInt("0")) {
+    if (message.nonce !== undefined && message.nonce !== BigInt("0")) {
       obj.nonce = message.nonce.toString();
     }
-    if (message.transactionIndex !== BigInt("0")) {
+    if (message.transactionIndex !== undefined && message.transactionIndex !== BigInt("0")) {
       obj.transactionIndex = message.transactionIndex.toString();
     }
     if (message.from !== undefined) {
@@ -1315,13 +1373,13 @@ export const Transaction = {
     if (message.signature !== undefined) {
       obj.signature = Signature.toJSON(message.signature);
     }
-    if (message.chainId !== BigInt("0")) {
+    if (message.chainId !== undefined && message.chainId !== BigInt("0")) {
       obj.chainId = message.chainId.toString();
     }
     if (message.accessList?.length) {
       obj.accessList = message.accessList.map((e) => AccessListItem.toJSON(e));
     }
-    if (message.transactionType !== BigInt("0")) {
+    if (message.transactionType !== undefined && message.transactionType !== BigInt("0")) {
       obj.transactionType = message.transactionType.toString();
     }
     if (message.maxFeePerBlobGas !== undefined) {
@@ -1394,7 +1452,7 @@ export const TransactionReceipt = {
     if (message.transactionHash !== undefined) {
       B256.encode(message.transactionHash, writer.uint32(10).fork()).ldelim();
     }
-    if (message.transactionIndex !== BigInt("0")) {
+    if (message.transactionIndex !== undefined && message.transactionIndex !== BigInt("0")) {
       if (BigInt.asUintN(64, message.transactionIndex) !== message.transactionIndex) {
         throw new globalThis.Error("value provided for field message.transactionIndex of type uint64 too large");
       }
@@ -1421,13 +1479,13 @@ export const TransactionReceipt = {
     if (message.logsBloom !== undefined) {
       Bloom.encode(message.logsBloom, writer.uint32(74).fork()).ldelim();
     }
-    if (message.statusCode !== BigInt("0")) {
+    if (message.statusCode !== undefined && message.statusCode !== BigInt("0")) {
       if (BigInt.asUintN(64, message.statusCode) !== message.statusCode) {
         throw new globalThis.Error("value provided for field message.statusCode of type uint64 too large");
       }
       writer.uint32(80).uint64(message.statusCode.toString());
     }
-    if (message.transactionType !== BigInt("0")) {
+    if (message.transactionType !== undefined && message.transactionType !== BigInt("0")) {
       if (BigInt.asUintN(64, message.transactionType) !== message.transactionType) {
         throw new globalThis.Error("value provided for field message.transactionType of type uint64 too large");
       }
@@ -1572,7 +1630,7 @@ export const TransactionReceipt = {
     if (message.transactionHash !== undefined) {
       obj.transactionHash = B256.toJSON(message.transactionHash);
     }
-    if (message.transactionIndex !== BigInt("0")) {
+    if (message.transactionIndex !== undefined && message.transactionIndex !== BigInt("0")) {
       obj.transactionIndex = message.transactionIndex.toString();
     }
     if (message.cumulativeGasUsed !== undefined) {
@@ -1596,10 +1654,10 @@ export const TransactionReceipt = {
     if (message.logsBloom !== undefined) {
       obj.logsBloom = Bloom.toJSON(message.logsBloom);
     }
-    if (message.statusCode !== BigInt("0")) {
+    if (message.statusCode !== undefined && message.statusCode !== BigInt("0")) {
       obj.statusCode = message.statusCode.toString();
     }
-    if (message.transactionType !== BigInt("0")) {
+    if (message.transactionType !== undefined && message.transactionType !== BigInt("0")) {
       obj.transactionType = message.transactionType.toString();
     }
     if (message.blobGasUsed !== undefined) {
@@ -1665,19 +1723,21 @@ export const Log = {
     if (message.address !== undefined) {
       Address.encode(message.address, writer.uint32(10).fork()).ldelim();
     }
-    for (const v of message.topics) {
-      B256.encode(v!, writer.uint32(18).fork()).ldelim();
+    if (message.topics !== undefined && message.topics.length !== 0) {
+      for (const v of message.topics) {
+        B256.encode(v!, writer.uint32(18).fork()).ldelim();
+      }
     }
     if (message.data !== undefined) {
       HexData.encode(message.data, writer.uint32(26).fork()).ldelim();
     }
-    if (message.logIndex !== BigInt("0")) {
+    if (message.logIndex !== undefined && message.logIndex !== BigInt("0")) {
       if (BigInt.asUintN(64, message.logIndex) !== message.logIndex) {
         throw new globalThis.Error("value provided for field message.logIndex of type uint64 too large");
       }
       writer.uint32(32).uint64(message.logIndex.toString());
     }
-    if (message.transactionIndex !== BigInt("0")) {
+    if (message.transactionIndex !== undefined && message.transactionIndex !== BigInt("0")) {
       if (BigInt.asUintN(64, message.transactionIndex) !== message.transactionIndex) {
         throw new globalThis.Error("value provided for field message.transactionIndex of type uint64 too large");
       }
@@ -1708,7 +1768,7 @@ export const Log = {
             break;
           }
 
-          message.topics.push(B256.decode(reader, reader.uint32()));
+          message.topics!.push(B256.decode(reader, reader.uint32()));
           continue;
         case 3:
           if (tag !== 26) {
@@ -1769,10 +1829,10 @@ export const Log = {
     if (message.data !== undefined) {
       obj.data = HexData.toJSON(message.data);
     }
-    if (message.logIndex !== BigInt("0")) {
+    if (message.logIndex !== undefined && message.logIndex !== BigInt("0")) {
       obj.logIndex = message.logIndex.toString();
     }
-    if (message.transactionIndex !== BigInt("0")) {
+    if (message.transactionIndex !== undefined && message.transactionIndex !== BigInt("0")) {
       obj.transactionIndex = message.transactionIndex.toString();
     }
     if (message.transactionHash !== undefined) {
@@ -1815,7 +1875,7 @@ export const Signature = {
     if (message.v !== undefined) {
       U256.encode(message.v, writer.uint32(26).fork()).ldelim();
     }
-    if (message.yParity !== false) {
+    if (message.yParity !== undefined && message.yParity !== false) {
       writer.uint32(32).bool(message.yParity);
     }
     return writer;
@@ -1885,7 +1945,7 @@ export const Signature = {
     if (message.v !== undefined) {
       obj.v = U256.toJSON(message.v);
     }
-    if (message.yParity !== false) {
+    if (message.yParity !== undefined && message.yParity !== false) {
       obj.yParity = message.yParity;
     }
     return obj;
@@ -1913,8 +1973,10 @@ export const AccessListItem = {
     if (message.address !== undefined) {
       Address.encode(message.address, writer.uint32(10).fork()).ldelim();
     }
-    for (const v of message.storageKeys) {
-      B256.encode(v!, writer.uint32(18).fork()).ldelim();
+    if (message.storageKeys !== undefined && message.storageKeys.length !== 0) {
+      for (const v of message.storageKeys) {
+        B256.encode(v!, writer.uint32(18).fork()).ldelim();
+      }
     }
     return writer;
   },
@@ -1938,7 +2000,7 @@ export const AccessListItem = {
             break;
           }
 
-          message.storageKeys.push(B256.decode(reader, reader.uint32()));
+          message.storageKeys!.push(B256.decode(reader, reader.uint32()));
           continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
@@ -1999,7 +2061,7 @@ function toTimestamp(date: Date): Timestamp {
 }
 
 function fromTimestamp(t: Timestamp): Date {
-  let millis = (globalThis.Number(t.seconds.toString()) || 0) * 1_000;
+  let millis = (globalThis.Number(t.seconds?.toString()) || 0) * 1_000;
   millis += (t.nanos || 0) / 1_000_000;
   return new globalThis.Date(millis);
 }

@@ -1,7 +1,8 @@
 import { describe, it, expect } from "vitest";
-import { encodeEventTopics, parseAbi } from "viem";
+import { encodeEventTopics, pad, parseAbi } from "viem";
 
-import { Filter } from "./filter";
+import { Filter, LogFilter, filterFromProto, filterToProto } from "./filter";
+import { Schema } from "@effect/schema";
 
 const abi = parseAbi([
   "event Transfer(address indexed from, address indexed to, uint256 value)",
@@ -9,20 +10,15 @@ const abi = parseAbi([
 
 describe("Filter", () => {
   it("all filters are optional", () => {
-    const filter = new Filter({ logs: [], withdrawals: [], transactions: [] });
+    const filter = Filter.make({});
 
-    expect(filter.header).toBeUndefined();
-    expect(filter.logs).toHaveLength(0);
-
-    const proto = filter.toProto();
-    const back = Filter.fromProto(proto);
-    expect(back).toBeDefined();
+    const proto = filterToProto(filter);
+    const back = filterFromProto(proto);
+    expect(back).toEqual(filter);
   });
 
   it("accepts logs filter", () => {
-    const filter = new Filter({
-      withdrawals: [],
-      transactions: [],
+    const filter = Filter.make({
       logs: [
         {
           address: "0x123456789012",
@@ -38,9 +34,47 @@ describe("Filter", () => {
 
     expect(filter.logs).toHaveLength(1);
 
-    const proto = filter.toProto();
-    const back = Filter.fromProto(proto);
+    const proto = filterToProto(filter);
+    const back = filterFromProto(proto);
+
     expect(back).toBeDefined();
     expect(back.logs).toHaveLength(1);
+  });
+});
+
+describe("LogFilter", () => {
+  const encode = Schema.encodeSync(LogFilter);
+  const decode = Schema.decodeSync(LogFilter);
+
+  it("can be empty", () => {
+    const filter = LogFilter.make({});
+
+    const proto = encode(filter);
+    const back = decode(proto);
+    expect(back).toEqual(filter);
+  });
+
+  it("can have null topics", () => {
+    const filter = LogFilter.make({
+      topics: [null, pad("0x1"), null, pad("0x3")],
+    });
+
+    const proto = encode(filter);
+    const back = decode(proto);
+    expect(back).toEqual(filter);
+  });
+
+  it("can have all optional fields", () => {
+    const filter = LogFilter.make({
+      address: pad("0xa", { size: 20 }),
+      topics: [null, pad("0x1"), null, pad("0x3")],
+      includeTransaction: true,
+      includeReceipt: true,
+      strict: true,
+    });
+
+    const proto = encode(filter);
+    const back = decode(proto);
+    expect(back).toEqual(filter);
   });
 });

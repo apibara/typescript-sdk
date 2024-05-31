@@ -107,14 +107,16 @@ export interface Timestamp {
    * 1970-01-01T00:00:00Z. Must be from 0001-01-01T00:00:00Z to
    * 9999-12-31T23:59:59Z inclusive.
    */
-  readonly seconds: bigint;
+  readonly seconds?:
+    | bigint
+    | undefined;
   /**
    * Non-negative fractions of a second at nanosecond resolution. Negative
    * second values with fractions must still have non-negative nanos values
    * that count forward in time. Must be from 0 to 999,999,999
    * inclusive.
    */
-  readonly nanos: number;
+  readonly nanos?: number | undefined;
 }
 
 function createBaseTimestamp(): Timestamp {
@@ -123,13 +125,13 @@ function createBaseTimestamp(): Timestamp {
 
 export const Timestamp = {
   encode(message: Timestamp, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.seconds !== BigInt("0")) {
+    if (message.seconds !== undefined && message.seconds !== BigInt("0")) {
       if (BigInt.asIntN(64, message.seconds) !== message.seconds) {
         throw new globalThis.Error("value provided for field message.seconds of type int64 too large");
       }
       writer.uint32(8).int64(message.seconds.toString());
     }
-    if (message.nanos !== 0) {
+    if (message.nanos !== undefined && message.nanos !== 0) {
       writer.uint32(16).int32(message.nanos);
     }
     return writer;
@@ -174,10 +176,10 @@ export const Timestamp = {
 
   toJSON(message: Timestamp): unknown {
     const obj: any = {};
-    if (message.seconds !== BigInt("0")) {
+    if (message.seconds !== undefined && message.seconds !== BigInt("0")) {
       obj.seconds = message.seconds.toString();
     }
-    if (message.nanos !== 0) {
+    if (message.nanos !== undefined && message.nanos !== 0) {
       obj.nanos = Math.round(message.nanos);
     }
     return obj;

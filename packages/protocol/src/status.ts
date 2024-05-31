@@ -1,27 +1,22 @@
 import { Schema } from "@effect/schema";
-import type { ParseOptions } from "@effect/schema/AST";
 
 import { Cursor } from "./common";
 
-export class StatusRequest extends Schema.Class<StatusRequest>("StatusRequest")(
-  {},
-) {
-  toProto(options?: ParseOptions) {
-    return Schema.encodeSync(StatusRequest)(this, options);
-  }
+/** The request to the `status` endpoint. */
+export const StatusRequest = Schema.Struct({});
 
-  static fromProto = Schema.decodeSync(StatusRequest);
-}
+export type StatusRequest = typeof StatusRequest.Type;
 
-export class StatusResponse extends Schema.Class<StatusResponse>(
-  "StatusResponse",
-)({
+export const statusRequestToProto = Schema.encodeSync(StatusRequest);
+export const statusRequestFromProto = Schema.decodeSync(StatusRequest);
+
+/** The response from the `status` endpoint. */
+export const StatusResponse = Schema.Struct({
   currentHead: Schema.optional(Cursor),
   lastIngested: Schema.optional(Cursor),
-}) {
-  toProto(options?: ParseOptions) {
-    return Schema.encodeSync(StatusResponse)(this, options);
-  }
+});
 
-  static fromProto = Schema.decodeSync(StatusResponse);
-}
+export type StatusResponse = typeof StatusResponse.Type;
+
+export const statusResponseToProto = Schema.encodeSync(StatusResponse);
+export const statusResponseFromProto = Schema.decodeSync(StatusResponse);

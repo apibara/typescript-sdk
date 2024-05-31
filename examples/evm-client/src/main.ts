@@ -1,18 +1,15 @@
 import { runMain, defineCommand } from "citty";
 import consola from "consola";
 import { encodeEventTopics, parseAbi } from "viem";
-import { Filter, blockFromBytes } from "@apibara/evm";
-import {
-  Cursor,
-  DataFinality,
-  StreamDataRequest,
-  createClient,
-} from "@apibara/protocol";
+import { Filter, FilterFromBytes } from "@apibara/evm";
+import { createClient, StreamDataRequest } from "@apibara/protocol";
 import { createChannel } from "nice-grpc";
 
 const abi = parseAbi([
   "event Transfer(address indexed from, address indexed to, uint256 value)",
 ]);
+
+const EvmStreamDataRequest = StreamDataRequest(FilterFromBytes);
 
 const command = defineCommand({
   meta: {
@@ -39,14 +36,10 @@ const command = defineCommand({
     const response = await client.status();
     console.log(response);
 
-    const filter = new Filter({
+    const filter = Filter.make({
       header: {
         always: true,
       },
-      transactions: [],
-      withdrawals: [],
-      logs: [],
-      /*
       logs: [
         {
           strict: true,
@@ -57,9 +50,19 @@ const command = defineCommand({
           }),
         },
       ],
-      */
     });
 
+    const request = EvmStreamDataRequest.make({
+      finality: "accepted",
+      startingCursor: {
+        orderKey: 5_000_000n,
+      },
+      filter: [filter],
+    });
+
+    console.log(request);
+
+    /*
     const request = new StreamDataRequest({
       finality: "accepted",
       startingCursor: new Cursor({
@@ -78,6 +81,7 @@ const command = defineCommand({
         }
       }
     }
+    */
 
     /*
     const head = Cursor.fromProto(response.currentHead!);
