@@ -1,22 +1,38 @@
 import { Schema } from "@effect/schema";
+import { Bytes, BytesFromUint8Array } from "@apibara/protocol";
 
-/*
-import { AddressFromMessage, B256, B256FromMessage } from "./common";
 import * as proto from "./proto";
+import { Address, B256 } from "./common";
+
+export const HexData = Schema.transform(
+  Schema.Struct({
+    value: BytesFromUint8Array,
+  }),
+  Bytes,
+  {
+    strict: false,
+    encode(value) {
+      throw new Error("Not implemented");
+    },
+    decode({ value }) {
+      return value;
+    },
+  },
+);
 
 export const BlockHeader = Schema.Struct({
   number: Schema.BigIntFromSelf,
-  hash: Schema.optional(B256FromMessage),
-  parentHash: Schema.optional(B256FromMessage),
-  uncleHash: Schema.optional(B256FromMessage),
-  miner: Schema.optional(AddressFromMessage),
-  stateRoot: Schema.optional(B256FromMessage),
-  transactionRoot: Schema.optional(B256FromMessage),
-  receiptRoot: Schema.optional(B256FromMessage),
+  hash: Schema.optional(B256),
+  parentHash: Schema.optional(B256),
+  uncleHash: Schema.optional(B256),
+  miner: Schema.optional(Address),
+  stateRoot: Schema.optional(B256),
+  transactionRoot: Schema.optional(B256),
+  receiptRoot: Schema.optional(B256),
   // TODO: logsBloom, etc.
   nonce: Schema.BigIntFromSelf,
   // TODO.
-  uncles: Schema.Array(B256FromMessage),
+  uncles: Schema.Array(B256),
   // TODO.
   blobGasUsed: Schema.BigIntFromSelf,
   excessBlobGas: Schema.BigIntFromSelf,
@@ -28,12 +44,12 @@ export const Withdrawal = Schema.Struct({
   index: Schema.BigIntFromSelf,
   validatorIndex: Schema.BigIntFromSelf,
   withdrawalIndex: Schema.BigIntFromSelf,
-  address: Schema.optional(AddressFromMessage),
+  address: Schema.optional(Address),
 });
 
 export const AccessListItem = Schema.Struct({
   // TODO: fields.
-  storageKeys: Schema.Array(B256FromMessage),
+  storageKeys: Schema.Array(B256),
 });
 
 export const Transaction = Schema.Struct({
@@ -43,7 +59,7 @@ export const Transaction = Schema.Struct({
   chainId: Schema.BigIntFromSelf,
   accessList: Schema.Array(AccessListItem),
   transactionType: Schema.BigIntFromSelf,
-  blobVersionedHashes: Schema.Array(B256FromMessage),
+  blobVersionedHashes: Schema.Array(B256),
 });
 
 export const TransactionReceipt = Schema.Struct({
@@ -54,11 +70,14 @@ export const TransactionReceipt = Schema.Struct({
 });
 
 export const Log = Schema.Struct({
-  address: Schema.optional(AddressFromMessage),
-  topics: Schema.Array(B256FromMessage),
+  address: Schema.optional(Address),
+  topics: Schema.Array(B256),
+  data: HexData,
   logIndex: Schema.BigIntFromSelf,
   transactionIndex: Schema.BigIntFromSelf,
 });
+
+export type Log = typeof Log.Type;
 
 export const Block = Schema.Struct({
   header: Schema.optional(BlockHeader),
@@ -68,25 +87,16 @@ export const Block = Schema.Struct({
   logs: Schema.Array(Log),
 });
 
-export type Block = typeof Block.Type;
-
-const blockToProto = Schema.encodeSync(Block);
-const blockFromProto = Schema.decodeSync(Block);
-
 export const BlockFromBytes = Schema.transform(
-  Block,
   Schema.Uint8ArrayFromSelf,
+  Block,
   {
-    encode(value) {
-      const blockProto = proto.data.Block.decode(value);
-      return blockFromProto(blockProto);
-    },
+    strict: false,
     decode(value) {
-      const blockProto = blockToProto(value);
-      return proto.data.Block.encode(blockProto).finish();
+      return proto.data.Block.decode(value);
+    },
+    encode(value) {
+      return proto.data.Block.encode(value).finish();
     },
   },
 );
-
-export const blockFromBytes = Schema.encodeSync(BlockFromBytes);
-*/

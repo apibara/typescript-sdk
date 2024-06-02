@@ -12,7 +12,7 @@ export const Bytes = Schema.TemplateLiteral(
 
 export type Bytes = typeof Bytes.Type;
 
-const BytesFromUint8Array = Schema.requiredToOptional(
+export const BytesFromUint8Array = Schema.requiredToOptional(
   Schema.Uint8ArrayFromSelf,
   Bytes,
   {

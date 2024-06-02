@@ -1,15 +1,13 @@
 import { runMain, defineCommand } from "citty";
 import consola from "consola";
-import { encodeEventTopics, parseAbi } from "viem";
-import { Filter, FilterFromBytes } from "@apibara/evm";
-import { createClient, StreamConfig } from "@apibara/protocol";
+import { encodeEventTopics, parseAbi, decodeEventLog } from "viem";
+import { EvmStream, Filter } from "@apibara/evm";
+import { createClient } from "@apibara/protocol";
 import { createChannel } from "nice-grpc";
 
 const abi = parseAbi([
   "event Transfer(address indexed from, address indexed to, uint256 value)",
 ]);
-
-const EvmStream = new StreamConfig(FilterFromBytes);
 
 type Request = typeof EvmStream.Request.Type;
 
@@ -63,73 +61,32 @@ const command = defineCommand({
     });
 
     for await (const message of client.streamData(request)) {
-      console.log(message);
-    }
-    /*
-    const request = EvmStreamDataRequest.make({
-      finality: "accepted",
-      startingCursor: {
-        orderKey: 5_000_000n,
-      },
-      filter: [filter],
-    });
-
-    console.log(request);
-    */
-
-    /*
-    const request = new StreamDataRequest({
-      finality: "accepted",
-      startingCursor: new Cursor({
-        orderKey: 5_000_000n,
-      }),
-      filter: [filter.encode()],
-    });
-
-    // console.log(request.toProto());
-    for await (const message of client.streamData(request)) {
-      if (message._tag === "data") {
-        console.log("data", message.endCursor);
-        for (const data of message.data) {
-          const block = blockFromBytes(data);
-          console.log(block);
-        }
-      }
-    }
-    */
-
-    /*
-    const head = Cursor.fromProto(response.currentHead!);
-    consola.info(`EVM stream head=${head.orderKey} hash=${head.uniqueKey}`);
-
-    const request = new StreamDataRequest(
-      new Cursor(5_000_000n),
-      DataFinality.ACCEPTED,
-      [filter],
-    );
-
-    const stream = client.streamData(request.toProto());
-    for await (const message of stream) {
-      switch (message?.message?.$case) {
+      switch (message._tag) {
         case "data": {
-          const endCursor = message.message.data.endCursor;
-          // consola.log("Received data", endCursor?.orderKey);
-          const blockData = message.message.data.data[0];
-          const block = BlockDecoder.decode(blockData);
-          const { header, logs } = block;
-          consola.info(header);
-          for (const log of logs ?? []) {
-            consola.log(log);
+          consola.info("Block", message.data.endCursor?.orderKey);
+          for (const block of message.data.data) {
+            consola.info("Block", block.header?.number);
+            for (const log of block.logs ?? []) {
+              const { args } = decodeEventLog({
+                abi,
+                // @ts-ignore
+                topics: log.topics,
+                data: log.data,
+                eventName: "Transfer",
+              });
+              consola.info(
+                "Log",
+                log.logIndex,
+                args.from,
+                args.to,
+                args.value.toString(),
+              );
+            }
           }
-          // console.log(block.header?.number!);
           break;
         }
-        default: {
-          consola.info("Received message", message);
-        }
       }
     }
-    */
   },
 });
 

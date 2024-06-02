@@ -109,8 +109,10 @@ describe("StreamDataResponse", () => {
       const message = SystemMessage.make({
         _tag: "systemMessage",
         systemMessage: {
-          _tag: "stdout",
-          stdout: "hello",
+          output: {
+            _tag: "stdout",
+            stdout: "hello",
+          },
         },
       });
 
@@ -123,8 +125,10 @@ describe("StreamDataResponse", () => {
       const message = SystemMessage.make({
         _tag: "systemMessage",
         systemMessage: {
-          _tag: "stderr",
-          stderr: "hello",
+          output: {
+            _tag: "stderr",
+            stderr: "hello",
+          },
         },
       });
 

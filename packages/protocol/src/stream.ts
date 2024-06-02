@@ -81,7 +81,9 @@ export type StdErr = typeof StdErr.Type;
 
 export const SystemMessage = Schema.Struct({
   _tag: tag("systemMessage"),
-  systemMessage: Schema.Union(StdOut, StdErr),
+  systemMessage: Schema.Struct({
+    output: Schema.optional(Schema.Union(StdOut, StdErr)),
+  }),
 });
 
 export type SystemMessage = typeof SystemMessage.Type;
@@ -108,6 +110,21 @@ export const StreamDataResponse = <TA, TR>(
     static SystemMessage = SystemMessage;
   };
 */
+
+const ResponseWithoutData = Schema.Union(Invalidate, Heartbeat, SystemMessage);
+type ResponseWithoutData = typeof ResponseWithoutData.Type;
+
+export type StreamDataResponse<TA> =
+  | ResponseWithoutData
+  | {
+      _tag: "data";
+      data: {
+        cursor?: Cursor | undefined;
+        endCursor?: Cursor | undefined;
+        finality: DataFinality;
+        data: readonly TA[];
+      };
+    };
 
 function tag<T extends string>(tag: T) {
   return Schema.Literal(tag).pipe(
