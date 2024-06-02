@@ -21,10 +21,10 @@ export const DataFinality = Schema.transform(
     },
     encode(value) {
       const enumMap = {
-        ["finalized"]: proto.stream.DataFinality.FINALIZED,
-        ["accepted"]: proto.stream.DataFinality.ACCEPTED,
-        ["pending"]: proto.stream.DataFinality.PENDING,
-        ["unknown"]: proto.stream.DataFinality.UNKNOWN,
+        finalized: proto.stream.DataFinality.FINALIZED,
+        accepted: proto.stream.DataFinality.ACCEPTED,
+        pending: proto.stream.DataFinality.PENDING,
+        unknown: proto.stream.DataFinality.UNKNOWN,
       };
 
       return enumMap[value] ?? proto.stream.DataFinality.UNKNOWN;
@@ -34,6 +34,7 @@ export const DataFinality = Schema.transform(
 
 export type DataFinality = typeof DataFinality.Type;
 
+/** Create a `StreamDataRequest` with the given filter schema. */
 export const StreamDataRequest = <TA, TR>(
   filter: Schema.Schema<TA, Uint8Array, TR>,
 ) =>
@@ -49,18 +50,68 @@ export type StreamDataRequest<TA> = {
   filter: readonly TA[];
 };
 
-export const Invalidate = Schema.TaggedStruct("invalidate", {
-  cursor: Schema.optional(Cursor),
+export const Invalidate = Schema.Struct({
+  _tag: tag("invalidate"),
+  invalidate: Schema.Struct({
+    cursor: Schema.optional(Cursor),
+  }),
 });
 
 export type Invalidate = typeof Invalidate.Type;
 
+export const Heartbeat = Schema.Struct({
+  _tag: tag("heartbeat"),
+});
+
+export type Heartbeat = typeof Heartbeat.Type;
+
+export const StdOut = Schema.Struct({
+  _tag: tag("stdout"),
+  stdout: Schema.String,
+});
+
+export type StdOut = typeof StdOut.Type;
+
+export const StdErr = Schema.Struct({
+  _tag: tag("stderr"),
+  stderr: Schema.String,
+});
+
+export type StdErr = typeof StdErr.Type;
+
+export const SystemMessage = Schema.Struct({
+  _tag: tag("systemMessage"),
+  systemMessage: Schema.Union(StdOut, StdErr),
+});
+
+export type SystemMessage = typeof SystemMessage.Type;
+
 export const Data = <TA, TR>(schema: Schema.Schema<TA, Uint8Array, TR>) =>
-  Schema.TaggedStruct("data", {
-    cursor: Schema.optional(Cursor),
-    endCursor: Schema.optional(Cursor),
-    finality: DataFinality,
-    data: Schema.Array(schema),
+  Schema.Struct({
+    _tag: tag("data"),
+    data: Schema.Struct({
+      cursor: Schema.optional(Cursor),
+      endCursor: Schema.optional(Cursor),
+      finality: DataFinality,
+      data: Schema.Array(schema),
+    }),
   });
 
-export const StreamDataResponse = Schema.Union(Invalidate);
+export const StreamDataResponse = <TA, TR>(
+  data: Schema.Schema<TA, Uint8Array, TR>,
+) => Schema.Union(Data(data), Invalidate, Heartbeat, SystemMessage);
+/*
+  class extends Schema.Union(Data(data), Invalidate, Heartbeat, SystemMessage) {
+    static Invalidate = Invalidate;
+    static Data = Data(data);
+    static Heartbeat = Heartbeat;
+    static SystemMessage = SystemMessage;
+  };
+*/
+
+function tag<T extends string>(tag: T) {
+  return Schema.Literal(tag).pipe(
+    Schema.propertySignature,
+    Schema.fromKey("$case"),
+  );
+}

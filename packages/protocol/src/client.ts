@@ -1,8 +1,8 @@
 import {
-  CallOptions,
-  Channel,
-  DefaultCallOptions,
-  NormalizedServiceDefinition,
+  type CallOptions,
+  type Channel,
+  type DefaultCallOptions,
+  type NormalizedServiceDefinition,
   createClient as grpcCreateClient,
 } from "nice-grpc";
 import { Schema } from "@effect/schema";
@@ -10,7 +10,7 @@ import { Schema } from "@effect/schema";
 import * as proto from "./proto";
 
 import {
-  StatusRequest,
+  type StatusRequest,
   statusRequestToProto,
   statusResponseFromProto,
 } from "./status";
