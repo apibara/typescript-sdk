@@ -35,13 +35,19 @@ export const DataFinality = Schema.transform(
 export type DataFinality = typeof DataFinality.Type;
 
 export const StreamDataRequest = <TA, TR>(
-  data: Schema.Schema<TA, Uint8Array, TR>,
+  filter: Schema.Schema<TA, Uint8Array, TR>,
 ) =>
   Schema.Struct({
     finality: Schema.optional(DataFinality),
     startingCursor: Schema.optional(Cursor),
-    filter: Schema.Array(data),
+    filter: Schema.Array(filter),
   });
+
+export type StreamDataRequest<TA> = {
+  finality?: DataFinality | undefined;
+  startingCursor?: Cursor | undefined;
+  filter: readonly TA[];
+};
 
 export const Invalidate = Schema.TaggedStruct("invalidate", {
   cursor: Schema.optional(Cursor),

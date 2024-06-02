@@ -1,4 +1,3 @@
-import util from "util";
 import {
   CallOptions,
   Channel,
@@ -15,8 +14,22 @@ import {
   statusRequestToProto,
   statusResponseFromProto,
 } from "./status";
+import { StreamDataRequest } from "./stream";
 
-export function createClient(
+export class StreamConfig<TFilter> {
+  public RequestSchema;
+
+  constructor(private filter: Schema.Schema<TFilter, Uint8Array, never>) {
+    this.RequestSchema = StreamDataRequest(this.filter);
+  }
+
+  get Request() {
+    return this.RequestSchema;
+  }
+}
+
+export function createClient<TFilter>(
+  config: StreamConfig<TFilter>,
   channel: Channel,
   defaultCallOptions?: DefaultCallOptions<
     NormalizedServiceDefinition<proto.stream.DnaStreamDefinition>
@@ -27,11 +40,18 @@ export function createClient(
     channel,
     defaultCallOptions,
   );
-  return new Client(client);
+  return new Client(config, client);
 }
 
-export class Client {
-  constructor(private client: proto.stream.DnaStreamClient) {}
+export class Client<TFilter> {
+  private encodeRequest;
+
+  constructor(
+    config: StreamConfig<TFilter>,
+    private client: proto.stream.DnaStreamClient,
+  ) {
+    this.encodeRequest = Schema.encodeSync(config.RequestSchema);
+  }
 
   async status(request?: StatusRequest, options?: CallOptions) {
     const response = await this.client.status(
@@ -41,18 +61,17 @@ export class Client {
     return statusResponseFromProto(response);
   }
 
-  // streamData(request: StreamDataRequest, options?: CallOptions) {
-  //   const it = this.client.streamData(request.toProto(), options);
-  //   return new StreamDataIterable(it);
-  // }
+  streamData(request: StreamDataRequest<TFilter>, options?: CallOptions) {
+    const it = this.client.streamData(this.encodeRequest(request), options);
+    return new StreamDataIterable(it);
+  }
 }
 
-/*
 export class StreamDataIterable {
   constructor(private it: AsyncIterable<proto.stream.StreamDataResponse>) {}
 
-  [Symbol.asyncIterator](): AsyncIterator<StreamDataResponse> {
-    const decoder = Schema.decodeSync(StreamDataResponseFromMessage);
+  [Symbol.asyncIterator](): AsyncIterator<number> {
+    // const decoder = Schema.decodeSync(StreamDataResponseFromMessage);
     const inner = this.it[Symbol.asyncIterator]();
     return {
       async next() {
@@ -62,14 +81,12 @@ export class StreamDataIterable {
           return { done: true, value: undefined };
         }
 
-        console.log("raw message", util.inspect(value, { depth: null }));
+        // console.log("raw message", util.inspect(value, { depth: null }));
         return {
           done: false,
-          value: decoder(value),
+          value: 42,
         };
       },
     };
   }
 }
-
-*/

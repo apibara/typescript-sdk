@@ -2,14 +2,16 @@ import { runMain, defineCommand } from "citty";
 import consola from "consola";
 import { encodeEventTopics, parseAbi } from "viem";
 import { Filter, FilterFromBytes } from "@apibara/evm";
-import { createClient, StreamDataRequest } from "@apibara/protocol";
+import { createClient, StreamConfig } from "@apibara/protocol";
 import { createChannel } from "nice-grpc";
 
 const abi = parseAbi([
   "event Transfer(address indexed from, address indexed to, uint256 value)",
 ]);
 
-const EvmStreamDataRequest = StreamDataRequest(FilterFromBytes);
+const EvmStream = new StreamConfig(FilterFromBytes);
+
+type Request = typeof EvmStream.Request.Type;
 
 const command = defineCommand({
   meta: {
@@ -31,7 +33,7 @@ const command = defineCommand({
   async run({ args }) {
     consola.info("Connecting to EVM stream", args.stream);
     const channel = createChannel(args.stream);
-    const client = createClient(channel);
+    const client = createClient(EvmStream, channel);
 
     const response = await client.status();
     console.log(response);
@@ -52,6 +54,18 @@ const command = defineCommand({
       ],
     });
 
+    const request = EvmStream.Request.make({
+      filter: [filter],
+      finality: "accepted",
+      startingCursor: {
+        orderKey: 5_000_000n,
+      },
+    });
+
+    for await (const message of client.streamData(request)) {
+      console.log(message);
+    }
+    /*
     const request = EvmStreamDataRequest.make({
       finality: "accepted",
       startingCursor: {
@@ -61,6 +75,7 @@ const command = defineCommand({
     });
 
     console.log(request);
+    */
 
     /*
     const request = new StreamDataRequest({
