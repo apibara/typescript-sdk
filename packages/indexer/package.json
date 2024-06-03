@@ -1,47 +1,24 @@
 {
   "name": "@apibara/indexer",
-  "version": "0.4.1",
+  "version": "2.0.0",
   "type": "module",
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "default": "./dist/index.js"
-    },
-    "./sink/console": {
-      "types": "./dist/sink/console.d.ts",
-      "import": "./dist/sink/console.js",
-      "default": "./dist/sink/console.js"
-    },
-    "./sink/mongo": {
-      "types": "./dist/sink/mongo.d.ts",
-      "import": "./dist/sink/mongo.js",
-      "default": "./dist/sink/mongo.js"
-    },
-    "./sink/parquet": {
-      "types": "./dist/sink/parquet.d.ts",
-      "import": "./dist/sink/parquet.js",
-      "default": "./dist/sink/parquet.js"
-    },
-    "./sink/postgres": {
-      "types": "./dist/sink/postgres.d.ts",
-      "import": "./dist/sink/postgres.js",
-      "default": "./dist/sink/postgres.js"
-    },
-    "./sink/webhook": {
-      "types": "./dist/sink/webhook.d.ts",
-      "import": "./dist/sink/webhook.js",
-      "default": "./dist/sink/webhook.js"
-    },
-    "./starknet": {
-      "types": "./dist/starknet/index.d.ts",
-      "import": "./dist/starknet/index.js",
-      "default": "./dist/starknet/index.js"
+  "source": "./src/index.ts",
+  "main": "./src/index.ts",
+  "exports": "./src/index.ts",
+  "publishConfig": {
+    "files": ["dist", "src", "README.md"],
+    "main": "./dist/index.mjs",
+    "types": "./dist/index.d.ts",
+    "exports": {
+      ".": {
+        "types": "./dist/index.d.ts",
+        "import": "./dist/index.mjs",
+        "default": "./dist/index.mjs"
+      }
     }
   },
-  "files": ["dist", "src", "README.md"],
   "scripts": {
-    "build": "tsc",
+    "build": "unbuild",
     "test": "vitest",
     "test:typecheck": "vitest typecheck",
     "lint": "biome check .",
@@ -49,10 +26,13 @@
     "format": "biome format . --write"
   },
   "devDependencies": {
-    "vitest": "^0.34.3"
+    "@types/node": "^20.14.0",
+    "typescript": "^5.4.5",
+    "unbuild": "^2.0.0",
+    "vitest": "^1.6.0"
   },
   "dependencies": {
-    "starknet": "^5.24.3",
-    "zod": "^3.22.2"
+    "@apibara/protocol": "workspace:*",
+    "hookable": "^5.5.3"
   }
 }

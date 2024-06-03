@@ -1,0 +1,22 @@
+{
+  "name": "example-indexer",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start": "jiti ./src/main.ts",
+    "lint": "biome check .",
+    "lint:fix": "pnpm lint --apply",
+    "format": "biome format . --write"
+  },
+  "dependencies": {
+    "@apibara/evm": "workspace:*",
+    "@apibara/indexer": "workspace:*",
+    "citty": "^0.1.6",
+    "consola": "^3.2.3",
+    "viem": "^2.12.4"
+  },
+  "devDependencies": {
+    "@types/node": "^20.12.12",
+    "jiti": "^1.21.0"
+  }
+}

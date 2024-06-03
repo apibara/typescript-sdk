@@ -87,6 +87,8 @@ export const Block = Schema.Struct({
   logs: Schema.Array(Log),
 });
 
+export type Block = typeof Block.Type;
+
 export const BlockFromBytes = Schema.transform(
   Schema.Uint8ArrayFromSelf,
   Block,

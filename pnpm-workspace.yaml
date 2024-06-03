@@ -1,4 +1,5 @@
 packages:
-- 'packages/evm'
-- 'packages/protocol'
-- 'examples/**'
+  - "packages/evm"
+  - "packages/protocol"
+  - "packages/indexer"
+  - "examples/**"
