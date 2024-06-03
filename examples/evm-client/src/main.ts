@@ -2,7 +2,7 @@ import { runMain, defineCommand } from "citty";
 import consola from "consola";
 import { encodeEventTopics, parseAbi, decodeEventLog } from "viem";
 import { EvmStream, Filter } from "@apibara/evm";
-import { StreamConfig, createClient } from "@apibara/protocol";
+import { createClient } from "@apibara/protocol";
 import { createChannel } from "nice-grpc";
 
 const abi = parseAbi([

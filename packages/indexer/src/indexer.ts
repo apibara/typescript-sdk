@@ -13,13 +13,13 @@ import {
   type StreamConfig,
 } from "@apibara/protocol";
 
-export interface IndexerHooks {
+export interface IndexerHooks<TFilter, TBlock, TRet> {
   "run:before": () => void;
   "run:after": () => void;
   "connect:before": () => void;
   "connect:after": () => void;
-  "handler:before": () => void;
-  "handler:after": () => void;
+  "handler:before": ({ block }: { block: TBlock }) => void;
+  "handler:after": ({ output }: { output: TRet }) => void;
 }
 
 export interface IndexerConfig<TFilter, TBlock, TRet> {
@@ -29,7 +29,7 @@ export interface IndexerConfig<TFilter, TBlock, TRet> {
   startingCursor?: Cursor;
   factory?: (block: TBlock) => { filter?: TFilter; data?: TRet };
   transform: (block: TBlock) => TRet;
-  hooks?: NestedHooks<IndexerHooks>;
+  hooks?: NestedHooks<IndexerHooks<TFilter, TBlock, TRet>>;
   debug?: boolean;
 }
 
@@ -52,7 +52,7 @@ export function defineIndexer<TFilter, TBlock>(
 export interface Indexer<TFilter, TBlock, TRet> {
   streamConfig: StreamConfig<TFilter, TBlock>;
   options: IndexerConfig<TFilter, TBlock, TRet>;
-  hooks: Hookable<IndexerHooks>;
+  hooks: Hookable<IndexerHooks<TFilter, TBlock, TRet>>;
 }
 
 export function createIndexer<TFilter, TBlock, TRet>({
@@ -62,7 +62,7 @@ export function createIndexer<TFilter, TBlock, TRet>({
   const indexer: Indexer<TFilter, TBlock, TRet> = {
     options,
     streamConfig,
-    hooks: createHooks(),
+    hooks: createHooks<IndexerHooks<TFilter, TBlock, TRet>>(),
   };
 
   if (indexer.options.debug) {
@@ -103,10 +103,10 @@ export async function run<TFilter, TBlock, TRet>(
           throw new Error("expected exactly one block");
         }
         const block = blocks[0];
-        await indexer.hooks.callHook("handler:before");
+        await indexer.hooks.callHook("handler:before", { block });
         const output = await indexer.options.transform(block);
-        await indexer.hooks.callHook("handler:after");
-        consola.info(output);
+        await indexer.hooks.callHook("handler:after", { output });
+        // TODO: pass this data to the sink.
         break;
       }
       default: {
