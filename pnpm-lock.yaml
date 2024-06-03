@@ -122,9 +122,15 @@ importers:
       '@apibara/protocol':
         specifier: workspace:*
         version: link:../protocol
+      consola:
+        specifier: ^3.2.3
+        version: 3.2.3
       hookable:
         specifier: ^5.5.3
         version: 5.5.3
+      nice-grpc:
+        specifier: ^2.1.8
+        version: 2.1.8
     devDependencies:
       '@types/node':
         specifier: ^20.14.0

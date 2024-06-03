@@ -33,6 +33,8 @@
   },
   "dependencies": {
     "@apibara/protocol": "workspace:*",
-    "hookable": "^5.5.3"
+    "consola": "^3.2.3",
+    "hookable": "^5.5.3",
+    "nice-grpc": "^2.1.8"
   }
 }

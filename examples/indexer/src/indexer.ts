@@ -2,7 +2,7 @@ import consola from "consola";
 import { EvmStream } from "@apibara/evm";
 import { defineIndexer } from "@apibara/indexer";
 
-export function createIndexer(streamUrl: string) {
+export function createIndexerConfig(streamUrl: string) {
   return defineIndexer(EvmStream)({
     streamUrl,
     finality: "accepted",

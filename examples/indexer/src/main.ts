@@ -1,6 +1,7 @@
 import { runMain, defineCommand } from "citty";
 import consola from "consola";
-import { createIndexer } from "./indexer";
+import { createIndexer, run } from "@apibara/indexer";
+import { createIndexerConfig } from "./indexer";
 
 const command = defineCommand({
   meta: {
@@ -22,8 +23,9 @@ const command = defineCommand({
   async run({ args }) {
     consola.info("Connecting to EVM stream", args.stream);
 
-    const indexer = createIndexer(args.stream);
-    console.log(indexer);
+    const indexer = createIndexer(createIndexerConfig(args.stream));
+
+    await run(indexer);
   },
 });
 
