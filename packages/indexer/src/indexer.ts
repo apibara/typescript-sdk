@@ -15,6 +15,7 @@ import {
 
 import { indexerAsyncContext } from "./context";
 import { type Sink, defaultSink } from "./sink";
+import type { IndexerPlugin } from "./plugins";
 
 export interface IndexerHooks<TFilter, TBlock, TRet> {
   "run:before": () => void;
@@ -36,6 +37,7 @@ export interface IndexerConfig<TFilter, TBlock, TRet> {
   transform: (block: TBlock) => TRet;
   sink?: Sink<TRet>;
   hooks?: NestedHooks<IndexerHooks<TFilter, TBlock, TRet>>;
+  plugins?: ReadonlyArray<IndexerPlugin<TFilter, TBlock, TRet>>;
   debug?: boolean;
 }
 
@@ -76,6 +78,10 @@ export function createIndexer<TFilter, TBlock, TRet>({
   }
 
   indexer.hooks.addHooks(indexer.options.hooks ?? {});
+
+  for (const plugin of indexer.options.plugins ?? []) {
+    plugin(indexer);
+  }
 
   return indexer;
 }

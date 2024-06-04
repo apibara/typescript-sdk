@@ -1,7 +1,7 @@
 import consola from "consola";
 import assert from "node:assert";
 import { EvmStream } from "@apibara/evm";
-import { defineIndexer, useIndexerContext, Sink } from "@apibara/indexer";
+import { defineIndexer, kv, useIndexerContext } from "@apibara/indexer";
 import { encodeEventTopics, parseAbi, decodeEventLog } from "viem";
 
 const abi = parseAbi([
@@ -75,5 +75,6 @@ export function createIndexerConfig(streamUrl: string) {
         consola.debug("Flushing");
       },
     },
+    plugins: [kv()],
   });
 }
