@@ -1,7 +1,7 @@
 import consola from "consola";
 import assert from "node:assert";
 import { EvmStream } from "@apibara/evm";
-import { defineIndexer, useIndexerContext } from "@apibara/indexer";
+import { defineIndexer, useIndexerContext, Sink } from "@apibara/indexer";
 import { encodeEventTopics, parseAbi, decodeEventLog } from "viem";
 
 const abi = parseAbi([
@@ -67,6 +67,12 @@ export function createIndexerConfig(streamUrl: string) {
             transfer.value.toString(),
           );
         }
+      },
+      "sink:write"({ data }) {
+        consola.info("Wrote", data.length, "transfers");
+      },
+      "sink:flush"() {
+        consola.debug("Flushing");
       },
     },
   });

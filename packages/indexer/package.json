@@ -34,6 +34,7 @@
   "dependencies": {
     "@apibara/protocol": "workspace:*",
     "consola": "^3.2.3",
+    "eventemitter3": "^5.0.1",
     "hookable": "^5.5.3",
     "nice-grpc": "^2.1.8",
     "unctx": "^2.3.1"

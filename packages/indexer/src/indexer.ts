@@ -12,7 +12,9 @@ import {
   type DataFinality,
   type StreamConfig,
 } from "@apibara/protocol";
+
 import { indexerAsyncContext } from "./context";
+import { type Sink, defaultSink } from "./sink";
 
 export interface IndexerHooks<TFilter, TBlock, TRet> {
   "run:before": () => void;
@@ -21,6 +23,8 @@ export interface IndexerHooks<TFilter, TBlock, TRet> {
   "connect:after": () => void;
   "handler:before": ({ block }: { block: TBlock }) => void;
   "handler:after": ({ output }: { output: TRet }) => void;
+  "sink:write": ({ data }: { data: TRet }) => void;
+  "sink:flush": () => void;
 }
 
 export interface IndexerConfig<TFilter, TBlock, TRet> {
@@ -30,6 +34,7 @@ export interface IndexerConfig<TFilter, TBlock, TRet> {
   startingCursor?: Cursor;
   factory?: (block: TBlock) => { filter?: TFilter; data?: TRet };
   transform: (block: TBlock) => TRet;
+  sink?: Sink<TRet>;
   hooks?: NestedHooks<IndexerHooks<TFilter, TBlock, TRet>>;
   debug?: boolean;
 }
@@ -81,6 +86,15 @@ export async function run<TFilter, TBlock, TRet>(
   await indexerAsyncContext.callAsync({}, async () => {
     await indexer.hooks.callHook("run:before");
 
+    const sink = indexer.options.sink ?? defaultSink();
+
+    sink.on("write", async ({ data }) => {
+      await indexer.hooks.callHook("sink:write", { data });
+    });
+    sink.on("flush", async () => {
+      await indexer.hooks.callHook("sink:flush");
+    });
+
     const channel = createChannel(indexer.options.streamUrl);
     const client = createClient(indexer.streamConfig, channel);
 
@@ -108,7 +122,7 @@ export async function run<TFilter, TBlock, TRet>(
           await indexer.hooks.callHook("handler:before", { block });
           const output = await indexer.options.transform(block);
           await indexer.hooks.callHook("handler:after", { output });
-          // TODO: pass this data to the sink.
+          await sink.write({ data: output });
           break;
         }
         default: {
