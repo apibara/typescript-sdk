@@ -1,7 +1,7 @@
 import consola from "consola";
 import assert from "node:assert";
 import { EvmStream } from "@apibara/evm";
-import { defineIndexer } from "@apibara/indexer";
+import { defineIndexer, useIndexerContext } from "@apibara/indexer";
 import { encodeEventTopics, parseAbi, decodeEventLog } from "viem";
 
 const abi = parseAbi([
@@ -28,6 +28,9 @@ export function createIndexerConfig(streamUrl: string) {
       ],
     },
     transform({ header, logs }) {
+      const ctx = useIndexerContext();
+      ctx.counter += 1;
+
       return logs.map((log) => {
         assert(log.topics.length === 3, "Transfer event has 3 topics");
 
@@ -49,7 +52,11 @@ export function createIndexerConfig(streamUrl: string) {
       });
     },
     hooks: {
-      "handler:after": ({ output }) => {
+      "run:before"() {
+        const ctx = useIndexerContext();
+        ctx.counter = 0;
+      },
+      "handler:after"({ output }) {
         for (const transfer of output) {
           consola.info(
             "Transfer",

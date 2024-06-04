@@ -35,6 +35,7 @@
     "@apibara/protocol": "workspace:*",
     "consola": "^3.2.3",
     "hookable": "^5.5.3",
-    "nice-grpc": "^2.1.8"
+    "nice-grpc": "^2.1.8",
+    "unctx": "^2.3.1"
   }
 }

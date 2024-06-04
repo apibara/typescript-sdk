@@ -12,6 +12,7 @@ import {
   type DataFinality,
   type StreamConfig,
 } from "@apibara/protocol";
+import { indexerAsyncContext } from "./context";
 
 export interface IndexerHooks<TFilter, TBlock, TRet> {
   "run:before": () => void;
@@ -77,44 +78,46 @@ export function createIndexer<TFilter, TBlock, TRet>({
 export async function run<TFilter, TBlock, TRet>(
   indexer: Indexer<TFilter, TBlock, TRet>,
 ) {
-  await indexer.hooks.callHook("run:before");
+  await indexerAsyncContext.callAsync({}, async () => {
+    await indexer.hooks.callHook("run:before");
 
-  const channel = createChannel(indexer.options.streamUrl);
-  const client = createClient(indexer.streamConfig, channel);
+    const channel = createChannel(indexer.options.streamUrl);
+    const client = createClient(indexer.streamConfig, channel);
 
-  const request = indexer.streamConfig.Request.make({
-    filter: [indexer.options.filter],
-    finality: indexer.options.finality,
-    startingCursor: indexer.options.startingCursor,
-  });
+    const request = indexer.streamConfig.Request.make({
+      filter: [indexer.options.filter],
+      finality: indexer.options.finality,
+      startingCursor: indexer.options.startingCursor,
+    });
 
-  await indexer.hooks.callHook("connect:before");
+    await indexer.hooks.callHook("connect:before");
 
-  const stream = client.streamData(request);
+    const stream = client.streamData(request);
 
-  await indexer.hooks.callHook("connect:after");
+    await indexer.hooks.callHook("connect:after");
 
-  for await (const message of stream) {
-    switch (message._tag) {
-      case "data": {
-        const blocks = message.data.data;
-        if (blocks.length !== 1) {
-          // Ask me about this.
-          throw new Error("expected exactly one block");
+    for await (const message of stream) {
+      switch (message._tag) {
+        case "data": {
+          const blocks = message.data.data;
+          if (blocks.length !== 1) {
+            // Ask me about this.
+            throw new Error("expected exactly one block");
+          }
+          const block = blocks[0];
+          await indexer.hooks.callHook("handler:before", { block });
+          const output = await indexer.options.transform(block);
+          await indexer.hooks.callHook("handler:after", { output });
+          // TODO: pass this data to the sink.
+          break;
         }
-        const block = blocks[0];
-        await indexer.hooks.callHook("handler:before", { block });
-        const output = await indexer.options.transform(block);
-        await indexer.hooks.callHook("handler:after", { output });
-        // TODO: pass this data to the sink.
-        break;
-      }
-      default: {
-        consola.warn("unexpected message", message);
-        throw new Error("not implemented");
+        default: {
+          consola.warn("unexpected message", message);
+          throw new Error("not implemented");
+        }
       }
     }
-  }
 
-  await indexer.hooks.callHook("run:after");
+    await indexer.hooks.callHook("run:after");
+  });
 }
