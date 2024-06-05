@@ -7,7 +7,7 @@ import {
   type Hookable,
 } from "hookable";
 import {
-  createClient,
+  Client,
   type Cursor,
   type DataFinality,
   type StreamConfig,
@@ -87,6 +87,7 @@ export function createIndexer<TFilter, TBlock, TRet>({
 }
 
 export async function run<TFilter, TBlock, TRet>(
+  client: Client<TFilter, TBlock>,
   indexer: Indexer<TFilter, TBlock, TRet>,
 ) {
   await indexerAsyncContext.callAsync({}, async () => {
@@ -100,9 +101,6 @@ export async function run<TFilter, TBlock, TRet>(
     sink.on("flush", async () => {
       await indexer.hooks.callHook("sink:flush");
     });
-
-    const channel = createChannel(indexer.options.streamUrl);
-    const client = createClient(indexer.streamConfig, channel);
 
     const request = indexer.streamConfig.Request.make({
       filter: [indexer.options.filter],

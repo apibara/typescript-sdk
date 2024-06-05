@@ -4,6 +4,7 @@ import {
   type DefaultCallOptions,
   type NormalizedServiceDefinition,
   createClient as grpcCreateClient,
+  createChannel,
 } from "nice-grpc";
 import { Schema } from "@effect/schema";
 
@@ -41,11 +42,12 @@ export interface Client<TFilter, TBlock> {
 /** Create a client connecting to the DNA grpc service. */
 export function createClient<TFilter, TBlock>(
   config: StreamConfig<TFilter, TBlock>,
-  channel: Channel,
+  streamUrl: string,
   defaultCallOptions?: DefaultCallOptions<
     NormalizedServiceDefinition<proto.stream.DnaStreamDefinition>
   >,
 ) {
+  const channel = createChannel(streamUrl);
   const client: proto.stream.DnaStreamClient = grpcCreateClient(
     proto.stream.DnaStreamDefinition,
     channel,
