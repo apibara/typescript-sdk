@@ -32,7 +32,7 @@ export const BytesFromUint8Array = Schema.requiredToOptional(
 );
 
 /** Represent a position in the stream. */
-export const Cursor = Schema.Struct({
+export const _Cursor = Schema.Struct({
   /** The block number. */
   orderKey: Schema.BigIntFromSelf,
   /** The block hash, if any. */
@@ -40,8 +40,10 @@ export const Cursor = Schema.Struct({
 });
 
 /** The Cursor protobuf representation. */
-export type CursorProto = typeof Cursor.Encoded;
-export type Cursor = typeof Cursor.Type;
+export interface CursorProto extends Schema.Schema.Encoded<typeof _Cursor> {}
+export interface Cursor extends Schema.Schema.Type<typeof _Cursor> {}
+export const Cursor: Schema.Schema<Cursor, CursorProto> = _Cursor;
+export const createCursor = (props: Cursor) => props;
 
 export const cursorToProto = Schema.encodeSync(Cursor);
 export const cursorFromProto = Schema.decodeSync(Cursor);

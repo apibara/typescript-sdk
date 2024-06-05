@@ -9,42 +9,36 @@ import { Schema } from "@effect/schema";
 
 import * as proto from "./proto";
 
+import { StreamConfig } from "./config";
 import {
   type StatusRequest,
   statusRequestToProto,
   statusResponseFromProto,
+  StatusResponse,
 } from "./status";
 import { StreamDataRequest, StreamDataResponse } from "./stream";
 
-export class StreamConfig<TFilter, TBlock> {
-  public RequestSchema;
-  public ResponseSchema;
-
-  constructor(
-    private filter: Schema.Schema<TFilter, Uint8Array, never>,
-    private block: Schema.Schema<TBlock, Uint8Array, never>,
-  ) {
-    this.RequestSchema = StreamDataRequest(this.filter);
-    this.ResponseSchema = StreamDataResponse(this.block);
-  }
-
-  get Filter() {
-    return this.filter;
-  }
-
-  get Block() {
-    return this.block;
-  }
-
-  get Request() {
-    return this.RequestSchema;
-  }
-
-  get Response() {
-    return this.ResponseSchema;
-  }
+/** Client call options. */
+export interface ClientCallOptions {
+  signal?: AbortSignal;
 }
 
+/** DNA client. */
+export interface Client<TFilter, TBlock> {
+  /** Fetch the DNA stream status. */
+  status(
+    request?: StatusRequest,
+    options?: ClientCallOptions,
+  ): Promise<StatusResponse>;
+
+  /** Start streaming data from the DNA server. */
+  streamData(
+    request: StreamDataRequest<TFilter>,
+    options?: ClientCallOptions,
+  ): AsyncIterable<StreamDataResponse<TBlock>>;
+}
+
+/** Create a client connecting to the DNA grpc service. */
 export function createClient<TFilter, TBlock>(
   config: StreamConfig<TFilter, TBlock>,
   channel: Channel,
@@ -57,20 +51,20 @@ export function createClient<TFilter, TBlock>(
     channel,
     defaultCallOptions,
   );
-  return new Client(config, client);
+  return new GrpcClient(config, client);
 }
 
-export class Client<TFilter, TBlock> {
+export class GrpcClient<TFilter, TBlock> implements Client<TFilter, TBlock> {
   private encodeRequest;
 
   constructor(
     private config: StreamConfig<TFilter, TBlock>,
     private client: proto.stream.DnaStreamClient,
   ) {
-    this.encodeRequest = Schema.encodeSync(config.RequestSchema);
+    this.encodeRequest = Schema.encodeSync(config.Request);
   }
 
-  async status(request?: StatusRequest, options?: CallOptions) {
+  async status(request?: StatusRequest, options?: ClientCallOptions) {
     const response = await this.client.status(
       statusRequestToProto(request ?? {}),
       options,
@@ -78,7 +72,7 @@ export class Client<TFilter, TBlock> {
     return statusResponseFromProto(response);
   }
 
-  streamData(request: StreamDataRequest<TFilter>, options?: CallOptions) {
+  streamData(request: StreamDataRequest<TFilter>, options?: ClientCallOptions) {
     const it = this.client.streamData(this.encodeRequest(request), options);
     return new StreamDataIterable(it, this.config.Block);
   }

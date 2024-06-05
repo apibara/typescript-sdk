@@ -5,4 +5,5 @@ export * from "./common";
 export * from "./status";
 export * from "./stream";
 
+export * from "./config";
 export * from "./client";

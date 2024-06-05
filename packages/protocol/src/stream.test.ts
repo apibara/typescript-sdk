@@ -47,7 +47,31 @@ describe("StreamDataRequest", () => {
     });
 
     const proto = encodeTestRequest(request);
-    expect(proto.filter).toHaveLength(2);
+    expect(proto).toMatchInlineSnapshot(`
+      {
+        "filter": [
+          Uint8Array [
+            104,
+            101,
+            108,
+            108,
+            111,
+          ],
+          Uint8Array [
+            119,
+            111,
+            114,
+            108,
+            100,
+          ],
+        ],
+        "finality": 2,
+        "startingCursor": {
+          "orderKey": 5000000n,
+          "uniqueKey": Uint8Array [],
+        },
+      }
+    `);
     const back = decodeTestRequest(proto);
     expect(request).toEqual(back);
   });
@@ -68,7 +92,30 @@ describe("StreamDataResponse", () => {
       } as const;
 
       const proto = encode(message);
-      expect(proto.$case).toBe("data");
+      expect(proto).toMatchInlineSnapshot(`
+        {
+          "$case": "data",
+          "data": {
+            "data": [
+              Uint8Array [
+                104,
+                101,
+                108,
+                108,
+                111,
+              ],
+              Uint8Array [
+                119,
+                111,
+                114,
+                108,
+                100,
+              ],
+            ],
+            "finality": 2,
+          },
+        }
+      `);
       const back = decode(proto);
       expect(back).toEqual(message);
     });
@@ -87,6 +134,23 @@ describe("StreamDataResponse", () => {
       });
 
       const proto = encode(invalidate);
+      expect(proto).toMatchInlineSnapshot(`
+        {
+          "$case": "invalidate",
+          "invalidate": {
+            "cursor": {
+              "orderKey": 5000000n,
+              "uniqueKey": Uint8Array [
+                18,
+                52,
+                86,
+                120,
+                144,
+              ],
+            },
+          },
+        }
+      `);
       const back = decode(proto);
       expect(back).toEqual(invalidate);
     });
@@ -99,6 +163,11 @@ describe("StreamDataResponse", () => {
       });
 
       const proto = encode(heartbeat);
+      expect(proto).toMatchInlineSnapshot(`
+        {
+          "$case": "heartbeat",
+        }
+      `);
       const back = decode(proto);
       expect(back).toEqual(heartbeat);
     });
@@ -117,6 +186,17 @@ describe("StreamDataResponse", () => {
       });
 
       const proto = encode(message);
+      expect(proto).toMatchInlineSnapshot(`
+        {
+          "$case": "systemMessage",
+          "systemMessage": {
+            "output": {
+              "$case": "stdout",
+              "stdout": "hello",
+            },
+          },
+        }
+      `);
       const back = decode(proto);
       expect(back).toEqual(message);
     });
@@ -133,6 +213,17 @@ describe("StreamDataResponse", () => {
       });
 
       const proto = encode(message);
+      expect(proto).toMatchInlineSnapshot(`
+        {
+          "$case": "systemMessage",
+          "systemMessage": {
+            "output": {
+              "$case": "stderr",
+              "stderr": "hello",
+            },
+          },
+        }
+      `);
       const back = decode(proto);
       expect(back).toEqual(message);
     });

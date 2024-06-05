@@ -102,14 +102,6 @@ export const Data = <TA, TR>(schema: Schema.Schema<TA, Uint8Array, TR>) =>
 export const StreamDataResponse = <TA, TR>(
   data: Schema.Schema<TA, Uint8Array, TR>,
 ) => Schema.Union(Data(data), Invalidate, Heartbeat, SystemMessage);
-/*
-  class extends Schema.Union(Data(data), Invalidate, Heartbeat, SystemMessage) {
-    static Invalidate = Invalidate;
-    static Data = Data(data);
-    static Heartbeat = Heartbeat;
-    static SystemMessage = SystemMessage;
-  };
-*/
 
 const ResponseWithoutData = Schema.Union(Invalidate, Heartbeat, SystemMessage);
 type ResponseWithoutData = typeof ResponseWithoutData.Type;
