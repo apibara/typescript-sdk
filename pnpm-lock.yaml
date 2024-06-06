@@ -57,6 +57,9 @@ importers:
       '@apibara/indexer':
         specifier: workspace:*
         version: link:../../packages/indexer
+      '@apibara/protocol':
+        specifier: workspace:*
+        version: link:../../packages/protocol
       citty:
         specifier: ^0.1.6
         version: 0.1.6
