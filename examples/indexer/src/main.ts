@@ -2,7 +2,10 @@ import { runMain, defineCommand } from "citty";
 import consola from "consola";
 import { createClient } from "@apibara/protocol";
 import { createIndexer, run } from "@apibara/indexer";
+
 import { createIndexerConfig } from "./indexer";
+
+import "./instrumentation";
 
 const command = defineCommand({
   meta: {

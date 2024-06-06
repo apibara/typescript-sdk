@@ -12,6 +12,12 @@
     "@apibara/evm": "workspace:*",
     "@apibara/indexer": "workspace:*",
     "@apibara/protocol": "workspace:*",
+    "@opentelemetry/api": "^1.9.0",
+    "@opentelemetry/exporter-trace-otlp-proto": "^0.52.0",
+    "@opentelemetry/resources": "^1.25.0",
+    "@opentelemetry/sdk-node": "^0.52.0",
+    "@opentelemetry/sdk-trace-base": "^1.25.0",
+    "@opentelemetry/semantic-conventions": "^1.25.0",
     "citty": "^0.1.6",
     "consola": "^3.2.3",
     "viem": "^2.12.4"

@@ -1,12 +1,16 @@
 import consola from "consola";
 import assert from "node:assert";
 import { EvmStream } from "@apibara/evm";
-import { defineIndexer, kv, useIndexerContext } from "@apibara/indexer";
+import { defineIndexer, useIndexerContext } from "@apibara/indexer";
+import { kv } from "@apibara/indexer/plugins";
 import { encodeEventTopics, parseAbi, decodeEventLog } from "viem";
+import { trace } from "@opentelemetry/api";
 
 const abi = parseAbi([
   "event Transfer(address indexed from, address indexed to, uint256 value)",
 ]);
+
+const tracer = trace.getTracer("evm-indexer-demo");
 
 export function createIndexerConfig(streamUrl: string) {
   return defineIndexer(EvmStream)({
@@ -31,24 +35,34 @@ export function createIndexerConfig(streamUrl: string) {
       const ctx = useIndexerContext();
       ctx.counter += 1;
 
-      return logs.map((log) => {
-        assert(log.topics.length === 3, "Transfer event has 3 topics");
+      return tracer.startActiveSpan("parseLogs", (span) => {
+        const rows = logs.map((log) => {
+          assert(log.topics.length === 3, "Transfer event has 3 topics");
 
-        const { args } = decodeEventLog({
-          abi,
-          topics: log.topics as [`0x${string}`, ...`0x${string}`[]],
-          data: log.data,
-          eventName: "Transfer",
+          const { args } = tracer.startActiveSpan("decodeEventLog", (span) => {
+            const decoded = decodeEventLog({
+              abi,
+              topics: log.topics as [`0x${string}`, ...`0x${string}`[]],
+              data: log.data,
+              eventName: "Transfer",
+            });
+
+            span.end();
+            return decoded;
+          });
+
+          return {
+            blockNumber: header?.number,
+            blockHash: header?.hash,
+            logIndex: log.logIndex,
+            from: args.from,
+            to: args.to,
+            value: args.value,
+          };
         });
 
-        return {
-          blockNumber: header?.number,
-          blockHash: header?.hash,
-          logIndex: log.logIndex,
-          from: args.from,
-          to: args.to,
-          value: args.value,
-        };
+        span.end();
+        return rows;
       });
     },
     hooks: {
@@ -58,7 +72,7 @@ export function createIndexerConfig(streamUrl: string) {
       },
       "handler:after"({ output }) {
         for (const transfer of output) {
-          consola.info(
+          consola.debug(
             "Transfer",
             transfer.blockNumber,
             transfer.logIndex,

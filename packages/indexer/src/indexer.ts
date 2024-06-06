@@ -1,21 +1,21 @@
 import consola from "consola";
-import { createChannel } from "nice-grpc";
 import {
   createHooks,
   createDebugger,
   type NestedHooks,
   type Hookable,
 } from "hookable";
-import {
+import type {
   Client,
-  type Cursor,
-  type DataFinality,
-  type StreamConfig,
+  Cursor,
+  DataFinality,
+  StreamConfig,
 } from "@apibara/protocol";
 
 import { indexerAsyncContext } from "./context";
 import { type Sink, defaultSink } from "./sink";
 import type { IndexerPlugin } from "./plugins";
+import { tracer } from "./otel";
 
 export interface IndexerHooks<TFilter, TBlock, TRet> {
   "run:before": () => void;
@@ -117,16 +117,35 @@ export async function run<TFilter, TBlock, TRet>(
     for await (const message of stream) {
       switch (message._tag) {
         case "data": {
-          const blocks = message.data.data;
-          if (blocks.length !== 1) {
-            // Ask me about this.
-            throw new Error("expected exactly one block");
-          }
-          const block = blocks[0];
-          await indexer.hooks.callHook("handler:before", { block });
-          const output = await indexer.options.transform(block);
-          await indexer.hooks.callHook("handler:after", { output });
-          await sink.write({ data: output });
+          await tracer.startActiveSpan("message data", async (span) => {
+            const blocks = message.data.data;
+            if (blocks.length !== 1) {
+              // Ask me about this.
+              throw new Error("expected exactly one block");
+            }
+
+            const block = blocks[0];
+
+            const output = await tracer.startActiveSpan(
+              "handler",
+              async (span) => {
+                await indexer.hooks.callHook("handler:before", { block });
+                const output = await indexer.options.transform(block);
+                await indexer.hooks.callHook("handler:after", { output });
+
+                span.end();
+                return output;
+              },
+            );
+
+            await tracer.startActiveSpan("sink write", async (span) => {
+              await sink.write({ data: output });
+
+              span.end();
+            });
+
+            span.end();
+          });
           break;
         }
         default: {
