@@ -1,4 +1,4 @@
-import { Schema } from "@effect/schema";
+import type { Schema } from "@effect/schema";
 
 import { StreamDataRequest, StreamDataResponse } from "./stream";
 

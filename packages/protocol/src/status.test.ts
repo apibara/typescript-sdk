@@ -12,7 +12,7 @@ describe("StatusRequest", () => {
   describe("proto", () => {
     it("should encode and decode", () => {
       const proto = statusRequestToProto({});
-      expect(proto).toMatchInlineSnapshot(`{}`);
+      expect(proto).toMatchInlineSnapshot("{}");
       const back = statusRequestFromProto(proto);
       expect(back).toEqual({});
     });

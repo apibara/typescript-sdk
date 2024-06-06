@@ -1,6 +1,4 @@
 import {
-  type CallOptions,
-  type Channel,
   type DefaultCallOptions,
   type NormalizedServiceDefinition,
   createClient as grpcCreateClient,
@@ -10,14 +8,14 @@ import { Schema } from "@effect/schema";
 
 import * as proto from "./proto";
 
-import { StreamConfig } from "./config";
+import type { StreamConfig } from "./config";
 import {
   type StatusRequest,
   statusRequestToProto,
   statusResponseFromProto,
-  StatusResponse,
+  type StatusResponse,
 } from "./status";
-import { StreamDataRequest, StreamDataResponse } from "./stream";
+import { type StreamDataRequest, StreamDataResponse } from "./stream";
 
 /** Client call options. */
 export interface ClientCallOptions {

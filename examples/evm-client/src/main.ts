@@ -3,7 +3,6 @@ import consola from "consola";
 import { encodeEventTopics, parseAbi, decodeEventLog } from "viem";
 import { EvmStream, Filter } from "@apibara/evm";
 import { createClient } from "@apibara/protocol";
-import { createChannel } from "nice-grpc";
 
 const abi = parseAbi([
   "event Transfer(address indexed from, address indexed to, uint256 value)",
@@ -30,8 +29,7 @@ const command = defineCommand({
   },
   async run({ args }) {
     consola.info("Connecting to EVM stream", args.stream);
-    const channel = createChannel(args.stream);
-    const client = createClient(EvmStream, channel);
+    const client = createClient(EvmStream, args.stream);
 
     const response = await client.status();
     console.log(response);
