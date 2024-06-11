@@ -41,6 +41,7 @@
     "eventemitter3": "^5.0.1",
     "hookable": "^5.5.3",
     "nice-grpc": "^2.1.8",
+    "sqlite3": "^5.1.7",
     "unctx": "^2.3.1"
   }
 }

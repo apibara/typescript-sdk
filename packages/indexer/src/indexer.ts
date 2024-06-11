@@ -34,7 +34,12 @@ export interface IndexerConfig<TFilter, TBlock, TRet> {
   finality?: DataFinality;
   startingCursor?: Cursor;
   factory?: (block: TBlock) => { filter?: TFilter; data?: TRet };
-  transform: (block: TBlock) => TRet;
+  transform: (args: {
+    block: TBlock;
+    cursor?: Cursor | undefined;
+    endCursor?: Cursor | undefined;
+    finality: DataFinality;
+  }) => TRet;
   sink?: Sink<TRet>;
   hooks?: NestedHooks<IndexerHooks<TFilter, TBlock, TRet>>;
   plugins?: ReadonlyArray<IndexerPlugin<TFilter, TBlock, TRet>>;
@@ -119,6 +124,7 @@ export async function run<TFilter, TBlock, TRet>(
         case "data": {
           await tracer.startActiveSpan("message data", async (span) => {
             const blocks = message.data.data;
+            const { cursor, endCursor, finality } = message.data;
             if (blocks.length !== 1) {
               // Ask me about this.
               throw new Error("expected exactly one block");
@@ -130,7 +136,12 @@ export async function run<TFilter, TBlock, TRet>(
               "handler",
               async (span) => {
                 await indexer.hooks.callHook("handler:before", { block });
-                const output = await indexer.options.transform(block);
+                const output = await indexer.options.transform({
+                  block,
+                  cursor,
+                  endCursor,
+                  finality,
+                });
                 await indexer.hooks.callHook("handler:after", { output });
 
                 span.end();
@@ -139,7 +150,7 @@ export async function run<TFilter, TBlock, TRet>(
             );
 
             await tracer.startActiveSpan("sink write", async (span) => {
-              await sink.write({ data: output });
+              await sink.write({ data: output, cursor, endCursor, finality });
 
               span.end();
             });
