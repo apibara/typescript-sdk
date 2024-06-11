@@ -5,6 +5,7 @@ import { defineIndexer, sqlite, useIndexerContext } from "@apibara/indexer";
 import { kv } from "@apibara/indexer/plugins";
 import { encodeEventTopics, parseAbi, decodeEventLog } from "viem";
 import { trace } from "@opentelemetry/api";
+import { open } from "sqlite";
 import sqlite3 from "sqlite3";
 
 const abi = parseAbi([
@@ -32,8 +33,12 @@ export function createIndexerConfig(streamUrl: string) {
         },
       ],
     },
-    // biome-ignore lint/suspicious/noExplicitAny: <explanation>
-    sink: sqlite({ dbPath: "sqlite_test.db", tableName: "test" }) as any,
+    sink: sqlite({
+      filename: "sqlite_test.db",
+      driver: sqlite3.Database,
+      tableName: "test",
+      // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+    }) as any,
     transform({ block: { header, logs, transactions } }) {
       const ctx = useIndexerContext();
       ctx.counter += 1;
@@ -71,18 +76,19 @@ export function createIndexerConfig(streamUrl: string) {
       });
     },
     hooks: {
-      "run:before"() {
+      async "run:before"() {
         const ctx = useIndexerContext();
         ctx.counter = 0;
 
         // Initialize SQLite database
-        const db = new sqlite3.Database("sqlite_test.db", (err) => {
-          if (err) throw new Error(err.message);
+        const db = await open({
+          filename: "sqlite_test.db",
+          driver: sqlite3.Database,
         });
         // Delete table if exists
-        db.run("DROP TABLE IF EXISTS test;");
+        await db.run("DROP TABLE IF EXISTS test;");
         // Create table if not exists
-        db.run(
+        await db.run(
           `CREATE TABLE IF NOT EXISTS test (
               blockHash VARCHAR(66),
               blockNumber BIGINT,
@@ -92,9 +98,6 @@ export function createIndexerConfig(streamUrl: string) {
               toAddress VARCHAR(66),
               _cursor BIGINT
           );`,
-          (err) => {
-            if (err) throw new Error(err.message);
-          },
         );
       },
       "handler:after"({ output }) {

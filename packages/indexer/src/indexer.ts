@@ -40,7 +40,7 @@ export interface IndexerConfig<TFilter, TBlock, TRet> {
     endCursor?: Cursor | undefined;
     finality: DataFinality;
   }) => TRet;
-  sink?: Sink<TRet>;
+  sink?: Promise<Sink<TRet>>;
   hooks?: NestedHooks<IndexerHooks<TFilter, TBlock, TRet>>;
   plugins?: ReadonlyArray<IndexerPlugin<TFilter, TBlock, TRet>>;
   debug?: boolean;
@@ -98,7 +98,7 @@ export async function run<TFilter, TBlock, TRet>(
   await indexerAsyncContext.callAsync({}, async () => {
     await indexer.hooks.callHook("run:before");
 
-    const sink = indexer.options.sink ?? defaultSink();
+    const sink = (await indexer.options.sink) ?? defaultSink();
 
     sink.on("write", async ({ data }) => {
       await indexer.hooks.callHook("sink:write", { data });
