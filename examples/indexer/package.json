@@ -20,6 +20,7 @@
     "@opentelemetry/semantic-conventions": "^1.25.0",
     "citty": "^0.1.6",
     "consola": "^3.2.3",
+    "sqlite3": "^5.1.7",
     "viem": "^2.12.4"
   },
   "devDependencies": {

@@ -1,10 +1,11 @@
 import consola from "consola";
 import assert from "node:assert";
 import { EvmStream } from "@apibara/evm";
-import { defineIndexer, useIndexerContext } from "@apibara/indexer";
+import { defineIndexer, sqlite, useIndexerContext } from "@apibara/indexer";
 import { kv } from "@apibara/indexer/plugins";
 import { encodeEventTopics, parseAbi, decodeEventLog } from "viem";
 import { trace } from "@opentelemetry/api";
+import sqlite3 from "sqlite3";
 
 const abi = parseAbi([
   "event Transfer(address indexed from, address indexed to, uint256 value)",
@@ -31,9 +32,13 @@ export function createIndexerConfig(streamUrl: string) {
         },
       ],
     },
-    transform({ header, logs }) {
+    // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+    sink: sqlite({ dbPath: "sqlite_test.db", tableName: "test" }) as any,
+    transform({ block: { header, logs, transactions } }) {
       const ctx = useIndexerContext();
       ctx.counter += 1;
+
+      if (!transactions || !header || !header.number) return [];
 
       return tracer.startActiveSpan("parseLogs", (span) => {
         const rows = logs.map((log) => {
@@ -52,12 +57,12 @@ export function createIndexerConfig(streamUrl: string) {
           });
 
           return {
-            blockNumber: header?.number,
-            blockHash: header?.hash,
-            logIndex: log.logIndex,
-            from: args.from,
-            to: args.to,
-            value: args.value,
+            blockNumber: Number(header.number),
+            blockHash: header.hash,
+            logIndex: Number(log.logIndex),
+            fromAddress: args.from,
+            toAddress: args.to,
+            value: Number(args.value),
           };
         });
 
@@ -69,6 +74,28 @@ export function createIndexerConfig(streamUrl: string) {
       "run:before"() {
         const ctx = useIndexerContext();
         ctx.counter = 0;
+
+        // Initialize SQLite database
+        const db = new sqlite3.Database("sqlite_test.db", (err) => {
+          if (err) throw new Error(err.message);
+        });
+        // Delete table if exists
+        db.run("DROP TABLE IF EXISTS test;");
+        // Create table if not exists
+        db.run(
+          `CREATE TABLE IF NOT EXISTS test (
+              blockHash VARCHAR(66),
+              blockNumber BIGINT,
+              logIndex BIGINT,
+              value BIGINT,
+              fromAddress VARCHAR(66),
+              toAddress VARCHAR(66),
+              _cursor BIGINT
+          );`,
+          (err) => {
+            if (err) throw new Error(err.message);
+          },
+        );
       },
       "handler:after"({ output }) {
         for (const transfer of output) {
@@ -76,8 +103,8 @@ export function createIndexerConfig(streamUrl: string) {
             "Transfer",
             transfer.blockNumber,
             transfer.logIndex,
-            transfer.from,
-            transfer.to,
+            transfer.fromAddress,
+            transfer.toAddress,
             transfer.value.toString(),
           );
         }
