@@ -1,12 +1,10 @@
-import type { Database } from "sqlite3";
-import sqlite3 from "sqlite3";
+import type { Cursor } from "@apibara/protocol";
+import { open, type Database, type ISqlite } from "sqlite";
 import { Sink, type SinkWriteArgs } from "../sink";
 
+export type SqliteArgs = ISqlite.Config;
+
 export type SqliteSinkOptions = {
-  /**
-   * The file path to the SQLite database.
-   */
-  dbPath: string;
   /**
    * The name of the table where data will be inserted.
    */
@@ -26,57 +24,27 @@ export type SqliteSinkOptions = {
 
 class SqliteSink<TData = unknown> extends Sink<TData> {
   private _config: SqliteSinkOptions;
-  private _db?: Database;
+  private _db: Database;
 
-  constructor(config: SqliteSinkOptions) {
+  constructor(db: Database, config: SqliteSinkOptions) {
     super();
     this._config = config;
-    this.init();
+    this._db = db;
   }
 
   async write({ data, endCursor }: SinkWriteArgs<TData>) {
     this.emit("write", { data });
 
-    if (!Array.isArray(data) || data === null) {
-      throw new Error("Data is not an array or is null");
-    }
+    const { cursorColumn } = this._config;
 
-    const cursorColumn = this._config.cursorColumn;
-
-    // If user specifies cursorColumn
-    if (cursorColumn) {
-      // Validate cursorColumn value against endCursor.orderKey
-      if (data.some((row) => row[cursorColumn] !== endCursor?.orderKey)) {
-        throw new Error(
-          `The ${cursorColumn} value must be equal to endCursor.orderKey: (${endCursor?.orderKey})`,
-        );
-      }
-    } else if (endCursor) {
-      // add _cursor property with value "endCursor.orderKey"
-      data = data.map((row) => ({
-        ...row,
-        _cursor: Number(endCursor.orderKey),
-      })) as TData;
-    }
+    data = this.processCursorColumn(data, cursorColumn, endCursor);
 
     await this.insertJsonArray(data);
 
     this.emit("flush");
   }
 
-  private init() {
-    this._db = new sqlite3.Database(this._config.dbPath, (err) => {
-      if (err) {
-        throw new Error(err.message);
-      }
-    });
-  }
-
   private async insertJsonArray(data: TData) {
-    if (!this._db || this._db === undefined) {
-      throw new Error("SQlite database is not initialized");
-    }
-
     if (!Array.isArray(data) || data === null) {
       throw new Error("Data is not an array or is null");
     }
@@ -89,14 +57,7 @@ class SqliteSink<TData = unknown> extends Sink<TData> {
     const placeholders = columns.map(() => "?").join(", ");
 
     // Handle onConflict option
-    const { on, update } = this._config.onConflict || {};
-    let conflictClause = "";
-    if (on && update && update.length > 0) {
-      const updateColumns = update
-        .map((col) => `${col}=excluded.${col}`)
-        .join(", ");
-      conflictClause = ` ON CONFLICT(${on}) DO UPDATE SET ${updateColumns}`;
-    }
+    const conflictClause = this.buildConflictClause();
 
     // Build the SQL insert statement with multiple rows
     const insertSQL = `INSERT INTO ${this._config.tableName} (${columnNames}) VALUES `;
@@ -106,16 +67,45 @@ class SqliteSink<TData = unknown> extends Sink<TData> {
     // Prepare and execute the SQL statement
     const values = data.flatMap((row) => columns.map((col) => row[col]));
 
-    await new Promise<void>((resolve, reject) => {
-      this._db?.run(statement, values, (err) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve();
-        }
-      });
-    });
+    await this._db.run(statement, values);
+  }
+
+  private processCursorColumn(
+    data: TData,
+    cursorColumn?: string,
+    endCursor?: Cursor,
+  ): TData {
+    if (!Array.isArray(data) || data === null) {
+      throw new Error("Data is not an array or is null");
+    }
+
+    if (
+      cursorColumn &&
+      data.some((row) => row[cursorColumn] !== endCursor?.orderKey)
+    ) {
+      throw new Error(`Mismatch of ${cursorColumn} and Cursor`);
+    }
+
+    return data.map((row) => ({
+      ...row,
+      _cursor: Number(endCursor?.orderKey),
+    })) as TData;
+  }
+
+  private buildConflictClause(): string {
+    const { on, update } = this._config.onConflict || {};
+    if (on && update && update.length > 0) {
+      const updateColumns = update
+        .map((col) => `${col}=excluded.${col}`)
+        .join(", ");
+      return ` ON CONFLICT(${on}) DO UPDATE SET ${updateColumns}`;
+    }
+    return "";
   }
 }
 
-export const sqlite = (options: SqliteSinkOptions) => new SqliteSink(options);
+export const sqlite = async (args: SqliteArgs & SqliteSinkOptions) => {
+  const { filename, mode, driver, ...sinkOptions } = args;
+  const db = await open({ filename, mode, driver });
+  return new SqliteSink(db, sinkOptions);
+};

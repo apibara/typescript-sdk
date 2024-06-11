@@ -84,6 +84,9 @@ importers:
       consola:
         specifier: ^3.2.3
         version: 3.2.3
+      sqlite:
+        specifier: ^5.1.1
+        version: 5.1.1
       sqlite3:
         specifier: ^5.1.7
         version: 5.1.7
@@ -161,9 +164,6 @@ importers:
       nice-grpc:
         specifier: ^2.1.8
         version: 2.1.8
-      sqlite3:
-        specifier: ^5.1.7
-        version: 5.1.7
       unctx:
         specifier: ^2.3.1
         version: 2.3.1
@@ -171,6 +171,9 @@ importers:
       '@types/node':
         specifier: ^20.14.0
         version: 20.14.0
+      sqlite:
+        specifier: ^5.1.1
+        version: 5.1.1
       typescript:
         specifier: ^5.4.5
         version: 5.4.5
@@ -5525,6 +5528,9 @@ packages:
       - bluebird
       - supports-color
     dev: false
+
+  /sqlite@5.1.1:
+    resolution: {integrity: sha512-oBkezXa2hnkfuJwUo44Hl9hS3er+YFtueifoajrgidvqsJRQFpc5fKoAkAor1O5ZnLoa28GBScfHXs8j0K358Q==}
 
   /ssri@8.0.1:
     resolution: {integrity: sha512-97qShzy1AiyxvPNIkLWoGua7xoQzzPjQ0HAH4B0rWKo7SZ6USuPcrUiAFrws0UH8RrbWmgq3LMTObhPIHbbBeQ==}
