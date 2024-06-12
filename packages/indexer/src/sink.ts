@@ -2,12 +2,12 @@ import type { Cursor, DataFinality } from "@apibara/protocol";
 import { EventEmitter } from "eventemitter3";
 
 export interface SinkEvents<TData> {
-  write({ data }: { data: TData }): void;
+  write({ data }: { data: TData[] }): void;
   flush(): void;
 }
 
 export type SinkWriteArgs<TData> = {
-  data: TData;
+  data: TData[];
   cursor?: Cursor | undefined;
   endCursor?: Cursor | undefined;
   finality: DataFinality;
