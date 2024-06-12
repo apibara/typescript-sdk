@@ -22,7 +22,7 @@ export type SqliteSinkOptions = {
   onConflict?: { on: string; update: string[] };
 };
 
-class SqliteSink<TData = unknown> extends Sink<TData> {
+class SqliteSink<TData extends Record<string, unknown>> extends Sink<TData> {
   private _config: SqliteSinkOptions;
   private _db: Database;
 
@@ -44,11 +44,7 @@ class SqliteSink<TData = unknown> extends Sink<TData> {
     this.emit("flush");
   }
 
-  private async insertJsonArray(data: TData) {
-    if (!Array.isArray(data) || data === null) {
-      throw new Error("Data is not an array or is null");
-    }
-
+  private async insertJsonArray(data: TData[]) {
     if (data.length === 0) return;
 
     // Get columns from the first row of the object array
@@ -71,14 +67,10 @@ class SqliteSink<TData = unknown> extends Sink<TData> {
   }
 
   private processCursorColumn(
-    data: TData,
+    data: TData[],
     cursorColumn?: string,
     endCursor?: Cursor,
-  ): TData {
-    if (!Array.isArray(data) || data === null) {
-      throw new Error("Data is not an array or is null");
-    }
-
+  ): TData[] {
     if (
       cursorColumn &&
       data.some((row) => row[cursorColumn] !== endCursor?.orderKey)
@@ -89,7 +81,7 @@ class SqliteSink<TData = unknown> extends Sink<TData> {
     return data.map((row) => ({
       ...row,
       _cursor: Number(endCursor?.orderKey),
-    })) as TData;
+    })) as TData[];
   }
 
   private buildConflictClause(): string {

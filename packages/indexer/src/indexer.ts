@@ -23,8 +23,8 @@ export interface IndexerHooks<TFilter, TBlock, TRet> {
   "connect:before": () => void;
   "connect:after": () => void;
   "handler:before": ({ block }: { block: TBlock }) => void;
-  "handler:after": ({ output }: { output: TRet }) => void;
-  "sink:write": ({ data }: { data: TRet }) => void;
+  "handler:after": ({ output }: { output: TRet[] }) => void;
+  "sink:write": ({ data }: { data: TRet[] }) => void;
   "sink:flush": () => void;
 }
 
@@ -33,14 +33,14 @@ export interface IndexerConfig<TFilter, TBlock, TRet> {
   filter: TFilter;
   finality?: DataFinality;
   startingCursor?: Cursor;
-  factory?: (block: TBlock) => { filter?: TFilter; data?: TRet };
+  factory?: (block: TBlock) => { filter?: TFilter; data?: TRet[] };
   transform: (args: {
     block: TBlock;
     cursor?: Cursor | undefined;
     endCursor?: Cursor | undefined;
     finality: DataFinality;
-  }) => TRet;
-  sink?: Promise<Sink<TRet>>;
+  }) => TRet[];
+  sink?: Sink<TRet> | Promise<Sink<TRet>>;
   hooks?: NestedHooks<IndexerHooks<TFilter, TBlock, TRet>>;
   plugins?: ReadonlyArray<IndexerPlugin<TFilter, TBlock, TRet>>;
   debug?: boolean;
