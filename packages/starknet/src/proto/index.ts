@@ -1,3 +1,4 @@
-import { apibara } from "./generated";
+export * as common from "./common";
+export * as data from "./data";
+export * as filter from "./filter";
 
-export import v1alpha2 = apibara.starknet.v1alpha2;

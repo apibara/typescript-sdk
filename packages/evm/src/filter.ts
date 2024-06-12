@@ -1,6 +1,4 @@
-import { Option } from "effect";
-import { Schema, TreeFormatter } from "@effect/schema";
-import { ParseOptions } from "@effect/schema/AST";
+import { Schema } from "@effect/schema";
 
 import { Address, B256, b256FromProto, b256ToProto } from "./common";
 
