@@ -1,6 +1,6 @@
 # `@apibara/starknet`
 
-This package provides types for the StarkNet streams on Apibara.
+This package provides types for the Starknet streams on Apibara.
 
 ## Installation
 
@@ -10,7 +10,7 @@ npm add @apibara/starknet
 
 ## License
 
-Copyright 2022 GNC Labs Limited
+Copyright 2024 GNC Labs Limited
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
