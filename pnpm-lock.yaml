@@ -84,6 +84,9 @@ importers:
       consola:
         specifier: ^3.2.3
         version: 3.2.3
+      csv-stringify:
+        specifier: ^6.5.0
+        version: 6.5.0
       sqlite:
         specifier: ^5.1.1
         version: 5.1.1
@@ -196,6 +199,9 @@ importers:
       '@types/node':
         specifier: ^20.14.0
         version: 20.14.0
+      csv-stringify:
+        specifier: ^6.5.0
+        version: 6.5.0
       sqlite:
         specifier: ^5.1.1
         version: 5.1.1
@@ -2839,6 +2845,9 @@ packages:
   /csv-stringify@5.6.5:
     resolution: {integrity: sha512-PjiQ659aQ+fUTQqSrd1XEDnOr52jh30RBurfzkscaE2tPaFsDH5wOAHJiw8XAHphRknCwMUE9KRayc4K/NbO8A==}
     dev: true
+
+  /csv-stringify@6.5.0:
+    resolution: {integrity: sha512-edlXFVKcUx7r8Vx5zQucsuMg4wb/xT6qyz+Sr1vnLrdXqlLD1+UKyWNyZ9zn6mUW1ewmGxrpVwAcChGF0HQ/2Q==}
 
   /csv@5.5.3:
     resolution: {integrity: sha512-QTaY0XjjhTQOdguARF0lGKm5/mEq9PD9/VhZZegHDIBq2tQwgNpHc3dneD4mGo2iJs+fTKv5Bp0fZ+BRuY3Z0g==}
