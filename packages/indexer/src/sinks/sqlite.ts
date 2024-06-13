@@ -35,10 +35,7 @@ class SqliteSink<TData extends Record<string, unknown>> extends Sink<TData> {
   async write({ data, endCursor }: SinkWriteArgs<TData>) {
     this.emit("write", { data });
 
-    const { cursorColumn } = this._config;
-
-    data = this.processCursorColumn(data, cursorColumn, endCursor);
-
+    data = this.processCursorColumn(data, endCursor);
     await this.insertJsonArray(data);
 
     this.emit("flush");
@@ -66,22 +63,26 @@ class SqliteSink<TData extends Record<string, unknown>> extends Sink<TData> {
     await this._db.run(statement, values);
   }
 
-  private processCursorColumn(
-    data: TData[],
-    cursorColumn?: string,
-    endCursor?: Cursor,
-  ): TData[] {
+  private processCursorColumn(data: TData[], endCursor?: Cursor): TData[] {
+    const { cursorColumn } = this._config;
+
     if (
       cursorColumn &&
-      data.some((row) => row[cursorColumn] !== endCursor?.orderKey)
+      data.some(
+        (row) => Number(row[cursorColumn]) !== Number(endCursor?.orderKey),
+      )
     ) {
-      throw new Error(`Mismatch of ${cursorColumn} and Cursor`);
+      throw new Error(
+        `Mismatch of ${cursorColumn} and Cursor ${Number(endCursor?.orderKey)}`,
+      );
     }
 
-    return data.map((row) => ({
-      ...row,
-      _cursor: Number(endCursor?.orderKey),
-    })) as TData[];
+    return cursorColumn
+      ? data
+      : (data.map((row) => ({
+          ...row,
+          _cursor: Number(endCursor?.orderKey),
+        })) as TData[]);
   }
 
   private buildConflictClause(): string {
