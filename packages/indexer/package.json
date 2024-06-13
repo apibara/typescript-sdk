@@ -6,7 +6,8 @@
   "main": "./src/index.ts",
   "exports": {
     ".": "./src/index.ts",
-    "./plugins": "./src/plugins/index.ts"
+    "./plugins": "./src/plugins/index.ts",
+    "./sinks/sqlite": "./src/sinks/sqlite.ts"
   },
   "publishConfig": {
     "files": ["dist", "src", "README.md"],
@@ -17,6 +18,11 @@
         "types": "./dist/index.d.ts",
         "import": "./dist/index.mjs",
         "default": "./dist/index.mjs"
+      },
+      "./sinks/sqlite": {
+        "types": "./dist/sinks/sqlite.d.ts",
+        "import": "./dist/sinks/sqlite.mjs",
+        "default": "./dist/sinks/sqlite.mjs"
       }
     }
   },
