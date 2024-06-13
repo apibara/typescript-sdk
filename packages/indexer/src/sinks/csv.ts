@@ -35,8 +35,9 @@ class CsvSink<TData extends Record<string, unknown>> extends Sink<TData> {
 
   async write({ data, endCursor }: SinkWriteArgs<TData>) {
     this.emit("write", { data });
-
+    // adds a "_cursor" property if "cursorColumn" is not specified by user
     data = this.processCursorColumn(data, endCursor);
+    // Insert the data into csv
     await this.insertToCSV(data);
 
     this.emit("flush");
@@ -44,9 +45,19 @@ class CsvSink<TData extends Record<string, unknown>> extends Sink<TData> {
 
   private async insertToCSV(data: TData[]) {
     if (data.length === 0) return;
-    for (const row of data) {
-      this._stringifier.write(row);
-    }
+
+    return await new Promise<void>((resolve, reject) => {
+      for (const row of data) {
+        this._stringifier.write(row, (err) => {
+          if (err) throw new Error(err.message);
+
+          // resolve when all rows are inserted into csv
+          if (row === data[data.length - 1]) {
+            resolve();
+          }
+        });
+      }
+    });
   }
 
   private processCursorColumn(data: TData[], endCursor?: Cursor): TData[] {
@@ -63,16 +74,18 @@ class CsvSink<TData extends Record<string, unknown>> extends Sink<TData> {
       );
     }
 
-    return cursorColumn
-      ? data
-      : (data.map((row) => ({
-          ...row,
-          _cursor: Number(endCursor?.orderKey),
-        })) as TData[]);
+    if (cursorColumn) {
+      return data;
+    }
+
+    return data.map((row) => ({
+      ...row,
+      _cursor: Number(endCursor?.orderKey),
+    }));
   }
 }
 
-export const csv = async (args: CsvArgs & CsvSinkOptions) => {
+export const csv = (args: CsvArgs & CsvSinkOptions) => {
   const { csvOptions, filepath, ...sinkOptions } = args;
   const stringifier = stringify({ ...csvOptions });
 

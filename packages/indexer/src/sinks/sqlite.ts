@@ -77,12 +77,14 @@ class SqliteSink<TData extends Record<string, unknown>> extends Sink<TData> {
       );
     }
 
-    return cursorColumn
-      ? data
-      : (data.map((row) => ({
-          ...row,
-          _cursor: Number(endCursor?.orderKey),
-        })) as TData[]);
+    if (cursorColumn) {
+      return data;
+    }
+
+    return data.map((row) => ({
+      ...row,
+      _cursor: Number(endCursor?.orderKey),
+    }));
   }
 
   private buildConflictClause(): string {
