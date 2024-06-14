@@ -44,9 +44,9 @@ const command = defineCommand({
     for await (const message of client.streamData(request)) {
       switch (message._tag) {
         case "data": {
-          consola.info("Block", message.data.endCursor?.orderKey);
+          consola.info("Data", message.data.endCursor?.orderKey);
           for (const block of message.data.data) {
-            consola.info("Block", block.header?.blockNumber);
+            consola.info("Block", block.header);
           }
           break;
         }
