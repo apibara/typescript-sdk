@@ -7,6 +7,8 @@ export const BlockHeader = Schema.Struct({
   blockNumber: Schema.BigIntFromSelf,
   blockHash: Schema.optional(FieldElement),
   parentBlockHash: Schema.optional(FieldElement),
+  starknetVersion: Schema.optional(Schema.String),
+  timestamp: Schema.optional(Schema.DateFromSelf),
 });
 
 export type BlockHeader = typeof BlockHeader.Type;
