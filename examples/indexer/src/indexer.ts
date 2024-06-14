@@ -1,12 +1,9 @@
 import consola from "consola";
 import assert from "node:assert";
 import { EvmStream } from "@apibara/evm";
-import { defineIndexer, sqlite, useIndexerContext } from "@apibara/indexer";
-import { kv } from "@apibara/indexer/plugins";
+import { defineIndexer, useIndexerContext } from "@apibara/indexer";
 import { encodeEventTopics, parseAbi, decodeEventLog } from "viem";
 import { trace } from "@opentelemetry/api";
-import { open } from "sqlite";
-import sqlite3 from "sqlite3";
 
 const abi = parseAbi([
   "event Transfer(address indexed from, address indexed to, uint256 value)",
@@ -33,12 +30,6 @@ export function createIndexerConfig(streamUrl: string) {
         },
       ],
     },
-    sink: sqlite({
-      filename: "sqlite_test.db",
-      driver: sqlite3.Database,
-      tableName: "test",
-      // biome-ignore lint/suspicious/noExplicitAny: <explanation>
-    }) as any,
     transform({ block: { header, logs, transactions } }) {
       const ctx = useIndexerContext();
       ctx.counter += 1;
@@ -76,30 +67,7 @@ export function createIndexerConfig(streamUrl: string) {
       });
     },
     hooks: {
-      async "run:before"() {
-        const ctx = useIndexerContext();
-        ctx.counter = 0;
-
-        // Initialize SQLite database
-        const db = await open({
-          filename: "sqlite_test.db",
-          driver: sqlite3.Database,
-        });
-        // Delete table if exists
-        await db.run("DROP TABLE IF EXISTS test;");
-        // Create table if not exists
-        await db.run(
-          `CREATE TABLE IF NOT EXISTS test (
-              blockHash VARCHAR(66),
-              blockNumber BIGINT,
-              logIndex BIGINT,
-              value BIGINT,
-              fromAddress VARCHAR(66),
-              toAddress VARCHAR(66),
-              _cursor BIGINT
-          );`,
-        );
-      },
+      async "run:before"() {},
       "handler:after"({ output }) {
         for (const transfer of output) {
           consola.debug(
@@ -119,6 +87,6 @@ export function createIndexerConfig(streamUrl: string) {
         consola.debug("Flushing");
       },
     },
-    plugins: [kv()],
+    plugins: [],
   });
 }
