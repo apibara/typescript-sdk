@@ -2,9 +2,25 @@ import { Schema } from "@effect/schema";
 import { Bytes, BytesFromUint8Array } from "@apibara/protocol";
 
 import * as proto from "./proto";
-import { Address, B256 } from "./common";
+import { Address, B256, U128, U256 } from "./common";
 
 export const HexData = Schema.transform(
+  Schema.Struct({
+    value: BytesFromUint8Array,
+  }),
+  Bytes,
+  {
+    strict: false,
+    encode(value) {
+      throw new Error("Not implemented");
+    },
+    decode({ value }) {
+      return value;
+    },
+  },
+);
+
+export const Bloom = Schema.transform(
   Schema.Struct({
     value: BytesFromUint8Array,
   }),
@@ -29,13 +45,22 @@ export const BlockHeader = Schema.Struct({
   stateRoot: Schema.optional(B256),
   transactionRoot: Schema.optional(B256),
   receiptRoot: Schema.optional(B256),
-  // TODO: logsBloom, etc.
+  logsBloom: Schema.optional(Bloom),
+  difficulty: Schema.optional(U256),
+  gasLimit: Schema.optional(U256),
+  gasUsed: Schema.optional(U256),
+  timestamp: Schema.optional(Schema.DateFromSelf),
+  extraData: Schema.optional(HexData),
+  mixHash: Schema.optional(B256),
   nonce: Schema.BigIntFromSelf,
-  // TODO.
+  baseFeePerGas: Schema.optional(U256),
+  withdrawalsRoot: Schema.optional(B256),
+  totalDifficulty: Schema.optional(U256),
   uncles: Schema.Array(B256),
-  // TODO.
+  size: Schema.optional(U256),
   blobGasUsed: Schema.BigIntFromSelf,
   excessBlobGas: Schema.BigIntFromSelf,
+  parentBeaconBlockRoot: Schema.optional(B256),
 });
 
 export type BlockHeader = typeof BlockHeader.Type;
@@ -45,28 +70,55 @@ export const Withdrawal = Schema.Struct({
   validatorIndex: Schema.BigIntFromSelf,
   withdrawalIndex: Schema.BigIntFromSelf,
   address: Schema.optional(Address),
+  amount: Schema.optional(U256),
 });
 
 export const AccessListItem = Schema.Struct({
-  // TODO: fields.
+  address: Schema.optional(Address),
   storageKeys: Schema.Array(B256),
 });
 
+export const Signature = Schema.Struct({
+  r: Schema.optional(U256),
+  s: Schema.optional(U256),
+  v: Schema.optional(U256),
+  YParity: Schema.optional(Schema.Boolean),
+});
+
 export const Transaction = Schema.Struct({
-  // TODO: fields.
+  hash: Schema.optional(B256),
   nonce: Schema.BigIntFromSelf,
   transactionIndex: Schema.BigIntFromSelf,
+  from: Schema.optional(Address),
+  to: Schema.optional(Address),
+  value: Schema.optional(U256),
+  gasPrice: Schema.optional(U128),
+  gas: Schema.optional(U256),
+  maxFeePerGas: Schema.optional(U128),
+  maxPriorityFeePerGas: Schema.optional(U128),
+  // input: Schema.optional(HexData),
+  signature: Schema.optional(Signature),
   chainId: Schema.BigIntFromSelf,
   accessList: Schema.Array(AccessListItem),
   transactionType: Schema.BigIntFromSelf,
+  maxFeePerBlobGas: Schema.optional(U128),
   blobVersionedHashes: Schema.Array(B256),
 });
 
 export const TransactionReceipt = Schema.Struct({
-  // TODO: fields.
+  transactionHash: Schema.optional(B256),
   transactionIndex: Schema.BigIntFromSelf,
+  cumulativeGasUsed: Schema.optional(U256),
+  gasUsed: Schema.optional(U256),
+  effectiveGasPrice: Schema.optional(U128),
+  from: Schema.optional(Address),
+  to: Schema.optional(Address),
+  contractAddress: Schema.optional(Address),
+  logsBloom: Schema.optional(Bloom),
   statusCode: Schema.BigIntFromSelf,
   transactionType: Schema.BigIntFromSelf,
+  blobGasUsed: Schema.optional(U128),
+  blobGasPrice: Schema.optional(U128),
 });
 
 export const Log = Schema.Struct({
@@ -75,6 +127,7 @@ export const Log = Schema.Struct({
   data: HexData,
   logIndex: Schema.BigIntFromSelf,
   transactionIndex: Schema.BigIntFromSelf,
+  transactionHash: Schema.optional(B256),
 });
 
 export type Log = typeof Log.Type;
