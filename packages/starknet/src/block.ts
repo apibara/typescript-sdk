@@ -431,13 +431,36 @@ export const Event = Schema.Struct({
 
 export type Event = typeof Event.Type;
 
+/** A message from the L2 to the L1.
+ *
+ * @prop fromAddress The address on L2 that sent the message.
+ * @prop toAddress The address on L1 that will receive the message.
+ * @prop payload The message payload.
+ * @prop messageIndex The message index in the block.
+ * @prop transactionIndex The transaction index in the block.
+ * @prop transactionHash The transaction hash.
+ * @prop transactionReverted Whether the transaction was reverted.
+ */
 export const MessageToL1 = Schema.Struct({
+  fromAddress: Schema.optional(FieldElement),
   toAddress: Schema.optional(FieldElement),
+  payload: Schema.optional(Schema.Array(FieldElement)),
   messageIndex: Schema.optional(Schema.Number),
+  transactionIndex: Schema.optional(Schema.Number),
+  transactionHash: Schema.optional(FieldElement),
+  transactionReverted: Schema.optional(Schema.Boolean),
 });
 
 export type MessageToL1 = typeof MessageToL1.Type;
 
+/** A block.
+ *
+ * @prop header The block header.
+ * @prop transactions The transactions in the block.
+ * @prop receipts The receipts of the transactions.
+ * @prop events The events emitted by the transactions.
+ * @prop messages The messages sent to L1 by the transactions.
+ */
 export const Block = Schema.Struct({
   header: Schema.optional(BlockHeader),
   transactions: Schema.Array(Transaction),
