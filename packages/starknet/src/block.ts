@@ -409,10 +409,24 @@ export const TransactionReceipt = Schema.Struct({
 
 export type TransactionReceipt = typeof TransactionReceipt.Type;
 
+/** A transaction event.
+ *
+ * @prop fromAddress The address that emitted the event.
+ * @prop keys Indexed fields of the event.
+ * @prop data Non-indexed fields of the event.
+ * @prop eventIndex The event index in the block.
+ * @prop transactionIndex The transaction index in the block.
+ * @prop transactionHash The transaction hash.
+ * @prop transactionReverted Whether the transaction was reverted.
+ */
 export const Event = Schema.Struct({
   fromAddress: Schema.optional(FieldElement),
   keys: Schema.optional(Schema.Array(FieldElement)),
+  data: Schema.optional(Schema.Array(FieldElement)),
   eventIndex: Schema.optional(Schema.Number),
+  transactionIndex: Schema.optional(Schema.Number),
+  transactionHash: Schema.optional(FieldElement),
+  transactionReverted: Schema.optional(Schema.Boolean),
 });
 
 export type Event = typeof Event.Type;
