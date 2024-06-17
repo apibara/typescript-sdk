@@ -15,12 +15,12 @@ export const protobufPackage = "starknet.v2";
 /** Starknet DNA definitions (data). */
 
 export enum L1DataAvailabilityMode {
-  /** L1_DATA_AVAILABILITY_MODE_UNSPECIFIED - Unknown DA. */
-  L1_DATA_AVAILABILITY_MODE_UNSPECIFIED = 0,
-  /** L1_DATA_AVAILABILITY_MODE_BLOB - Data published via blobs. */
-  L1_DATA_AVAILABILITY_MODE_BLOB = 1,
-  /** L1_DATA_AVAILABILITY_MODE_CALLDATA - Data published via calldata. */
-  L1_DATA_AVAILABILITY_MODE_CALLDATA = 2,
+  /** UNSPECIFIED - Unknown DA. */
+  UNSPECIFIED = 0,
+  /** BLOB - Data published via blobs. */
+  BLOB = 1,
+  /** CALLDATA - Data published via calldata. */
+  CALLDATA = 2,
   UNRECOGNIZED = -1,
 }
 
@@ -28,13 +28,13 @@ export function l1DataAvailabilityModeFromJSON(object: any): L1DataAvailabilityM
   switch (object) {
     case 0:
     case "L1_DATA_AVAILABILITY_MODE_UNSPECIFIED":
-      return L1DataAvailabilityMode.L1_DATA_AVAILABILITY_MODE_UNSPECIFIED;
+      return L1DataAvailabilityMode.UNSPECIFIED;
     case 1:
     case "L1_DATA_AVAILABILITY_MODE_BLOB":
-      return L1DataAvailabilityMode.L1_DATA_AVAILABILITY_MODE_BLOB;
+      return L1DataAvailabilityMode.BLOB;
     case 2:
     case "L1_DATA_AVAILABILITY_MODE_CALLDATA":
-      return L1DataAvailabilityMode.L1_DATA_AVAILABILITY_MODE_CALLDATA;
+      return L1DataAvailabilityMode.CALLDATA;
     case -1:
     case "UNRECOGNIZED":
     default:
@@ -44,11 +44,11 @@ export function l1DataAvailabilityModeFromJSON(object: any): L1DataAvailabilityM
 
 export function l1DataAvailabilityModeToJSON(object: L1DataAvailabilityMode): string {
   switch (object) {
-    case L1DataAvailabilityMode.L1_DATA_AVAILABILITY_MODE_UNSPECIFIED:
+    case L1DataAvailabilityMode.UNSPECIFIED:
       return "L1_DATA_AVAILABILITY_MODE_UNSPECIFIED";
-    case L1DataAvailabilityMode.L1_DATA_AVAILABILITY_MODE_BLOB:
+    case L1DataAvailabilityMode.BLOB:
       return "L1_DATA_AVAILABILITY_MODE_BLOB";
-    case L1DataAvailabilityMode.L1_DATA_AVAILABILITY_MODE_CALLDATA:
+    case L1DataAvailabilityMode.CALLDATA:
       return "L1_DATA_AVAILABILITY_MODE_CALLDATA";
     case L1DataAvailabilityMode.UNRECOGNIZED:
     default:
@@ -58,12 +58,12 @@ export function l1DataAvailabilityModeToJSON(object: L1DataAvailabilityMode): st
 
 /** Transaction execution status. */
 export enum ExecutionStatus {
-  /** EXECUTION_STATUS_UNSPECIFIED - Unknown execution status. */
-  EXECUTION_STATUS_UNSPECIFIED = 0,
-  /** EXECUTION_STATUS_SUCCEEDED - Transaction succeeded. */
-  EXECUTION_STATUS_SUCCEEDED = 1,
-  /** EXECUTION_STATUS_REVERTED - Transaction reverted. */
-  EXECUTION_STATUS_REVERTED = 2,
+  /** UNSPECIFIED - Unknown execution status. */
+  UNSPECIFIED = 0,
+  /** SUCCEEDED - Transaction succeeded. */
+  SUCCEEDED = 1,
+  /** REVERTED - Transaction reverted. */
+  REVERTED = 2,
   UNRECOGNIZED = -1,
 }
 
@@ -71,13 +71,13 @@ export function executionStatusFromJSON(object: any): ExecutionStatus {
   switch (object) {
     case 0:
     case "EXECUTION_STATUS_UNSPECIFIED":
-      return ExecutionStatus.EXECUTION_STATUS_UNSPECIFIED;
+      return ExecutionStatus.UNSPECIFIED;
     case 1:
     case "EXECUTION_STATUS_SUCCEEDED":
-      return ExecutionStatus.EXECUTION_STATUS_SUCCEEDED;
+      return ExecutionStatus.SUCCEEDED;
     case 2:
     case "EXECUTION_STATUS_REVERTED":
-      return ExecutionStatus.EXECUTION_STATUS_REVERTED;
+      return ExecutionStatus.REVERTED;
     case -1:
     case "UNRECOGNIZED":
     default:
@@ -87,11 +87,11 @@ export function executionStatusFromJSON(object: any): ExecutionStatus {
 
 export function executionStatusToJSON(object: ExecutionStatus): string {
   switch (object) {
-    case ExecutionStatus.EXECUTION_STATUS_UNSPECIFIED:
+    case ExecutionStatus.UNSPECIFIED:
       return "EXECUTION_STATUS_UNSPECIFIED";
-    case ExecutionStatus.EXECUTION_STATUS_SUCCEEDED:
+    case ExecutionStatus.SUCCEEDED:
       return "EXECUTION_STATUS_SUCCEEDED";
-    case ExecutionStatus.EXECUTION_STATUS_REVERTED:
+    case ExecutionStatus.REVERTED:
       return "EXECUTION_STATUS_REVERTED";
     case ExecutionStatus.UNRECOGNIZED:
     default:
@@ -101,12 +101,12 @@ export function executionStatusToJSON(object: ExecutionStatus): string {
 
 /** Price unit. */
 export enum PriceUnit {
-  /** PRICE_UNIT_UNSPECIFIED - Unknown price unit. */
-  PRICE_UNIT_UNSPECIFIED = 0,
-  /** PRICE_UNIT_WEI - WEI. */
-  PRICE_UNIT_WEI = 1,
-  /** PRICE_UNIT_FRI - FRI. */
-  PRICE_UNIT_FRI = 2,
+  /** UNSPECIFIED - Unknown price unit. */
+  UNSPECIFIED = 0,
+  /** WEI - WEI. */
+  WEI = 1,
+  /** FRI - FRI. */
+  FRI = 2,
   UNRECOGNIZED = -1,
 }
 
@@ -114,13 +114,13 @@ export function priceUnitFromJSON(object: any): PriceUnit {
   switch (object) {
     case 0:
     case "PRICE_UNIT_UNSPECIFIED":
-      return PriceUnit.PRICE_UNIT_UNSPECIFIED;
+      return PriceUnit.UNSPECIFIED;
     case 1:
     case "PRICE_UNIT_WEI":
-      return PriceUnit.PRICE_UNIT_WEI;
+      return PriceUnit.WEI;
     case 2:
     case "PRICE_UNIT_FRI":
-      return PriceUnit.PRICE_UNIT_FRI;
+      return PriceUnit.FRI;
     case -1:
     case "UNRECOGNIZED":
     default:
@@ -130,11 +130,11 @@ export function priceUnitFromJSON(object: any): PriceUnit {
 
 export function priceUnitToJSON(object: PriceUnit): string {
   switch (object) {
-    case PriceUnit.PRICE_UNIT_UNSPECIFIED:
+    case PriceUnit.UNSPECIFIED:
       return "PRICE_UNIT_UNSPECIFIED";
-    case PriceUnit.PRICE_UNIT_WEI:
+    case PriceUnit.WEI:
       return "PRICE_UNIT_WEI";
-    case PriceUnit.PRICE_UNIT_FRI:
+    case PriceUnit.FRI:
       return "PRICE_UNIT_FRI";
     case PriceUnit.UNRECOGNIZED:
     default:
@@ -144,12 +144,12 @@ export function priceUnitToJSON(object: PriceUnit): string {
 
 /** DA mode. */
 export enum DataAvailabilityMode {
-  /** DATA_AVAILABILITY_MODE_UNSPECIFIED - Unknown DA. */
-  DATA_AVAILABILITY_MODE_UNSPECIFIED = 0,
-  /** DATA_AVAILABILITY_MODE_L1 - L1. */
-  DATA_AVAILABILITY_MODE_L1 = 1,
-  /** DATA_AVAILABILITY_MODE_L2 - L2. */
-  DATA_AVAILABILITY_MODE_L2 = 2,
+  /** UNSPECIFIED - Unknown DA. */
+  UNSPECIFIED = 0,
+  /** L1 - L1. */
+  L1 = 1,
+  /** L2 - L2. */
+  L2 = 2,
   UNRECOGNIZED = -1,
 }
 
@@ -157,13 +157,13 @@ export function dataAvailabilityModeFromJSON(object: any): DataAvailabilityMode 
   switch (object) {
     case 0:
     case "DATA_AVAILABILITY_MODE_UNSPECIFIED":
-      return DataAvailabilityMode.DATA_AVAILABILITY_MODE_UNSPECIFIED;
+      return DataAvailabilityMode.UNSPECIFIED;
     case 1:
     case "DATA_AVAILABILITY_MODE_L1":
-      return DataAvailabilityMode.DATA_AVAILABILITY_MODE_L1;
+      return DataAvailabilityMode.L1;
     case 2:
     case "DATA_AVAILABILITY_MODE_L2":
-      return DataAvailabilityMode.DATA_AVAILABILITY_MODE_L2;
+      return DataAvailabilityMode.L2;
     case -1:
     case "UNRECOGNIZED":
     default:
@@ -173,11 +173,11 @@ export function dataAvailabilityModeFromJSON(object: any): DataAvailabilityMode 
 
 export function dataAvailabilityModeToJSON(object: DataAvailabilityMode): string {
   switch (object) {
-    case DataAvailabilityMode.DATA_AVAILABILITY_MODE_UNSPECIFIED:
+    case DataAvailabilityMode.UNSPECIFIED:
       return "DATA_AVAILABILITY_MODE_UNSPECIFIED";
-    case DataAvailabilityMode.DATA_AVAILABILITY_MODE_L1:
+    case DataAvailabilityMode.L1:
       return "DATA_AVAILABILITY_MODE_L1";
-    case DataAvailabilityMode.DATA_AVAILABILITY_MODE_L2:
+    case DataAvailabilityMode.L2:
       return "DATA_AVAILABILITY_MODE_L2";
     case DataAvailabilityMode.UNRECOGNIZED:
     default:

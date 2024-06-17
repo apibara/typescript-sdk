@@ -10,6 +10,6 @@ plugins:
       - useReadonlyTypes=true
       - forceLong=bigint
       - esModuleInterop=true
+      - removeEnumPrefix=true
       - oneof=unions
       - useDate=true
-
