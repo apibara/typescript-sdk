@@ -99,11 +99,13 @@ const command = defineCommand({
           let events = 0;
           for (const block of message.data.data) {
             events += block.events.length ?? 0;
-            consola.info(`Block n=${block.header?.blockNumber} h=${block.header?.blockHash}`);
-            consola.info(`   Events: ${block.events.length}`)
-            consola.info(`   Messages: ${block.messages.length}`)
-            consola.info(`   Transactions: ${block.transactions.length}`)
-            consola.info(`   Receipts: ${block.receipts.length}`)
+            consola.info(
+              `Block n=${block.header?.blockNumber} h=${block.header?.blockHash}`,
+            );
+            consola.info(`   Events: ${block.events.length}`);
+            consola.info(`   Messages: ${block.messages.length}`);
+            consola.info(`   Transactions: ${block.transactions.length}`);
+            consola.info(`   Receipts: ${block.receipts.length}`);
 
             if (args.headers) {
               consola.log(block.header);
