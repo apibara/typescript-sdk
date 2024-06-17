@@ -110,25 +110,25 @@ const command = defineCommand({
             }
 
             if (args.events) {
-              for (const event of block.events.slice(0, 5)) {
+              for (const event of block.events) {
                 consola.log(event);
               }
             }
 
             if (args.messages) {
-              for (const message of block.messages.slice(0, 5)) {
+              for (const message of block.messages) {
                 consola.log(message);
               }
             }
 
             if (args.transactions) {
-              for (const transaction of block.transactions.slice(0, 5)) {
+              for (const transaction of block.transactions) {
                 consola.log(transaction);
               }
             }
 
             if (args.receipts) {
-              for (const receipt of block.receipts.slice(0, 5)) {
+              for (const receipt of block.receipts) {
                 consola.log(receipt);
               }
             }

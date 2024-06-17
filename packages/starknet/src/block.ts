@@ -287,7 +287,125 @@ export const Transaction = Schema.Struct({
 
 export type Transaction = typeof Transaction.Type;
 
-export const TransactionReceipt = Schema.Struct({});
+export const PriceUnit = Schema.transform(
+  Schema.Enums(proto.data.PriceUnit),
+  Schema.Literal("wei", "fri", "unknown"),
+  {
+    decode(value) {
+      const enumMap = {
+        [proto.data.PriceUnit.WEI]: "wei",
+        [proto.data.PriceUnit.FRI]: "fri",
+        [proto.data.PriceUnit.UNSPECIFIED]: "unknown",
+        [proto.data.PriceUnit.UNRECOGNIZED]: "unknown",
+      } as const;
+
+      return enumMap[value] ?? "unknown";
+    },
+    encode(value) {
+      throw new Error("encode: not implemented");
+    },
+  },
+);
+
+export const FeePayment = Schema.Struct({
+  amount: Schema.optional(FieldElement),
+  unit: Schema.optional(PriceUnit),
+});
+
+export const ComputationResources = Schema.Struct({
+  steps: Schema.optional(Schema.BigIntFromSelf),
+  memoryHoles: Schema.optional(Schema.BigIntFromSelf),
+  rangeCheckBuiltinApplications: Schema.optional(Schema.BigIntFromSelf),
+  pedersenBuiltinApplications: Schema.optional(Schema.BigIntFromSelf),
+  poseidonBuiltinApplications: Schema.optional(Schema.BigIntFromSelf),
+  ecOpBuiltinApplications: Schema.optional(Schema.BigIntFromSelf),
+  ecdsaBuiltinApplications: Schema.optional(Schema.BigIntFromSelf),
+  bitwiseBuiltinApplications: Schema.optional(Schema.BigIntFromSelf),
+  keccakBuiltinApplications: Schema.optional(Schema.BigIntFromSelf),
+  segmentArenaBuiltin: Schema.optional(Schema.BigIntFromSelf),
+});
+
+export const DataAvailabilityResources = Schema.Struct({
+  l1Gas: Schema.optional(Schema.BigIntFromSelf),
+  l1DataGas: Schema.optional(Schema.BigIntFromSelf),
+});
+
+export const ExecutionResources = Schema.Struct({
+  computation: Schema.optional(ComputationResources),
+  dataAvailability: Schema.optional(DataAvailabilityResources),
+});
+
+export const ExecutionSucceeded = Schema.Struct({
+  _tag: tag("succeeded"),
+  succeeded: Schema.Struct({}),
+});
+
+export const ExecutionReverted = Schema.Struct({
+  _tag: tag("reverted"),
+  reverted: Schema.Struct({
+    reason: Schema.optional(Schema.String),
+  }),
+});
+
+/** Common fields for all transaction receipts. */
+export const TransactionReceiptMeta = Schema.Struct({
+  transactionIndex: Schema.optional(Schema.Number),
+  transactionHash: Schema.optional(FieldElement),
+  actualFee: Schema.optional(FeePayment),
+  executionResources: Schema.optional(ExecutionResources),
+  executionResult: Schema.optional(
+    Schema.Union(ExecutionSucceeded, ExecutionReverted),
+  ),
+});
+
+export const InvokeTransactionReceipt = Schema.Struct({
+  _tag: tag("invoke"),
+  invoke: Schema.Struct({}),
+});
+
+export const L1HandlerTransactionReceipt = Schema.Struct({
+  _tag: tag("l1Handler"),
+  l1Handler: Schema.Struct({
+    messageHash: Schema.optional(Schema.Uint8ArrayFromSelf),
+  }),
+});
+
+export const DeclareTransactionReceipt = Schema.Struct({
+  _tag: tag("declare"),
+  declare: Schema.Struct({}),
+});
+
+export const DeployTransactionReceipt = Schema.Struct({
+  _tag: tag("deploy"),
+  deploy: Schema.Struct({
+    contractAddress: Schema.optional(FieldElement),
+  }),
+});
+
+export const DeployAccountTransactionReceipt = Schema.Struct({
+  _tag: tag("deployAccount"),
+  deployAccount: Schema.Struct({
+    contractAddress: Schema.optional(FieldElement),
+  }),
+});
+
+/** A transaction receipt.
+ *
+ * @prop meta Transaction receipt metadata.
+ * @prop receipt Transaction-specific receipt.
+ */
+export const TransactionReceipt = Schema.Struct({
+  meta: Schema.optional(TransactionReceiptMeta),
+  receipt: Schema.optional(
+    Schema.Union(
+      InvokeTransactionReceipt,
+      L1HandlerTransactionReceipt,
+      DeclareTransactionReceipt,
+      DeployTransactionReceipt,
+      DeployAccountTransactionReceipt,
+    ),
+  ),
+});
 
 export type TransactionReceipt = typeof TransactionReceipt.Type;
 
