@@ -6,7 +6,7 @@ const _FieldElement = Schema.TemplateLiteral(
 );
 
 /** Wire representation of `FieldElement`. */
-const FieldElementProto = Schema.Struct({
+export const FieldElementProto = Schema.Struct({
   loLo: Schema.BigIntFromSelf,
   loHi: Schema.BigIntFromSelf,
   hiLo: Schema.BigIntFromSelf,

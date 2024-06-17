@@ -7,3 +7,5 @@ export * from "./stream";
 
 export * from "./config";
 export * from "./client";
+
+export * from "./rate";
