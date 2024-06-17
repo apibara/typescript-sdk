@@ -1,7 +1,7 @@
 import { runMain, defineCommand } from "citty";
 import consola from "consola";
 import { StarknetStream, Filter } from "@apibara/starknet";
-import { createClient, RateGauge } from "@apibara/protocol";
+import { createClient } from "@apibara/protocol";
 
 const command = defineCommand({
   meta: {
@@ -19,6 +19,31 @@ const command = defineCommand({
       type: "string",
       description: "DNA auth token",
     },
+    headers: {
+      type: "boolean",
+      description: "Log headers",
+      default: false,
+    },
+    events: {
+      type: "boolean",
+      description: "Log events",
+      default: false,
+    },
+    messages: {
+      type: "boolean",
+      description: "Log messages",
+      default: false,
+    },
+    transactions: {
+      type: "boolean",
+      description: "Log transactions",
+      default: false,
+    },
+    receipts: {
+      type: "boolean",
+      description: "Log receipts",
+      default: false,
+    },
   },
   async run({ args }) {
     consola.info("Connecting to Starknet stream", args.stream);
@@ -28,6 +53,14 @@ const command = defineCommand({
     console.log(response);
 
     const filter = Filter.make({
+      transactions: [
+        {
+          includeEvents: true,
+          includeMessages: true,
+          includeReceipt: true,
+          includeReverted: true,
+        },
+      ],
       // header: {
       //   always: true,
       // },
@@ -58,9 +91,6 @@ const command = defineCommand({
       },
     });
 
-    const blockRate = new RateGauge(10);
-    const eventRate = new RateGauge(10);
-
     for await (const message of client.streamData(request)) {
       switch (message._tag) {
         case "data": {
@@ -74,12 +104,35 @@ const command = defineCommand({
             consola.info(`   Messages: ${block.messages.length}`)
             consola.info(`   Transactions: ${block.transactions.length}`)
             consola.info(`   Receipts: ${block.receipts.length}`)
-          }
 
-          blockRate.record(message.data.data.length);
-          eventRate.record(events);
-          consola.info(`Block rate: ${blockRate.average()?.toFixed(0)}±${blockRate.variance().toFixed(0)} blocks/s`);
-          consola.info(`Event rate: ${eventRate.average()?.toFixed(0)}±${eventRate.variance().toFixed(0)} events/s`);
+            if (args.headers) {
+              consola.log(block.header);
+            }
+
+            if (args.events) {
+              for (const event of block.events.slice(0, 5)) {
+                consola.log(event);
+              }
+            }
+
+            if (args.messages) {
+              for (const message of block.messages.slice(0, 5)) {
+                consola.log(message);
+              }
+            }
+
+            if (args.transactions) {
+              for (const transaction of block.transactions.slice(0, 5)) {
+                consola.log(transaction);
+              }
+            }
+
+            if (args.receipts) {
+              for (const receipt of block.receipts.slice(0, 5)) {
+                consola.log(receipt);
+              }
+            }
+          }
 
           break;
         }
