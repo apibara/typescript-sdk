@@ -56,9 +56,9 @@ describe("EventFilter", () => {
 
   it("should encode and decode default values", () => {
     const proto = encode({});
-    expect(proto).toMatchInlineSnapshot(`{}`);
+    expect(proto).toMatchInlineSnapshot("{}");
     const decoded = decode(proto);
-    expect(decoded).toMatchInlineSnapshot(`{}`);
+    expect(decoded).toMatchInlineSnapshot("{}");
   });
 
   it("should encode and decode all values", () => {
@@ -144,9 +144,9 @@ describe("TransactionFilter", () => {
 
   it("should encode and decode default values", () => {
     const proto = encode({});
-    expect(proto).toMatchInlineSnapshot(`{}`);
+    expect(proto).toMatchInlineSnapshot("{}");
     const decoded = decode(proto);
-    expect(decoded).toMatchInlineSnapshot(`{}`);
+    expect(decoded).toMatchInlineSnapshot("{}");
   });
 
   it("should encode and decode extra fields", () => {
