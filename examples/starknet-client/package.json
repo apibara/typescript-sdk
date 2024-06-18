@@ -1,0 +1,22 @@
+{
+  "name": "example-starknet-client",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start": "jiti ./src/main.ts",
+    "lint": "biome check .",
+    "lint:fix": "pnpm lint --apply",
+    "format": "biome format . --write"
+  },
+  "dependencies": {
+    "@apibara/protocol": "workspace:*",
+    "@apibara/starknet": "workspace:*",
+    "citty": "^0.1.6",
+    "consola": "^3.2.3",
+    "nice-grpc": "^2.1.8"
+  },
+  "devDependencies": {
+    "@types/node": "^20.12.12",
+    "jiti": "^1.21.0"
+  }
+}

@@ -1,5 +1,3 @@
 packages:
-  - "packages/evm"
-  - "packages/protocol"
-  - "packages/indexer"
+  - "packages/*"
   - "examples/**"
