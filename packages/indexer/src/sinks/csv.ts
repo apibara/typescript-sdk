@@ -24,13 +24,11 @@ export type CsvSinkOptions = {
 };
 
 class CsvSink<TData extends Record<string, unknown>> extends Sink<TData> {
-  private _config: CsvSinkOptions;
-  private _stringifier: Stringifier;
-
-  constructor(stringifier: Stringifier, config: CsvSinkOptions) {
+  constructor(
+    private _stringifier: Stringifier,
+    private _config: CsvSinkOptions,
+  ) {
     super();
-    this._config = config;
-    this._stringifier = stringifier;
   }
 
   async write({ data, endCursor }: SinkWriteArgs<TData>) {
