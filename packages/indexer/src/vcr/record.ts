@@ -1,9 +1,10 @@
-import type { Client, StreamDataResponse } from "@apibara/protocol";
-import { run, type Indexer } from "@apibara/indexer";
-import type { CassetteOptions, VcrConfig } from "./config";
-import { klona } from "klona/full";
-import path from "node:path";
 import fs from "node:fs/promises";
+import path from "node:path";
+import { run, type Indexer } from "@apibara/indexer";
+import type { Client, StreamDataResponse } from "@apibara/protocol";
+import { klona } from "klona/full";
+import type { CassetteOptions, VcrConfig } from "./config";
+import { serialize } from "./helper";
 
 export type CassetteDataType<TFilter, TBlock> = {
   filter: TFilter;
@@ -13,13 +14,13 @@ export type CassetteDataType<TFilter, TBlock> = {
 export async function record<TFilter, TBlock, TRet>(
   vcr: VcrConfig,
   client: Client<TFilter, TBlock>,
-  indexer: Indexer<TFilter, TBlock, TRet>,
+  indexerArg: Indexer<TFilter, TBlock, TRet>,
   cassetteOptions: CassetteOptions,
 ) {
-  const _indexer = klona(indexer);
+  const indexer = klona(indexerArg);
   const messages: StreamDataResponse<TBlock>[] = [];
 
-  _indexer.hooks.addHooks({
+  indexer.hooks.addHooks({
     "connect:before"({ options, request }) {
       request.startingCursor = cassetteOptions.startingCursor;
       options.endingCursor = cassetteOptions.endingCursor;
@@ -29,7 +30,7 @@ export async function record<TFilter, TBlock, TRet>(
     },
     async "run:after"() {
       const output: CassetteDataType<TFilter, TBlock> = {
-        filter: _indexer.options.filter,
+        filter: indexer.options.filter,
         messages: messages,
       };
       const filePath = path.join(
@@ -40,13 +41,5 @@ export async function record<TFilter, TBlock, TRet>(
     },
   });
 
-  await run(client, _indexer);
-}
-
-function serialize(obj: Record<string, unknown>): string {
-  return JSON.stringify(
-    obj,
-    (_, value) => (typeof value === "bigint" ? `${value.toString()}n` : value),
-    "\t",
-  );
+  await run(client, indexer);
 }
