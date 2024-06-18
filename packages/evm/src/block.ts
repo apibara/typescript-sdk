@@ -50,7 +50,7 @@ export const BlockHeader = Schema.Struct({
   gasLimit: Schema.optional(U256),
   gasUsed: Schema.optional(U256),
   timestamp: Schema.optional(Schema.DateFromSelf),
-  extraData: Schema.optional(HexData),
+  // extraData: Schema.optional(HexData),
   mixHash: Schema.optional(B256),
   nonce: Schema.BigIntFromSelf,
   baseFeePerGas: Schema.optional(U256),
