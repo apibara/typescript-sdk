@@ -165,7 +165,7 @@ export const InvokeTransactionV3 = Schema.Struct({
   }),
 });
 
-export const L1HandleTransaction = Schema.Struct({
+export const L1HandlerTransaction = Schema.Struct({
   _tag: tag("l1Handler"),
   l1Handler: Schema.Struct({
     nonce: Schema.optional(Schema.BigIntFromSelf),
@@ -273,7 +273,7 @@ export const Transaction = Schema.Struct({
       InvokeTransactionV0,
       InvokeTransactionV1,
       InvokeTransactionV3,
-      L1HandleTransaction,
+      L1HandlerTransaction,
       DeployTransaction,
       DeclareTransactionV0,
       DeclareTransactionV1,
