@@ -22,7 +22,7 @@
     "build:proto": "buf generate proto",
     "test": "vitest",
     "lint": "biome check .",
-    "lint:fix": "pnpm lint --apply",
+    "lint:fix": "pnpm lint --write",
     "format": "biome format . --write"
   },
   "devDependencies": {

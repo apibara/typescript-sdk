@@ -12,8 +12,8 @@ import type {
   StreamDataResponse,
 } from "@apibara/protocol";
 import type { VcrConfig } from "./config";
-import type { CassetteDataType } from "./record";
 import { deserialize } from "./helper";
+import type { CassetteDataType } from "./record";
 
 export class VcrClient<TFilter, TBlock> implements Client<TFilter, TBlock> {
   constructor(

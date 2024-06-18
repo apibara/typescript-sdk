@@ -1,8 +1,8 @@
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
 
 import { pad } from "viem";
 
-import { feltToProto, feltFromProto } from "./common";
+import { feltFromProto, feltToProto } from "./common";
 
 describe("FieldElement", () => {
   it("should convert to and from proto", () => {

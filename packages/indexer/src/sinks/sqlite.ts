@@ -1,5 +1,5 @@
 import type { Cursor } from "@apibara/protocol";
-import { open, type Database, type ISqlite } from "sqlite";
+import { type Database, type ISqlite, open } from "sqlite";
 import { Sink, type SinkWriteArgs } from "../sink";
 
 export type SqliteArgs = ISqlite.Config;

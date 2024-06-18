@@ -1,7 +1,7 @@
-import { runMain, defineCommand } from "citty";
-import consola from "consola";
-import { createClient } from "@apibara/protocol";
 import { createIndexer, run } from "@apibara/indexer";
+import { createClient } from "@apibara/protocol";
+import { defineCommand, runMain } from "citty";
+import consola from "consola";
 
 import { createIndexerConfig } from "./indexer";
 

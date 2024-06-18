@@ -1,9 +1,9 @@
-import consola from "consola";
 import assert from "node:assert";
 import { EvmStream } from "@apibara/evm";
 import { defineIndexer, useIndexerContext } from "@apibara/indexer";
-import { encodeEventTopics, parseAbi, decodeEventLog } from "viem";
 import { trace } from "@opentelemetry/api";
+import consola from "consola";
+import { decodeEventLog, encodeEventTopics, parseAbi } from "viem";
 
 const abi = parseAbi([
   "event Transfer(address indexed from, address indexed to, uint256 value)",
