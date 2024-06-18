@@ -10,6 +10,9 @@ import type {
   Cursor,
   DataFinality,
   StreamConfig,
+  StreamDataOptions,
+  StreamDataRequest,
+  StreamDataResponse,
 } from "@apibara/protocol";
 
 import { indexerAsyncContext } from "./context";
@@ -20,12 +23,19 @@ import { tracer } from "./otel";
 export interface IndexerHooks<TFilter, TBlock, TRet> {
   "run:before": () => void;
   "run:after": () => void;
-  "connect:before": () => void;
+  "connect:before": ({
+    request,
+    options,
+  }: {
+    request: StreamDataRequest<TFilter>;
+    options: StreamDataOptions;
+  }) => void;
   "connect:after": () => void;
   "handler:before": ({ block }: { block: TBlock }) => void;
   "handler:after": ({ output }: { output: TRet[] }) => void;
   "sink:write": ({ data }: { data: TRet[] }) => void;
   "sink:flush": () => void;
+  message: ({ message }: { message: StreamDataResponse<TBlock> }) => void;
 }
 
 export interface IndexerConfig<TFilter, TBlock, TRet> {
@@ -40,7 +50,6 @@ export interface IndexerConfig<TFilter, TBlock, TRet> {
     endCursor?: Cursor | undefined;
     finality: DataFinality;
   }) => TRet[];
-  sink?: Sink<TRet> | Promise<Sink<TRet>>;
   hooks?: NestedHooks<IndexerHooks<TFilter, TBlock, TRet>>;
   plugins?: ReadonlyArray<IndexerPlugin<TFilter, TBlock, TRet>>;
   debug?: boolean;
@@ -94,16 +103,17 @@ export function createIndexer<TFilter, TBlock, TRet>({
 export async function run<TFilter, TBlock, TRet>(
   client: Client<TFilter, TBlock>,
   indexer: Indexer<TFilter, TBlock, TRet>,
+  sink?: Sink<TRet> | Promise<Sink<TRet>>,
 ) {
   await indexerAsyncContext.callAsync({}, async () => {
     await indexer.hooks.callHook("run:before");
 
-    const sink = (await indexer.options.sink) ?? defaultSink();
+    const _sink = (await sink) ?? defaultSink();
 
-    sink.on("write", async ({ data }) => {
+    _sink.on("write", async ({ data }) => {
       await indexer.hooks.callHook("sink:write", { data });
     });
-    sink.on("flush", async () => {
+    _sink.on("flush", async () => {
       await indexer.hooks.callHook("sink:flush");
     });
 
@@ -113,13 +123,17 @@ export async function run<TFilter, TBlock, TRet>(
       startingCursor: indexer.options.startingCursor,
     });
 
-    await indexer.hooks.callHook("connect:before");
+    const options: StreamDataOptions = {};
 
-    const stream = client.streamData(request);
+    await indexer.hooks.callHook("connect:before", { request, options });
+
+    const stream = client.streamData(request, options);
 
     await indexer.hooks.callHook("connect:after");
 
     for await (const message of stream) {
+      await indexer.hooks.callHook("message", { message });
+
       switch (message._tag) {
         case "data": {
           await tracer.startActiveSpan("message data", async (span) => {
@@ -150,7 +164,7 @@ export async function run<TFilter, TBlock, TRet>(
             );
 
             await tracer.startActiveSpan("sink write", async (span) => {
-              await sink.write({ data: output, cursor, endCursor, finality });
+              await _sink.write({ data: output, cursor, endCursor, finality });
 
               span.end();
             });
