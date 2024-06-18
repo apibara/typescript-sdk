@@ -37,7 +37,7 @@
     "test": "vitest",
     "test:typecheck": "vitest typecheck",
     "lint": "biome check .",
-    "lint:fix": "pnpm lint --apply",
+    "lint:fix": "pnpm lint --write",
     "format": "biome format . --write"
   },
   "devDependencies": {

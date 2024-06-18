@@ -1,10 +1,3 @@
-import consola from "consola";
-import {
-  createHooks,
-  createDebugger,
-  type NestedHooks,
-  type Hookable,
-} from "hookable";
 import type {
   Client,
   Cursor,
@@ -14,11 +7,18 @@ import type {
   StreamDataRequest,
   StreamDataResponse,
 } from "@apibara/protocol";
+import consola from "consola";
+import {
+  type Hookable,
+  type NestedHooks,
+  createDebugger,
+  createHooks,
+} from "hookable";
 
 import { indexerAsyncContext } from "./context";
-import { type Sink, defaultSink } from "./sink";
-import type { IndexerPlugin } from "./plugins";
 import { tracer } from "./otel";
+import type { IndexerPlugin } from "./plugins";
+import { type Sink, defaultSink } from "./sink";
 
 export interface IndexerHooks<TFilter, TBlock, TRet> {
   "run:before": () => void;

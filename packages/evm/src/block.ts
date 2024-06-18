@@ -1,8 +1,8 @@
-import { Schema } from "@effect/schema";
 import { Bytes, BytesFromUint8Array } from "@apibara/protocol";
+import { Schema } from "@effect/schema";
 
-import * as proto from "./proto";
 import { Address, B256, U128, U256 } from "./common";
+import * as proto from "./proto";
 
 export const HexData = Schema.transform(
   Schema.Struct({

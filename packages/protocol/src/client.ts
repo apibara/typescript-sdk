@@ -1,23 +1,23 @@
+import { Schema } from "@effect/schema";
 import {
   type DefaultCallOptions,
   type NormalizedServiceDefinition,
-  createClient as grpcCreateClient,
   createChannel,
+  createClient as grpcCreateClient,
 } from "nice-grpc";
-import { Schema } from "@effect/schema";
 
 import * as proto from "./proto";
 
+import assert from "node:assert";
+import type { Cursor } from "./common";
 import type { StreamConfig } from "./config";
 import {
   type StatusRequest,
+  type StatusResponse,
   statusRequestToProto,
   statusResponseFromProto,
-  type StatusResponse,
 } from "./status";
 import { type StreamDataRequest, StreamDataResponse } from "./stream";
-import type { Cursor } from "./common";
-import assert from "node:assert";
 
 /** Client call options. */
 export interface ClientCallOptions {

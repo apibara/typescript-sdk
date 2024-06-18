@@ -1,8 +1,8 @@
 import { Schema } from "@effect/schema";
 
-import * as proto from "./proto";
 import { FieldElement } from "./common";
 import { tag } from "./helpers";
+import * as proto from "./proto";
 
 /** Price of a unit of resource.
  *

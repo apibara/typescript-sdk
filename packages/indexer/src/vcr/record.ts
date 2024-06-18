@@ -1,6 +1,6 @@
 import fs from "node:fs/promises";
 import path from "node:path";
-import { run, type Indexer } from "@apibara/indexer";
+import { type Indexer, run } from "@apibara/indexer";
 import type { Client, StreamDataResponse } from "@apibara/protocol";
 import { klona } from "klona/full";
 import type { CassetteOptions, VcrConfig } from "./config";
