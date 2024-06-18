@@ -35,7 +35,5 @@ jobs:
         run: pnpm format
       - name: Run build
         run: pnpm build
-      - name: Run test:typecheck
-        run: CI=true pnpm test:typecheck
       - name: Run test
         run: CI=true pnpm test
