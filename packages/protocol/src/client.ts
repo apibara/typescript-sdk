@@ -16,10 +16,17 @@ import {
   type StatusResponse,
 } from "./status";
 import { type StreamDataRequest, StreamDataResponse } from "./stream";
+import type { Cursor } from "./common";
+import assert from "node:assert";
 
 /** Client call options. */
 export interface ClientCallOptions {
   signal?: AbortSignal;
+}
+
+export interface StreamDataOptions extends ClientCallOptions {
+  /** Stop at the specified cursor (inclusive) */
+  endingCursor?: Cursor;
 }
 
 /** DNA client. */
@@ -33,7 +40,7 @@ export interface Client<TFilter, TBlock> {
   /** Start streaming data from the DNA server. */
   streamData(
     request: StreamDataRequest<TFilter>,
-    options?: ClientCallOptions,
+    options?: StreamDataOptions,
   ): AsyncIterable<StreamDataResponse<TBlock>>;
 }
 
@@ -72,9 +79,9 @@ export class GrpcClient<TFilter, TBlock> implements Client<TFilter, TBlock> {
     return statusResponseFromProto(response);
   }
 
-  streamData(request: StreamDataRequest<TFilter>, options?: ClientCallOptions) {
+  streamData(request: StreamDataRequest<TFilter>, options?: StreamDataOptions) {
     const it = this.client.streamData(this.encodeRequest(request), options);
-    return new StreamDataIterable(it, this.config.Block);
+    return new StreamDataIterable(it, this.config.Block, options);
   }
 }
 
@@ -82,24 +89,50 @@ export class StreamDataIterable<TBlock> {
   constructor(
     private it: AsyncIterable<proto.stream.StreamDataResponse>,
     private schema: Schema.Schema<TBlock, Uint8Array, never>,
+    private options?: StreamDataOptions,
   ) {}
 
   [Symbol.asyncIterator](): AsyncIterator<StreamDataResponse<TBlock>> {
     const inner = this.it[Symbol.asyncIterator]();
     const schema = StreamDataResponse(this.schema);
     const decoder = Schema.decodeSync(schema);
+    const { endingCursor } = this.options ?? {};
+    let shouldStop = false;
 
     return {
       async next() {
+        if (shouldStop) {
+          return { done: true, value: undefined };
+        }
+
         const { done, value } = await inner.next();
 
         if (done || value.message === undefined) {
           return { done: true, value: undefined };
         }
 
+        const decodedMessage = decoder(value.message);
+
+        if (endingCursor) {
+          assert(value.message.$case === "data");
+          assert(decodedMessage._tag === "data");
+
+          const { orderKey, uniqueKey } = endingCursor;
+          const endCursor = decodedMessage.data.endCursor;
+
+          // Check if the orderKey matches
+          if (orderKey === endCursor?.orderKey) {
+            // If a uniqueKey is specified, it must also match
+            if (!uniqueKey || uniqueKey === endCursor.uniqueKey) {
+              shouldStop = true;
+              return { done: false, value: decodedMessage };
+            }
+          }
+        }
+
         return {
           done: false,
-          value: decoder(value.message),
+          value: decodedMessage,
         };
       },
     };
