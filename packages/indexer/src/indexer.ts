@@ -103,17 +103,17 @@ export function createIndexer<TFilter, TBlock, TRet>({
 export async function run<TFilter, TBlock, TRet>(
   client: Client<TFilter, TBlock>,
   indexer: Indexer<TFilter, TBlock, TRet>,
-  sink?: Sink<TRet> | Promise<Sink<TRet>>,
+  sinkArg?: Sink<TRet> | Promise<Sink<TRet>>,
 ) {
   await indexerAsyncContext.callAsync({}, async () => {
     await indexer.hooks.callHook("run:before");
 
-    const _sink = (await sink) ?? defaultSink();
+    const sink = (await sinkArg) ?? defaultSink();
 
-    _sink.on("write", async ({ data }) => {
+    sink.on("write", async ({ data }) => {
       await indexer.hooks.callHook("sink:write", { data });
     });
-    _sink.on("flush", async () => {
+    sink.on("flush", async () => {
       await indexer.hooks.callHook("sink:flush");
     });
 
@@ -164,7 +164,7 @@ export async function run<TFilter, TBlock, TRet>(
             );
 
             await tracer.startActiveSpan("sink write", async (span) => {
-              await _sink.write({ data: output, cursor, endCursor, finality });
+              await sink.write({ data: output, cursor, endCursor, finality });
 
               span.end();
             });

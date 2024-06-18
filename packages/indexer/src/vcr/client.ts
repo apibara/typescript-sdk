@@ -1,17 +1,19 @@
+import assert from "node:assert";
+import fs from "node:fs";
+import path from "node:path";
 import type {
   Client,
   ClientCallOptions,
   StatusRequest,
+  StatusResponse,
   StreamConfig,
   StreamDataOptions,
   StreamDataRequest,
   StreamDataResponse,
 } from "@apibara/protocol";
 import type { VcrConfig } from "./config";
-import path from "node:path";
-import fs from "node:fs";
 import type { CassetteDataType } from "./record";
-import assert from "node:assert";
+import { deserialize } from "./helper";
 
 export class VcrClient<TFilter, TBlock> implements Client<TFilter, TBlock> {
   constructor(
@@ -20,10 +22,13 @@ export class VcrClient<TFilter, TBlock> implements Client<TFilter, TBlock> {
     private streamConfig: StreamConfig<TFilter, TBlock>,
   ) {}
 
-  async status(request?: StatusRequest, options?: ClientCallOptions) {
-    // TODO
-    return {};
+  async status(
+    request?: StatusRequest,
+    options?: ClientCallOptions,
+  ): Promise<StatusResponse> {
+    throw new Error("Client.status is not implemented for VcrClient");
   }
+
   streamData(request: StreamDataRequest<TFilter>, options?: StreamDataOptions) {
     const filePath = path.join(
       this.vcrConfig.cassetteDir,
@@ -62,12 +67,4 @@ class StreamDataIterable<TBlock> {
       },
     };
   }
-}
-
-function deserialize(str: string) {
-  return JSON.parse(str, (_, value) =>
-    typeof value === "string" && value.match(/^\d+n$/)
-      ? BigInt(value.slice(0, -1))
-      : value,
-  );
 }
