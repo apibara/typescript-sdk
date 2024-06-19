@@ -1,12 +1,12 @@
-import consola from "consola";
-import * as opentelemetry from "@opentelemetry/sdk-node";
 import { OTLPTraceExporter } from "@opentelemetry/exporter-trace-otlp-proto";
 import { Resource } from "@opentelemetry/resources";
-import { SEMRESATTRS_SERVICE_NAME } from "@opentelemetry/semantic-conventions";
+import * as opentelemetry from "@opentelemetry/sdk-node";
 import {
   BatchSpanProcessor,
   type SpanProcessor,
 } from "@opentelemetry/sdk-trace-base";
+import { SEMRESATTRS_SERVICE_NAME } from "@opentelemetry/semantic-conventions";
+import consola from "consola";
 
 let spanProcessor: SpanProcessor | undefined;
 

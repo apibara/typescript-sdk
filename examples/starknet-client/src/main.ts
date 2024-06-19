@@ -1,7 +1,7 @@
-import { runMain, defineCommand } from "citty";
-import consola from "consola";
-import { StarknetStream, Filter } from "@apibara/starknet";
 import { createClient } from "@apibara/protocol";
+import { Filter, StarknetStream } from "@apibara/starknet";
+import { defineCommand, runMain } from "citty";
+import consola from "consola";
 
 const command = defineCommand({
   meta: {

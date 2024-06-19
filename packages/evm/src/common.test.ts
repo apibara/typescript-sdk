@@ -1,7 +1,7 @@
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
 
-import { pad } from "viem";
 import { Schema } from "@effect/schema";
+import { pad } from "viem";
 
 import { Address, B256, U128, U256 } from "./common";
 

@@ -1,8 +1,8 @@
-import { describe, it, expect } from "vitest";
 import { encodeEventTopics, pad, parseAbi } from "viem";
+import { describe, expect, it } from "vitest";
 
-import { Filter, LogFilter, filterFromProto, filterToProto } from "./filter";
 import { Schema } from "@effect/schema";
+import { Filter, LogFilter, filterFromProto, filterToProto } from "./filter";
 
 const abi = parseAbi([
   "event Transfer(address indexed from, address indexed to, uint256 value)",

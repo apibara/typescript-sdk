@@ -5,7 +5,6 @@
   "description": "Apibara Typescript monorepo",
   "scripts": {
     "build": "turbo run build --parallel",
-    "test:typecheck": "turbo run test:typecheck",
     "test": "turbo run test",
     "lint": "turbo run lint --parallel",
     "lint:fix": "turbo run lint:fix --parallel",
@@ -13,7 +12,7 @@
     "release": "pnpm build && pnpm changeset publish"
   },
   "devDependencies": {
-    "@biomejs/biome": "^1.7.3",
+    "@biomejs/biome": "^1.8.1",
     "@changesets/changelog-github": "^0.4.8",
     "@changesets/cli": "^2.27.1",
     "turbo": "^2.0.1"

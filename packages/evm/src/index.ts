@@ -1,6 +1,6 @@
 import { StreamConfig } from "@apibara/protocol";
-import { FilterFromBytes } from "./filter";
 import { BlockFromBytes } from "./block";
+import { FilterFromBytes } from "./filter";
 
 export * as proto from "./proto";
 

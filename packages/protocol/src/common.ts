@@ -1,6 +1,6 @@
-import { hexToBytes, toHex } from "viem";
-import { Option } from "effect";
 import { Schema } from "@effect/schema";
+import { Option } from "effect";
+import { hexToBytes, toHex } from "viem";
 
 import * as proto from "./proto";
 

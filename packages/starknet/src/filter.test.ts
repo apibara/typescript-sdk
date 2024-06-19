@@ -1,5 +1,5 @@
-import { describe, it, expect } from "vitest";
 import { Schema } from "@effect/schema";
+import { describe, expect, it } from "vitest";
 
 import { EventFilter, HeaderFilter, Key, TransactionFilter } from "./filter";
 
