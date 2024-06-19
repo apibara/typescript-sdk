@@ -30,6 +30,10 @@ export class VcrClient<TFilter, TBlock> implements Client<TFilter, TBlock> {
   }
 
   streamData(request: StreamDataRequest<TFilter>, options?: StreamDataOptions) {
+    if (!this.isCassetteAvailable()) {
+      throw new Error("Cassette doesn't exists");
+    }
+
     const filePath = path.join(
       this.vcrConfig.cassetteDir,
       `${this.cassetteName}.json`,
@@ -47,9 +51,17 @@ export class VcrClient<TFilter, TBlock> implements Client<TFilter, TBlock> {
 
     return new StreamDataIterable(messages);
   }
+
+  isCassetteAvailable(): boolean {
+    const filePath = path.join(
+      this.vcrConfig.cassetteDir,
+      `${this.cassetteName}.json`,
+    );
+    return fs.existsSync(filePath);
+  }
 }
 
-class StreamDataIterable<TBlock> {
+export class StreamDataIterable<TBlock> {
   constructor(private messages: StreamDataResponse<TBlock>[]) {}
 
   [Symbol.asyncIterator](): AsyncIterator<StreamDataResponse<TBlock>> {

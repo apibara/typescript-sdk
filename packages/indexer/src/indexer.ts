@@ -9,16 +9,16 @@ import type {
 } from "@apibara/protocol";
 import consola from "consola";
 import {
-  createDebugger,
-  createHooks,
   type Hookable,
   type NestedHooks,
+  createDebugger,
+  createHooks,
 } from "hookable";
 
 import { indexerAsyncContext } from "./context";
 import { tracer } from "./otel";
 import type { IndexerPlugin } from "./plugins";
-import { defaultSink, type Sink } from "./sink";
+import { type Sink, defaultSink } from "./sink";
 
 export interface IndexerHooks<TFilter, TBlock, TRet> {
   "run:before": () => void;
