@@ -20,6 +20,9 @@ importers:
       turbo:
         specifier: ^2.0.1
         version: 2.0.1
+      typescript:
+        specifier: ^5.4.5
+        version: 5.4.5
 
   examples/evm-client:
     dependencies:
@@ -156,9 +159,6 @@ importers:
       '@types/node':
         specifier: ^20.12.12
         version: 20.12.12
-      typescript:
-        specifier: ^5.4.5
-        version: 5.4.5
       unbuild:
         specifier: ^2.0.0
         version: 2.0.0(typescript@5.4.5)
@@ -205,9 +205,6 @@ importers:
       sqlite:
         specifier: ^5.1.1
         version: 5.1.1
-      typescript:
-        specifier: ^5.4.5
-        version: 5.4.5
       unbuild:
         specifier: ^2.0.0
         version: 2.0.0(typescript@5.4.5)
@@ -248,9 +245,6 @@ importers:
       '@types/node':
         specifier: ^20.12.13
         version: 20.12.13
-      typescript:
-        specifier: ^5.4.5
-        version: 5.4.5
       unbuild:
         specifier: ^2.0.0
         version: 2.0.0(typescript@5.4.5)
@@ -288,9 +282,6 @@ importers:
       '@types/node':
         specifier: ^20.12.12
         version: 20.14.0
-      typescript:
-        specifier: ^5.4.5
-        version: 5.4.5
       unbuild:
         specifier: ^2.0.0
         version: 2.0.0(typescript@5.4.5)
