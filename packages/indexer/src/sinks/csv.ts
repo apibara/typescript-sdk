@@ -1,6 +1,6 @@
-import type { Cursor } from "@apibara/protocol";
-import { stringify, type Options, type Stringifier } from "csv-stringify";
 import fs from "node:fs";
+import type { Cursor } from "@apibara/protocol";
+import { type Options, type Stringifier, stringify } from "csv-stringify";
 import { Sink, type SinkWriteArgs } from "../sink";
 
 export type CsvArgs = {
