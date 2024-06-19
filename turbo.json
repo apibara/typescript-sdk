@@ -12,6 +12,9 @@
         "build"
       ]
     },
+    "typecheck": {
+      "cache": false
+    },
     "lint": {
       "cache": false
     },
