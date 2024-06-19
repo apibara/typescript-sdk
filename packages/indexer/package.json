@@ -35,6 +35,7 @@
   "scripts": {
     "build": "unbuild",
     "lint": "biome check .",
+    "typecheck": "tsc --noEmit",
     "lint:fix": "pnpm lint --write",
     "format": "biome format . --write"
   },

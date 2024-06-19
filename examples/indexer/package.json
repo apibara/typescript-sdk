@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "start": "jiti ./src/main.ts",
+    "typecheck": "tsc --noEmit",
     "lint": "biome check .",
     "lint:fix": "pnpm lint --write",
     "format": "biome format . --write"

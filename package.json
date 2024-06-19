@@ -5,6 +5,7 @@
   "description": "Apibara Typescript monorepo",
   "scripts": {
     "build": "turbo run build --parallel",
+    "typecheck": "turbo run typecheck --parallel",
     "test": "turbo run test",
     "lint": "turbo run lint --parallel",
     "lint:fix": "turbo run lint:fix --parallel",
