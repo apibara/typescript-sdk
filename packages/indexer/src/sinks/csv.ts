@@ -1,6 +1,6 @@
-import fs from "node:fs";
 import type { Cursor } from "@apibara/protocol";
-import { type Options, type Stringifier, stringify } from "csv-stringify";
+import { stringify, type Options, type Stringifier } from "csv-stringify";
+import fs from "node:fs";
 import { Sink, type SinkWriteArgs } from "../sink";
 
 export type CsvArgs = {
@@ -23,7 +23,9 @@ export type CsvSinkOptions = {
   cursorColumn?: string;
 };
 
-class CsvSink<TData extends Record<string, unknown>> extends Sink<TData> {
+export class CsvSink<
+  TData extends Record<string, unknown>,
+> extends Sink<TData> {
   constructor(
     private _stringifier: Stringifier,
     private _config: CsvSinkOptions,
