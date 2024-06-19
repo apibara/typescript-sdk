@@ -22,7 +22,9 @@ export type SqliteSinkOptions = {
   onConflict?: { on: string; update: string[] };
 };
 
-class SqliteSink<TData extends Record<string, unknown>> extends Sink<TData> {
+export class SqliteSink<
+  TData extends Record<string, unknown>,
+> extends Sink<TData> {
   private _config: SqliteSinkOptions;
   private _db: Database;
 

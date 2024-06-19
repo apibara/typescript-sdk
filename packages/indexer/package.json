@@ -29,6 +29,11 @@
         "types": "./dist/sinks/csv.d.ts",
         "import": "./dist/sinks/csv.mjs",
         "default": "./dist/sinks/csv.mjs"
+      },
+      "./sinks/vcr": {
+        "types": "./dist/sinks/vcr.d.ts",
+        "import": "./dist/sinks/vcr.mjs",
+        "default": "./dist/sinks/vcr.mjs"
       }
     }
   },
