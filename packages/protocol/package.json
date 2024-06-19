@@ -20,6 +20,7 @@
   "scripts": {
     "build": "pnpm build:proto && unbuild",
     "build:proto": "buf generate proto",
+    "typecheck": "tsc --noEmit",
     "test": "vitest",
     "lint": "biome check .",
     "lint:fix": "pnpm lint --write",

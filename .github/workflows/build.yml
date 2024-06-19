@@ -33,6 +33,8 @@ jobs:
         run: pnpm lint
       - name: Run format
         run: pnpm format
+      - name: Run typecheck
+        run: pnpm typecheck
       - name: Run build
         run: pnpm build
       - name: Run test
