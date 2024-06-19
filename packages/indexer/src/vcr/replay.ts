@@ -1,6 +1,6 @@
 import { type Indexer, run } from "@apibara/indexer";
 import type { Cursor } from "@apibara/protocol";
-import { vcr } from "../sinks/vcr";
+import { vcr } from "../testing/vcr";
 import { VcrClient } from "./client";
 import type { VcrConfig } from "./config";
 
