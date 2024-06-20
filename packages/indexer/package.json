@@ -8,7 +8,8 @@
     ".": "./src/index.ts",
     "./plugins": "./src/plugins/index.ts",
     "./sinks/sqlite": "./src/sinks/sqlite.ts",
-    "./sinks/csv": "./src/sinks/csv.ts"
+    "./sinks/csv": "./src/sinks/csv.ts",
+    "./testing": "./src/testing/index.ts"
   },
   "publishConfig": {
     "files": ["dist", "src", "README.md"],
@@ -29,6 +30,11 @@
         "types": "./dist/sinks/csv.d.ts",
         "import": "./dist/sinks/csv.mjs",
         "default": "./dist/sinks/csv.mjs"
+      },
+      "./testing": {
+        "types": "./dist/testing/index.d.ts",
+        "import": "./dist/testing/index.mjs",
+        "default": "./dist/testing/index.mjs"
       }
     }
   },
@@ -43,7 +49,6 @@
     "@types/node": "^20.14.0",
     "csv-stringify": "^6.5.0",
     "sqlite": "^5.1.1",
-    "typescript": "^5.4.5",
     "unbuild": "^2.0.0",
     "vitest": "^1.6.0"
   },
@@ -59,6 +64,7 @@
   },
   "peerDependencies": {
     "csv-stringify": "^6.5.0",
-    "sqlite": "^5.1.1"
+    "sqlite": "^5.1.1",
+    "vitest": "^1.6.0"
   }
 }

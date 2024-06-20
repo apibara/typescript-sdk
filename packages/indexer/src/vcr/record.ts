@@ -12,7 +12,7 @@ export type CassetteDataType<TFilter, TBlock> = {
 };
 
 export async function record<TFilter, TBlock, TRet>(
-  vcr: VcrConfig,
+  vcrConfig: VcrConfig,
   client: Client<TFilter, TBlock>,
   indexerArg: Indexer<TFilter, TBlock, TRet>,
   cassetteOptions: CassetteOptions,
@@ -34,7 +34,7 @@ export async function record<TFilter, TBlock, TRet>(
         messages: messages,
       };
       const filePath = path.join(
-        vcr.cassetteDir,
+        vcrConfig.cassetteDir,
         `${cassetteOptions.name}.json`,
       );
       await fs.writeFile(filePath, serialize(output), { flag: "w" });

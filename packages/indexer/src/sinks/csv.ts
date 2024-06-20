@@ -23,7 +23,9 @@ export type CsvSinkOptions = {
   cursorColumn?: string;
 };
 
-class CsvSink<TData extends Record<string, unknown>> extends Sink<TData> {
+export class CsvSink<
+  TData extends Record<string, unknown>,
+> extends Sink<TData> {
   constructor(
     private _stringifier: Stringifier,
     private _config: CsvSinkOptions,

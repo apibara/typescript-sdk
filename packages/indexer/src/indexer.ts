@@ -103,12 +103,12 @@ export function createIndexer<TFilter, TBlock, TRet>({
 export async function run<TFilter, TBlock, TRet>(
   client: Client<TFilter, TBlock>,
   indexer: Indexer<TFilter, TBlock, TRet>,
-  sinkArg?: Sink<TRet> | Promise<Sink<TRet>>,
+  sinkArg?: Sink<TRet>,
 ) {
   await indexerAsyncContext.callAsync({}, async () => {
     await indexer.hooks.callHook("run:before");
 
-    const sink = (await sinkArg) ?? defaultSink();
+    const sink = sinkArg ?? defaultSink();
 
     sink.on("write", async ({ data }) => {
       await indexer.hooks.callHook("sink:write", { data });
