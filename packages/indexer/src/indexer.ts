@@ -31,8 +31,13 @@ export interface IndexerHooks<TFilter, TBlock, TRet> {
     options: StreamDataOptions;
   }) => void;
   "connect:after": () => void;
-  "handler:before": ({ block }: { block: TBlock }) => void;
+  "handler:before": ({
+    block,
+    finality,
+    endCursor,
+  }: { block: TBlock; finality: DataFinality; endCursor?: Cursor }) => void;
   "handler:after": ({ output }: { output: TRet[] }) => void;
+  "handler:exception": ({ error }: { error: Error }) => void;
   "sink:write": ({ data }: { data: TRet[] }) => void;
   "sink:flush": () => void;
   message: ({ message }: { message: StreamDataResponse<TBlock> }) => void;
@@ -149,7 +154,11 @@ export async function run<TFilter, TBlock, TRet>(
             const output = await tracer.startActiveSpan(
               "handler",
               async (span) => {
-                await indexer.hooks.callHook("handler:before", { block });
+                await indexer.hooks.callHook("handler:before", {
+                  block,
+                  endCursor,
+                  finality,
+                });
                 const output = await indexer.options.transform({
                   block,
                   cursor,
