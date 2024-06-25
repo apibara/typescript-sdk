@@ -56,14 +56,14 @@ export function kv<TFilter, TBlock, TRet>(args: SqliteArgs) {
   });
 }
 
-export class KVStore<T> {
+export class KVStore {
   constructor(
     private _db: Database,
     private _finality: DataFinality,
     private _endCursor: Cursor,
   ) {}
 
-  async get(key: string): Promise<T> {
+  async get<T>(key: string): Promise<T> {
     const row = await this._db.get<{ v: string }>(
       `
       SELECT v
@@ -76,7 +76,7 @@ export class KVStore<T> {
     return row ? deserialize(row.v) : undefined;
   }
 
-  async put(key: string, value: T) {
+  async put<T>(key: string, value: T) {
     await this._db.run(
       `
       UPDATE kvs

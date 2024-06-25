@@ -3,9 +3,11 @@ import sqlite3 from "sqlite3";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { KVStore } from "./kv";
 
+type ValueType = { data: bigint };
+
 describe("KVStore", () => {
   let db: Database<sqlite3.Database, sqlite3.Statement>;
-  let store: KVStore<{ data: bigint }>;
+  let store: KVStore;
   const key = "test_key";
 
   beforeAll(async () => {
@@ -29,14 +31,14 @@ describe("KVStore", () => {
   it("should put and get a value", async () => {
     const value = { data: 0n };
 
-    await store.put(key, value);
-    const result = await store.get(key);
+    await store.put<ValueType>(key, value);
+    const result = await store.get<ValueType>(key);
 
     expect(result).toEqual(value);
   });
 
   it("should return undefined for non-existing key", async () => {
-    const result = await store.get("non_existent_key");
+    const result = await store.get<ValueType>("non_existent_key");
     expect(result).toBeUndefined();
   });
 
@@ -45,15 +47,15 @@ describe("KVStore", () => {
 
     const value = { data: 50n };
 
-    await store.put(key, value);
-    const result = await store.get(key);
+    await store.put<ValueType>(key, value);
+    const result = await store.get<ValueType>(key);
 
     expect(result).toEqual(value);
   });
 
   it("should delete a value", async () => {
     await store.del(key);
-    const result = await store.get(key);
+    const result = await store.get<ValueType>(key);
 
     expect(result).toBeUndefined();
 
