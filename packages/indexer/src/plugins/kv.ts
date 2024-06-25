@@ -2,8 +2,8 @@ import assert from "node:assert";
 import type { Cursor, DataFinality } from "@apibara/protocol";
 import { type Database, type ISqlite, open } from "sqlite";
 import { useIndexerContext } from "../context";
-import { defineIndexerPlugin } from "../plugins";
 import { deserialize, serialize } from "../vcr";
+import { defineIndexerPlugin } from "./config";
 
 type SqliteArgs = ISqlite.Config;
 
@@ -43,7 +43,7 @@ export function kv<TFilter, TBlock, TRet>(args: SqliteArgs) {
     });
 
     indexer.hooks.hook("handler:exception", async () => {
-      await db.exec("COMMIT TRANSACTION");
+      await db.exec("ROLLBACK TRANSACTION");
 
       const ctx = useIndexerContext();
 
@@ -56,14 +56,14 @@ export function kv<TFilter, TBlock, TRet>(args: SqliteArgs) {
   });
 }
 
-export class KVStore {
+export class KVStore<T> {
   constructor(
     private _db: Database,
     private _finality: DataFinality,
     private _endCursor: Cursor,
   ) {}
 
-  async get<T extends Record<string, unknown>>(key: string): Promise<T> {
+  async get(key: string): Promise<T> {
     const row = await this._db.get<{ v: string }>(
       `
       SELECT v
@@ -76,7 +76,7 @@ export class KVStore {
     return row ? deserialize(row.v) : undefined;
   }
 
-  async put<T extends Record<string, unknown>>(key: string, value: T) {
+  async put(key: string, value: T) {
     await this._db.run(
       `
       UPDATE kvs
@@ -91,11 +91,15 @@ export class KVStore {
       INSERT INTO kvs (from_block, to_block, k, v)
       VALUES (?, NULL, ?, ?)
     `,
-      [Number(this._endCursor.orderKey), key, serialize(value)],
+      [
+        Number(this._endCursor.orderKey),
+        key,
+        serialize(value as Record<string, unknown>),
+      ],
     );
   }
 
-  async del<T>(key: string) {
+  async del(key: string) {
     await this._db.run(
       `
       UPDATE kvs
