@@ -45,7 +45,7 @@ const command = defineCommand({
             abi,
             eventName: "Transfer",
             args: { from: null, to: null },
-          }),
+          }) as `0x${string}`[],
         },
       ],
     });
