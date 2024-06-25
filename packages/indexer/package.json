@@ -43,12 +43,14 @@
     "lint": "biome check .",
     "typecheck": "tsc --noEmit",
     "lint:fix": "pnpm lint --write",
+    "test": "vitest",
     "format": "biome format . --write"
   },
   "devDependencies": {
     "@types/node": "^20.14.0",
     "csv-stringify": "^6.5.0",
     "sqlite": "^5.1.1",
+    "sqlite3": "^5.1.7",
     "unbuild": "^2.0.0",
     "vitest": "^1.6.0"
   },
