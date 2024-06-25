@@ -177,7 +177,7 @@ export async function run<TFilter, TBlock, TRet>(
                 } catch (error) {
                   assert(error instanceof Error);
                   await indexer.hooks.callHook("handler:exception", { error });
-                  throw new Error(error?.message || "Some Error Occurred!");
+                  throw error;
                 }
 
                 await indexer.hooks.callHook("handler:after", { output });
