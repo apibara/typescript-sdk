@@ -15,6 +15,7 @@ import {
   createHooks,
 } from "hookable";
 
+import assert from "node:assert";
 import { indexerAsyncContext } from "./context";
 import { tracer } from "./otel";
 import type { IndexerPlugin } from "./plugins";
@@ -35,7 +36,11 @@ export interface IndexerHooks<TFilter, TBlock, TRet> {
     block,
     finality,
     endCursor,
-  }: { block: TBlock; finality: DataFinality; endCursor?: Cursor }) => void;
+  }: {
+    block: TBlock;
+    finality: DataFinality;
+    endCursor?: Cursor;
+  }) => void;
   "handler:after": ({ output }: { output: TRet[] }) => void;
   "handler:exception": ({ error }: { error: Error }) => void;
   "sink:write": ({ data }: { data: TRet[] }) => void;
@@ -159,12 +164,22 @@ export async function run<TFilter, TBlock, TRet>(
                   endCursor,
                   finality,
                 });
-                const output = await indexer.options.transform({
-                  block,
-                  cursor,
-                  endCursor,
-                  finality,
-                });
+
+                let output: TRet[];
+
+                try {
+                  output = await indexer.options.transform({
+                    block,
+                    cursor,
+                    endCursor,
+                    finality,
+                  });
+                } catch (error) {
+                  assert(error instanceof Error);
+                  await indexer.hooks.callHook("handler:exception", { error });
+                  throw new Error(error?.message || "Some Error Occurred!");
+                }
+
                 await indexer.hooks.callHook("handler:after", { output });
 
                 span.end();
