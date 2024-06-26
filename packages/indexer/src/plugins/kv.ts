@@ -13,15 +13,7 @@ export function kv<TFilter, TBlock, TRet>(args: SqliteArgs) {
 
     indexer.hooks.hook("run:before", async () => {
       db = await open(args);
-      await db.exec(`
-        CREATE TABLE IF NOT EXISTS kvs (
-          from_block INTEGER NOT NULL,
-          to_block INTEGER,
-          k TEXT NOT NULL,
-          v BLOB NOT NULL,
-          PRIMARY KEY (from_block, k)
-        );
-      `);
+      await KVStore.initialize(db);
     });
 
     indexer.hooks.hook("handler:before", async ({ finality, endCursor }) => {
@@ -31,21 +23,21 @@ export function kv<TFilter, TBlock, TRet>(args: SqliteArgs) {
 
       ctx.kv = new KVStore(db, finality, endCursor);
 
-      await db.exec("BEGIN TRANSACTION");
+      await ctx.kv.beginTransaction();
     });
 
     indexer.hooks.hook("handler:after", async () => {
-      await db.exec("COMMIT TRANSACTION");
-
       const ctx = useIndexerContext();
+
+      await ctx.kv.commitTransaction();
 
       ctx.kv = null;
     });
 
     indexer.hooks.hook("handler:exception", async () => {
-      await db.exec("ROLLBACK TRANSACTION");
-
       const ctx = useIndexerContext();
+
+      await ctx.kv.rollbackTransaction();
 
       ctx.kv = null;
     });
@@ -62,6 +54,30 @@ export class KVStore {
     private _finality: DataFinality,
     private _endCursor: Cursor,
   ) {}
+
+  static async initialize(db: Database) {
+    await db.exec(`
+      CREATE TABLE IF NOT EXISTS kvs (
+        from_block INTEGER NOT NULL,
+        to_block INTEGER,
+        k TEXT NOT NULL,
+        v BLOB NOT NULL,
+        PRIMARY KEY (from_block, k)
+      );
+    `);
+  }
+
+  async beginTransaction() {
+    await this._db.exec("BEGIN TRANSACTION");
+  }
+
+  async commitTransaction() {
+    await this._db.exec("COMMIT TRANSACTION");
+  }
+
+  async rollbackTransaction() {
+    await this._db.exec("ROLLBACK TRANSACTION");
+  }
 
   async get<T>(key: string): Promise<T> {
     const row = await this._db.get<{ v: string }>(

@@ -12,20 +12,16 @@ describe("KVStore", () => {
 
   beforeAll(async () => {
     db = await open({ driver: sqlite3.Database, filename: ":memory:" });
-    await db.exec(`
-      CREATE TABLE IF NOT EXISTS kvs (
-        from_block INTEGER NOT NULL,
-        to_block INTEGER,
-        k TEXT NOT NULL,
-        v BLOB NOT NULL,
-        PRIMARY KEY (from_block, k)
-      );
-    `);
+    await KVStore.initialize(db);
     store = new KVStore(db, "finalized", { orderKey: 5_000_000n });
   });
 
   afterAll(async () => {
     await db.close();
+  });
+
+  it("should begin transaction", async () => {
+    await store.beginTransaction();
   });
 
   it("should put and get a value", async () => {
@@ -37,9 +33,23 @@ describe("KVStore", () => {
     expect(result).toEqual(value);
   });
 
+  it("should commit transaction", async () => {
+    await store.commitTransaction();
+
+    const value = { data: 0n };
+
+    const result = await store.get<ValueType>(key);
+
+    expect(result).toEqual(value);
+  });
+
   it("should return undefined for non-existing key", async () => {
     const result = await store.get<ValueType>("non_existent_key");
     expect(result).toBeUndefined();
+  });
+
+  it("should begin transaction", async () => {
+    await store.beginTransaction();
   });
 
   it("should update an existing value", async () => {
@@ -70,5 +80,33 @@ describe("KVStore", () => {
 
     // Check that the old is correctly marked with to_block
     expect(rows[0].to_block).toBe(Number(5_000_020n));
+  });
+
+  it("should rollback transaction", async () => {
+    await store.rollbackTransaction();
+  });
+
+  it("should revert the changes to last commit", async () => {
+    const rows = await db.all(
+      `
+      SELECT from_block, to_block, k, v
+      FROM kvs
+      WHERE k = ?
+    `,
+      [key],
+    );
+
+    expect(rows).toMatchInlineSnapshot(`
+      [
+        {
+          "from_block": 5000000,
+          "k": "test_key",
+          "to_block": null,
+          "v": "{
+      	"data": "0n"
+      }",
+        },
+      ]
+    `);
   });
 });
