@@ -7,7 +7,7 @@
 /* eslint-disable */
 import Long from "long";
 import _m0 from "protobufjs/minimal";
-import { Address, B256, Bloom, HexData, U128, U256 } from "./common";
+import { Address, B256, Bloom, U128, U256 } from "./common";
 import { Timestamp } from "./google/protobuf/timestamp";
 
 export const protobufPackage = "evm.v2";
@@ -92,7 +92,7 @@ export interface BlockHeader {
     | undefined;
   /** Extra data. */
   readonly extraData?:
-    | HexData
+    | Uint8Array
     | undefined;
   /** Mix hash. */
   readonly mixHash?:
@@ -199,7 +199,7 @@ export interface Transaction {
     | undefined;
   /** Data. */
   readonly input?:
-    | HexData
+    | Uint8Array
     | undefined;
   /** The signature's r,s,v,yParity values. */
   readonly signature?:
@@ -289,7 +289,7 @@ export interface Log {
     | undefined;
   /** Additional data. */
   readonly data?:
-    | HexData
+    | Uint8Array
     | undefined;
   /** Index of the log in the block. */
   readonly logIndex?:
@@ -479,7 +479,7 @@ function createBaseBlockHeader(): BlockHeader {
     gasLimit: undefined,
     gasUsed: undefined,
     timestamp: undefined,
-    extraData: undefined,
+    extraData: new Uint8Array(0),
     mixHash: undefined,
     nonce: BigInt("0"),
     baseFeePerGas: undefined,
@@ -537,8 +537,8 @@ export const BlockHeader = {
     if (message.timestamp !== undefined) {
       Timestamp.encode(toTimestamp(message.timestamp), writer.uint32(106).fork()).ldelim();
     }
-    if (message.extraData !== undefined) {
-      HexData.encode(message.extraData, writer.uint32(114).fork()).ldelim();
+    if (message.extraData !== undefined && message.extraData.length !== 0) {
+      writer.uint32(114).bytes(message.extraData);
     }
     if (message.mixHash !== undefined) {
       B256.encode(message.mixHash, writer.uint32(122).fork()).ldelim();
@@ -687,7 +687,7 @@ export const BlockHeader = {
             break;
           }
 
-          message.extraData = HexData.decode(reader, reader.uint32());
+          message.extraData = reader.bytes();
           continue;
         case 15:
           if (tag !== 122) {
@@ -783,7 +783,7 @@ export const BlockHeader = {
       gasLimit: isSet(object.gasLimit) ? U256.fromJSON(object.gasLimit) : undefined,
       gasUsed: isSet(object.gasUsed) ? U256.fromJSON(object.gasUsed) : undefined,
       timestamp: isSet(object.timestamp) ? fromJsonTimestamp(object.timestamp) : undefined,
-      extraData: isSet(object.extraData) ? HexData.fromJSON(object.extraData) : undefined,
+      extraData: isSet(object.extraData) ? bytesFromBase64(object.extraData) : new Uint8Array(0),
       mixHash: isSet(object.mixHash) ? B256.fromJSON(object.mixHash) : undefined,
       nonce: isSet(object.nonce) ? BigInt(object.nonce) : BigInt("0"),
       baseFeePerGas: isSet(object.baseFeePerGas) ? U256.fromJSON(object.baseFeePerGas) : undefined,
@@ -840,8 +840,8 @@ export const BlockHeader = {
     if (message.timestamp !== undefined) {
       obj.timestamp = message.timestamp.toISOString();
     }
-    if (message.extraData !== undefined) {
-      obj.extraData = HexData.toJSON(message.extraData);
+    if (message.extraData !== undefined && message.extraData.length !== 0) {
+      obj.extraData = base64FromBytes(message.extraData);
     }
     if (message.mixHash !== undefined) {
       obj.mixHash = B256.toJSON(message.mixHash);
@@ -914,9 +914,7 @@ export const BlockHeader = {
       ? U256.fromPartial(object.gasUsed)
       : undefined;
     message.timestamp = object.timestamp ?? undefined;
-    message.extraData = (object.extraData !== undefined && object.extraData !== null)
-      ? HexData.fromPartial(object.extraData)
-      : undefined;
+    message.extraData = object.extraData ?? new Uint8Array(0);
     message.mixHash = (object.mixHash !== undefined && object.mixHash !== null)
       ? B256.fromPartial(object.mixHash)
       : undefined;
@@ -1092,7 +1090,7 @@ function createBaseTransaction(): Transaction {
     gas: undefined,
     maxFeePerGas: undefined,
     maxPriorityFeePerGas: undefined,
-    input: undefined,
+    input: new Uint8Array(0),
     signature: undefined,
     chainId: BigInt("0"),
     accessList: [],
@@ -1140,8 +1138,8 @@ export const Transaction = {
     if (message.maxPriorityFeePerGas !== undefined) {
       U128.encode(message.maxPriorityFeePerGas, writer.uint32(82).fork()).ldelim();
     }
-    if (message.input !== undefined) {
-      HexData.encode(message.input, writer.uint32(90).fork()).ldelim();
+    if (message.input !== undefined && message.input.length !== 0) {
+      writer.uint32(90).bytes(message.input);
     }
     if (message.signature !== undefined) {
       Signature.encode(message.signature, writer.uint32(98).fork()).ldelim();
@@ -1256,7 +1254,7 @@ export const Transaction = {
             break;
           }
 
-          message.input = HexData.decode(reader, reader.uint32());
+          message.input = reader.bytes();
           continue;
         case 12:
           if (tag !== 98) {
@@ -1321,7 +1319,7 @@ export const Transaction = {
       gas: isSet(object.gas) ? U256.fromJSON(object.gas) : undefined,
       maxFeePerGas: isSet(object.maxFeePerGas) ? U128.fromJSON(object.maxFeePerGas) : undefined,
       maxPriorityFeePerGas: isSet(object.maxPriorityFeePerGas) ? U128.fromJSON(object.maxPriorityFeePerGas) : undefined,
-      input: isSet(object.input) ? HexData.fromJSON(object.input) : undefined,
+      input: isSet(object.input) ? bytesFromBase64(object.input) : new Uint8Array(0),
       signature: isSet(object.signature) ? Signature.fromJSON(object.signature) : undefined,
       chainId: isSet(object.chainId) ? BigInt(object.chainId) : BigInt("0"),
       accessList: globalThis.Array.isArray(object?.accessList)
@@ -1367,8 +1365,8 @@ export const Transaction = {
     if (message.maxPriorityFeePerGas !== undefined) {
       obj.maxPriorityFeePerGas = U128.toJSON(message.maxPriorityFeePerGas);
     }
-    if (message.input !== undefined) {
-      obj.input = HexData.toJSON(message.input);
+    if (message.input !== undefined && message.input.length !== 0) {
+      obj.input = base64FromBytes(message.input);
     }
     if (message.signature !== undefined) {
       obj.signature = Signature.toJSON(message.signature);
@@ -1412,9 +1410,7 @@ export const Transaction = {
     message.maxPriorityFeePerGas = (object.maxPriorityFeePerGas !== undefined && object.maxPriorityFeePerGas !== null)
       ? U128.fromPartial(object.maxPriorityFeePerGas)
       : undefined;
-    message.input = (object.input !== undefined && object.input !== null)
-      ? HexData.fromPartial(object.input)
-      : undefined;
+    message.input = object.input ?? new Uint8Array(0);
     message.signature = (object.signature !== undefined && object.signature !== null)
       ? Signature.fromPartial(object.signature)
       : undefined;
@@ -1711,7 +1707,7 @@ function createBaseLog(): Log {
   return {
     address: undefined,
     topics: [],
-    data: undefined,
+    data: new Uint8Array(0),
     logIndex: BigInt("0"),
     transactionIndex: BigInt("0"),
     transactionHash: undefined,
@@ -1728,8 +1724,8 @@ export const Log = {
         B256.encode(v!, writer.uint32(18).fork()).ldelim();
       }
     }
-    if (message.data !== undefined) {
-      HexData.encode(message.data, writer.uint32(26).fork()).ldelim();
+    if (message.data !== undefined && message.data.length !== 0) {
+      writer.uint32(26).bytes(message.data);
     }
     if (message.logIndex !== undefined && message.logIndex !== BigInt("0")) {
       if (BigInt.asUintN(64, message.logIndex) !== message.logIndex) {
@@ -1775,7 +1771,7 @@ export const Log = {
             break;
           }
 
-          message.data = HexData.decode(reader, reader.uint32());
+          message.data = reader.bytes();
           continue;
         case 4:
           if (tag !== 32) {
@@ -1811,7 +1807,7 @@ export const Log = {
     return {
       address: isSet(object.address) ? Address.fromJSON(object.address) : undefined,
       topics: globalThis.Array.isArray(object?.topics) ? object.topics.map((e: any) => B256.fromJSON(e)) : [],
-      data: isSet(object.data) ? HexData.fromJSON(object.data) : undefined,
+      data: isSet(object.data) ? bytesFromBase64(object.data) : new Uint8Array(0),
       logIndex: isSet(object.logIndex) ? BigInt(object.logIndex) : BigInt("0"),
       transactionIndex: isSet(object.transactionIndex) ? BigInt(object.transactionIndex) : BigInt("0"),
       transactionHash: isSet(object.transactionHash) ? B256.fromJSON(object.transactionHash) : undefined,
@@ -1826,8 +1822,8 @@ export const Log = {
     if (message.topics?.length) {
       obj.topics = message.topics.map((e) => B256.toJSON(e));
     }
-    if (message.data !== undefined) {
-      obj.data = HexData.toJSON(message.data);
+    if (message.data !== undefined && message.data.length !== 0) {
+      obj.data = base64FromBytes(message.data);
     }
     if (message.logIndex !== undefined && message.logIndex !== BigInt("0")) {
       obj.logIndex = message.logIndex.toString();
@@ -1850,7 +1846,7 @@ export const Log = {
       ? Address.fromPartial(object.address)
       : undefined;
     message.topics = object.topics?.map((e) => B256.fromPartial(e)) || [];
-    message.data = (object.data !== undefined && object.data !== null) ? HexData.fromPartial(object.data) : undefined;
+    message.data = object.data ?? new Uint8Array(0);
     message.logIndex = object.logIndex ?? BigInt("0");
     message.transactionIndex = object.transactionIndex ?? BigInt("0");
     message.transactionHash = (object.transactionHash !== undefined && object.transactionHash !== null)
@@ -2043,6 +2039,31 @@ export const AccessListItem = {
     return message;
   },
 };
+
+function bytesFromBase64(b64: string): Uint8Array {
+  if ((globalThis as any).Buffer) {
+    return Uint8Array.from(globalThis.Buffer.from(b64, "base64"));
+  } else {
+    const bin = globalThis.atob(b64);
+    const arr = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; ++i) {
+      arr[i] = bin.charCodeAt(i);
+    }
+    return arr;
+  }
+}
+
+function base64FromBytes(arr: Uint8Array): string {
+  if ((globalThis as any).Buffer) {
+    return globalThis.Buffer.from(arr).toString("base64");
+  } else {
+    const bin: string[] = [];
+    arr.forEach((byte) => {
+      bin.push(globalThis.String.fromCharCode(byte));
+    });
+    return globalThis.btoa(bin.join(""));
+  }
+}
 
 type Builtin = Date | Function | Uint8Array | string | number | boolean | bigint | undefined;
 
