@@ -15,7 +15,8 @@ export const HexData = Schema.transform(
       throw new Error("Not implemented");
     },
     decode({ value }) {
-      return value;
+      // return value;
+      throw new Error("Not implemented");
     },
   },
 );
@@ -31,7 +32,8 @@ export const Bloom = Schema.transform(
       throw new Error("Not implemented");
     },
     decode({ value }) {
-      return value;
+      throw new Error("Not implemented");
+      // return value;
     },
   },
 );
@@ -96,6 +98,7 @@ export const Transaction = Schema.Struct({
   gas: Schema.optional(U256),
   maxFeePerGas: Schema.optional(U128),
   maxPriorityFeePerGas: Schema.optional(U128),
+  // TODO
   // input: Schema.optional(HexData),
   signature: Schema.optional(Signature),
   chainId: Schema.BigIntFromSelf,
@@ -124,7 +127,8 @@ export const TransactionReceipt = Schema.Struct({
 export const Log = Schema.Struct({
   address: Schema.optional(Address),
   topics: Schema.Array(B256),
-  data: HexData,
+  // TODO
+  // data: Bytes,
   logIndex: Schema.BigIntFromSelf,
   transactionIndex: Schema.BigIntFromSelf,
   transactionHash: Schema.optional(B256),

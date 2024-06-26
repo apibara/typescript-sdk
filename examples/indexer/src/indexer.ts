@@ -3,7 +3,7 @@ import { EvmStream } from "@apibara/evm";
 import { defineIndexer, useIndexerContext } from "@apibara/indexer";
 import { trace } from "@opentelemetry/api";
 import consola from "consola";
-import { decodeEventLog, encodeEventTopics, parseAbi } from "viem";
+import { encodeEventTopics, parseAbi } from "viem";
 
 const abi = parseAbi([
   "event Transfer(address indexed from, address indexed to, uint256 value)",
@@ -41,12 +41,13 @@ export function createIndexerConfig(streamUrl: string) {
           assert(log.topics.length === 3, "Transfer event has 3 topics");
 
           const { args } = tracer.startActiveSpan("decodeEventLog", (span) => {
-            const decoded = decodeEventLog({
-              abi,
-              topics: log.topics as [`0x${string}`, ...`0x${string}`[]],
-              data: log.data,
-              eventName: "Transfer",
-            });
+            // const decoded = decodeEventLog({
+            //   abi,
+            //   topics: log.topics as [`0x${string}`, ...`0x${string}`[]],
+            //   data: log.data,
+            //   eventName: "Transfer",
+            // });
+            const decoded = { args: { from: "0x0", to: "0x0", value: "0" } };
 
             span.end();
             return decoded;
