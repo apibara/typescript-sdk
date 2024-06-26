@@ -1,6 +1,7 @@
 import { Schema } from "@effect/schema";
 
 import * as proto from "./proto";
+import { ValidatorStatus } from "./common";
 
 /** Header options.
  *
@@ -12,8 +13,16 @@ export const HeaderFilter = Schema.Struct({
 
 export type HeaderFilter = typeof HeaderFilter.Type;
 
+export const ValidatorFilter = Schema.Struct({
+  validatorIndex: Schema.optional(Schema.Number),
+  status: Schema.optional(ValidatorStatus),
+});
+
+export type ValidatorFilter = typeof ValidatorFilter.Type;
+
 export const Filter = Schema.Struct({
   header: Schema.optional(HeaderFilter),
+  validators: Schema.optional(Schema.Array(ValidatorFilter)),
 });
 
 export type Filter = typeof Filter.Type;
