@@ -2,9 +2,10 @@ import { test as viTest } from "vitest";
 import type { Indexer } from "../indexer";
 import {
   type CassetteOptions,
-  VcrClient,
   type VcrConfig,
   type VcrReplayResult,
+  isCassetteAvailable,
+  loadCassette,
   record,
   replay,
 } from "../vcr";
@@ -46,13 +47,9 @@ async function withClient<TFilter, TBlock, TRet>(
 
   const context: WithClientContext<TFilter, TBlock, TRet> = {
     async run(indexer) {
-      const client = new VcrClient(
-        vcrConfig,
-        cassetteName,
-        indexer.streamConfig,
-      );
+      const client = loadCassette<TFilter, TBlock>(vcrConfig, cassetteName);
 
-      if (!client.isCassetteAvailable()) {
+      if (!isCassetteAvailable(vcrConfig, cassetteName)) {
         await record(vcrConfig, client, indexer, cassetteOptions);
       }
 
