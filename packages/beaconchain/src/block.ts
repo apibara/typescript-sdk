@@ -1,6 +1,7 @@
 import { Schema } from "@effect/schema";
 import { Address, B256 } from "@apibara/evm";
 
+import { ValidatorStatus } from "./common";
 import * as proto from "./proto";
 
 export const ExecutionPayload = Schema.Struct({
@@ -32,8 +33,13 @@ export const BlockHeader = Schema.Struct({
 
 export type BlockHeader = typeof BlockHeader.Type;
 
+export const Validator = Schema.Struct({
+  status: Schema.optional(ValidatorStatus),
+});
+
 export const Block = Schema.Struct({
   header: Schema.optional(BlockHeader),
+  validators: Schema.optional(Schema.Array(Validator)),
 });
 
 export type Block = typeof Block.Type;

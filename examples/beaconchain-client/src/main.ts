@@ -33,9 +33,15 @@ const command = defineCommand({
     console.log(response);
 
     const filter = Filter.make({
-      header: {
-        always: true,
-      }
+      // header: {
+      //   always: true,
+      // }
+      validators: [
+        {
+          // validatorIndex: 1000,
+          status: "withdrawal_done",
+        }
+      ]
     });
 
     const request = BeaconChainStream.Request.make({
