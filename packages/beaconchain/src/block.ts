@@ -34,7 +34,17 @@ export const BlockHeader = Schema.Struct({
 export type BlockHeader = typeof BlockHeader.Type;
 
 export const Validator = Schema.Struct({
+  validatorIndex: Schema.optional(Schema.Number),
+  balance: Schema.optional(Schema.BigIntFromSelf),
   status: Schema.optional(ValidatorStatus),
+  // TODO: pubkey
+  withdrawalCredentials: Schema.optional(B256),
+  effectiveBalance: Schema.optional(Schema.BigIntFromSelf),
+  slashed: Schema.optional(Schema.Boolean),
+  activationEligibilityEpoch: Schema.optional(Schema.BigIntFromSelf),
+  activationEpoch: Schema.optional(Schema.BigIntFromSelf),
+  exitEpoch: Schema.optional(Schema.BigIntFromSelf),
+  withdrawableEpoch: Schema.optional(Schema.BigIntFromSelf),
 });
 
 export const Block = Schema.Struct({
