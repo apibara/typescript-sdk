@@ -40,8 +40,12 @@ const command = defineCommand({
         {
           // validatorIndex: 1000,
           status: "withdrawal_done",
-        }
-      ]
+        },
+        // {
+        //   // validatorIndex: 1000,
+        //   status: "withdrawal_possible",
+        // }
+      ],
     });
 
     const request = BeaconChainStream.Request.make({
