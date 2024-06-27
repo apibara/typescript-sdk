@@ -1,30 +1,32 @@
 import { Schema } from "@effect/schema";
+import { hexToBytes, pad } from "viem";
+
+const MAX_U64 = 0xffffffffffffffffn;
 
 const _Address = Schema.TemplateLiteral(Schema.Literal("0x"), Schema.String);
 
 /** Wire representation of `Address`. */
 const AddressProto = Schema.Struct({
-  loLo: Schema.BigIntFromSelf,
-  loHi: Schema.BigIntFromSelf,
-  hi: Schema.Number,
+  x0: Schema.BigIntFromSelf,
+  x1: Schema.BigIntFromSelf,
+  x2: Schema.Number,
 });
 
 /** An Ethereum address. */
 export const Address = Schema.transform(AddressProto, _Address, {
   decode(value) {
-    const loLo = value.loLo.toString(16).padStart(16, "0");
-    const loHi = value.loHi.toString(16).padStart(16, "0");
-    const hi = value.hi.toString(16).padStart(8, "0");
-    return `0x${loLo}${loHi}${hi}` as `0x${string}`;
+    const x0 = value.x0.toString(16).padStart(16, "0");
+    const x1 = value.x1.toString(16).padStart(16, "0");
+    const x2 = value.x2.toString(16).padStart(8, "0");
+    return `0x${x0}${x1}${x2}` as `0x${string}`;
   },
   encode(value) {
-    const bn = BigInt(value);
-    const hex = bn.toString(16).padStart(40, "0");
-    const s = hex.length;
-    const hi = Number(BigInt(`0x${hex.slice(s - 8, s)}`));
-    const loHi = BigInt(`0x${hex.slice(s - 24, s - 8)}`);
-    const loLo = BigInt(`0x${hex.slice(s - 40, s - 24)}`);
-    return { loLo, loHi, hi };
+    const bytes = hexToBytes(pad(value, { size: 20, dir: "left" }));
+    const dv = new DataView(bytes.buffer);
+    const x0 = dv.getBigUint64(0);
+    const x1 = dv.getBigUint64(8);
+    const x2 = dv.getUint32(16);
+    return { x0, x1, x2 };
   },
 });
 
@@ -34,30 +36,29 @@ const _B256 = Schema.TemplateLiteral(Schema.Literal("0x"), Schema.String);
 
 /** Wire representation of `B256`. */
 const B256Proto = Schema.Struct({
-  loLo: Schema.BigIntFromSelf,
-  loHi: Schema.BigIntFromSelf,
-  hiLo: Schema.BigIntFromSelf,
-  hiHi: Schema.BigIntFromSelf,
+  x0: Schema.BigIntFromSelf,
+  x1: Schema.BigIntFromSelf,
+  x2: Schema.BigIntFromSelf,
+  x3: Schema.BigIntFromSelf,
 });
 
 /** Data with length 256 bits. */
 export const B256 = Schema.transform(B256Proto, _B256, {
   decode(value) {
-    const loLo = value.loLo.toString(16).padStart(16, "0");
-    const loHi = value.loHi.toString(16).padStart(16, "0");
-    const hiLo = value.hiLo.toString(16).padStart(16, "0");
-    const hiHi = value.hiHi.toString(16).padStart(16, "0");
-    return `0x${loLo}${loHi}${hiLo}${hiHi}` as `0x${string}`;
+    const x0 = value.x0.toString(16).padStart(16, "0");
+    const x1 = value.x1.toString(16).padStart(16, "0");
+    const x2 = value.x2.toString(16).padStart(16, "0");
+    const x3 = value.x3.toString(16).padStart(16, "0");
+    return `0x${x0}${x1}${x2}${x3}` as `0x${string}`;
   },
   encode(value) {
-    const bn = BigInt(value);
-    const hex = bn.toString(16).padStart(64, "0");
-    const s = hex.length;
-    const hiHi = BigInt(`0x${hex.slice(s - 16, s)}`);
-    const hiLo = BigInt(`0x${hex.slice(s - 32, s - 16)}`);
-    const loHi = BigInt(`0x${hex.slice(s - 48, s - 32)}`);
-    const loLo = BigInt(`0x${hex.slice(s - 64, s - 48)}`);
-    return { loLo, loHi, hiLo, hiHi };
+    const bytes = hexToBytes(pad(value, { size: 32, dir: "left" }));
+    const dv = new DataView(bytes.buffer);
+    const x0 = dv.getBigUint64(0);
+    const x1 = dv.getBigUint64(8);
+    const x2 = dv.getBigUint64(16);
+    const x3 = dv.getBigUint64(24);
+    return { x0, x1, x2, x3 };
   },
 });
 
@@ -66,29 +67,28 @@ export const b256FromProto = Schema.decodeSync(B256);
 
 /** Wire representation of `U256`. */
 const U256Proto = Schema.Struct({
-  loLo: Schema.BigIntFromSelf,
-  loHi: Schema.BigIntFromSelf,
-  hiLo: Schema.BigIntFromSelf,
-  hiHi: Schema.BigIntFromSelf,
+  x0: Schema.BigIntFromSelf,
+  x1: Schema.BigIntFromSelf,
+  x2: Schema.BigIntFromSelf,
+  x3: Schema.BigIntFromSelf,
 });
 
 /** Data with length 256 bits. */
 export const U256 = Schema.transform(U256Proto, Schema.BigIntFromSelf, {
   decode(value) {
-    const loLo = value.loLo.toString(16).padStart(16, "0");
-    const loHi = value.loHi.toString(16).padStart(16, "0");
-    const hiLo = value.hiLo.toString(16).padStart(16, "0");
-    const hiHi = value.hiHi.toString(16).padStart(16, "0");
-    return BigInt(`0x${loLo}${loHi}${hiLo}${hiHi}`);
+    return (
+      (value.x0 << (8n * 24n)) +
+      (value.x1 << (8n * 16n)) +
+      (value.x2 << (8n * 8n)) +
+      value.x3
+    );
   },
   encode(value) {
-    const hex = value.toString(16).padStart(64, "0");
-    const s = hex.length;
-    const hiHi = BigInt(`0x${hex.slice(s - 16, s)}`);
-    const hiLo = BigInt(`0x${hex.slice(s - 32, s - 16)}`);
-    const loHi = BigInt(`0x${hex.slice(s - 48, s - 32)}`);
-    const loLo = BigInt(`0x${hex.slice(s - 64, s - 48)}`);
-    return { loLo, loHi, hiLo, hiHi };
+    const x0 = (value >> (8n * 24n)) & MAX_U64;
+    const x1 = (value >> (8n * 16n)) & MAX_U64;
+    const x2 = (value >> (8n * 8n)) & MAX_U64;
+    const x3 = value & MAX_U64;
+    return { x0, x1, x2, x3 };
   },
 });
 
@@ -97,23 +97,19 @@ export const u256FromProto = Schema.decodeSync(U256);
 
 /** Wire representation of `U128`. */
 const U128Proto = Schema.Struct({
-  lo: Schema.BigIntFromSelf,
-  hi: Schema.BigIntFromSelf,
+  x0: Schema.BigIntFromSelf,
+  x1: Schema.BigIntFromSelf,
 });
 
 /** Data with length 128 bits. */
 export const U128 = Schema.transform(U128Proto, Schema.BigIntFromSelf, {
   decode(value) {
-    const lo = value.lo.toString(16).padStart(32, "0");
-    const hi = value.hi.toString(16).padStart(32, "0");
-    return BigInt(`0x${lo}${hi}`);
+    return (value.x0 << (8n * 8n)) + value.x1;
   },
   encode(value) {
-    const hex = value.toString(16).padStart(64, "0");
-    const s = hex.length;
-    const hi = BigInt(`0x${hex.slice(s - 32, s)}`);
-    const lo = BigInt(`0x${hex.slice(s - 64, s - 32)}`);
-    return { lo, hi };
+    const x0 = (value >> (8n * 8n)) & MAX_U64;
+    const x1 = value & MAX_U64;
+    return { x0, x1 };
   },
 });
 

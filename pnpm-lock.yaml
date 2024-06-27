@@ -24,6 +24,31 @@ importers:
         specifier: ^5.4.5
         version: 5.4.5
 
+  examples/beaconchain-client:
+    dependencies:
+      '@apibara/beaconchain':
+        specifier: workspace:*
+        version: link:../../packages/beaconchain
+      '@apibara/protocol':
+        specifier: workspace:*
+        version: link:../../packages/protocol
+      citty:
+        specifier: ^0.1.6
+        version: 0.1.6
+      consola:
+        specifier: ^3.2.3
+        version: 3.2.3
+      nice-grpc:
+        specifier: ^2.1.8
+        version: 2.1.8
+    devDependencies:
+      '@types/node':
+        specifier: ^20.12.12
+        version: 20.14.0
+      jiti:
+        specifier: ^1.21.0
+        version: 1.21.0
+
   examples/evm-client:
     dependencies:
       '@apibara/evm':
@@ -128,6 +153,49 @@ importers:
       jiti:
         specifier: ^1.21.0
         version: 1.21.0
+
+  packages/beaconchain:
+    dependencies:
+      '@apibara/evm':
+        specifier: workspace:*
+        version: link:../evm
+      '@apibara/protocol':
+        specifier: workspace:*
+        version: link:../protocol
+      '@effect/schema':
+        specifier: ^0.67.15
+        version: 0.67.15(effect@3.2.6)
+      effect:
+        specifier: ^3.2.6
+        version: 3.2.6
+      long:
+        specifier: ^5.2.1
+        version: 5.2.3
+      nice-grpc-common:
+        specifier: ^2.0.2
+        version: 2.0.2
+      protobufjs:
+        specifier: ^7.1.2
+        version: 7.3.0
+      viem:
+        specifier: ^2.13.8
+        version: 2.13.8(typescript@5.4.5)
+    devDependencies:
+      '@bufbuild/buf':
+        specifier: ^1.32.1
+        version: 1.32.2
+      '@types/long':
+        specifier: ^5.0.0
+        version: 5.0.0
+      '@types/node':
+        specifier: ^20.12.12
+        version: 20.14.0
+      unbuild:
+        specifier: ^2.0.0
+        version: 2.0.0(typescript@5.4.5)
+      vitest:
+        specifier: ^1.6.0
+        version: 1.6.0(@types/node@20.14.0)
 
   packages/evm:
     dependencies:

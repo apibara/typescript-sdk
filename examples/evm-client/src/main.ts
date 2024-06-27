@@ -2,7 +2,7 @@ import { EvmStream, Filter } from "@apibara/evm";
 import { createClient } from "@apibara/protocol";
 import { defineCommand, runMain } from "citty";
 import consola from "consola";
-import { decodeEventLog, encodeEventTopics, parseAbi } from "viem";
+import { encodeEventTopics, parseAbi } from "viem";
 
 const abi = parseAbi([
   "event Transfer(address indexed from, address indexed to, uint256 value)",
@@ -65,20 +65,20 @@ const command = defineCommand({
           for (const block of message.data.data) {
             consola.info("Block", block.header?.number);
             for (const log of block.logs ?? []) {
-              const { args } = decodeEventLog({
-                abi,
-                // @ts-ignore
-                topics: log.topics,
-                data: log.data,
-                eventName: "Transfer",
-              });
-              consola.info(
-                "Log",
-                log.logIndex,
-                args.from,
-                args.to,
-                args.value.toString(),
-              );
+              // const { args } = decodeEventLog({
+              //   abi,
+              //   // @ts-ignore
+              //   topics: log.topics,
+              //   data: log.data,
+              //   eventName: "Transfer",
+              // });
+              // consola.info(
+              //   "Log",
+              //   log.logIndex,
+              //   args.from,
+              //   args.to,
+              //   args.value.toString(),
+              // );
             }
           }
           break;

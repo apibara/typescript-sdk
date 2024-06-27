@@ -1,5 +1,5 @@
 {
-  "name": "@apibara/evm",
+  "name": "@apibara/beaconchain",
   "version": "2.0.0",
   "type": "module",
   "source": "./src/index.ts",
@@ -34,12 +34,13 @@
     "vitest": "^1.6.0"
   },
   "dependencies": {
+    "@apibara/evm": "workspace:*",
     "@apibara/protocol": "workspace:*",
     "@effect/schema": "^0.67.15",
     "effect": "^3.2.6",
     "long": "^5.2.1",
     "nice-grpc-common": "^2.0.2",
     "protobufjs": "^7.1.2",
-    "viem": "^2.12.4"
+    "viem": "^2.13.8"
   }
 }
