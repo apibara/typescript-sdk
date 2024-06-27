@@ -2,7 +2,7 @@ import { EvmStream, Filter } from "@apibara/evm";
 import { createClient } from "@apibara/protocol";
 import { defineCommand, runMain } from "citty";
 import consola from "consola";
-import { decodeEventLog, encodeEventTopics, parseAbi } from "viem";
+import { encodeEventTopics, parseAbi } from "viem";
 
 const abi = parseAbi([
   "event Transfer(address indexed from, address indexed to, uint256 value)",

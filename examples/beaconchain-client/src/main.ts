@@ -1,5 +1,5 @@
+import { BeaconChainStream, Filter } from "@apibara/beaconchain";
 import { createClient } from "@apibara/protocol";
-import { Filter, BeaconChainStream } from "@apibara/beaconchain";
 import { defineCommand, runMain } from "citty";
 import consola from "consola";
 
@@ -33,26 +33,23 @@ const command = defineCommand({
     console.log(response);
 
     const filter = Filter.make({
-      // header: {
-      //   always: true,
-      // }
-      validators: [
+      blobs: [
         {
-          // validatorIndex: 1000,
-          status: "withdrawal_done",
+          includeTransaction: true,
         },
-        // {
-        //   // validatorIndex: 1000,
-        //   status: "withdrawal_possible",
-        // }
       ],
+      // transactions: [{
+      //   to: "0xff00000000000000000000000000000000042069",
+      //   includeBlob: true,
+      // }]
+      // validators: [{}],
     });
 
     const request = BeaconChainStream.Request.make({
       filter: [filter],
       finality: "accepted",
       startingCursor: {
-        orderKey: 5_000_000n,
+        orderKey: 5_200_000n,
       },
     });
 
@@ -61,8 +58,22 @@ const command = defineCommand({
         case "data": {
           consola.info("Data", message.data.endCursor?.orderKey);
 
+          const maxBlobSize = 131_072; // bytes
           for (const block of message.data.data) {
-            console.log(block);
+            const transactions = block.transactions ?? [];
+            for (const blob of block.blobs) {
+              if (blob.blob === undefined) continue;
+              let i = blob.blob.length - 1;
+              while (i >= 0 && blob.blob[i] === 0) i--;
+              const utilization = (i / maxBlobSize) * 100;
+              const tx = transactions.find(
+                (tx) => tx.transactionIndex === blob.transactionIndex,
+              );
+              consola.info(
+                `${blob.transactionHash} - ${utilization.toFixed(2)}%`,
+              );
+              consola.info(`    ${tx?.to}`);
+            }
           }
 
           break;

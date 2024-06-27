@@ -57,6 +57,8 @@ export interface ValidatorFilter {
 }
 
 export interface BlobFilter {
+  /** Include the transaction that posted the blob. */
+  readonly includeTransaction?: boolean | undefined;
 }
 
 function createBaseFilter(): Filter {
@@ -396,11 +398,14 @@ export const ValidatorFilter = {
 };
 
 function createBaseBlobFilter(): BlobFilter {
-  return {};
+  return { includeTransaction: undefined };
 }
 
 export const BlobFilter = {
-  encode(_: BlobFilter, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+  encode(message: BlobFilter, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.includeTransaction !== undefined) {
+      writer.uint32(8).bool(message.includeTransaction);
+    }
     return writer;
   },
 
@@ -411,6 +416,13 @@ export const BlobFilter = {
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
+        case 1:
+          if (tag !== 8) {
+            break;
+          }
+
+          message.includeTransaction = reader.bool();
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -420,20 +432,26 @@ export const BlobFilter = {
     return message;
   },
 
-  fromJSON(_: any): BlobFilter {
-    return {};
+  fromJSON(object: any): BlobFilter {
+    return {
+      includeTransaction: isSet(object.includeTransaction) ? globalThis.Boolean(object.includeTransaction) : undefined,
+    };
   },
 
-  toJSON(_: BlobFilter): unknown {
+  toJSON(message: BlobFilter): unknown {
     const obj: any = {};
+    if (message.includeTransaction !== undefined) {
+      obj.includeTransaction = message.includeTransaction;
+    }
     return obj;
   },
 
   create(base?: DeepPartial<BlobFilter>): BlobFilter {
     return BlobFilter.fromPartial(base ?? {});
   },
-  fromPartial(_: DeepPartial<BlobFilter>): BlobFilter {
+  fromPartial(object: DeepPartial<BlobFilter>): BlobFilter {
     const message = createBaseBlobFilter() as any;
+    message.includeTransaction = object.includeTransaction ?? undefined;
     return message;
   },
 };
