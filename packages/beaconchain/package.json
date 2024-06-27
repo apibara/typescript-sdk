@@ -31,7 +31,6 @@
     "@types/long": "^5.0.0",
     "@types/node": "^20.12.12",
     "unbuild": "^2.0.0",
-    "viem": "^2.13.8",
     "vitest": "^1.6.0"
   },
   "dependencies": {
@@ -41,6 +40,7 @@
     "effect": "^3.2.6",
     "long": "^5.2.1",
     "nice-grpc-common": "^2.0.2",
-    "protobufjs": "^7.1.2"
+    "protobufjs": "^7.1.2",
+    "viem": "^2.13.8"
   }
 }

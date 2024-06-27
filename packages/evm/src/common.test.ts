@@ -28,7 +28,8 @@ describe("B256", () => {
   const decode = Schema.decodeSync(B256);
 
   it("should convert to and from proto", () => {
-    const value = "0x9df92d765b5aa041fd4bbe8d5878eb89290efa78e444c1a603eecfae2ea05fa4";
+    const value =
+      "0x9df92d765b5aa041fd4bbe8d5878eb89290efa78e444c1a603eecfae2ea05fa4";
     const message = encode(value);
 
     expect(message.x0).toBeDefined();
@@ -46,7 +47,9 @@ describe("U256", () => {
   const decode = Schema.decodeSync(U256);
 
   it("should convert to and from proto", () => {
-    const value = BigInt("0x9df92d765b5aa041fd4bbe8d5878eb89290efa78e444c1a603eecfae2ea05fa4");
+    const value = BigInt(
+      "0x9df92d765b5aa041fd4bbe8d5878eb89290efa78e444c1a603eecfae2ea05fa4",
+    );
     const message = encode(value);
 
     expect(message.x0).toBeDefined();

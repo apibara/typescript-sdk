@@ -57,7 +57,7 @@ export interface BlockHeader {
 
 export interface Transaction {
   /** Transaction hash. */
-  readonly hash?:
+  readonly transactionHash?:
     | B256
     | undefined;
   /** Nonce. */
@@ -66,7 +66,7 @@ export interface Transaction {
     | undefined;
   /** Transaction index in the block. */
   readonly transactionIndex?:
-    | bigint
+    | number
     | undefined;
   /** Sender. */
   readonly from?:
@@ -85,8 +85,8 @@ export interface Transaction {
     | U128
     | undefined;
   /** Gas amount. */
-  readonly gas?:
-    | U256
+  readonly gasLimit?:
+    | U128
     | undefined;
   /** Max base fee per gas the sender is willing to pay. */
   readonly maxFeePerGas?:
@@ -160,7 +160,15 @@ export interface Blob {
     | readonly B256[]
     | undefined;
   /** Blob hash. */
-  readonly blobHash?: B256 | undefined;
+  readonly blobHash?:
+    | B256
+    | undefined;
+  /** Index of the transaction that posted the blob. */
+  readonly transactionIndex?:
+    | number
+    | undefined;
+  /** Hash of the transaction that posted the blob. */
+  readonly transactionHash?: B256 | undefined;
 }
 
 export interface ExecutionPayload {
@@ -583,19 +591,19 @@ export const BlockHeader = {
 
 function createBaseTransaction(): Transaction {
   return {
-    hash: undefined,
+    transactionHash: undefined,
     nonce: BigInt("0"),
-    transactionIndex: BigInt("0"),
+    transactionIndex: 0,
     from: undefined,
     to: undefined,
     value: undefined,
     gasPrice: undefined,
-    gas: undefined,
+    gasLimit: undefined,
     maxFeePerGas: undefined,
     maxPriorityFeePerGas: undefined,
     input: new Uint8Array(0),
     signature: undefined,
-    chainId: BigInt("0"),
+    chainId: undefined,
     accessList: [],
     transactionType: BigInt("0"),
     maxFeePerBlobGas: undefined,
@@ -605,8 +613,8 @@ function createBaseTransaction(): Transaction {
 
 export const Transaction = {
   encode(message: Transaction, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.hash !== undefined) {
-      B256.encode(message.hash, writer.uint32(10).fork()).ldelim();
+    if (message.transactionHash !== undefined) {
+      B256.encode(message.transactionHash, writer.uint32(10).fork()).ldelim();
     }
     if (message.nonce !== undefined && message.nonce !== BigInt("0")) {
       if (BigInt.asUintN(64, message.nonce) !== message.nonce) {
@@ -614,11 +622,8 @@ export const Transaction = {
       }
       writer.uint32(16).uint64(message.nonce.toString());
     }
-    if (message.transactionIndex !== undefined && message.transactionIndex !== BigInt("0")) {
-      if (BigInt.asUintN(64, message.transactionIndex) !== message.transactionIndex) {
-        throw new globalThis.Error("value provided for field message.transactionIndex of type uint64 too large");
-      }
-      writer.uint32(24).uint64(message.transactionIndex.toString());
+    if (message.transactionIndex !== undefined && message.transactionIndex !== 0) {
+      writer.uint32(24).uint32(message.transactionIndex);
     }
     if (message.from !== undefined) {
       Address.encode(message.from, writer.uint32(34).fork()).ldelim();
@@ -632,8 +637,8 @@ export const Transaction = {
     if (message.gasPrice !== undefined) {
       U128.encode(message.gasPrice, writer.uint32(58).fork()).ldelim();
     }
-    if (message.gas !== undefined) {
-      U256.encode(message.gas, writer.uint32(66).fork()).ldelim();
+    if (message.gasLimit !== undefined) {
+      U128.encode(message.gasLimit, writer.uint32(66).fork()).ldelim();
     }
     if (message.maxFeePerGas !== undefined) {
       U128.encode(message.maxFeePerGas, writer.uint32(74).fork()).ldelim();
@@ -647,7 +652,7 @@ export const Transaction = {
     if (message.signature !== undefined) {
       Signature.encode(message.signature, writer.uint32(98).fork()).ldelim();
     }
-    if (message.chainId !== undefined && message.chainId !== BigInt("0")) {
+    if (message.chainId !== undefined) {
       if (BigInt.asUintN(64, message.chainId) !== message.chainId) {
         throw new globalThis.Error("value provided for field message.chainId of type uint64 too large");
       }
@@ -687,7 +692,7 @@ export const Transaction = {
             break;
           }
 
-          message.hash = B256.decode(reader, reader.uint32());
+          message.transactionHash = B256.decode(reader, reader.uint32());
           continue;
         case 2:
           if (tag !== 16) {
@@ -701,7 +706,7 @@ export const Transaction = {
             break;
           }
 
-          message.transactionIndex = longToBigint(reader.uint64() as Long);
+          message.transactionIndex = reader.uint32();
           continue;
         case 4:
           if (tag !== 34) {
@@ -736,7 +741,7 @@ export const Transaction = {
             break;
           }
 
-          message.gas = U256.decode(reader, reader.uint32());
+          message.gasLimit = U128.decode(reader, reader.uint32());
           continue;
         case 9:
           if (tag !== 74) {
@@ -812,19 +817,19 @@ export const Transaction = {
 
   fromJSON(object: any): Transaction {
     return {
-      hash: isSet(object.hash) ? B256.fromJSON(object.hash) : undefined,
+      transactionHash: isSet(object.transactionHash) ? B256.fromJSON(object.transactionHash) : undefined,
       nonce: isSet(object.nonce) ? BigInt(object.nonce) : BigInt("0"),
-      transactionIndex: isSet(object.transactionIndex) ? BigInt(object.transactionIndex) : BigInt("0"),
+      transactionIndex: isSet(object.transactionIndex) ? globalThis.Number(object.transactionIndex) : 0,
       from: isSet(object.from) ? Address.fromJSON(object.from) : undefined,
       to: isSet(object.to) ? Address.fromJSON(object.to) : undefined,
       value: isSet(object.value) ? U256.fromJSON(object.value) : undefined,
       gasPrice: isSet(object.gasPrice) ? U128.fromJSON(object.gasPrice) : undefined,
-      gas: isSet(object.gas) ? U256.fromJSON(object.gas) : undefined,
+      gasLimit: isSet(object.gasLimit) ? U128.fromJSON(object.gasLimit) : undefined,
       maxFeePerGas: isSet(object.maxFeePerGas) ? U128.fromJSON(object.maxFeePerGas) : undefined,
       maxPriorityFeePerGas: isSet(object.maxPriorityFeePerGas) ? U128.fromJSON(object.maxPriorityFeePerGas) : undefined,
       input: isSet(object.input) ? bytesFromBase64(object.input) : new Uint8Array(0),
       signature: isSet(object.signature) ? Signature.fromJSON(object.signature) : undefined,
-      chainId: isSet(object.chainId) ? BigInt(object.chainId) : BigInt("0"),
+      chainId: isSet(object.chainId) ? BigInt(object.chainId) : undefined,
       accessList: globalThis.Array.isArray(object?.accessList)
         ? object.accessList.map((e: any) => AccessListItem.fromJSON(e))
         : [],
@@ -838,14 +843,14 @@ export const Transaction = {
 
   toJSON(message: Transaction): unknown {
     const obj: any = {};
-    if (message.hash !== undefined) {
-      obj.hash = B256.toJSON(message.hash);
+    if (message.transactionHash !== undefined) {
+      obj.transactionHash = B256.toJSON(message.transactionHash);
     }
     if (message.nonce !== undefined && message.nonce !== BigInt("0")) {
       obj.nonce = message.nonce.toString();
     }
-    if (message.transactionIndex !== undefined && message.transactionIndex !== BigInt("0")) {
-      obj.transactionIndex = message.transactionIndex.toString();
+    if (message.transactionIndex !== undefined && message.transactionIndex !== 0) {
+      obj.transactionIndex = Math.round(message.transactionIndex);
     }
     if (message.from !== undefined) {
       obj.from = Address.toJSON(message.from);
@@ -859,8 +864,8 @@ export const Transaction = {
     if (message.gasPrice !== undefined) {
       obj.gasPrice = U128.toJSON(message.gasPrice);
     }
-    if (message.gas !== undefined) {
-      obj.gas = U256.toJSON(message.gas);
+    if (message.gasLimit !== undefined) {
+      obj.gasLimit = U128.toJSON(message.gasLimit);
     }
     if (message.maxFeePerGas !== undefined) {
       obj.maxFeePerGas = U128.toJSON(message.maxFeePerGas);
@@ -874,7 +879,7 @@ export const Transaction = {
     if (message.signature !== undefined) {
       obj.signature = Signature.toJSON(message.signature);
     }
-    if (message.chainId !== undefined && message.chainId !== BigInt("0")) {
+    if (message.chainId !== undefined) {
       obj.chainId = message.chainId.toString();
     }
     if (message.accessList?.length) {
@@ -897,16 +902,20 @@ export const Transaction = {
   },
   fromPartial(object: DeepPartial<Transaction>): Transaction {
     const message = createBaseTransaction() as any;
-    message.hash = (object.hash !== undefined && object.hash !== null) ? B256.fromPartial(object.hash) : undefined;
+    message.transactionHash = (object.transactionHash !== undefined && object.transactionHash !== null)
+      ? B256.fromPartial(object.transactionHash)
+      : undefined;
     message.nonce = object.nonce ?? BigInt("0");
-    message.transactionIndex = object.transactionIndex ?? BigInt("0");
+    message.transactionIndex = object.transactionIndex ?? 0;
     message.from = (object.from !== undefined && object.from !== null) ? Address.fromPartial(object.from) : undefined;
     message.to = (object.to !== undefined && object.to !== null) ? Address.fromPartial(object.to) : undefined;
     message.value = (object.value !== undefined && object.value !== null) ? U256.fromPartial(object.value) : undefined;
     message.gasPrice = (object.gasPrice !== undefined && object.gasPrice !== null)
       ? U128.fromPartial(object.gasPrice)
       : undefined;
-    message.gas = (object.gas !== undefined && object.gas !== null) ? U256.fromPartial(object.gas) : undefined;
+    message.gasLimit = (object.gasLimit !== undefined && object.gasLimit !== null)
+      ? U128.fromPartial(object.gasLimit)
+      : undefined;
     message.maxFeePerGas = (object.maxFeePerGas !== undefined && object.maxFeePerGas !== null)
       ? U128.fromPartial(object.maxFeePerGas)
       : undefined;
@@ -917,7 +926,7 @@ export const Transaction = {
     message.signature = (object.signature !== undefined && object.signature !== null)
       ? Signature.fromPartial(object.signature)
       : undefined;
-    message.chainId = object.chainId ?? BigInt("0");
+    message.chainId = object.chainId ?? undefined;
     message.accessList = object.accessList?.map((e) => AccessListItem.fromPartial(e)) || [];
     message.transactionType = object.transactionType ?? BigInt("0");
     message.maxFeePerBlobGas = (object.maxFeePerBlobGas !== undefined && object.maxFeePerBlobGas !== null)
@@ -1186,6 +1195,8 @@ function createBaseBlob(): Blob {
     kzgProof: undefined,
     kzgCommitmentInclusionProof: [],
     blobHash: undefined,
+    transactionIndex: 0,
+    transactionHash: undefined,
   };
 }
 
@@ -1210,6 +1221,12 @@ export const Blob = {
     }
     if (message.blobHash !== undefined) {
       B256.encode(message.blobHash, writer.uint32(50).fork()).ldelim();
+    }
+    if (message.transactionIndex !== undefined && message.transactionIndex !== 0) {
+      writer.uint32(56).uint32(message.transactionIndex);
+    }
+    if (message.transactionHash !== undefined) {
+      B256.encode(message.transactionHash, writer.uint32(66).fork()).ldelim();
     }
     return writer;
   },
@@ -1263,6 +1280,20 @@ export const Blob = {
 
           message.blobHash = B256.decode(reader, reader.uint32());
           continue;
+        case 7:
+          if (tag !== 56) {
+            break;
+          }
+
+          message.transactionIndex = reader.uint32();
+          continue;
+        case 8:
+          if (tag !== 66) {
+            break;
+          }
+
+          message.transactionHash = B256.decode(reader, reader.uint32());
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -1282,6 +1313,8 @@ export const Blob = {
         ? object.kzgCommitmentInclusionProof.map((e: any) => B256.fromJSON(e))
         : [],
       blobHash: isSet(object.blobHash) ? B256.fromJSON(object.blobHash) : undefined,
+      transactionIndex: isSet(object.transactionIndex) ? globalThis.Number(object.transactionIndex) : 0,
+      transactionHash: isSet(object.transactionHash) ? B256.fromJSON(object.transactionHash) : undefined,
     };
   },
 
@@ -1305,6 +1338,12 @@ export const Blob = {
     if (message.blobHash !== undefined) {
       obj.blobHash = B256.toJSON(message.blobHash);
     }
+    if (message.transactionIndex !== undefined && message.transactionIndex !== 0) {
+      obj.transactionIndex = Math.round(message.transactionIndex);
+    }
+    if (message.transactionHash !== undefined) {
+      obj.transactionHash = B256.toJSON(message.transactionHash);
+    }
     return obj;
   },
 
@@ -1324,6 +1363,10 @@ export const Blob = {
     message.kzgCommitmentInclusionProof = object.kzgCommitmentInclusionProof?.map((e) => B256.fromPartial(e)) || [];
     message.blobHash = (object.blobHash !== undefined && object.blobHash !== null)
       ? B256.fromPartial(object.blobHash)
+      : undefined;
+    message.transactionIndex = object.transactionIndex ?? 0;
+    message.transactionHash = (object.transactionHash !== undefined && object.transactionHash !== null)
+      ? B256.fromPartial(object.transactionHash)
       : undefined;
     return message;
   },

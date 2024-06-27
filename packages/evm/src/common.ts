@@ -1,7 +1,7 @@
 import { Schema } from "@effect/schema";
 import { hexToBytes, pad } from "viem";
 
-const MAX_U64 = 0xFFFFFFFFFFFFFFFFn;
+const MAX_U64 = 0xffffffffffffffffn;
 
 const _Address = Schema.TemplateLiteral(Schema.Literal("0x"), Schema.String);
 
@@ -58,7 +58,7 @@ export const B256 = Schema.transform(B256Proto, _B256, {
     const x1 = dv.getBigUint64(8);
     const x2 = dv.getBigUint64(16);
     const x3 = dv.getBigUint64(24);
-    return { x0, x1, x2,  x3 };
+    return { x0, x1, x2, x3 };
   },
 });
 
@@ -76,14 +76,19 @@ const U256Proto = Schema.Struct({
 /** Data with length 256 bits. */
 export const U256 = Schema.transform(U256Proto, Schema.BigIntFromSelf, {
   decode(value) {
-    return (value.x0 << (8n * 24n)) + (value.x1 << (8n * 16n)) + (value.x2 << (8n * 8n)) + value.x3;
+    return (
+      (value.x0 << (8n * 24n)) +
+      (value.x1 << (8n * 16n)) +
+      (value.x2 << (8n * 8n)) +
+      value.x3
+    );
   },
   encode(value) {
     const x0 = (value >> (8n * 24n)) & MAX_U64;
     const x1 = (value >> (8n * 16n)) & MAX_U64;
     const x2 = (value >> (8n * 8n)) & MAX_U64;
     const x3 = value & MAX_U64;
-    return { x0, x1, x2, x3 }
+    return { x0, x1, x2, x3 };
   },
 });
 
@@ -104,7 +109,7 @@ export const U128 = Schema.transform(U128Proto, Schema.BigIntFromSelf, {
   encode(value) {
     const x0 = (value >> (8n * 8n)) & MAX_U64;
     const x1 = value & MAX_U64;
-    return { x0, x1 }
+    return { x0, x1 };
   },
 });
 
