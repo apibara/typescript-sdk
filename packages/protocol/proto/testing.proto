@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+package dna.v2.testing;
+
+message MockFilter {}
+
+message MockBlock {
+  uint64 block_number = 1;
+}

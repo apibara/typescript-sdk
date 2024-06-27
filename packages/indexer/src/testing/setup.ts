@@ -10,13 +10,11 @@ import {
   replay,
 } from "../vcr";
 
-export function test() {
-  return viTest.extend({
-    vcr: {
-      withClient,
-    },
-  });
-}
+export const test = viTest.extend({
+  vcr: {
+    withClient,
+  },
+});
 
 type WithClientContext<TFilter, TBlock, TRet> = {
   run: (

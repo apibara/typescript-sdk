@@ -217,6 +217,9 @@ importers:
       protobufjs:
         specifier: ^7.1.2
         version: 7.2.5
+      viem:
+        specifier: ^2.12.4
+        version: 2.12.4(typescript@5.4.5)
     devDependencies:
       '@bufbuild/buf':
         specifier: ^1.32.1
@@ -230,9 +233,6 @@ importers:
       unbuild:
         specifier: ^2.0.0
         version: 2.0.0(typescript@5.4.5)
-      viem:
-        specifier: ^2.12.4
-        version: 2.12.4(typescript@5.4.5)
       vitest:
         specifier: ^1.6.0
         version: 1.6.0(@types/node@20.12.12)
@@ -6225,7 +6225,7 @@ packages:
       - bufferutil
       - utf-8-validate
       - zod
-    dev: true
+    dev: false
 
   /viem@2.13.2(typescript@5.4.5):
     resolution: {integrity: sha512-9n64fjWL34Q8MQ0EksI77/okE8tiS9bQlGb11/JMGoaEE+MYJgG8yDAWX2srqp7MsBK7/ahoAWJZdMwgcFD65g==}
