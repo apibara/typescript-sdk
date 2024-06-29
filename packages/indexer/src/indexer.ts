@@ -44,7 +44,10 @@ export interface IndexerHooks<TFilter, TBlock, TRet> {
   "handler:after": ({ output }: { output: TRet[] }) => void;
   "handler:exception": ({ error }: { error: Error }) => void;
   "sink:write": ({ data }: { data: TRet[] }) => void;
-  "sink:flush": () => void;
+  "sink:flush": ({
+    endCursor,
+    finality,
+  }: { endCursor?: Cursor; finality: DataFinality }) => void;
   message: ({ message }: { message: StreamDataResponse<TBlock> }) => void;
 }
 
@@ -123,8 +126,8 @@ export async function run<TFilter, TBlock, TRet>(
     sink.hook("write", async ({ data }) => {
       await indexer.hooks.callHook("sink:write", { data });
     });
-    sink.hook("flush", async () => {
-      await indexer.hooks.callHook("sink:flush");
+    sink.hook("flush", async ({ endCursor, finality }) => {
+      await indexer.hooks.callHook("sink:flush", { endCursor, finality });
     });
 
     const request = indexer.streamConfig.Request.make({
