@@ -3,7 +3,10 @@ import { Hookable } from "hookable";
 
 export interface SinkEvents<TData> {
   write({ data }: { data: TData[] }): void;
-  flush(): void;
+  flush({
+    endCursor,
+    finality,
+  }: { endCursor?: Cursor; finality: DataFinality }): void;
 }
 
 export type SinkWriteArgs<TData> = {
@@ -23,9 +26,9 @@ export abstract class Sink<TData> extends Hookable<SinkEvents<TData>> {
 }
 
 export class DefaultSink<TData = unknown> extends Sink<TData> {
-  async write({ data }: SinkWriteArgs<TData>) {
+  async write({ data, endCursor, finality }: SinkWriteArgs<TData>) {
     await this.callHook("write", { data });
-    await this.callHook("flush");
+    await this.callHook("flush", { endCursor, finality });
   }
 }
 

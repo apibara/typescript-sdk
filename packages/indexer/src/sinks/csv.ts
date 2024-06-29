@@ -33,14 +33,14 @@ export class CsvSink<
     super();
   }
 
-  async write({ data, endCursor }: SinkWriteArgs<TData>) {
+  async write({ data, endCursor, finality }: SinkWriteArgs<TData>) {
     await this.callHook("write", { data });
     // adds a "_cursor" property if "cursorColumn" is not specified by user
     data = this.processCursorColumn(data, endCursor);
     // Insert the data into csv
     await this.insertToCSV(data);
 
-    await this.callHook("flush");
+    await this.callHook("flush", { endCursor, finality });
   }
 
   private async insertToCSV(data: TData[]) {
