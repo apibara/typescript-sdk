@@ -7,15 +7,17 @@ type SqliteArgs = ISqlite.Config;
 export function sqlitePersistence<TFilter, TBlock, TRet>(args: SqliteArgs) {
   return defineIndexerPlugin<TFilter, TBlock, TRet>((indexer) => {
     let db: Database;
+    let store: SqlitePersistence;
 
     indexer.hooks.hook("run:before", async () => {
       db = await open(args);
+
       await SqlitePersistence.initialize(db);
+
+      store = new SqlitePersistence(db);
     });
 
     indexer.hooks.hook("connect:before", async ({ request }) => {
-      const store = new SqlitePersistence(db);
-
       const lastCursor = await store.get();
 
       if (lastCursor) {
@@ -24,8 +26,9 @@ export function sqlitePersistence<TFilter, TBlock, TRet>(args: SqliteArgs) {
     });
 
     indexer.hooks.hook("sink:flush", async ({ endCursor }) => {
-      const store = new SqlitePersistence(db);
-      if (endCursor) store.put(endCursor);
+      if (endCursor) {
+        await store.put(endCursor);
+      }
     });
   });
 }
@@ -38,8 +41,7 @@ export class SqlitePersistence {
       CREATE TABLE IF NOT EXISTS checkpoints (
         id TEXT NOT NULL PRIMARY KEY,
         order_key INTEGER NOT NULL,
-        unique_key TEXT,
-        PRIMARY KEY (order_key, unique_key)
+        unique_key TEXT
       );
     `);
   }
