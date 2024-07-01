@@ -120,10 +120,10 @@ export async function run<TFilter, TBlock, TRet>(
 
     const sink = sinkArg ?? defaultSink();
 
-    sink.on("write", async ({ data }) => {
+    sink.hook("write", async ({ data }) => {
       await indexer.hooks.callHook("sink:write", { data });
     });
-    sink.on("flush", async () => {
+    sink.hook("flush", async () => {
       await indexer.hooks.callHook("sink:flush");
     });
 

@@ -1,5 +1,5 @@
 import type { Cursor, DataFinality } from "@apibara/protocol";
-import { EventEmitter } from "eventemitter3";
+import { Hookable } from "hookable";
 
 export interface SinkEvents<TData> {
   write({ data }: { data: TData[] }): void;
@@ -13,7 +13,7 @@ export type SinkWriteArgs<TData> = {
   finality: DataFinality;
 };
 
-export abstract class Sink<TData> extends EventEmitter<SinkEvents<TData>> {
+export abstract class Sink<TData> extends Hookable<SinkEvents<TData>> {
   abstract write({
     data,
     cursor,
@@ -24,8 +24,8 @@ export abstract class Sink<TData> extends EventEmitter<SinkEvents<TData>> {
 
 export class DefaultSink<TData = unknown> extends Sink<TData> {
   async write({ data }: SinkWriteArgs<TData>) {
-    this.emit("write", { data });
-    this.emit("flush");
+    await this.callHook("write", { data });
+    await this.callHook("flush");
   }
 }
 
