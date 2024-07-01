@@ -1,5 +1,9 @@
 import type { Cursor } from "@apibara/protocol";
-import { type MockBlock, MockClient } from "@apibara/protocol/testing";
+import {
+  type MockBlock,
+  MockClient,
+  type MockFilter,
+} from "@apibara/protocol/testing";
 import { klona } from "klona/full";
 import { open } from "sqlite";
 import sqlite3 from "sqlite3";
@@ -88,8 +92,7 @@ describe("Persistence", () => {
   it("should work with indexer and store cursor of last message", async () => {
     const client = new MockClient(messages, [{}]);
 
-    // biome-ignore lint/complexity/noBannedTypes: <explanation>
-    const persistence = sqlitePersistence<{}, MockBlock, MockRet>({
+    const persistence = sqlitePersistence<MockFilter, MockBlock, MockRet>({
       driver: sqlite3.Database,
       filename: "file:memdb1?mode=memory&cache=shared",
     });

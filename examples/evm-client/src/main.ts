@@ -1,3 +1,4 @@
+import assert from "node:assert";
 import { EvmStream, Filter } from "@apibara/evm";
 import { createClient } from "@apibara/protocol";
 import { defineCommand, runMain } from "citty";
@@ -63,6 +64,7 @@ const command = defineCommand({
         case "data": {
           consola.info("Block", message.data.endCursor?.orderKey);
           for (const block of message.data.data) {
+            assert(block !== null);
             consola.info("Block", block.header?.number);
             for (const log of block.logs ?? []) {
               // const { args } = decodeEventLog({

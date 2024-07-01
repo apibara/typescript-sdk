@@ -1,3 +1,4 @@
+import assert from "node:assert";
 import { createClient } from "@apibara/protocol";
 import { Filter, StarknetStream } from "@apibara/starknet";
 import { defineCommand, runMain } from "citty";
@@ -98,6 +99,7 @@ const command = defineCommand({
 
           let events = 0;
           for (const block of message.data.data) {
+            assert(block !== null);
             events += block.events.length ?? 0;
             consola.info(
               `Block n=${block.header?.blockNumber} h=${block.header?.blockHash}`,

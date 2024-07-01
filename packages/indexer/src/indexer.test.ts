@@ -1,7 +1,7 @@
-import { MockClient } from "@apibara/protocol/testing";
+import { MockClient, type MockStreamResponse } from "@apibara/protocol/testing";
 import { describe, expect, it } from "vitest";
 import { run } from "./indexer";
-import { generateMockMessages, vcr } from "./testing";
+import { vcr } from "./testing";
 import { type MockRet, getMockIndexer } from "./testing/indexer";
 
 describe("Run Test", () => {
@@ -16,7 +16,7 @@ describe("Run Test", () => {
         {
           "data": [
             {
-              "blockNumber": 5000000,
+              "data": "5000000",
             },
           ],
           "endCursor": {
@@ -26,7 +26,7 @@ describe("Run Test", () => {
         {
           "data": [
             {
-              "blockNumber": 5000001,
+              "data": "5000001",
             },
           ],
           "endCursor": {
@@ -36,7 +36,7 @@ describe("Run Test", () => {
         {
           "data": [
             {
-              "blockNumber": 5000002,
+              "data": "5000002",
             },
           ],
           "endCursor": {
@@ -46,7 +46,7 @@ describe("Run Test", () => {
         {
           "data": [
             {
-              "blockNumber": 5000003,
+              "data": "5000003",
             },
           ],
           "endCursor": {
@@ -56,7 +56,7 @@ describe("Run Test", () => {
         {
           "data": [
             {
-              "blockNumber": 5000004,
+              "data": "5000004",
             },
           ],
           "endCursor": {
@@ -66,7 +66,7 @@ describe("Run Test", () => {
         {
           "data": [
             {
-              "blockNumber": 5000005,
+              "data": "5000005",
             },
           ],
           "endCursor": {
@@ -76,7 +76,7 @@ describe("Run Test", () => {
         {
           "data": [
             {
-              "blockNumber": 5000006,
+              "data": "5000006",
             },
           ],
           "endCursor": {
@@ -86,7 +86,7 @@ describe("Run Test", () => {
         {
           "data": [
             {
-              "blockNumber": 5000007,
+              "data": "5000007",
             },
           ],
           "endCursor": {
@@ -96,7 +96,7 @@ describe("Run Test", () => {
         {
           "data": [
             {
-              "blockNumber": 5000008,
+              "data": "5000008",
             },
           ],
           "endCursor": {
@@ -106,7 +106,7 @@ describe("Run Test", () => {
         {
           "data": [
             {
-              "blockNumber": 5000009,
+              "data": "5000009",
             },
           ],
           "endCursor": {
@@ -118,4 +118,11 @@ describe("Run Test", () => {
   });
 });
 
-const messages = generateMockMessages();
+const messages: MockStreamResponse[] = [...Array(10)].map((_, i) => ({
+  _tag: "data",
+  data: {
+    finality: "accepted",
+    data: [{ data: `${5_000_000 + i}` }],
+    endCursor: { orderKey: BigInt(5_000_000 + i) },
+  },
+}));
