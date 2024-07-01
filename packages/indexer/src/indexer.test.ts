@@ -1,16 +1,15 @@
-import type { StreamDataResponse } from "@apibara/protocol";
-import { type MockBlock, MockClient } from "@apibara/protocol/testing";
+import { MockClient } from "@apibara/protocol/testing";
 import { describe, expect, it } from "vitest";
 import { run } from "./indexer";
-import { vcr } from "./testing";
-import { type MockRet, mockIndexer } from "./testing/indexer";
+import { generateMockMessages, vcr } from "./testing";
+import { type MockRet, getMockIndexer } from "./testing/indexer";
 
 describe("Run Test", () => {
   const client = new MockClient(messages, [{}]);
 
   it("should stream messages", async () => {
     const sink = vcr<MockRet>();
-    await run(client, mockIndexer, sink);
+    await run(client, getMockIndexer(), sink);
 
     expect(sink.result).toMatchInlineSnapshot(`
       [
@@ -119,13 +118,4 @@ describe("Run Test", () => {
   });
 });
 
-const messages: StreamDataResponse<MockBlock>[] = [...Array(10)].map(
-  (_, i) => ({
-    _tag: "data",
-    data: {
-      finality: "accepted",
-      data: [{ blockNumber: BigInt(5_000_000 + i) }],
-      endCursor: { orderKey: BigInt(5_000_000 + i) },
-    },
-  }),
-);
+const messages = generateMockMessages();
