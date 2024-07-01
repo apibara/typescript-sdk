@@ -2,8 +2,10 @@ syntax = "proto3";
 
 package dna.v2.testing;
 
-message MockFilter {}
+message MockFilter {
+  optional string filter = 1;
+}
 
 message MockBlock {
-  uint64 block_number = 1;
+  optional string data = 1;
 }

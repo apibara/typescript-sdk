@@ -158,6 +158,8 @@ export async function run<TFilter, TBlock, TRet>(
             }
 
             const block = blocks[0];
+            // Until we implement factory mode, block should never be null.
+            assert(block !== null);
 
             const output = await tracer.startActiveSpan(
               "handler",
