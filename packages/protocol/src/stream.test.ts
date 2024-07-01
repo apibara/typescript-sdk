@@ -14,15 +14,22 @@ const InnerData = Schema.Struct({
   value: Schema.String,
 });
 
-const TestData = Schema.transform(Schema.Uint8ArrayFromSelf, InnerData, {
-  decode(bytes) {
-    const value = new TextDecoder().decode(bytes);
-    return { value };
+const TestData = Schema.transform(
+  Schema.Uint8ArrayFromSelf,
+  Schema.NullOr(InnerData),
+  {
+    decode(bytes) {
+      const value = new TextDecoder().decode(bytes);
+      return { value };
+    },
+    encode(value) {
+      if (value === null) {
+        return new Uint8Array();
+      }
+      return new TextEncoder().encode(value.value);
+    },
   },
-  encode({ value }) {
-    return new TextEncoder().encode(value);
-  },
-});
+);
 
 const TestStreamDataRequest = StreamDataRequest(TestData);
 
