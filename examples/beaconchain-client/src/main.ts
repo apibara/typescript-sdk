@@ -1,3 +1,4 @@
+import assert from "node:assert";
 import { BeaconChainStream, Filter } from "@apibara/beaconchain";
 import { createClient } from "@apibara/protocol";
 import { defineCommand, runMain } from "citty";
@@ -60,6 +61,7 @@ const command = defineCommand({
 
           const maxBlobSize = 131_072; // bytes
           for (const block of message.data.data) {
+            assert(block !== null);
             const transactions = block.transactions ?? [];
             for (const blob of block.blobs) {
               if (blob.blob === undefined) continue;

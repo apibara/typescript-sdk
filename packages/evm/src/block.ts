@@ -148,13 +148,19 @@ export type Block = typeof Block.Type;
 
 export const BlockFromBytes = Schema.transform(
   Schema.Uint8ArrayFromSelf,
-  Block,
+  Schema.NullOr(Block),
   {
     strict: false,
     decode(value) {
+      if (value.length === 0) {
+        return null;
+      }
       return proto.data.Block.decode(value);
     },
     encode(value) {
+      if (value === null) {
+        return new Uint8Array();
+      }
       return proto.data.Block.encode(value).finish();
     },
   },

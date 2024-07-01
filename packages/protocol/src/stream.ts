@@ -88,7 +88,9 @@ export const SystemMessage = Schema.Struct({
 
 export type SystemMessage = typeof SystemMessage.Type;
 
-export const Data = <TA, TR>(schema: Schema.Schema<TA, Uint8Array, TR>) =>
+export const Data = <TA, TR>(
+  schema: Schema.Schema<TA | null, Uint8Array, TR>,
+) =>
   Schema.Struct({
     _tag: tag("data"),
     data: Schema.Struct({
@@ -100,7 +102,7 @@ export const Data = <TA, TR>(schema: Schema.Schema<TA, Uint8Array, TR>) =>
   });
 
 export const StreamDataResponse = <TA, TR>(
-  data: Schema.Schema<TA, Uint8Array, TR>,
+  data: Schema.Schema<TA | null, Uint8Array, TR>,
 ) => Schema.Union(Data(data), Invalidate, Heartbeat, SystemMessage);
 
 const ResponseWithoutData = Schema.Union(Invalidate, Heartbeat, SystemMessage);
@@ -114,7 +116,7 @@ export type StreamDataResponse<TA> =
         cursor?: Cursor | undefined;
         endCursor?: Cursor | undefined;
         finality: DataFinality;
-        data: readonly TA[];
+        data: readonly (TA | null)[];
       };
     };
 

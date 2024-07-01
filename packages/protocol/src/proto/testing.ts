@@ -5,24 +5,27 @@
 // source: testing.proto
 
 /* eslint-disable */
-import Long from "long";
 import _m0 from "protobufjs/minimal";
 
 export const protobufPackage = "dna.v2.testing";
 
 export interface MockFilter {
+  readonly filter?: string | undefined;
 }
 
 export interface MockBlock {
-  readonly blockNumber: bigint;
+  readonly data?: string | undefined;
 }
 
 function createBaseMockFilter(): MockFilter {
-  return {};
+  return { filter: undefined };
 }
 
 export const MockFilter = {
-  encode(_: MockFilter, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+  encode(message: MockFilter, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.filter !== undefined) {
+      writer.uint32(10).string(message.filter);
+    }
     return writer;
   },
 
@@ -33,6 +36,13 @@ export const MockFilter = {
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.filter = reader.string();
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -42,35 +52,36 @@ export const MockFilter = {
     return message;
   },
 
-  fromJSON(_: any): MockFilter {
-    return {};
+  fromJSON(object: any): MockFilter {
+    return { filter: isSet(object.filter) ? globalThis.String(object.filter) : undefined };
   },
 
-  toJSON(_: MockFilter): unknown {
+  toJSON(message: MockFilter): unknown {
     const obj: any = {};
+    if (message.filter !== undefined) {
+      obj.filter = message.filter;
+    }
     return obj;
   },
 
   create(base?: DeepPartial<MockFilter>): MockFilter {
     return MockFilter.fromPartial(base ?? {});
   },
-  fromPartial(_: DeepPartial<MockFilter>): MockFilter {
+  fromPartial(object: DeepPartial<MockFilter>): MockFilter {
     const message = createBaseMockFilter() as any;
+    message.filter = object.filter ?? undefined;
     return message;
   },
 };
 
 function createBaseMockBlock(): MockBlock {
-  return { blockNumber: BigInt("0") };
+  return { data: undefined };
 }
 
 export const MockBlock = {
   encode(message: MockBlock, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.blockNumber !== BigInt("0")) {
-      if (BigInt.asUintN(64, message.blockNumber) !== message.blockNumber) {
-        throw new globalThis.Error("value provided for field message.blockNumber of type uint64 too large");
-      }
-      writer.uint32(8).uint64(message.blockNumber.toString());
+    if (message.data !== undefined) {
+      writer.uint32(10).string(message.data);
     }
     return writer;
   },
@@ -83,11 +94,11 @@ export const MockBlock = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          if (tag !== 8) {
+          if (tag !== 10) {
             break;
           }
 
-          message.blockNumber = longToBigint(reader.uint64() as Long);
+          message.data = reader.string();
           continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
@@ -99,13 +110,13 @@ export const MockBlock = {
   },
 
   fromJSON(object: any): MockBlock {
-    return { blockNumber: isSet(object.blockNumber) ? BigInt(object.blockNumber) : BigInt("0") };
+    return { data: isSet(object.data) ? globalThis.String(object.data) : undefined };
   },
 
   toJSON(message: MockBlock): unknown {
     const obj: any = {};
-    if (message.blockNumber !== BigInt("0")) {
-      obj.blockNumber = message.blockNumber.toString();
+    if (message.data !== undefined) {
+      obj.data = message.data;
     }
     return obj;
   },
@@ -115,7 +126,7 @@ export const MockBlock = {
   },
   fromPartial(object: DeepPartial<MockBlock>): MockBlock {
     const message = createBaseMockBlock() as any;
-    message.blockNumber = object.blockNumber ?? BigInt("0");
+    message.data = object.data ?? undefined;
     return message;
   },
 };
@@ -129,15 +140,6 @@ export type DeepPartial<T> = T extends Builtin ? T
     ? { [K in keyof Omit<T, "$case">]?: DeepPartial<T[K]> } & { readonly $case: T["$case"] }
   : T extends {} ? { [K in keyof T]?: DeepPartial<T[K]> }
   : Partial<T>;
-
-function longToBigint(long: Long) {
-  return BigInt(long.toString());
-}
-
-if (_m0.util.Long !== Long) {
-  _m0.util.Long = Long as any;
-  _m0.configure();
-}
 
 function isSet(value: any): boolean {
   return value !== null && value !== undefined;
