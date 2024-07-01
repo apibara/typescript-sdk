@@ -35,12 +35,12 @@ export class SqliteSink<
   }
 
   async write({ data, endCursor }: SinkWriteArgs<TData>) {
-    this.emit("write", { data });
+    await this.callHook("write", { data });
 
     data = this.processCursorColumn(data, endCursor);
     await this.insertJsonArray(data);
 
-    this.emit("flush");
+    await this.callHook("flush");
   }
 
   private async insertJsonArray(data: TData[]) {
