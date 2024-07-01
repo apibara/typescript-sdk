@@ -49,9 +49,22 @@ export const MockBlockFromBytes = Schema.transform(
   },
 );
 
+/** For testing, simply concatenate the values of `.filter` */
+function mergeMockFilter(a: MockFilter, b: MockFilter): MockFilter {
+  let filter = "";
+  if (a.filter) {
+    filter += a.filter;
+  }
+  if (b.filter) {
+    filter += b.filter;
+  }
+  return { filter };
+}
+
 export const MockStream = new StreamConfig(
   MockFilterFromBytes,
   MockBlockFromBytes,
+  mergeMockFilter,
 );
 
 export const MockStreamResponse = StreamDataResponse(MockBlockFromBytes);

@@ -197,3 +197,28 @@ export const FilterFromBytes = Schema.transform(
 
 export const filterToBytes = Schema.encodeSync(FilterFromBytes);
 export const filterFromBytes = Schema.decodeSync(FilterFromBytes);
+
+export function mergeFilter(a: Filter, b: Filter): Filter {
+  const header = mergeHeaderFilter(a.header, b.header);
+  return {
+    header,
+    transactions: [...(a.transactions ?? []), ...(b.transactions ?? [])],
+    events: [...(a.events ?? []), ...(b.events ?? [])],
+    messages: [...(a.messages ?? []), ...(b.messages ?? [])],
+  };
+}
+
+function mergeHeaderFilter(
+  a?: HeaderFilter,
+  b?: HeaderFilter,
+): HeaderFilter | undefined {
+  if (a === undefined) {
+    return b;
+  }
+  if (b === undefined) {
+    return a;
+  }
+  return {
+    always: a.always || b.always,
+  };
+}
