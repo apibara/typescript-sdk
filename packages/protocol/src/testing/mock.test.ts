@@ -1,7 +1,7 @@
 import { Schema } from "@effect/schema";
 import { describe, expect, it } from "vitest";
 
-import { type MockBlock, MockBlockFromBytes } from "./mock";
+import { type MockBlock, MockBlockFromBytes, MockStream } from "./mock";
 
 describe("MockBlock", () => {
   const encode = Schema.encodeSync(MockBlockFromBytes);
@@ -24,5 +24,12 @@ describe("MockBlock", () => {
   it("decodes empty data as null", () => {
     const block = decode(new Uint8Array());
     expect(block).toBe(null);
+  });
+});
+
+describe("MockStream", () => {
+  it("allow filters to be merged", () => {
+    const f = MockStream.mergeFilter({ filter: "hello" }, { filter: "world" });
+    expect(f).toEqual({ filter: "helloworld" });
   });
 });

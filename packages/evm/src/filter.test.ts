@@ -2,7 +2,13 @@ import { encodeEventTopics, pad, parseAbi } from "viem";
 import { describe, expect, it } from "vitest";
 
 import { Schema } from "@effect/schema";
-import { Filter, LogFilter, filterFromProto, filterToProto } from "./filter";
+import {
+  Filter,
+  LogFilter,
+  filterFromProto,
+  filterToProto,
+  mergeFilter,
+} from "./filter";
 
 const abi = parseAbi([
   "event Transfer(address indexed from, address indexed to, uint256 value)",
@@ -76,5 +82,110 @@ describe("LogFilter", () => {
     const proto = encode(filter);
     const back = decode(proto);
     expect(back).toEqual(filter);
+  });
+});
+
+describe("mergeFilter", () => {
+  it("returns header.always if any has it", () => {
+    const fa = mergeFilter({}, { header: { always: true } });
+    expect(fa).toMatchInlineSnapshot(`
+      {
+        "header": {
+          "always": true,
+        },
+        "logs": [],
+        "transactions": [],
+        "withdrawals": [],
+      }
+    `);
+    const fb = mergeFilter({ header: { always: true } }, {});
+    expect(fb).toMatchInlineSnapshot(`
+      {
+        "header": {
+          "always": true,
+        },
+        "logs": [],
+        "transactions": [],
+        "withdrawals": [],
+      }
+    `);
+  });
+
+  it("returns an empty header by default", () => {
+    const f = mergeFilter({}, {});
+    expect(f).toMatchInlineSnapshot(`
+      {
+        "header": undefined,
+        "logs": [],
+        "transactions": [],
+        "withdrawals": [],
+      }
+    `);
+  });
+
+  it("concatenates logs", () => {
+    const f = mergeFilter(
+      { logs: [{ address: "0xAAAAAAAAAAAAAAAAAAAAAA" }] },
+      { logs: [{ address: "0xBBBBBBBBBBBBBBBBBBBBBB" }] },
+    );
+    expect(f).toMatchInlineSnapshot(`
+      {
+        "header": undefined,
+        "logs": [
+          {
+            "address": "0xAAAAAAAAAAAAAAAAAAAAAA",
+          },
+          {
+            "address": "0xBBBBBBBBBBBBBBBBBBBBBB",
+          },
+        ],
+        "transactions": [],
+        "withdrawals": [],
+      }
+    `);
+  });
+
+  it("concatenates transactions", () => {
+    const f = mergeFilter(
+      { transactions: [{ from: "0xAAAAAAAAAAAAAAAAAAAAAA" }] },
+      { transactions: [{ from: "0xBBBBBBBBBBBBBBBBBBBBBB" }] },
+    );
+    expect(f).toMatchInlineSnapshot(`
+      {
+        "header": undefined,
+        "logs": [],
+        "transactions": [
+          {
+            "from": "0xAAAAAAAAAAAAAAAAAAAAAA",
+          },
+          {
+            "from": "0xBBBBBBBBBBBBBBBBBBBBBB",
+          },
+        ],
+        "withdrawals": [],
+      }
+    `);
+  });
+
+  it("concatenates withdrawals", () => {
+    const f = mergeFilter(
+      { withdrawals: [{ validatorIndex: 1n }] },
+      { withdrawals: [{ validatorIndex: 100n }] },
+    );
+    expect(f).toMatchInlineSnapshot(`
+      {
+        "header": undefined,
+        "logs": [],
+        "transactions": [],
+        "withdrawals": [
+          {
+            "validatorIndex": 1n,
+          },
+          {
+            "validatorIndex": 100n,
+          },
+        ],
+      }
+    `);
   });
 });

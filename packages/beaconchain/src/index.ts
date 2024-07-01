@@ -1,6 +1,6 @@
 import { StreamConfig } from "@apibara/protocol";
 import { BlockFromBytes } from "./block";
-import { FilterFromBytes } from "./filter";
+import { FilterFromBytes, mergeFilter } from "./filter";
 
 export * as proto from "./proto";
 
@@ -11,4 +11,5 @@ export * from "./block";
 export const BeaconChainStream = new StreamConfig(
   FilterFromBytes,
   BlockFromBytes,
+  mergeFilter,
 );
