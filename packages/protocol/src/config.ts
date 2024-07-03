@@ -9,7 +9,8 @@ export class StreamConfig<TFilter, TBlock> {
 
   constructor(
     private filter: Schema.Schema<TFilter, Uint8Array, never>,
-    private block: Schema.Schema<TBlock, Uint8Array, never>,
+    private block: Schema.Schema<TBlock | null, Uint8Array, never>,
+    public mergeFilter: (a: TFilter, b: TFilter) => TFilter,
   ) {
     this.request = StreamDataRequest(this.filter);
     this.response = StreamDataResponse(this.block);

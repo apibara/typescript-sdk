@@ -1,7 +1,13 @@
 import { Schema } from "@effect/schema";
 import { describe, expect, it } from "vitest";
 
-import { EventFilter, HeaderFilter, Key, TransactionFilter } from "./filter";
+import {
+  EventFilter,
+  HeaderFilter,
+  Key,
+  TransactionFilter,
+  mergeFilter,
+} from "./filter";
 
 describe("HeaderFilter", () => {
   const encode = Schema.encodeSync(HeaderFilter);
@@ -457,6 +463,121 @@ describe("TransactionFilter", () => {
           "_tag": "deployAccountV3",
           "deployAccountV3": {},
         },
+      }
+    `);
+  });
+});
+
+describe("mergeFilter", () => {
+  it("returns header.always if any has it", () => {
+    const fa = mergeFilter({}, { header: { always: true } });
+    expect(fa).toMatchInlineSnapshot(`
+      {
+        "events": [],
+        "header": {
+          "always": true,
+        },
+        "messages": [],
+        "transactions": [],
+      }
+    `);
+    const fb = mergeFilter({ header: { always: true } }, {});
+    expect(fb).toMatchInlineSnapshot(`
+      {
+        "events": [],
+        "header": {
+          "always": true,
+        },
+        "messages": [],
+        "transactions": [],
+      }
+    `);
+  });
+
+  it("returns an empty header by default", () => {
+    const f = mergeFilter({}, {});
+    expect(f).toMatchInlineSnapshot(`
+      {
+        "events": [],
+        "header": undefined,
+        "messages": [],
+        "transactions": [],
+      }
+    `);
+  });
+
+  it("concatenates transactions", () => {
+    const f = mergeFilter(
+      {
+        transactions: [{ transactionType: { _tag: "invokeV0", invokeV0: {} } }],
+      },
+      {
+        transactions: [{ transactionType: { _tag: "invokeV3", invokeV3: {} } }],
+      },
+    );
+    expect(f).toMatchInlineSnapshot(`
+      {
+        "events": [],
+        "header": undefined,
+        "messages": [],
+        "transactions": [
+          {
+            "transactionType": {
+              "_tag": "invokeV0",
+              "invokeV0": {},
+            },
+          },
+          {
+            "transactionType": {
+              "_tag": "invokeV3",
+              "invokeV3": {},
+            },
+          },
+        ],
+      }
+    `);
+  });
+
+  it("concatenates events", () => {
+    const f = mergeFilter(
+      { events: [{ fromAddress: "0xAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" }] },
+      { events: [{ fromAddress: "0xBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB" }] },
+    );
+    expect(f).toMatchInlineSnapshot(`
+      {
+        "events": [
+          {
+            "fromAddress": "0xAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+          },
+          {
+            "fromAddress": "0xBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
+          },
+        ],
+        "header": undefined,
+        "messages": [],
+        "transactions": [],
+      }
+    `);
+  });
+
+  it("concatenates messages", () => {
+    const f = mergeFilter(
+      { messages: [{ fromAddress: "0xAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" }] },
+      { messages: [{ fromAddress: "0xBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB" }] },
+    );
+    expect(f).toMatchInlineSnapshot(`
+      {
+        "events": [],
+        "header": undefined,
+        "messages": [
+          {
+            "fromAddress": "0xAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+          },
+          {
+            "fromAddress": "0xBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
+          },
+        ],
+        "transactions": [],
       }
     `);
   });

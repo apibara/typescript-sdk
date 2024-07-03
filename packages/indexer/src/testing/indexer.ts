@@ -1,25 +1,28 @@
-import { type MockBlock, MockStream } from "@apibara/protocol/testing";
+import {
+  type MockBlock,
+  type MockFilter,
+  MockStream,
+} from "@apibara/protocol/testing";
 import { createIndexer, defineIndexer } from "../indexer";
 import type { IndexerPlugin } from "../plugins";
 
 export const getMockIndexer = (
-  // biome-ignore lint/complexity/noBannedTypes: <explanation>
-  plugins: ReadonlyArray<IndexerPlugin<{}, MockBlock, MockRet>> = [],
+  plugins: ReadonlyArray<IndexerPlugin<MockFilter, MockBlock, MockRet>> = [],
 ) =>
   createIndexer(
     defineIndexer(MockStream)({
       streamUrl: "https://sepolia.ethereum.a5a.ch",
       finality: "accepted",
       filter: {},
-      transform({ block: { blockNumber } }) {
-        if (!blockNumber) return [];
+      transform({ block: { data } }) {
+        if (!data) return [];
 
-        return [{ blockNumber: Number(blockNumber) }];
+        return [{ data }];
       },
       plugins,
     }),
   );
 
 export type MockRet = {
-  blockNumber: number;
+  data: string;
 };
