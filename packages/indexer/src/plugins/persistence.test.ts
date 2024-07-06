@@ -1,3 +1,4 @@
+import fs from "node:fs/promises";
 import type { Cursor } from "@apibara/protocol";
 import {
   type MockBlock,
@@ -7,7 +8,7 @@ import {
 import { klona } from "klona/full";
 import { open } from "sqlite";
 import sqlite3 from "sqlite3";
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it } from "vitest";
 import { run } from "../indexer";
 import { generateMockMessages } from "../testing";
 import { type MockRet, getMockIndexer } from "../testing/indexer";
@@ -20,25 +21,34 @@ describe("Persistence", () => {
     return db;
   };
 
-  it("should handle storing and updating a cursor", async () => {
+  it("should handle storing and updating a cursor & filter", async () => {
     const db = await initDB();
-    const store = new SqlitePersistence(db);
+    const store = new SqlitePersistence<MockFilter>(db);
 
     // Assert there's no data
     let latest = await store.get();
-    expect(latest).toBeUndefined();
+
+    expect(latest.cursor).toBeUndefined();
+    expect(latest.filter).toBeUndefined();
 
     // Insert value
     const cursor: Cursor = {
       orderKey: 5_000_000n,
     };
-    await store.put(cursor);
+    const filter: MockFilter = {
+      filter: "X",
+    };
+    await store.put({ cursor, filter });
 
     // Check that value was stored
     latest = await store.get();
-    expect(latest).toEqual({
+
+    expect(latest.cursor).toEqual({
       orderKey: 5_000_000n,
       uniqueKey: null,
+    });
+    expect(latest.filter).toEqual({
+      filter: "X",
     });
 
     // Update value
@@ -46,37 +56,52 @@ describe("Persistence", () => {
       orderKey: 5_000_010n,
       uniqueKey: "0x1234567890",
     };
-    await store.put(updatedCursor);
+    const updatedFilter: MockFilter = {
+      filter: "Y",
+    };
+
+    await store.put({ cursor: updatedCursor, filter: updatedFilter });
 
     // Check that value was updated
     latest = await store.get();
-    expect(latest).toEqual({
+
+    expect(latest.cursor).toEqual({
       orderKey: 5_000_010n,
       uniqueKey: "0x1234567890",
+    });
+    expect(latest.filter).toEqual({
+      filter: "Y",
     });
 
     await db.close();
   });
 
-  it("should handle storing and deleting a cursor", async () => {
+  it("should handle storing and deleting a cursor & filter", async () => {
     const db = await initDB();
     const store = new SqlitePersistence(db);
 
     // Assert there's no data
     let latest = await store.get();
-    expect(latest).toBeUndefined();
+    expect(latest.cursor).toBeUndefined();
+    expect(latest.filter).toBeUndefined();
 
     // Insert value
     const cursor: Cursor = {
       orderKey: 5_000_000n,
     };
-    await store.put(cursor);
+    const filter: MockFilter = {
+      filter: "X",
+    };
+    await store.put({ cursor, filter });
 
     // Check that value was stored
     latest = await store.get();
-    expect(latest).toEqual({
+    expect(latest.cursor).toEqual({
       orderKey: 5_000_000n,
       uniqueKey: null,
+    });
+    expect(latest.filter).toEqual({
+      filter: "X",
     });
 
     // Delete value
@@ -84,13 +109,16 @@ describe("Persistence", () => {
 
     // Check there's no data
     latest = await store.get();
-    expect(latest).toBeUndefined();
+    expect(latest.cursor).toBeUndefined();
+    expect(latest.filter).toBeUndefined();
 
     await db.close();
   });
 
   it("should work with indexer and store cursor of last message", async () => {
-    const client = new MockClient(messages, [{}]);
+    const client = new MockClient<MockFilter, MockBlock>((request, options) => {
+      return messages;
+    });
 
     const persistence = sqlitePersistence<MockFilter, MockBlock, MockRet>({
       driver: sqlite3.Database,
@@ -108,16 +136,23 @@ describe("Persistence", () => {
       filename: "file:memdb1?mode=memory&cache=shared",
     });
 
-    const store = new SqlitePersistence(db);
+    const store = new SqlitePersistence<MockFilter>(db);
 
     const latest = await store.get();
 
-    expect(latest).toMatchInlineSnapshot(`
+    expect(latest.cursor).toMatchInlineSnapshot(`
       {
         "orderKey": 5000009n,
         "uniqueKey": null,
       }
     `);
+  });
+
+  // Cleanup
+  afterEach(async () => {
+    try {
+      await fs.unlink("file:memdb1?mode=memory&cache=shared");
+    } catch {}
   });
 });
 
