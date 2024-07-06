@@ -30,7 +30,7 @@ export function createIndexerConfig(streamUrl: string) {
         },
       ],
     },
-    transform({ block: { header, logs, transactions } }) {
+    async transform({ block: { header, logs, transactions } }) {
       const ctx = useIndexerContext();
       ctx.counter += 1;
 
