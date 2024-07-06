@@ -41,13 +41,13 @@ export const StreamDataRequest = <TA, TR>(
   Schema.Struct({
     finality: Schema.optional(DataFinality),
     startingCursor: Schema.optional(Cursor),
-    filter: Schema.Array(filter),
+    filter: Schema.mutable(Schema.Array(filter)),
   });
 
 export type StreamDataRequest<TA> = {
   finality?: DataFinality | undefined;
   startingCursor?: Cursor | undefined;
-  filter: readonly TA[];
+  filter: TA[];
 };
 
 export const Invalidate = Schema.Struct({

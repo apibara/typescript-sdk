@@ -1,3 +1,4 @@
+import assert from "node:assert";
 import fs from "node:fs";
 import path from "node:path";
 import type { Client, Cursor } from "@apibara/protocol";
@@ -38,5 +39,12 @@ export function loadCassette<TFilter, TBlock>(
 
   const { filter, messages } = cassetteData;
 
-  return new MockClient(messages, [filter]);
+  return new MockClient<TFilter, TBlock>((request, options) => {
+    assert.deepStrictEqual(
+      request.filter,
+      filter,
+      "Request and Cassette filter mismatch",
+    );
+    return messages;
+  });
 }
