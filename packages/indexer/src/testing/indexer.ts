@@ -14,7 +14,7 @@ export const getMockIndexer = (
       streamUrl: "https://sepolia.ethereum.a5a.ch",
       finality: "accepted",
       filter: {},
-      transform({ block: { data } }) {
+      async transform({ block: { data } }) {
         if (!data) return [];
 
         return [{ data }];
