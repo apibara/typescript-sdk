@@ -15,9 +15,9 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: 16
-      - uses: pnpm/action-setup@v2.2.2
+      - uses: pnpm/action-setup@v4
         with:
-          version: 7.1.7
+          version: 8.15.5
       - name: Install Protoc
         uses: arduino/setup-protoc@v1
         with:
