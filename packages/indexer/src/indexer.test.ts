@@ -7,17 +7,25 @@ import {
 import { klona } from "klona/full";
 import { open } from "sqlite";
 import sqlite3 from "sqlite3";
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { run } from "./indexer";
 import { SqlitePersistence, sqlitePersistence } from "./plugins/persistence";
 import { generateMockMessages, vcr } from "./testing";
 import { type MockRet, getMockIndexer } from "./testing/indexer";
 
 describe("Run Test", () => {
-  afterEach(async () => {
+  async function cleanup() {
     try {
       await fs.unlink("file:memdb_indexer?mode=memory&cache=shared");
     } catch {}
+  }
+
+  beforeEach(async () => {
+    await cleanup();
+  });
+
+  afterEach(async () => {
+    await cleanup();
   });
 
   it("should stream messages", async () => {
@@ -136,7 +144,7 @@ describe("Run Test", () => {
 
   it("factory mode: indexer should merge filters and restart when needed", async () => {
     const client = new MockClient<MockFilter, MockBlock>((request, options) => {
-      const [, mainFilter] = request.filter;
+      const [_factoryFilter, mainFilter] = request.filter;
 
       if (Object.keys(mainFilter).length === 0) {
         expect(request.startingCursor?.orderKey).toEqual(100n);
@@ -357,7 +365,7 @@ describe("Run Test", () => {
 
   it("factory mode: last cursor should persist when error is thrown in indexer", async () => {
     const client = new MockClient<MockFilter, MockBlock>((request, options) => {
-      const [, mainFilter] = request.filter;
+      const [_factoryFilter, mainFilter] = request.filter;
 
       if (Object.keys(mainFilter).length === 0) {
         expect(request.startingCursor?.orderKey).toEqual(100n);
@@ -390,6 +398,7 @@ describe("Run Test", () => {
               data: [{ data: "B" }, null],
             },
           },
+          Error("this error should not occurr!"),
         ];
       }
 
@@ -397,7 +406,7 @@ describe("Run Test", () => {
         expect(request.startingCursor?.orderKey).toEqual(102n);
 
         return [
-          Error("Some error occurred!"),
+          Error("this error should occurr!"),
           {
             _tag: "data",
             data: {
@@ -453,7 +462,9 @@ describe("Run Test", () => {
 
     const sink = vcr<MockRet>();
 
-    await expect(() => run(client, indexer, sink)).rejects.toThrowError();
+    await expect(() => run(client, indexer, sink)).rejects.toThrowError(
+      "this error should occurr!",
+    );
 
     // open same db again to check last cursor
     const db = await open({
