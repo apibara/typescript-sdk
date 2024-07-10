@@ -173,8 +173,6 @@ export async function run<TFilter, TBlock, TRet>(
     };
 
     while (true) {
-      let restartStream = false;
-
       for await (const message of stream) {
         await indexer.hooks.callHook("message", { message });
 
@@ -232,9 +230,6 @@ export async function run<TFilter, TBlock, TRet>(
                       _tag: "recover",
                       data,
                     };
-
-                    // restart stream
-                    restartStream = true;
 
                     return;
                   }
@@ -309,13 +304,13 @@ export async function run<TFilter, TBlock, TRet>(
 
         // if stream needs a restart
         // break out of the current stream iterator
-        if (restartStream) {
+        if (state._tag !== "normal") {
           break;
         }
       }
 
       // when restarting stream we continue while loop again
-      if (restartStream) {
+      if (state._tag !== "normal") {
         continue;
       }
 
