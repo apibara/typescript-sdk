@@ -22,6 +22,7 @@
     "build:proto": "buf generate proto",
     "typecheck": "tsc --noEmit",
     "test": "vitest",
+    "test:ci": "vitest run",
     "lint": "biome check .",
     "lint:fix": "pnpm lint --write",
     "format": "biome format . --write"
