@@ -38,4 +38,4 @@ jobs:
       - name: Run build
         run: pnpm build
       - name: Run test
-        run: CI=true pnpm test
+        run: pnpm test:ci

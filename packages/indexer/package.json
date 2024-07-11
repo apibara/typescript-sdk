@@ -44,6 +44,7 @@
     "typecheck": "tsc --noEmit",
     "lint:fix": "pnpm lint --write",
     "test": "vitest",
+    "test:ci": "vitest run",
     "format": "biome format . --write"
   },
   "devDependencies": {
