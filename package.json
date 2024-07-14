@@ -7,6 +7,7 @@
     "build": "turbo run build --parallel",
     "typecheck": "turbo run typecheck --parallel",
     "test": "turbo run test",
+    "test:ci": "turbo run test:ci",
     "lint": "turbo run lint --parallel",
     "lint:fix": "turbo run lint:fix --parallel",
     "format": "turbo run format --parallel",

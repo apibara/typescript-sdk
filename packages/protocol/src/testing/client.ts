@@ -1,13 +1,13 @@
-import assert from "node:assert";
-
 import type { Client, ClientCallOptions, StreamDataOptions } from "../client";
 import type { StatusRequest, StatusResponse } from "../status";
 import type { StreamDataRequest, StreamDataResponse } from "../stream";
 
 export class MockClient<TFilter, TBlock> implements Client<TFilter, TBlock> {
   constructor(
-    private messages: StreamDataResponse<TBlock>[],
-    private filter: TFilter[],
+    private messageFactory: (
+      request: StreamDataRequest<TFilter>,
+      options?: StreamDataOptions,
+    ) => (StreamDataResponse<TBlock> | Error)[],
   ) {}
 
   async status(
@@ -18,18 +18,14 @@ export class MockClient<TFilter, TBlock> implements Client<TFilter, TBlock> {
   }
 
   streamData(request: StreamDataRequest<TFilter>, options?: StreamDataOptions) {
-    assert.deepStrictEqual(
-      this.filter,
-      request.filter,
-      "Request and Cassette filter mismatch",
-    );
+    const messages = this.messageFactory(request, options);
 
-    return new StreamDataIterable(this.messages);
+    return new StreamDataIterable(messages);
   }
 }
 
 export class StreamDataIterable<TBlock> {
-  constructor(private messages: StreamDataResponse<TBlock>[]) {}
+  constructor(private messages: (StreamDataResponse<TBlock> | Error)[]) {}
 
   [Symbol.asyncIterator](): AsyncIterator<StreamDataResponse<TBlock>> {
     let index = 0;
@@ -42,6 +38,10 @@ export class StreamDataIterable<TBlock> {
         }
 
         const message = messages[index++];
+        if (message instanceof Error) {
+          throw message;
+        }
+
         return { done: false, value: message };
       },
     };
