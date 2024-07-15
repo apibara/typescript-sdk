@@ -4,9 +4,8 @@ import {
   MockClient,
   type MockFilter,
 } from "@apibara/protocol/testing";
+import Database from "better-sqlite3";
 import { klona } from "klona/full";
-import { open } from "sqlite";
-import sqlite3 from "sqlite3";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { run } from "./indexer";
 import { SqlitePersistence, sqlitePersistence } from "./plugins/persistence";
@@ -17,6 +16,8 @@ describe("Run Test", () => {
   async function cleanup() {
     try {
       await fs.unlink("file:memdb_indexer?mode=memory&cache=shared");
+      await fs.unlink("file:memdb_indexer?mode=memory&cache=shared-wal");
+      await fs.unlink("file:memdb_indexer?mode=memory&cache=shared-shm");
     } catch {}
   }
 
@@ -261,7 +262,6 @@ describe("Run Test", () => {
     });
 
     const persistence = sqlitePersistence<MockFilter, MockBlock, MockRet>({
-      driver: sqlite3.Database,
       filename: "file:memdb_indexer?mode=memory&cache=shared",
     });
 
@@ -285,14 +285,11 @@ describe("Run Test", () => {
     await run(client, indexer, sink);
 
     // open same db again to check last cursor
-    const db = await open({
-      driver: sqlite3.Database,
-      filename: "file:memdb_indexer?mode=memory&cache=shared",
-    });
+    const db = Database("file:memdb_indexer?mode=memory&cache=shared");
 
     const store = new SqlitePersistence<MockFilter>(db);
 
-    const latest = await store.get();
+    const latest = store.get();
 
     expect(latest.cursor?.orderKey).toEqual(108n);
     expect(latest.filter?.filter).toEqual("BC");
@@ -441,7 +438,6 @@ describe("Run Test", () => {
     });
 
     const persistence = sqlitePersistence<MockFilter, MockBlock, MockRet>({
-      driver: sqlite3.Database,
       filename: "file:memdb_indexer?mode=memory&cache=shared",
     });
 
@@ -467,14 +463,11 @@ describe("Run Test", () => {
     );
 
     // open same db again to check last cursor
-    const db = await open({
-      driver: sqlite3.Database,
-      filename: "file:memdb_indexer?mode=memory&cache=shared",
-    });
+    const db = Database("file:memdb_indexer?mode=memory&cache=shared");
 
     const store = new SqlitePersistence<MockFilter>(db);
 
-    const latest = await store.get();
+    const latest = store.get();
 
     expect(latest.cursor?.orderKey).toEqual(103n);
     expect(latest.filter?.filter).toEqual("B");

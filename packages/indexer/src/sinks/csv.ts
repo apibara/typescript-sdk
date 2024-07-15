@@ -85,11 +85,13 @@ export class CsvSink<
   }
 }
 
-export const csv = (args: CsvArgs & CsvSinkOptions) => {
+export const csv = <TData extends Record<string, unknown>>(
+  args: CsvArgs & CsvSinkOptions,
+) => {
   const { csvOptions, filepath, ...sinkOptions } = args;
   const stringifier = stringify({ ...csvOptions });
 
   const writeStream = fs.createWriteStream(filepath, { flags: "a" });
   stringifier.pipe(writeStream);
-  return new CsvSink(stringifier, sinkOptions);
+  return new CsvSink<TData>(stringifier, sinkOptions);
 };
