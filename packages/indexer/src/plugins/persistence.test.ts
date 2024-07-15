@@ -5,9 +5,8 @@ import {
   MockClient,
   type MockFilter,
 } from "@apibara/protocol/testing";
+import Database from "better-sqlite3";
 import { klona } from "klona/full";
-import { open } from "sqlite";
-import sqlite3 from "sqlite3";
 import { afterEach, describe, expect, it } from "vitest";
 import { run } from "../indexer";
 import { generateMockMessages } from "../testing";
@@ -15,18 +14,18 @@ import { type MockRet, getMockIndexer } from "../testing/indexer";
 import { SqlitePersistence, sqlitePersistence } from "./persistence";
 
 describe("Persistence", () => {
-  const initDB = async () => {
-    const db = await open({ driver: sqlite3.Database, filename: ":memory:" });
-    await SqlitePersistence.initialize(db);
+  const initDB = () => {
+    const db = new Database(":memory:");
+    SqlitePersistence.initialize(db);
     return db;
   };
 
-  it("should handle storing and updating a cursor & filter", async () => {
-    const db = await initDB();
+  it("should handle storing and updating a cursor & filter", () => {
+    const db = initDB();
     const store = new SqlitePersistence<MockFilter>(db);
 
     // Assert there's no data
-    let latest = await store.get();
+    let latest = store.get();
 
     expect(latest.cursor).toBeUndefined();
     expect(latest.filter).toBeUndefined();
@@ -38,10 +37,10 @@ describe("Persistence", () => {
     const filter: MockFilter = {
       filter: "X",
     };
-    await store.put({ cursor, filter });
+    store.put({ cursor, filter });
 
     // Check that value was stored
-    latest = await store.get();
+    latest = store.get();
 
     expect(latest.cursor).toEqual({
       orderKey: 5_000_000n,
@@ -60,10 +59,10 @@ describe("Persistence", () => {
       filter: "Y",
     };
 
-    await store.put({ cursor: updatedCursor, filter: updatedFilter });
+    store.put({ cursor: updatedCursor, filter: updatedFilter });
 
     // Check that value was updated
-    latest = await store.get();
+    latest = store.get();
 
     expect(latest.cursor).toEqual({
       orderKey: 5_000_010n,
@@ -73,15 +72,15 @@ describe("Persistence", () => {
       filter: "Y",
     });
 
-    await db.close();
+    db.close();
   });
 
-  it("should handle storing and deleting a cursor & filter", async () => {
-    const db = await initDB();
+  it("should handle storing and deleting a cursor & filter", () => {
+    const db = initDB();
     const store = new SqlitePersistence(db);
 
     // Assert there's no data
-    let latest = await store.get();
+    let latest = store.get();
     expect(latest.cursor).toBeUndefined();
     expect(latest.filter).toBeUndefined();
 
@@ -92,10 +91,10 @@ describe("Persistence", () => {
     const filter: MockFilter = {
       filter: "X",
     };
-    await store.put({ cursor, filter });
+    store.put({ cursor, filter });
 
     // Check that value was stored
-    latest = await store.get();
+    latest = store.get();
     expect(latest.cursor).toEqual({
       orderKey: 5_000_000n,
       uniqueKey: null,
@@ -105,14 +104,14 @@ describe("Persistence", () => {
     });
 
     // Delete value
-    await store.del();
+    store.del();
 
     // Check there's no data
-    latest = await store.get();
+    latest = store.get();
     expect(latest.cursor).toBeUndefined();
     expect(latest.filter).toBeUndefined();
 
-    await db.close();
+    db.close();
   });
 
   it("should work with indexer and store cursor of last message", async () => {
@@ -121,7 +120,6 @@ describe("Persistence", () => {
     });
 
     const persistence = sqlitePersistence<MockFilter, MockBlock, MockRet>({
-      driver: sqlite3.Database,
       filename: "file:memdb1?mode=memory&cache=shared",
     });
 
@@ -131,14 +129,11 @@ describe("Persistence", () => {
     await run(client, indexer);
 
     // open same db again to check last cursor
-    const db = await open({
-      driver: sqlite3.Database,
-      filename: "file:memdb1?mode=memory&cache=shared",
-    });
+    const db = new Database("file:memdb1?mode=memory&cache=shared");
 
     const store = new SqlitePersistence<MockFilter>(db);
 
-    const latest = await store.get();
+    const latest = store.get();
 
     expect(latest.cursor).toMatchInlineSnapshot(`
       {
@@ -152,6 +147,8 @@ describe("Persistence", () => {
   afterEach(async () => {
     try {
       await fs.unlink("file:memdb1?mode=memory&cache=shared");
+      await fs.unlink("file:memdb1?mode=memory&cache=shared-shm");
+      await fs.unlink("file:memdb1?mode=memory&cache=shared-wal");
     } catch {}
   });
 });

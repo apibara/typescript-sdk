@@ -1,55 +1,61 @@
-import { type Database, open } from "sqlite";
-import sqlite3 from "sqlite3";
+import Database, { type Database as SqliteDatabase } from "better-sqlite3";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { KVStore } from "./kv";
 
 type ValueType = { data: bigint };
 
+type DatabaseRowType = {
+  from_block: number;
+  k: string;
+  to_block: number;
+  v: unknown;
+};
+
 describe("KVStore", () => {
-  let db: Database<sqlite3.Database, sqlite3.Statement>;
+  let db: SqliteDatabase;
   let store: KVStore;
   const key = "test_key";
 
-  beforeAll(async () => {
-    db = await open({ driver: sqlite3.Database, filename: ":memory:" });
-    await KVStore.initialize(db);
+  beforeAll(() => {
+    db = new Database(":memory:");
+    KVStore.initialize(db);
     store = new KVStore(db, "finalized", { orderKey: 5_000_000n });
   });
 
   afterAll(async () => {
-    await db.close();
+    db.close();
   });
 
-  it("should begin transaction", async () => {
-    await store.beginTransaction();
+  it("should begin transaction", () => {
+    store.beginTransaction();
   });
 
   it("should put and get a value", async () => {
     const value = { data: 0n };
 
-    await store.put<ValueType>(key, value);
-    const result = await store.get<ValueType>(key);
+    store.put<ValueType>(key, value);
+    const result = store.get<ValueType>(key);
 
     expect(result).toEqual(value);
   });
 
   it("should commit transaction", async () => {
-    await store.commitTransaction();
+    store.commitTransaction();
 
     const value = { data: 0n };
 
-    const result = await store.get<ValueType>(key);
+    const result = store.get<ValueType>(key);
 
     expect(result).toEqual(value);
   });
 
   it("should return undefined for non-existing key", async () => {
-    const result = await store.get<ValueType>("non_existent_key");
+    const result = store.get<ValueType>("non_existent_key");
     expect(result).toBeUndefined();
   });
 
   it("should begin transaction", async () => {
-    await store.beginTransaction();
+    store.beginTransaction();
   });
 
   it("should update an existing value", async () => {
@@ -57,26 +63,27 @@ describe("KVStore", () => {
 
     const value = { data: 50n };
 
-    await store.put<ValueType>(key, value);
-    const result = await store.get<ValueType>(key);
+    store.put<ValueType>(key, value);
+    const result = store.get<ValueType>(key);
 
     expect(result).toEqual(value);
   });
 
   it("should delete a value", async () => {
-    await store.del(key);
-    const result = await store.get<ValueType>(key);
+    store.del(key);
+    const result = store.get<ValueType>(key);
 
     expect(result).toBeUndefined();
 
-    const rows = await db.all(
-      `
+    const rows = db
+      .prepare<string, DatabaseRowType>(
+        `
       SELECT from_block, to_block, k, v
       FROM kvs
       WHERE k = ?
     `,
-      [key],
-    );
+      )
+      .all(key);
 
     // Check that the old is correctly marked with to_block
     expect(rows[0].to_block).toBe(Number(5_000_020n));
@@ -87,14 +94,15 @@ describe("KVStore", () => {
   });
 
   it("should revert the changes to last commit", async () => {
-    const rows = await db.all(
-      `
+    const rows = db
+      .prepare(
+        `
       SELECT from_block, to_block, k, v
       FROM kvs
       WHERE k = ?
     `,
-      [key],
-    );
+      )
+      .all([key]);
 
     expect(rows).toMatchInlineSnapshot(`
       [

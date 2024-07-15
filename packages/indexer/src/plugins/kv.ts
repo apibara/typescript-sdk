@@ -1,48 +1,52 @@
 import assert from "node:assert";
 import type { Cursor, DataFinality } from "@apibara/protocol";
-import { type Database, type ISqlite, open } from "sqlite";
+import Database, { type Database as SqliteDatabase } from "better-sqlite3";
 import { useIndexerContext } from "../context";
 import { deserialize, serialize } from "../vcr";
 import { defineIndexerPlugin } from "./config";
 
-type SqliteArgs = ISqlite.Config;
+type SqliteArgs = Database.Options & {
+  filename: string | Buffer | undefined;
+};
 
 export function kv<TFilter, TBlock, TRet>(args: SqliteArgs) {
   return defineIndexerPlugin<TFilter, TBlock, TRet>((indexer) => {
-    let db: Database;
+    let db: SqliteDatabase;
 
-    indexer.hooks.hook("run:before", async () => {
-      db = await open(args);
-      await KVStore.initialize(db);
+    indexer.hooks.hook("run:before", () => {
+      const { filename, ...sqliteOptions } = args;
+      db = new Database(filename, sqliteOptions);
+
+      KVStore.initialize(db);
     });
 
-    indexer.hooks.hook("handler:before", async ({ finality, endCursor }) => {
+    indexer.hooks.hook("handler:before", ({ finality, endCursor }) => {
       const ctx = useIndexerContext();
 
       assert(endCursor, new Error("endCursor cannot be undefined"));
 
       ctx.kv = new KVStore(db, finality, endCursor);
 
-      await ctx.kv.beginTransaction();
+      ctx.kv.beginTransaction();
     });
 
-    indexer.hooks.hook("handler:after", async () => {
+    indexer.hooks.hook("handler:after", () => {
       const ctx = useIndexerContext();
 
-      await ctx.kv.commitTransaction();
+      ctx.kv.commitTransaction();
 
       ctx.kv = null;
     });
 
-    indexer.hooks.hook("handler:exception", async () => {
+    indexer.hooks.hook("handler:exception", () => {
       const ctx = useIndexerContext();
 
-      await ctx.kv.rollbackTransaction();
+      ctx.kv.rollbackTransaction();
 
       ctx.kv = null;
     });
 
-    indexer.hooks.hook("run:after", async () => {
+    indexer.hooks.hook("run:after", () => {
       console.log("kv: ", useIndexerContext().kv);
     });
   });
@@ -50,13 +54,15 @@ export function kv<TFilter, TBlock, TRet>(args: SqliteArgs) {
 
 export class KVStore {
   constructor(
-    private _db: Database,
+    private _db: SqliteDatabase,
     private _finality: DataFinality,
     private _endCursor: Cursor,
   ) {}
 
-  static async initialize(db: Database) {
-    await db.exec(`
+  static initialize(db: SqliteDatabase) {
+    db.pragma("journal_mode = WAL");
+
+    db.prepare(`
       CREATE TABLE IF NOT EXISTS kvs (
         from_block INTEGER NOT NULL,
         to_block INTEGER,
@@ -64,65 +70,68 @@ export class KVStore {
         v BLOB NOT NULL,
         PRIMARY KEY (from_block, k)
       );
-    `);
+    `).run();
   }
 
-  async beginTransaction() {
-    await this._db.exec("BEGIN TRANSACTION");
+  beginTransaction() {
+    this._db.prepare("BEGIN TRANSACTION").run();
   }
 
-  async commitTransaction() {
-    await this._db.exec("COMMIT TRANSACTION");
+  commitTransaction() {
+    this._db.prepare("COMMIT TRANSACTION").run();
   }
 
-  async rollbackTransaction() {
-    await this._db.exec("ROLLBACK TRANSACTION");
+  rollbackTransaction() {
+    this._db.prepare("ROLLBACK TRANSACTION").run();
   }
 
-  async get<T>(key: string): Promise<T> {
-    const row = await this._db.get<{ v: string }>(
-      `
+  get<T>(key: string): T {
+    const row = this._db
+      .prepare<string, { v: string }>(
+        `
       SELECT v
       FROM kvs
-      WHERE k = ? AND to_block IS NULL
-    `,
-      [key],
-    );
+      WHERE k = ? AND to_block IS NULL`,
+      )
+      .get(key);
 
     return row ? deserialize(row.v) : undefined;
   }
 
-  async put<T>(key: string, value: T) {
-    await this._db.run(
-      `
+  put<T>(key: string, value: T) {
+    this._db
+      .prepare(
+        `
       UPDATE kvs
       SET to_block = ?
       WHERE k = ? AND to_block IS NULL
     `,
-      [Number(this._endCursor.orderKey), key],
-    );
+      )
+      .run(Number(this._endCursor.orderKey), key);
 
-    await this._db.run(
-      `
+    this._db
+      .prepare(
+        `
       INSERT INTO kvs (from_block, to_block, k, v)
       VALUES (?, NULL, ?, ?)
     `,
-      [
+      )
+      .run(
         Number(this._endCursor.orderKey),
         key,
         serialize(value as Record<string, unknown>),
-      ],
-    );
+      );
   }
 
-  async del(key: string) {
-    await this._db.run(
-      `
+  del(key: string) {
+    this._db
+      .prepare(
+        `
       UPDATE kvs
       SET to_block = ?
       WHERE k = ? AND to_block IS NULL
     `,
-      [Number(this._endCursor.orderKey), key],
-    );
+      )
+      .run(Number(this._endCursor.orderKey), key);
   }
 }
