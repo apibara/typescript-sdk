@@ -1,12 +1,12 @@
 import type { Cursor } from "@apibara/protocol";
-import Database, { type Database as SqliteDatabase } from "better-sqlite3";
+import type { Database as SqliteDatabase } from "better-sqlite3";
 import { Sink, type SinkWriteArgs } from "../sink";
 
-export type SqliteArgs = Database.Options & {
-  filename: string | Buffer | undefined;
-};
-
 export type SqliteSinkOptions = {
+  /**
+   * Database instance of better-sqlite3
+   */
+  database: SqliteDatabase;
   /**
    * The name of the table where data will be inserted.
    */
@@ -27,13 +27,14 @@ export type SqliteSinkOptions = {
 export class SqliteSink<
   TData extends Record<string, unknown>,
 > extends Sink<TData> {
-  private _config: SqliteSinkOptions;
+  private _config: Omit<SqliteSinkOptions, "database">;
   private _db: SqliteDatabase;
 
-  constructor(db: SqliteDatabase, config: SqliteSinkOptions) {
+  constructor(options: SqliteSinkOptions) {
     super();
+    const { database, ...config } = options;
     this._config = config;
-    this._db = db;
+    this._db = database;
   }
 
   async write({ data, endCursor, finality }: SinkWriteArgs<TData>) {
@@ -104,13 +105,7 @@ export class SqliteSink<
 }
 
 export const sqlite = <TData extends Record<string, unknown>>(
-  args: SqliteArgs & SqliteSinkOptions,
+  args: SqliteSinkOptions,
 ) => {
-  const { filename, cursorColumn, tableName, onConflict, ...sqliteOptions } =
-    args;
-  const db = new Database(filename, sqliteOptions);
-  // For performance reason: https://github.com/WiseLibs/better-sqlite3/blob/master/docs/performance.md
-  db.pragma("journal_mode = WAL");
-
-  return new SqliteSink<TData>(db, { tableName, cursorColumn, onConflict });
+  return new SqliteSink<TData>(args);
 };

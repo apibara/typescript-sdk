@@ -1,4 +1,3 @@
-import fs from "node:fs/promises";
 import {
   type MockBlock,
   MockClient,
@@ -6,29 +5,13 @@ import {
 } from "@apibara/protocol/testing";
 import Database from "better-sqlite3";
 import { klona } from "klona/full";
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { describe, expect, it } from "vitest";
 import { run } from "./indexer";
 import { SqlitePersistence, sqlitePersistence } from "./plugins/persistence";
 import { generateMockMessages, vcr } from "./testing";
 import { type MockRet, getMockIndexer } from "./testing/indexer";
 
 describe("Run Test", () => {
-  async function cleanup() {
-    try {
-      await fs.unlink("file:memdb_indexer?mode=memory&cache=shared");
-      await fs.unlink("file:memdb_indexer?mode=memory&cache=shared-wal");
-      await fs.unlink("file:memdb_indexer?mode=memory&cache=shared-shm");
-    } catch {}
-  }
-
-  beforeEach(async () => {
-    await cleanup();
-  });
-
-  afterEach(async () => {
-    await cleanup();
-  });
-
   it("should stream messages", async () => {
     const client = new MockClient<MockFilter, MockBlock>((request, options) => {
       return generateMockMessages();
@@ -261,8 +244,10 @@ describe("Run Test", () => {
       return [];
     });
 
+    const db = Database(":memory:");
+
     const persistence = sqlitePersistence<MockFilter, MockBlock, MockRet>({
-      filename: "file:memdb_indexer?mode=memory&cache=shared",
+      database: db,
     });
 
     // create mock indexer with persistence plugin
@@ -283,9 +268,6 @@ describe("Run Test", () => {
     const sink = vcr<MockRet>();
 
     await run(client, indexer, sink);
-
-    // open same db again to check last cursor
-    const db = Database("file:memdb_indexer?mode=memory&cache=shared");
 
     const store = new SqlitePersistence<MockFilter>(db);
 
@@ -358,6 +340,8 @@ describe("Run Test", () => {
         },
       ]
     `);
+
+    db.close();
   });
 
   it("factory mode: last cursor should persist when error is thrown in indexer", async () => {
@@ -437,8 +421,10 @@ describe("Run Test", () => {
       return [];
     });
 
+    const db = Database(":memory:");
+
     const persistence = sqlitePersistence<MockFilter, MockBlock, MockRet>({
-      filename: "file:memdb_indexer?mode=memory&cache=shared",
+      database: db,
     });
 
     // create mock indexer with persistence plugin
@@ -462,9 +448,6 @@ describe("Run Test", () => {
       "this error should occurr!",
     );
 
-    // open same db again to check last cursor
-    const db = Database("file:memdb_indexer?mode=memory&cache=shared");
-
     const store = new SqlitePersistence<MockFilter>(db);
 
     const latest = store.get();
@@ -473,5 +456,7 @@ describe("Run Test", () => {
     expect(latest.filter?.filter).toEqual("B");
 
     expect(sink.result).toMatchInlineSnapshot("[]");
+
+    db.close();
   });
 });
