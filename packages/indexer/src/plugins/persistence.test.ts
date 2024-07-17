@@ -1,4 +1,3 @@
-import fs from "node:fs/promises";
 import type { Cursor } from "@apibara/protocol";
 import {
   type MockBlock,
@@ -7,7 +6,7 @@ import {
 } from "@apibara/protocol/testing";
 import Database from "better-sqlite3";
 import { klona } from "klona/full";
-import { afterEach, describe, expect, it } from "vitest";
+import { describe, expect, it } from "vitest";
 import { run } from "../indexer";
 import { generateMockMessages } from "../testing";
 import { type MockRet, getMockIndexer } from "../testing/indexer";
@@ -119,17 +118,16 @@ describe("Persistence", () => {
       return messages;
     });
 
+    const db = new Database(":memory:");
+
     const persistence = sqlitePersistence<MockFilter, MockBlock, MockRet>({
-      filename: "file:memdb1?mode=memory&cache=shared",
+      database: db,
     });
 
     // create mock indexer with persistence plugin
     const indexer = klona(getMockIndexer([persistence]));
 
     await run(client, indexer);
-
-    // open same db again to check last cursor
-    const db = new Database("file:memdb1?mode=memory&cache=shared");
 
     const store = new SqlitePersistence<MockFilter>(db);
 
@@ -141,15 +139,8 @@ describe("Persistence", () => {
         "uniqueKey": null,
       }
     `);
-  });
 
-  // Cleanup
-  afterEach(async () => {
-    try {
-      await fs.unlink("file:memdb1?mode=memory&cache=shared");
-      await fs.unlink("file:memdb1?mode=memory&cache=shared-shm");
-      await fs.unlink("file:memdb1?mode=memory&cache=shared-wal");
-    } catch {}
+    db.close();
   });
 });
 

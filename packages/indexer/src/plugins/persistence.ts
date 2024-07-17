@@ -1,24 +1,18 @@
 import type { Cursor } from "@apibara/protocol";
-import Database, { type Database as SqliteDatabase } from "better-sqlite3";
+import type { Database as SqliteDatabase, Statement } from "better-sqlite3";
 import { deserialize, serialize } from "../vcr";
 import { defineIndexerPlugin } from "./config";
 
-type SqliteArgs = Database.Options & {
-  filename: string | Buffer | undefined;
-};
-
-export function sqlitePersistence<TFilter, TBlock, TRet>(args: SqliteArgs) {
+export function sqlitePersistence<TFilter, TBlock, TRet>({
+  database,
+}: { database: SqliteDatabase }) {
   return defineIndexerPlugin<TFilter, TBlock, TRet>((indexer) => {
-    let db: SqliteDatabase;
     let store: SqlitePersistence<TFilter>;
 
     indexer.hooks.hook("run:before", () => {
-      const { filename, ...sqliteOptions } = args;
-      db = new Database(filename, sqliteOptions);
+      SqlitePersistence.initialize(database);
 
-      SqlitePersistence.initialize(db);
-
-      store = new SqlitePersistence(db);
+      store = new SqlitePersistence(database);
     });
 
     indexer.hooks.hook("connect:before", ({ request }) => {
@@ -48,28 +42,32 @@ export function sqlitePersistence<TFilter, TBlock, TRet>(args: SqliteArgs) {
 }
 
 export class SqlitePersistence<TFilter> {
-  constructor(private _db: SqliteDatabase) {}
+  /** Sqlite Queries Prepare Statements */
+  private _getCheckpointQuery: Statement<string, CheckpointRow>;
+  private _putCheckpointQuery: Statement<
+    [string, number, `0x${string}` | undefined]
+  >;
+  private _delCheckpointQuery: Statement<string>;
+  private _getFilterQuery: Statement<string, FilterRow>;
+  private _updateFilterToBlockQuery: Statement<[number, string]>;
+  private _insertFilterQuery: Statement<[string, string, number]>;
+  private _delFilterQuery: Statement<string>;
+
+  constructor(private _db: SqliteDatabase) {
+    this._getCheckpointQuery = this._db.prepare(statements.getCheckpoint);
+    this._putCheckpointQuery = this._db.prepare(statements.putCheckpoint);
+    this._delCheckpointQuery = this._db.prepare(statements.delCheckpoint);
+    this._getFilterQuery = this._db.prepare(statements.getFilter);
+    this._updateFilterToBlockQuery = this._db.prepare(
+      statements.updateFilterToBlock,
+    );
+    this._insertFilterQuery = this._db.prepare(statements.insertFilter);
+    this._delFilterQuery = this._db.prepare(statements.delFilter);
+  }
 
   static initialize(db: SqliteDatabase) {
-    db.pragma("journal_mode = WAL");
-
-    db.prepare(`
-      CREATE TABLE IF NOT EXISTS checkpoints (
-        id TEXT NOT NULL PRIMARY KEY,
-        order_key INTEGER NOT NULL,
-        unique_key TEXT
-      );
-    `).run();
-
-    db.prepare(`
-      CREATE TABLE IF NOT EXISTS filters (
-        id TEXT NOT NULL,
-        filter BLOB NOT NULL,
-        from_block INTEGER NOT NULL,
-        to_block INTEGER,
-        PRIMARY KEY (id, from_block)
-      ); 
-    `).run();
+    db.prepare(statements.createCheckpointsTable).run();
+    db.prepare(statements.createFiltersTable).run();
   }
 
   public get(): { cursor?: Cursor; filter?: TFilter } {
@@ -97,15 +95,7 @@ export class SqlitePersistence<TFilter> {
   // --- CHECKPOINTS TABLE METHODS ---
 
   private _getCheckpoint(): Cursor | undefined {
-    const row = this._db
-      .prepare<string, CheckpointRow>(
-        `
-      SELECT *
-      FROM checkpoints
-      WHERE id = ?
-    `,
-      )
-      .get("default");
+    const row = this._getCheckpointQuery.get("default");
 
     if (!row) return undefined;
 
@@ -113,42 +103,21 @@ export class SqlitePersistence<TFilter> {
   }
 
   private _putCheckpoint(cursor: Cursor) {
-    this._db
-      .prepare(
-        `
-      INSERT INTO checkpoints (id, order_key, unique_key)
-      VALUES (?, ?, ?)
-      ON CONFLICT(id) DO UPDATE SET
-      order_key = excluded.order_key,
-      unique_key = excluded.unique_key
-    `,
-      )
-      .run("default", Number(cursor.orderKey), cursor.uniqueKey);
+    this._putCheckpointQuery.run(
+      "default",
+      Number(cursor.orderKey),
+      cursor.uniqueKey,
+    );
   }
 
   private _delCheckpoint() {
-    this._db
-      .prepare(
-        `
-      DELETE FROM checkpoints
-      WHERE id = ?
-    `,
-      )
-      .run("default");
+    this._delCheckpointQuery.run("default");
   }
 
   // --- FILTERS TABLE METHODS ---
 
   private _getFilter(): TFilter | undefined {
-    const row = this._db
-      .prepare<string, FilterRow>(
-        `
-      SELECT *
-      FROM filters
-      WHERE id = ? AND to_block IS NULL
-    `,
-      )
-      .get("default");
+    const row = this._getFilterQuery.get("default");
 
     if (!row) return undefined;
 
@@ -156,44 +125,68 @@ export class SqlitePersistence<TFilter> {
   }
 
   private _putFilter(filter: TFilter, endCursor: Cursor) {
-    this._db
-      .prepare(
-        `
-      UPDATE filters
-      SET to_block = ?
-      WHERE id = ? AND to_block IS NULL
-    `,
-      )
-      .run(Number(endCursor.orderKey), "default");
-
-    this._db
-      .prepare(
-        `
-      INSERT INTO filters (id, filter, from_block)
-      VALUES (?, ?, ?)
-      ON CONFLICT(id, from_block) DO UPDATE SET
-      filter = excluded.filter,
-      from_block = excluded.from_block
-    `,
-      )
-      .run(
-        "default",
-        serialize(filter as Record<string, unknown>),
-        Number(endCursor.orderKey),
-      );
+    this._updateFilterToBlockQuery.run(Number(endCursor.orderKey), "default");
+    this._insertFilterQuery.run(
+      "default",
+      serialize(filter as Record<string, unknown>),
+      Number(endCursor.orderKey),
+    );
   }
 
   private _delFilter() {
-    this._db
-      .prepare(
-        `
-      DELETE FROM filters
-      WHERE id = ?
-    `,
-      )
-      .run("default");
+    this._delFilterQuery.run("default");
   }
 }
+
+const statements = {
+  beginTxn: "BEGIN TRANSACTION",
+  commitTxn: "COMMIT TRANSACTION",
+  rollbackTxn: "ROLLBACK TRANSACTION",
+  createCheckpointsTable: `
+    CREATE TABLE IF NOT EXISTS checkpoints (
+      id TEXT NOT NULL PRIMARY KEY,
+      order_key INTEGER NOT NULL,
+      unique_key TEXT
+    );`,
+  createFiltersTable: `
+    CREATE TABLE IF NOT EXISTS filters (
+      id TEXT NOT NULL,
+      filter BLOB NOT NULL,
+      from_block INTEGER NOT NULL,
+      to_block INTEGER,
+      PRIMARY KEY (id, from_block)
+    );`,
+  getCheckpoint: `
+    SELECT *
+    FROM checkpoints
+    WHERE id = ?`,
+  putCheckpoint: `
+    INSERT INTO checkpoints (id, order_key, unique_key)
+    VALUES (?, ?, ?)
+    ON CONFLICT(id) DO UPDATE SET
+      order_key = excluded.order_key,
+      unique_key = excluded.unique_key`,
+  delCheckpoint: `
+    DELETE FROM checkpoints
+    WHERE id = ?`,
+  getFilter: `
+    SELECT *
+    FROM filters
+    WHERE id = ? AND to_block IS NULL`,
+  updateFilterToBlock: `
+    UPDATE filters
+    SET to_block = ?
+    WHERE id = ? AND to_block IS NULL`,
+  insertFilter: `
+    INSERT INTO filters (id, filter, from_block)
+    VALUES (?, ?, ?)
+    ON CONFLICT(id, from_block) DO UPDATE SET
+      filter = excluded.filter,
+      from_block = excluded.from_block`,
+  delFilter: `
+    DELETE FROM filters
+    WHERE id = ?`,
+};
 
 export type CheckpointRow = {
   id: string;
