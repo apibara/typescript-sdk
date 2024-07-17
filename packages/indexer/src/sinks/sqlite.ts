@@ -1,10 +1,12 @@
 import type { Cursor } from "@apibara/protocol";
-import { type Database, type ISqlite, open } from "sqlite";
+import type { Database as SqliteDatabase } from "better-sqlite3";
 import { Sink, type SinkWriteArgs } from "../sink";
 
-export type SqliteArgs = ISqlite.Config;
-
 export type SqliteSinkOptions = {
+  /**
+   * Database instance of better-sqlite3
+   */
+  database: SqliteDatabase;
   /**
    * The name of the table where data will be inserted.
    */
@@ -25,13 +27,14 @@ export type SqliteSinkOptions = {
 export class SqliteSink<
   TData extends Record<string, unknown>,
 > extends Sink<TData> {
-  private _config: SqliteSinkOptions;
-  private _db: Database;
+  private _config: Omit<SqliteSinkOptions, "database">;
+  private _db: SqliteDatabase;
 
-  constructor(db: Database, config: SqliteSinkOptions) {
+  constructor(options: SqliteSinkOptions) {
     super();
+    const { database, ...config } = options;
     this._config = config;
-    this._db = db;
+    this._db = database;
   }
 
   async write({ data, endCursor, finality }: SinkWriteArgs<TData>) {
@@ -62,7 +65,7 @@ export class SqliteSink<
     // Prepare and execute the SQL statement
     const values = data.flatMap((row) => columns.map((col) => row[col]));
 
-    await this._db.run(statement, values);
+    this._db.prepare(statement).run(values);
   }
 
   private processCursorColumn(data: TData[], endCursor?: Cursor): TData[] {
@@ -101,8 +104,8 @@ export class SqliteSink<
   }
 }
 
-export const sqlite = async (args: SqliteArgs & SqliteSinkOptions) => {
-  const { filename, mode, driver, ...sinkOptions } = args;
-  const db = await open({ filename, mode, driver });
-  return new SqliteSink(db, sinkOptions);
+export const sqlite = <TData extends Record<string, unknown>>(
+  args: SqliteSinkOptions,
+) => {
+  return new SqliteSink<TData>(args);
 };
