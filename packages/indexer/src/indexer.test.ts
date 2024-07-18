@@ -17,7 +17,7 @@ describe("Run Test", () => {
       return generateMockMessages();
     });
 
-    const sink = vcr<MockRet>();
+    const sink = vcr();
     await run(client, getMockIndexer(), sink);
 
     expect(sink.result).toMatchInlineSnapshot(`
@@ -265,7 +265,7 @@ describe("Run Test", () => {
       return {};
     };
 
-    const sink = vcr<MockRet>();
+    const sink = vcr();
 
     await run(client, indexer, sink);
 
@@ -442,7 +442,7 @@ describe("Run Test", () => {
       return {};
     };
 
-    const sink = vcr<MockRet>();
+    const sink = vcr();
 
     await expect(() => run(client, indexer, sink)).rejects.toThrowError(
       "this error should occurr!",

@@ -19,7 +19,7 @@ import assert from "node:assert";
 import { indexerAsyncContext } from "./context";
 import { tracer } from "./otel";
 import type { IndexerPlugin } from "./plugins";
-import { type Sink, defaultSink } from "./sink";
+import { type Sink, type SinkData, defaultSink } from "./sink";
 
 export interface IndexerHooks<TFilter, TBlock, TRet> {
   "run:before": () => void;
@@ -123,7 +123,7 @@ export function createIndexer<TFilter, TBlock, TRet>({
 export async function run<TFilter, TBlock, TRet>(
   client: Client<TFilter, TBlock>,
   indexer: Indexer<TFilter, TBlock, TRet>,
-  sinkArg?: Sink<TRet>,
+  sinkArg?: Sink,
 ) {
   await indexerAsyncContext.callAsync({}, async () => {
     await indexer.hooks.callHook("run:before");
@@ -131,7 +131,7 @@ export async function run<TFilter, TBlock, TRet>(
     const sink = sinkArg ?? defaultSink();
 
     sink.hook("write", async ({ data }) => {
-      await indexer.hooks.callHook("sink:write", { data });
+      await indexer.hooks.callHook("sink:write", { data: data as TRet[] });
     });
     sink.hook("flush", async ({ endCursor, finality }) => {
       await indexer.hooks.callHook("sink:flush", { endCursor, finality });
@@ -283,7 +283,7 @@ export async function run<TFilter, TBlock, TRet>(
               if (output.length > 0) {
                 await tracer.startActiveSpan("sink write", async (span) => {
                   await sink.write({
-                    data: output,
+                    data: output as SinkData[],
                     cursor,
                     endCursor,
                     finality,

@@ -19,7 +19,7 @@ export const test = viTest.extend({
 type WithClientContext<TFilter, TBlock, TRet> = {
   run: (
     indexerArgs: Indexer<TFilter, TBlock, TRet>,
-  ) => Promise<VcrReplayResult<TRet>>;
+  ) => Promise<VcrReplayResult>;
 };
 
 async function withClient<TFilter, TBlock, TRet>(

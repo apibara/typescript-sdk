@@ -8,7 +8,7 @@ import { describe, expect, it } from "vitest";
 import { run } from "../indexer";
 import {} from "../plugins/persistence";
 import { generateMockMessages } from "../testing";
-import { type MockRet, getMockIndexer } from "../testing/indexer";
+import { getMockIndexer } from "../testing/indexer";
 import { sqlite } from "./sqlite";
 
 describe("Run Test", () => {
@@ -29,7 +29,7 @@ describe("Run Test", () => {
           );`,
     ).run();
 
-    const sink = sqlite<MockRet>({
+    const sink = sqlite({
       database: db,
       tableName: "test",
     });

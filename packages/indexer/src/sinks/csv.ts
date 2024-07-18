@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import type { Cursor } from "@apibara/protocol";
 import { type Options, type Stringifier, stringify } from "csv-stringify";
-import { Sink, type SinkWriteArgs } from "../sink";
+import { Sink, type SinkData, type SinkWriteArgs } from "../sink";
 
 export type CsvArgs = {
   /**
@@ -23,9 +23,7 @@ export type CsvSinkOptions = {
   cursorColumn?: string;
 };
 
-export class CsvSink<
-  TData extends Record<string, unknown>,
-> extends Sink<TData> {
+export class CsvSink extends Sink {
   constructor(
     private _stringifier: Stringifier,
     private _config: CsvSinkOptions,
@@ -33,7 +31,7 @@ export class CsvSink<
     super();
   }
 
-  async write({ data, endCursor, finality }: SinkWriteArgs<TData>) {
+  async write({ data, endCursor, finality }: SinkWriteArgs) {
     await this.callHook("write", { data });
     // adds a "_cursor" property if "cursorColumn" is not specified by user
     data = this.processCursorColumn(data, endCursor);
@@ -43,7 +41,7 @@ export class CsvSink<
     await this.callHook("flush", { endCursor, finality });
   }
 
-  private async insertToCSV(data: TData[]) {
+  private async insertToCSV(data: SinkData[]) {
     if (data.length === 0) return;
 
     return await new Promise<void>((resolve, reject) => {
@@ -60,7 +58,10 @@ export class CsvSink<
     });
   }
 
-  private processCursorColumn(data: TData[], endCursor?: Cursor): TData[] {
+  private processCursorColumn(
+    data: SinkData[],
+    endCursor?: Cursor,
+  ): SinkData[] {
     const { cursorColumn } = this._config;
 
     if (
@@ -93,5 +94,5 @@ export const csv = <TData extends Record<string, unknown>>(
 
   const writeStream = fs.createWriteStream(filepath, { flags: "a" });
   stringifier.pipe(writeStream);
-  return new CsvSink<TData>(stringifier, sinkOptions);
+  return new CsvSink(stringifier, sinkOptions);
 };
