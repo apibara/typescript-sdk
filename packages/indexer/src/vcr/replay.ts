@@ -4,6 +4,7 @@ import path from "node:path";
 import type { Client, Cursor } from "@apibara/protocol";
 import { MockClient } from "@apibara/protocol/testing";
 import { type Indexer, run } from "../indexer";
+import type { SinkData } from "../sink";
 import { vcr } from "../testing/vcr";
 import { type CassetteDataType, deserialize } from "../vcr";
 import type { VcrConfig } from "./config";
@@ -12,10 +13,10 @@ export async function replay<TFilter, TBlock, TRet>(
   vcrConfig: VcrConfig,
   indexer: Indexer<TFilter, TBlock, TRet>,
   cassetteName: string,
-): Promise<VcrReplayResult<TRet>> {
+): Promise<VcrReplayResult> {
   const client = loadCassette<TFilter, TBlock>(vcrConfig, cassetteName);
 
-  const sink = vcr<TRet>();
+  const sink = vcr();
 
   await run(client, indexer, sink);
 
@@ -24,8 +25,8 @@ export async function replay<TFilter, TBlock, TRet>(
   };
 }
 
-export type VcrReplayResult<TRet> = {
-  outputs: Array<{ endCursor?: Cursor; data: TRet[] }>;
+export type VcrReplayResult = {
+  outputs: Array<{ endCursor?: Cursor; data: SinkData[] }>;
 };
 
 export function loadCassette<TFilter, TBlock>(

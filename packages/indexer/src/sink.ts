@@ -1,37 +1,39 @@
 import type { Cursor, DataFinality } from "@apibara/protocol";
 import { Hookable } from "hookable";
 
-export interface SinkEvents<TData> {
-  write({ data }: { data: TData[] }): void;
+export type SinkData = Record<string, unknown>;
+
+export interface SinkEvents {
+  write({ data }: { data: SinkData[] }): void;
   flush({
     endCursor,
     finality,
   }: { endCursor?: Cursor; finality: DataFinality }): void;
 }
 
-export type SinkWriteArgs<TData> = {
-  data: TData[];
+export type SinkWriteArgs = {
+  data: SinkData[];
   cursor?: Cursor | undefined;
   endCursor?: Cursor | undefined;
   finality: DataFinality;
 };
 
-export abstract class Sink<TData> extends Hookable<SinkEvents<TData>> {
+export abstract class Sink extends Hookable<SinkEvents> {
   abstract write({
     data,
     cursor,
     endCursor,
     finality,
-  }: SinkWriteArgs<TData>): Promise<void>;
+  }: SinkWriteArgs): Promise<void>;
 }
 
-export class DefaultSink<TData = unknown> extends Sink<TData> {
-  async write({ data, endCursor, finality }: SinkWriteArgs<TData>) {
+export class DefaultSink extends Sink {
+  async write({ data, endCursor, finality }: SinkWriteArgs) {
     await this.callHook("write", { data });
     await this.callHook("flush", { endCursor, finality });
   }
 }
 
-export function defaultSink<TData = unknown>() {
-  return new DefaultSink<TData>();
+export function defaultSink() {
+  return new DefaultSink();
 }

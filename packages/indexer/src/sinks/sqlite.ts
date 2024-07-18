@@ -1,6 +1,6 @@
 import type { Cursor } from "@apibara/protocol";
 import type { Database as SqliteDatabase } from "better-sqlite3";
-import { Sink, type SinkWriteArgs } from "../sink";
+import { Sink, type SinkData, type SinkWriteArgs } from "../sink";
 
 export type SqliteSinkOptions = {
   /**
@@ -24,9 +24,7 @@ export type SqliteSinkOptions = {
   onConflict?: { on: string; update: string[] };
 };
 
-export class SqliteSink<
-  TData extends Record<string, unknown>,
-> extends Sink<TData> {
+export class SqliteSink extends Sink {
   private _config: Omit<SqliteSinkOptions, "database">;
   private _db: SqliteDatabase;
 
@@ -37,7 +35,7 @@ export class SqliteSink<
     this._db = database;
   }
 
-  async write({ data, endCursor, finality }: SinkWriteArgs<TData>) {
+  async write({ data, endCursor, finality }: SinkWriteArgs) {
     await this.callHook("write", { data });
 
     data = this.processCursorColumn(data, endCursor);
@@ -46,7 +44,7 @@ export class SqliteSink<
     await this.callHook("flush", { endCursor, finality });
   }
 
-  private async insertJsonArray(data: TData[]) {
+  private async insertJsonArray(data: SinkData[]) {
     if (data.length === 0) return;
 
     // Get columns from the first row of the object array
@@ -68,7 +66,10 @@ export class SqliteSink<
     this._db.prepare(statement).run(values);
   }
 
-  private processCursorColumn(data: TData[], endCursor?: Cursor): TData[] {
+  private processCursorColumn(
+    data: SinkData[],
+    endCursor?: Cursor,
+  ): SinkData[] {
     const { cursorColumn } = this._config;
 
     if (
@@ -104,8 +105,6 @@ export class SqliteSink<
   }
 }
 
-export const sqlite = <TData extends Record<string, unknown>>(
-  args: SqliteSinkOptions,
-) => {
-  return new SqliteSink<TData>(args);
+export const sqlite = (args: SqliteSinkOptions) => {
+  return new SqliteSink(args);
 };
