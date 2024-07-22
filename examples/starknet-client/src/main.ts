@@ -54,41 +54,19 @@ const command = defineCommand({
     console.log(response);
 
     const filter = Filter.make({
-      transactions: [
+      events: [
         {
-          includeEvents: true,
-          includeMessages: true,
+          fromAddress: "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
           includeReceipt: true,
-          includeReverted: true,
-        },
-      ],
-      // header: {
-      //   always: true,
-      // },
-      // events: [
-      //   {
-      //     // fromAddress: "0x053c91253bc9682c04929ca02ed00b3e423f6710d2ee7e0d5ebb06f3ecf368a8",
-      //     // fromAddress: "0x07b696af58c967c1b14c9dde0ace001720635a660a8e90c565ea459345318b30",
-      //     // fromAddress: "0x0",
-      //     // includeReceipt: true,
-      //     // includeTransaction: true,
-      //     // includeSiblings: true,
-      //     // includeMessages: true,
-      //     // includeReverted: true,
-      //     // keys: [null]
-      //     // keys: []
-      //   }
-      // ],
-      // transactions: [{
-      //   includeEvents: true,
-      // }],
+        }
+      ]
     });
 
     const request = StarknetStream.Request.make({
       filter: [filter],
       finality: "accepted",
       startingCursor: {
-        orderKey: 500_000n,
+        orderKey: 80_000n,
       },
     });
 

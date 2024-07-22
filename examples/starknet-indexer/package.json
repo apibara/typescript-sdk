@@ -1,0 +1,32 @@
+{
+  "name": "example-starknet-indexer",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start": "jiti ./src/main.ts",
+    "typecheck": "tsc --noEmit",
+    "lint": "biome check .",
+    "lint:fix": "pnpm lint --write",
+    "format": "biome format . --write"
+  },
+  "dependencies": {
+    "@apibara/indexer": "workspace:*",
+    "@apibara/protocol": "workspace:*",
+    "@apibara/starknet": "workspace:*",
+    "@opentelemetry/api": "^1.9.0",
+    "@opentelemetry/exporter-trace-otlp-proto": "^0.52.0",
+    "@opentelemetry/resources": "^1.25.0",
+    "@opentelemetry/sdk-node": "^0.52.0",
+    "@opentelemetry/sdk-trace-base": "^1.25.0",
+    "@opentelemetry/semantic-conventions": "^1.25.0",
+    "citty": "^0.1.6",
+    "consola": "^3.2.3",
+    "csv-stringify": "^6.5.0",
+    "sqlite": "^5.1.1",
+    "viem": "^2.12.4"
+  },
+  "devDependencies": {
+    "@types/node": "^20.12.12",
+    "jiti": "^1.21.0"
+  }
+}
