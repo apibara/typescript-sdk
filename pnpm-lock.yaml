@@ -157,6 +157,58 @@ importers:
         specifier: ^1.21.0
         version: 1.21.0
 
+  examples/starknet-indexer:
+    dependencies:
+      '@apibara/indexer':
+        specifier: workspace:*
+        version: link:../../packages/indexer
+      '@apibara/protocol':
+        specifier: workspace:*
+        version: link:../../packages/protocol
+      '@apibara/starknet':
+        specifier: workspace:*
+        version: link:../../packages/starknet
+      '@opentelemetry/api':
+        specifier: ^1.9.0
+        version: 1.9.0
+      '@opentelemetry/exporter-trace-otlp-proto':
+        specifier: ^0.52.0
+        version: 0.52.0(@opentelemetry/api@1.9.0)
+      '@opentelemetry/resources':
+        specifier: ^1.25.0
+        version: 1.25.0(@opentelemetry/api@1.9.0)
+      '@opentelemetry/sdk-node':
+        specifier: ^0.52.0
+        version: 0.52.0(@opentelemetry/api@1.9.0)
+      '@opentelemetry/sdk-trace-base':
+        specifier: ^1.25.0
+        version: 1.25.0(@opentelemetry/api@1.9.0)
+      '@opentelemetry/semantic-conventions':
+        specifier: ^1.25.0
+        version: 1.25.0
+      citty:
+        specifier: ^0.1.6
+        version: 0.1.6
+      consola:
+        specifier: ^3.2.3
+        version: 3.2.3
+      csv-stringify:
+        specifier: ^6.5.0
+        version: 6.5.0
+      sqlite:
+        specifier: ^5.1.1
+        version: 5.1.1
+      viem:
+        specifier: ^2.12.4
+        version: 2.13.8(typescript@5.4.5)
+    devDependencies:
+      '@types/node':
+        specifier: ^20.12.12
+        version: 20.14.0
+      jiti:
+        specifier: ^1.21.0
+        version: 1.21.0
+
   packages/beaconchain:
     dependencies:
       '@apibara/evm':

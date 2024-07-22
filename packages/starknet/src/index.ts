@@ -8,6 +8,8 @@ export * from "./common";
 export * from "./filter";
 export * from "./block";
 
+export * from "./access";
+
 export const StarknetStream = new StreamConfig(
   FilterFromBytes,
   BlockFromBytes,
