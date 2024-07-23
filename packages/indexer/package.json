@@ -19,21 +19,25 @@
       ".": {
         "types": "./dist/index.d.ts",
         "import": "./dist/index.mjs",
+        "require": "./dist/index.cjs",
         "default": "./dist/index.mjs"
       },
       "./sinks/sqlite": {
         "types": "./dist/sinks/sqlite.d.ts",
         "import": "./dist/sinks/sqlite.mjs",
+        "require": "./dist/sinks/sqlite.cjs",
         "default": "./dist/sinks/sqlite.mjs"
       },
       "./sinks/csv": {
         "types": "./dist/sinks/csv.d.ts",
         "import": "./dist/sinks/csv.mjs",
+        "require": "./dist/sinks/csv.cjs",
         "default": "./dist/sinks/csv.mjs"
       },
       "./testing": {
         "types": "./dist/testing/index.d.ts",
         "import": "./dist/testing/index.mjs",
+        "require": "./dist/testing/index.cjs",
         "default": "./dist/testing/index.mjs"
       }
     }

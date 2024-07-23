@@ -1,7 +1,12 @@
 import { defineBuildConfig } from "unbuild";
 
 export default defineBuildConfig({
-  entries: ["./src/index.ts", "./src/testing/index.ts"],
+  entries: [
+    "./src/index.ts",
+    "./src/sinks/sqlite.ts",
+    "./src/sinks/csv.ts",
+    "./src/testing/index.ts",
+  ],
   clean: true,
   outDir: "./dist",
   declaration: true,
