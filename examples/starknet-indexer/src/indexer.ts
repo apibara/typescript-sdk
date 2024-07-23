@@ -1,6 +1,5 @@
-import assert from "node:assert";
-import { getReceipt, getTransaction, StarknetStream } from "@apibara/starknet";
-import { defineIndexer, useIndexerContext } from "@apibara/indexer";
+import { defineIndexer } from "@apibara/indexer";
+import { StarknetStream, getReceipt, getTransaction } from "@apibara/starknet";
 import consola from "consola";
 
 export function createIndexerConfig(streamUrl: string) {
@@ -13,11 +12,12 @@ export function createIndexerConfig(streamUrl: string) {
     filter: {
       events: [
         {
-          fromAddress: "0x00000005dd3D2F4429AF886cD1a3b08289DBcEa99A294197E9eB43b0e0325b4b",
+          fromAddress:
+            "0x00000005dd3D2F4429AF886cD1a3b08289DBcEa99A294197E9eB43b0e0325b4b",
           includeReceipt: true,
           includeTransaction: true,
-        }
-      ]
+        },
+      ],
     },
     async transform({ block: { header, events, transactions, receipts } }) {
       const ts = header?.timestamp!;
