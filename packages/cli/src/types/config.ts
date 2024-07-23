@@ -1,27 +1,35 @@
 import type { Sink } from "@apibara/indexer";
-import type { ConfigWatcher, ResolvedConfig, WatchConfigOptions } from "c12";
+import type {
+  C12InputConfig,
+  ConfigWatcher,
+  ResolvedConfig,
+  WatchConfigOptions,
+} from "c12";
+import type { WatchOptions } from "chokidar";
+import type { NestedHooks } from "hookable";
 import type { DeepPartial } from "./_utils";
-import type { PresetName } from "./presets";
+import type { ApibaraHooks } from "./hooks";
 import type { RollupConfig } from "./rollup";
 
 /**
  * Apibara Config type (apibara.config)
  */
-export interface ApibaraConfig
-  extends DeepPartial<Omit<ApibaraOptions, "preset">> {
+export interface ApibaraConfig<
+  // biome-ignore lint/complexity/noBannedTypes: <explanation>
+  T extends Record<string, Partial<ApibaraConfig<T>>> = {},
+> extends DeepPartial<Omit<ApibaraOptions<T>, "preset" | "presets">>,
+    C12InputConfig<ApibaraConfig> {
   sink?: {
     default: Sink;
     [key: string]: Sink;
   };
   dev?: boolean;
-  runtimeConfig?: RuntimeConfig;
-  presets?: {
-    [key: string]: Partial<ApibaraConfig>;
-  };
-  preset?: string;
+  runtimeConfig?: ApibaraRuntimeConfig;
+  presets?: T;
+  preset?: keyof T;
 }
 
-export interface RuntimeConfig {
+export interface ApibaraRuntimeConfig {
   [key: string]: unknown;
 }
 
@@ -35,17 +43,36 @@ export interface LoadConfigOptions {
   c12?: WatchConfigOptions;
 }
 
-export interface ApibaraOptions {
+export interface ApibaraOptions<
+  // biome-ignore lint/complexity/noBannedTypes: <explanation>
+  T extends Record<string, Partial<ApibaraConfig<T>>> = {},
+> {
   // Internal
-  _config: ApibaraConfig;
-  _c12: ResolvedConfig<ApibaraConfig> | ConfigWatcher<ApibaraConfig>;
+  _config: ApibaraConfig<T>;
+  _c12: ResolvedConfig<ApibaraConfig<T>> | ConfigWatcher<ApibaraConfig<T>>;
+
+  // Sink
+  sink: {
+    default: Sink;
+    [key: string]: Sink;
+  };
+
+  // Presets
+  presets?: T;
+  preset?: keyof T;
+
   // General
   debug: boolean;
-  preset: PresetName;
-  runtimeConfig: RuntimeConfig;
+  runtimeConfig: ApibaraRuntimeConfig;
   rootDir: string;
   outputDir: string;
   // Dev
   dev: boolean;
+  watchOptions: WatchOptions;
+
+  // Hooks
+  hooks: NestedHooks<ApibaraHooks>;
+  // Rollup
   rollupConfig?: RollupConfig;
+  entry: string;
 }

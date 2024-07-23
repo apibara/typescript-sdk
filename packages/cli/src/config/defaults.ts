@@ -1,5 +1,13 @@
-import type { ApibaraConfig } from "../types/config";
+import { defaultSink } from "@apibara/indexer";
+import { defineConfig } from ".";
 
-export const ApibaraDefaults: ApibaraConfig = {
-  // TODO
-};
+export const ApibaraDefaults = defineConfig({
+  dev: false,
+  rootDir: ".",
+  outputDir: "./dist",
+  runtimeConfig: {},
+  sink: {
+    default: defaultSink(),
+  },
+  hooks: {},
+});

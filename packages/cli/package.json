@@ -20,6 +20,7 @@
     }
   },
   "scripts": {
+    "prepare": "jiti ./src/main.ts prepare",
     "build": "unbuild",
     "lint": "biome check .",
     "typecheck": "tsc --noEmit",
@@ -28,13 +29,16 @@
   },
   "devDependencies": {
     "@types/node": "^20.14.0",
+    "jiti": "^1.21.0",
     "unbuild": "^2.0.0",
     "vitest": "^1.6.0"
   },
   "dependencies": {
     "@apibara/indexer": "workspace:*",
     "c12": "^1.11.1",
+    "chokidar": "^3.6.0",
     "citty": "^0.1.6",
+    "consola": "^3.2.3",
     "hookable": "^5.5.3",
     "klona": "^2.0.6",
     "pathe": "^1.1.2",
