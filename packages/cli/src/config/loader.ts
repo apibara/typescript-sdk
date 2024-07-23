@@ -7,11 +7,13 @@ import type {
 } from "../types/config";
 import { ApibaraDefaults } from "./defaults";
 import { resolvePathOptions } from "./resolvers/paths.resolver";
+import { presetResolver } from "./resolvers/preset.resolver";
 import { resolveRuntimeConfigOptions } from "./resolvers/runtime-config.resolver";
 
 const configResolvers = [
   resolvePathOptions,
   resolveRuntimeConfigOptions,
+  presetResolver,
 ] as const;
 
 export async function loadOptions(
@@ -29,11 +31,6 @@ async function _loadUserConfig(
   configOverrides: ApibaraConfig = {},
   opts: LoadConfigOptions = {},
 ): Promise<ApibaraOptions> {
-  let presetOverride = configOverrides.preset;
-  if (configOverrides.dev) {
-    presetOverride = "apibara-dev";
-  }
-
   // biome-ignore lint: noParameterAssign
   configOverrides = klona(configOverrides);
 
@@ -44,9 +41,8 @@ async function _loadUserConfig(
     cwd: configOverrides.rootDir,
     overrides: {
       ...configOverrides,
-      preset: presetOverride,
     },
-    defaults: ApibaraDefaults,
+    defaults: { ...ApibaraDefaults },
     ...opts.c12,
   });
 
@@ -54,10 +50,6 @@ async function _loadUserConfig(
 
   options._config = configOverrides;
   options._c12 = loadedConfig;
-
-  if (presetOverride) {
-    options.preset = presetOverride;
-  }
 
   return options;
 }

@@ -2,8 +2,8 @@ import { type JSValue, generateTypes, resolveSchema } from "untyped";
 import type { Apibara } from "../types/apibara";
 
 export async function writeTypes(apibara: Apibara) {
-  // TODO
-  generateTypes(
+  // TODO write to a file
+  const type = generateTypes(
     await resolveSchema(
       Object.fromEntries(
         Object.entries(apibara.options.runtimeConfig),
@@ -17,4 +17,7 @@ export async function writeTypes(apibara: Apibara) {
       indentation: 2,
     },
   );
+
+  console.log("apibara ---> ", apibara);
+  console.log("type ---> ", type);
 }
