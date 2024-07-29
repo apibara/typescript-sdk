@@ -1,9 +1,8 @@
 import { defineCommand } from "citty";
 import { resolve } from "pathe";
-import { createApibara } from "../apibara";
+import { createApibara, build, prepare } from "apibara/core";
 import { commonArgs } from "../common";
-import { build } from "../core/build/build";
-import { prepare } from "../core/build/prepare";
+import consola from "consola";
 
 export default defineCommand({
   meta: {
@@ -14,10 +13,12 @@ export default defineCommand({
     ...commonArgs,
   },
   async run({ args }) {
+    consola.info("build", args);
     const rootDir = resolve((args.dir || args._dir || ".") as string);
     const apibara = await createApibara({
       rootDir,
     });
+    consola.info("apibara", apibara);
     await prepare(apibara);
     await build(apibara);
     await apibara.close();

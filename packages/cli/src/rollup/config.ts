@@ -4,10 +4,9 @@ import commonjs from "@rollup/plugin-commonjs";
 import json from "@rollup/plugin-json";
 import { nodeResolve } from "@rollup/plugin-node-resolve";
 import typescript from "@rollup/plugin-typescript";
-import { readdirSync } from "fs-extra";
+import fsExtra from "fs-extra";
 import { basename, join } from "pathe";
-import type { Apibara } from "../types/apibara";
-import type { RollupConfig } from "../types/rollup";
+import type { Apibara, RollupConfig } from "apibara/types";
 
 export const getRollupConfig = (
   apibara: Apibara,
@@ -37,7 +36,7 @@ export const getRollupConfig = (
   // Check if the indexers directory exists and is not empty
   let indexerFiles: string[] = [];
   try {
-    indexerFiles = readdirSync(indexerDir).filter((file) =>
+    indexerFiles = fsExtra.readdirSync(indexerDir).filter((file) =>
       file.endsWith(".indexer.ts"),
     );
     if (indexerFiles.length === 0) {
@@ -65,10 +64,10 @@ ${indexerImports}
 
 const indexers = {
   ${indexerFiles
-    .map(
-      (file, index) => `'${basename(file, ".indexer.ts")}': indexer${index},`,
-    )
-    .join("\n  ")}
+      .map(
+        (file, index) => `'${basename(file, ".indexer.ts")}': indexer${index},`,
+      )
+      .join("\n  ")}
 };
 
 const command = defineCommand({
@@ -114,13 +113,13 @@ const command = defineCommand({
       }
 
       const indexerFactory = indexers[name];
-      const indexer = typeof indexerFactory === 'function' 
-        ? await indexerFactory(runtimeConfig) 
+      const indexer = typeof indexerFactory === 'function'
+        ? await indexerFactory(runtimeConfig)
         : indexerFactory;
 
       const client = createClient(indexer.streamConfig, indexer.options.streamUrl);
       const sink = sinkFunction();
-      
+
       try {
       console.log("Running Indexer: ", name);
         await run(client, indexer, sink);

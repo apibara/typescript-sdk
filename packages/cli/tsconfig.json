@@ -5,7 +5,28 @@
     "declarationDir": "dist",
     "noEmit": false,
     "rootDir": "src",
-    "types": ["node"]
+    "types": [
+      "node"
+    ],
+    "paths": {
+      "apibara/cli": [
+        "./src/cli"
+      ],
+      "apibara/config": [
+        "./src/config"
+      ],
+      "apibara/core": [
+        "./src/core"
+      ],
+      "apibara/rollup": [
+        "./src/rollup"
+      ],
+      "apibara/types": [
+        "./src/types"
+      ]
+    }
   },
-  "include": ["src/"]
+  "include": [
+    "src/"
+  ]
 }

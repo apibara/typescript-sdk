@@ -1,24 +1,39 @@
 {
-  "name": "@apibara/cli",
+  "name": "apibara",
   "version": "2.0.0",
   "type": "module",
-  "source": "./src/index.ts",
-  "main": "./src/index.ts",
+  "source": "./src/core/index.ts",
+  "main": "./dist/core/index.mjs",
   "exports": {
-    ".": "./src/index.ts"
-  },
-  "publishConfig": {
-    "files": ["dist", "src", "README.md"],
-    "main": "./dist/index.mjs",
-    "types": "./dist/index.d.ts",
-    "exports": {
-      ".": {
-        "types": "./dist/index.d.ts",
-        "import": "./dist/index.mjs",
-        "default": "./dist/index.mjs"
-      }
+    ".": {
+      "types": "./dist/core/index.d.ts",
+      "import": "./dist/core/index.mjs"
+    },
+    "./cli": {
+      "types": "./dist/cli/index.d.ts",
+      "import": "./dist/cli/index.mjs"
+    },
+    "./config": {
+      "types": "./dist/config/index.d.ts",
+      "import": "./dist/config/index.mjs"
+    },
+    "./core": {
+      "types": "./dist/core/index.d.ts",
+      "import": "./dist/core/index.mjs"
+    },
+    "./rollup": {
+      "types": "./dist/rollup/index.d.ts",
+      "import": "./dist/rollup/index.mjs"
     }
   },
+  "bin": {
+    "apibara": "./dist/cli/index.mjs"
+  },
+  "files": [
+    "dist",
+    "src",
+    "README.md"
+  ],
   "scripts": {
     "build": "unbuild",
     "lint": "biome check .",

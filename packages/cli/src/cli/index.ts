@@ -1,4 +1,4 @@
-import { defineCommand } from "citty";
+import { defineCommand, runMain } from "citty";
 
 export const mainCli = defineCommand({
   meta: {
@@ -12,5 +12,5 @@ export const mainCli = defineCommand({
     prepare: () => import("./commands/prepare").then((r) => r.default),
   },
 });
-// TODO uncomment when we build the CLI
-// runMain(mainCli);
+
+runMain(mainCli);

@@ -2,12 +2,12 @@ import consola from "consola";
 import { createHooks } from "hookable";
 import { loadOptions } from "./config/loader";
 import { updateApibaraConfig } from "./config/update";
-import type { Apibara } from "./types/apibara";
 import type {
+  Apibara,
   ApibaraConfig,
   ApibaraDynamicConfig,
   LoadConfigOptions,
-} from "./types/config";
+} from "apibara/types";
 
 export async function createApibara(
   config: ApibaraConfig = {},
