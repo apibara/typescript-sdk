@@ -1,5 +1,4 @@
-import type { Apibara } from "../types/apibara";
-import type { ApibaraDynamicConfig } from "../types/config";
+import type { Apibara, ApibaraDynamicConfig } from "apibara/types";
 
 export async function updateApibaraConfig(
   apibara: Apibara,

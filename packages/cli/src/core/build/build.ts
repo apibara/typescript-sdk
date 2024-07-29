@@ -1,5 +1,5 @@
-import { getRollupConfig } from "../../rollup/config";
-import type { Apibara } from "../../types/apibara";
+import { getRollupConfig } from "apibara/rollup";
+import type { Apibara } from "apibara/types";
 import { buildProduction } from "./prod";
 
 export async function build(apibara: Apibara) {

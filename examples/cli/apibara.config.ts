@@ -1,4 +1,4 @@
-import { defineConfig } from "@apibara/cli";
+import { defineConfig } from "apibara/config";
 import { defaultSink } from "@apibara/indexer";
 
 export default defineConfig({

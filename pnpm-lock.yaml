@@ -51,9 +51,6 @@ importers:
 
   examples/cli:
     dependencies:
-      '@apibara/cli':
-        specifier: workspace:*
-        version: link:../../packages/cli
       '@apibara/evm':
         specifier: workspace:*
         version: link:../../packages/evm
@@ -81,6 +78,9 @@ importers:
       '@opentelemetry/semantic-conventions':
         specifier: ^1.25.0
         version: 1.25.0
+      apibara:
+        specifier: workspace:*
+        version: link:../../packages/cli
       better-sqlite3:
         specifier: ^11.1.2
         version: 11.1.2

@@ -1,6 +1,6 @@
 import fsp from "node:fs/promises";
 import fse from "fs-extra";
-import type { Apibara } from "../../types/apibara";
+import type { Apibara } from "apibara/types";
 
 export async function prepare(apibara: Apibara) {
   await prepareDir(apibara.options.outputDir);

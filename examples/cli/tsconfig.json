@@ -4,8 +4,12 @@
     "outDir": "dist",
     "declarationDir": "dist",
     "noEmit": false,
-    "rootDir": "src",
-    "types": ["node"]
+    "rootDir": ".",
+    "types": [
+      "node"
+    ]
   },
-  "include": ["src/"]
+  "include": [
+    "indexers/"
+  ]
 }
