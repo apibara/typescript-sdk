@@ -1,5 +1,5 @@
 import { type JSValue, generateTypes, resolveSchema } from "untyped";
-import type { Apibara } from "../types/apibara";
+import type { Apibara } from "../../types/apibara";
 
 export async function writeTypes(apibara: Apibara) {
   // TODO write to a file

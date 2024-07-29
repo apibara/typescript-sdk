@@ -38,7 +38,9 @@ async function _loadUserConfig(
     ? watchConfig<ApibaraConfig>
     : loadConfig<ApibaraConfig>)({
     name: "apibara",
-    cwd: configOverrides.rootDir,
+    // path from where apibara.config.ts is loaded
+    // defautl is "." path
+    // cwd: configOverrides.rootDir,
     overrides: {
       ...configOverrides,
     },

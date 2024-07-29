@@ -1,13 +1,12 @@
 import { defaultSink } from "@apibara/indexer";
-import { defineConfig } from ".";
+import { defineConfig } from "../config";
 
 export const ApibaraDefaults = defineConfig({
-  dev: false,
   rootDir: ".",
   outputDir: "./dist",
   runtimeConfig: {},
   sink: {
-    default: defaultSink(),
+    default: () => defaultSink(),
   },
   hooks: {},
 });

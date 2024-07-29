@@ -1,6 +1,6 @@
-import { defineCommand, runMain } from "citty";
+import { defineCommand } from "citty";
 
-const main = defineCommand({
+export const mainCli = defineCommand({
   meta: {
     name: "apibara",
     description: "Apibara CLI",
@@ -12,5 +12,5 @@ const main = defineCommand({
     prepare: () => import("./commands/prepare").then((r) => r.default),
   },
 });
-
-runMain(main);
+// TODO uncomment when we build the CLI
+// runMain(mainCli);
