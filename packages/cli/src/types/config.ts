@@ -16,21 +16,18 @@ import type { RollupConfig } from "./rollup";
  */
 export interface ApibaraConfig<
   // biome-ignore lint/complexity/noBannedTypes: <explanation>
-  T extends Record<string, Partial<ApibaraConfig<T>>> = {},
-> extends DeepPartial<Omit<ApibaraOptions<T>, "preset" | "presets">>,
-    C12InputConfig<ApibaraConfig> {
+  T extends Record<string, DeepPartial<ApibaraConfig<T, R>>> = {},
+  // biome-ignore lint/complexity/noBannedTypes: <explanation>
+  R extends Record<string, unknown> = {},
+> extends DeepPartial<Omit<ApibaraOptions<T, R>, "preset" | "presets" | "dev">>,
+    C12InputConfig<ApibaraConfig<T, R>> {
   sink?: {
-    default: Sink;
-    [key: string]: Sink;
+    default: () => Sink;
+    [key: string]: () => Sink;
   };
-  dev?: boolean;
-  runtimeConfig?: ApibaraRuntimeConfig;
+  runtimeConfig?: R;
   presets?: T;
   preset?: keyof T;
-}
-
-export interface ApibaraRuntimeConfig {
-  [key: string]: unknown;
 }
 
 export type ApibaraDynamicConfig = Pick<ApibaraConfig, "runtimeConfig">;
@@ -45,16 +42,20 @@ export interface LoadConfigOptions {
 
 export interface ApibaraOptions<
   // biome-ignore lint/complexity/noBannedTypes: <explanation>
-  T extends Record<string, Partial<ApibaraConfig<T>>> = {},
+  T extends Record<string, DeepPartial<ApibaraConfig<T, R>>> = {},
+  // biome-ignore lint/complexity/noBannedTypes: <explanation>
+  R extends Record<string, unknown> = {},
 > {
   // Internal
-  _config: ApibaraConfig<T>;
-  _c12: ResolvedConfig<ApibaraConfig<T>> | ConfigWatcher<ApibaraConfig<T>>;
+  _config: ApibaraConfig<T, R>;
+  _c12:
+    | ResolvedConfig<ApibaraConfig<T, R>>
+    | ConfigWatcher<ApibaraConfig<T, R>>;
 
   // Sink
   sink: {
-    default: Sink;
-    [key: string]: Sink;
+    default: () => Sink;
+    [key: string]: () => Sink;
   };
 
   // Presets
@@ -63,7 +64,7 @@ export interface ApibaraOptions<
 
   // General
   debug: boolean;
-  runtimeConfig: ApibaraRuntimeConfig;
+  runtimeConfig: R;
   rootDir: string;
   outputDir: string;
   // Dev
@@ -75,4 +76,5 @@ export interface ApibaraOptions<
   // Rollup
   rollupConfig?: RollupConfig;
   entry: string;
+  minify: boolean;
 }
