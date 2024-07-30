@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "build": "apibara build",
+    "apibara:build": "apibara build",
+    "apibara:start": "jiti ./dist/main.mjs",
+    "apibara:prepare": "apibara prepare",
     "typecheck": "tsc --noEmit",
     "lint": "biome check .",
     "lint:fix": "pnpm lint --write",

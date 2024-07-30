@@ -1,4 +1,4 @@
-import type { DeepPartial, ApibaraConfig } from "apibara/types";
+import type { ApibaraConfig, DeepPartial } from "apibara/types";
 
 export function defineConfig<
   // biome-ignore lint/complexity/noBannedTypes: <explanation>
@@ -8,4 +8,3 @@ export function defineConfig<
 >(config: ApibaraConfig<T, R>): ApibaraConfig<T, R> {
   return config;
 }
-

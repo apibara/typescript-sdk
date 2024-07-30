@@ -1,13 +1,13 @@
-import consola from "consola";
-import { createHooks } from "hookable";
-import { loadOptions } from "./config/loader";
-import { updateApibaraConfig } from "./config/update";
 import type {
   Apibara,
   ApibaraConfig,
   ApibaraDynamicConfig,
   LoadConfigOptions,
 } from "apibara/types";
+import consola from "consola";
+import { createHooks } from "hookable";
+import { loadOptions } from "./config/loader";
+import { updateApibaraConfig } from "./config/update";
 
 export async function createApibara(
   config: ApibaraConfig = {},

@@ -1,14 +1,13 @@
 import { EvmStream } from "@apibara/evm";
 import { defineIndexer } from "@apibara/indexer";
+import type { ApibaraRuntimeConfig } from "apibara/types";
 import { encodeEventTopics, parseAbi } from "viem";
 
 const abi = parseAbi([
   "event Transfer(address indexed from, address indexed to, uint256 value)",
 ]);
 
-// TODO: `runtimeConfig` type should come from the generated types file
-export default function indexer(runtimeConfig: unknown) {
-  console.log("runtimeConfig", runtimeConfig);
+export default function indexer(runtimeConfig: ApibaraRuntimeConfig) {
   return defineIndexer(EvmStream)({
     streamUrl: "https://sepolia.ethereum.a5a.ch",
     finality: "accepted",
@@ -30,5 +29,5 @@ export default function indexer(runtimeConfig: unknown) {
     async transform({ block: { header } }) {
       return [header];
     },
-  })
+  });
 }
