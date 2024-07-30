@@ -1,15 +1,10 @@
-import { defineBuildConfig } from "unbuild";
 import { fileURLToPath } from "node:url";
 import { resolve } from "pathe";
+import { defineBuildConfig } from "unbuild";
 
-const modules = [
-  "cli",
-  "config",
-  "core",
-  "rollup",
-  "types",
-];
+const modules = ["cli", "config", "core", "rollup", "types", "hooks "];
 
+// @ts-ignore The 'import.meta' meta-property is only allowed when the '--module' option is 'es2020', 'es2022', 'esnext', 'system', 'node16', or 'nodenext'.
 const srcDir = fileURLToPath(new URL("src", import.meta.url));
 
 export default defineBuildConfig({
@@ -18,6 +13,8 @@ export default defineBuildConfig({
     { input: "./src/config/index.ts" },
     { input: "./src/core/index.ts" },
     { input: "./src/rollup/index.ts" },
+    { input: "./src/types/index.ts" },
+    { input: "./src/hooks/index.ts" },
   ],
   clean: true,
   outDir: "./dist",
@@ -27,11 +24,8 @@ export default defineBuildConfig({
       modules.map((module) => [
         `apibara/${module}`,
         resolve(srcDir, `${module}/index.ts`),
-      ])
+      ]),
     ),
   },
-  externals: [
-    ...modules.map((module) => `apibara/${module}`),
-  ],
+  externals: [...modules.map((module) => `apibara/${module}`)],
 });
-

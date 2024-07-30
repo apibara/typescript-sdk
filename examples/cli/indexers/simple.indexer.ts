@@ -27,4 +27,4 @@ export default defineIndexer(EvmStream)({
   async transform({ block: { header } }) {
     return [header];
   },
-})
+});

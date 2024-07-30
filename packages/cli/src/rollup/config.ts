@@ -4,9 +4,9 @@ import commonjs from "@rollup/plugin-commonjs";
 import json from "@rollup/plugin-json";
 import { nodeResolve } from "@rollup/plugin-node-resolve";
 import typescript from "@rollup/plugin-typescript";
+import type { Apibara, RollupConfig } from "apibara/types";
 import fsExtra from "fs-extra";
 import { basename, join } from "pathe";
-import type { Apibara, RollupConfig } from "apibara/types";
 
 export const getRollupConfig = (
   apibara: Apibara,
@@ -36,9 +36,9 @@ export const getRollupConfig = (
   // Check if the indexers directory exists and is not empty
   let indexerFiles: string[] = [];
   try {
-    indexerFiles = fsExtra.readdirSync(indexerDir).filter((file) =>
-      file.endsWith(".indexer.ts"),
-    );
+    indexerFiles = fsExtra
+      .readdirSync(indexerDir)
+      .filter((file) => file.endsWith(".indexer.ts"));
     if (indexerFiles.length === 0) {
       console.warn(`No indexer files found in ${indexerDir}`);
     }
@@ -56,7 +56,8 @@ export const getRollupConfig = (
   // Generate main.ts content
   const mainContent = `
 import { createClient } from "@apibara/protocol";
-import { run } from "@apibara/indexer";
+import { createIndexer, run } from "@apibara/indexer";
+import consola from "consola";
 import { defineCommand, runMain } from "citty";
 import config from './${configPath}';
 
@@ -64,10 +65,10 @@ ${indexerImports}
 
 const indexers = {
   ${indexerFiles
-      .map(
-        (file, index) => `'${basename(file, ".indexer.ts")}': indexer${index},`,
-      )
-      .join("\n  ")}
+    .map(
+      (file, index) => `'${basename(file, ".indexer.ts")}': indexer${index},`,
+    )
+    .join("\n  ")}
 };
 
 const command = defineCommand({
@@ -112,19 +113,19 @@ const command = defineCommand({
         return;
       }
 
-      const indexerFactory = indexers[name];
-      const indexer = typeof indexerFactory === 'function'
-        ? await indexerFactory(runtimeConfig)
-        : indexerFactory;
+      const indexerConfig = indexers[name]
+      const indexer = typeof indexerConfig === 'function'
+        ? await createIndexer(indexerConfig(runtimeConfig))
+        : createIndexer(indexerConfig);
 
       const client = createClient(indexer.streamConfig, indexer.options.streamUrl);
       const sink = sinkFunction();
 
       try {
-      console.log("Running Indexer: ", name);
+      consola.log("Running Indexer: ", name);
         await run(client, indexer, sink);
       } catch (error) {
-        console.error(\`Error in indexer \${name}:\`, error);
+        consola.error(\`Error in indexer \${name}:\`, error);
       }
     }));
   },
@@ -169,6 +170,7 @@ runMain(command);
         },
       },
     ],
+    treeshake: true,
     external: [
       ...builtinModules,
       "@apibara/indexer",

@@ -1,5 +1,5 @@
-import { defineConfig } from "apibara/config";
 import { defaultSink } from "@apibara/indexer";
+import { defineConfig } from "apibara/config";
 
 export default defineConfig({
   runtimeConfig: {

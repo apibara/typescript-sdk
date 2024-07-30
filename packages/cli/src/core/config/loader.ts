@@ -1,10 +1,10 @@
-import { loadConfig, watchConfig } from "c12";
-import { klona } from "klona/full";
 import type {
   ApibaraConfig,
   ApibaraOptions,
   LoadConfigOptions,
 } from "apibara/types";
+import { loadConfig, watchConfig } from "c12";
+import { klona } from "klona/full";
 import { ApibaraDefaults } from "./defaults";
 import { resolvePathOptions } from "./resolvers/paths.resolver";
 import { presetResolver } from "./resolvers/preset.resolver";
@@ -37,16 +37,16 @@ async function _loadUserConfig(
   const loadedConfig = await (opts.watch
     ? watchConfig<ApibaraConfig>
     : loadConfig<ApibaraConfig>)({
-      name: "apibara",
-      // path from where apibara.config.ts is loaded
-      // defautl is "." path
-      // cwd: configOverrides.rootDir,
-      overrides: {
-        ...configOverrides,
-      },
-      defaults: { ...ApibaraDefaults },
-      ...opts.c12,
-    });
+    name: "apibara",
+    // path from where apibara.config.ts is loaded
+    // defautl is "." path
+    // cwd: configOverrides.rootDir,
+    overrides: {
+      ...configOverrides,
+    },
+    defaults: { ...ApibaraDefaults },
+    ...opts.c12,
+  });
 
   const options = klona(loadedConfig.config) as ApibaraOptions;
 

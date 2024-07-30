@@ -1,6 +1,6 @@
+import type { Apibara, RollupConfig } from "apibara/types";
+import consola from "consola";
 import { type OutputOptions, rollup } from "rollup";
-import type { Apibara } from "../../types/apibara";
-import type { RollupConfig } from "../../types/rollup";
 
 export async function buildProduction(
   apibara: Apibara,
@@ -24,7 +24,7 @@ export async function buildProduction(
     // Close the bundle
     await bundle.close();
 
-    console.log("Build completed successfully!");
+    consola.success("Build completed successfully!");
   } catch (error) {
     console.error("Build failed:", error);
     throw error;

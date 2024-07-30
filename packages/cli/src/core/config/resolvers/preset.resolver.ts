@@ -1,5 +1,5 @@
-import defu from "defu";
 import type { ApibaraOptions } from "apibara/types";
+import defu from "defu";
 
 export async function presetResolver(options: ApibaraOptions) {
   if (options.preset && options.presets?.[options.preset]) {

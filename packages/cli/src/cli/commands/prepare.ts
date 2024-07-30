@@ -1,5 +1,7 @@
-import consola from "consola";
+import { createApibara, writeTypes } from "apibara/core";
+import {} from "apibara/types";
 import { defineCommand } from "citty";
+import consola from "consola";
 import { resolve } from "pathe";
 // import { createApibara } from "../../apibara";
 import { commonArgs } from "../common";
@@ -14,11 +16,9 @@ export default defineCommand({
     ...commonArgs,
   },
   async run({ args }) {
+    consola.info("Prepairing \n\n");
     const rootDir = resolve((args.dir || ".") as string);
-    consola.info("prepare", args);
-    /*
     const apibara = await createApibara({ rootDir });
     await writeTypes(apibara);
-    */
   },
 });
