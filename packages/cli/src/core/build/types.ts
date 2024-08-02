@@ -131,17 +131,7 @@ declare module "apibara/types" {`,
     }),
   );
 
-  consola.info(
-    "To leverage type hints within your project, create a tsconfig.json file that extends auto generated types.\n",
-  );
-  consola.log.raw(
-    {
-      extends: "./.apibara/types/tsconfig.json",
-    },
-    "\n\n",
-  );
-
-  consola.success("Preparation successful!\n\n");
+  consola.success("Types generated");
 }
 
 const RELATIVE_RE = /^\.{1,2}\//;

@@ -13,7 +13,7 @@ export default defineCommand({
     ...commonArgs,
   },
   async run({ args }) {
-    consola.info("Building with args", args);
+    consola.start("Building");
     const rootDir = resolve((args.dir || args._dir || ".") as string);
     const apibara = await createApibara({
       rootDir,

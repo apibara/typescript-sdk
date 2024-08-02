@@ -12,9 +12,10 @@ import { updateApibaraConfig } from "./config/update";
 export async function createApibara(
   config: ApibaraConfig = {},
   opts: LoadConfigOptions = {},
+  dev = false,
 ): Promise<Apibara> {
   // load options
-  const options = await loadOptions(config, opts);
+  const options = await loadOptions(config, opts, dev);
 
   // create apibara context
   const apibara: Apibara = {
@@ -29,6 +30,5 @@ export async function createApibara(
 
   apibara.hooks.addHooks(apibara.options.hooks);
 
-  // TODO
   return apibara;
 }

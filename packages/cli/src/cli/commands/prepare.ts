@@ -3,9 +3,7 @@ import {} from "apibara/types";
 import { defineCommand } from "citty";
 import consola from "consola";
 import { resolve } from "pathe";
-// import { createApibara } from "../../apibara";
 import { commonArgs } from "../common";
-// import { writeTypes } from "../../core/build/types";
 
 export default defineCommand({
   meta: {
@@ -16,7 +14,7 @@ export default defineCommand({
     ...commonArgs,
   },
   async run({ args }) {
-    consola.info("Prepairing \n\n");
+    consola.start("Prepairing Types");
     const rootDir = resolve((args.dir || ".") as string);
     const apibara = await createApibara({ rootDir });
     await writeTypes(apibara);

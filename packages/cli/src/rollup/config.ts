@@ -141,19 +141,19 @@ runMain(command);
     output: {
       dir: join(apibara.options.outputDir || "dist"),
       format: "esm",
+      exports: "auto",
       entryFileNames: "[name].mjs",
       chunkFileNames: "chunks/[name]-[hash].mjs",
+      generatedCode: {
+        constBindings: true,
+      },
+      sourcemap: true,
+      sourcemapExcludeSources: true,
+      sourcemapIgnoreList(relativePath, sourcemapPath) {
+        return relativePath.includes("node_modules");
+      },
     },
     plugins: [
-      commonjs(),
-      json(),
-      typescript({
-        tsconfig: join("./tsconfig.json"),
-      }),
-      nodeResolve({
-        extensions,
-        preferBuiltins: true,
-      }),
       {
         name: "virtual",
         resolveId(id) {
@@ -169,7 +169,24 @@ runMain(command);
           return null;
         },
       },
+      nodeResolve({
+        extensions,
+        preferBuiltins: true,
+      }),
+      commonjs(),
+      json(),
+      typescript({
+        tsconfig: join("./tsconfig.json"),
+      }),
     ],
+    onwarn(warning, rollupWarn) {
+      if (
+        !["CIRCULAR_DEPENDENCY", "EVAL"].includes(warning.code || "") &&
+        !warning.message.includes("Unsupported source map comment")
+      ) {
+        rollupWarn(warning);
+      }
+    },
     treeshake: true,
     external: [
       ...builtinModules,

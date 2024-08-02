@@ -1,6 +1,7 @@
 import { EvmStream } from "@apibara/evm";
 import { defineIndexer } from "@apibara/indexer";
 import type { ApibaraRuntimeConfig } from "apibara/types";
+import consola from "consola";
 import { encodeEventTopics, parseAbi } from "viem";
 
 const abi = parseAbi([
@@ -8,6 +9,7 @@ const abi = parseAbi([
 ]);
 
 export default function indexer(runtimeConfig: ApibaraRuntimeConfig) {
+  consola.log("Runtime Config", runtimeConfig);
   return defineIndexer(EvmStream)({
     streamUrl: "https://sepolia.ethereum.a5a.ch",
     finality: "accepted",

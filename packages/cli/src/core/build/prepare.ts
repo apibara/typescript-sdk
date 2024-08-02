@@ -4,8 +4,8 @@ import consola from "consola";
 import fse from "fs-extra";
 
 export async function prepare(apibara: Apibara) {
-  consola.info("Cleaning output directory");
   await prepareDir(apibara.options.outputDir);
+  consola.success("Output directory cleaned");
 }
 
 async function prepareDir(dir: string) {
