@@ -19,8 +19,9 @@ const configResolvers = [
 export async function loadOptions(
   configOverrides: ApibaraConfig = {},
   opts: LoadConfigOptions = {},
+  dev = false,
 ): Promise<ApibaraOptions> {
-  const options = await _loadUserConfig(configOverrides, opts);
+  const options = await _loadUserConfig(configOverrides, opts, dev);
   for (const resolver of configResolvers) {
     await resolver(options);
   }
@@ -30,6 +31,7 @@ export async function loadOptions(
 async function _loadUserConfig(
   configOverrides: ApibaraConfig = {},
   opts: LoadConfigOptions = {},
+  dev = false,
 ): Promise<ApibaraOptions> {
   // biome-ignore lint: noParameterAssign
   configOverrides = klona(configOverrides);
@@ -38,6 +40,7 @@ async function _loadUserConfig(
     ? watchConfig<ApibaraConfig>
     : loadConfig<ApibaraConfig>)({
     name: "apibara",
+    dotenv: dev,
     // path from where apibara.config.ts is loaded
     // defautl is "." path
     // cwd: configOverrides.rootDir,
@@ -52,6 +55,9 @@ async function _loadUserConfig(
 
   options._config = configOverrides;
   options._c12 = loadedConfig;
+  if (dev) {
+    options.dev = dev;
+  }
 
   return options;
 }
