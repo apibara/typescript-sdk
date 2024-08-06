@@ -139,7 +139,7 @@ runMain(command);
       main: "virtual:main.ts",
     },
     output: {
-      dir: join(apibara.options.outputDir || "dist"),
+      dir: join(apibara.options.outputDir || "./.apibara/build"),
       format: "esm",
       exports: "auto",
       entryFileNames: "[name].mjs",
@@ -177,6 +177,12 @@ runMain(command);
       json(),
       typescript({
         tsconfig: join("./tsconfig.json"),
+        compilerOptions: {
+          outDir: join(apibara.options.outputDir || "./.apibara/build"),
+          declarationDir: join(apibara.options.outputDir || "./.apibara/build"),
+          noEmit: false,
+          types: ["node"],
+        },
       }),
     ],
     onwarn(warning, rollupWarn) {

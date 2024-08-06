@@ -4,10 +4,10 @@
   "private": true,
   "scripts": {
     "apibara:build": "apibara build",
-    "apibara:start": "jiti ./dist/main.mjs",
+    "apibara:start": "jiti ./.apibara/build/main.mjs",
     "apibara:prepare": "apibara prepare",
     "apibara:dev": "apibara dev",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "pnpm apibara:prepare && tsc --noEmit",
     "lint": "biome check .",
     "lint:fix": "pnpm lint --write",
     "format": "biome format . --write"

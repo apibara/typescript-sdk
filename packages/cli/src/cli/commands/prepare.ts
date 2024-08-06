@@ -14,7 +14,7 @@ export default defineCommand({
     ...commonArgs,
   },
   async run({ args }) {
-    consola.start("Prepairing Types");
+    consola.start("Preparing Types");
     const rootDir = resolve((args.dir || ".") as string);
     const apibara = await createApibara({ rootDir });
     await writeTypes(apibara);

@@ -87,7 +87,7 @@ export default defineCommand({
         }
 
         const childArgs = [
-          resolve(apibara.options.outputDir || "./dist", "main.mjs"),
+          resolve(apibara.options.outputDir || "./.apibara/build", "main.mjs"),
           ...(args.indexers ? ["--indexers", args.indexers] : []),
           ...(args.preset ? ["--preset", args.preset] : []),
           ...(args.sink ? ["--sink", args.sink] : []),
