@@ -1,4 +1,4 @@
-import { build, createApibara, prepare } from "apibara/core";
+import { build, createApibara, prepare, writeTypes } from "apibara/core";
 import { defineCommand } from "citty";
 import consola from "consola";
 import { resolve } from "pathe";
@@ -19,6 +19,7 @@ export default defineCommand({
       rootDir,
     });
     await prepare(apibara);
+    await writeTypes(apibara);
     await build(apibara);
     await apibara.close();
   },

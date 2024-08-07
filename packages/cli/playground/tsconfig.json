@@ -1,5 +1,5 @@
 {
-  "extends": ["../../tsconfig.json", "./.apibara/types/tsconfig.json"],
+  "extends": ["../../../tsconfig.json", "./.apibara/types/tsconfig.json"],
   "compilerOptions": {
     "outDir": "dist",
     "declarationDir": "dist",

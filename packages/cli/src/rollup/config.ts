@@ -23,7 +23,7 @@ export const getRollupConfig = (
   ];
 
   const indexerDir = join(apibara.options.rootDir, "indexers");
-  const configPath = join("./apibara.config.ts");
+  const configPath = join(apibara.options.rootDir, "./apibara.config.ts");
 
   // Check if the indexers directory and config file exist
   if (!existsSync(indexerDir)) {
@@ -176,7 +176,7 @@ runMain(command);
       commonjs(),
       json(),
       typescript({
-        tsconfig: join("./tsconfig.json"),
+        tsconfig: join(apibara.options.rootDir, "./tsconfig.json"),
         compilerOptions: {
           outDir: join(apibara.options.outputDir || "./.apibara/build"),
           declarationDir: join(apibara.options.outputDir || "./.apibara/build"),
