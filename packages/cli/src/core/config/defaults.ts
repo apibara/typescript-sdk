@@ -3,7 +3,6 @@ import type { ApibaraConfig } from "apibara/types";
 
 export const ApibaraDefaults: ApibaraConfig = {
   rootDir: ".",
-  outputDir: "./.apibara/build",
 
   runtimeConfig: {},
   hooks: {},

@@ -49,64 +49,6 @@ importers:
         specifier: ^1.21.0
         version: 1.21.0
 
-  examples/cli:
-    dependencies:
-      '@apibara/evm':
-        specifier: workspace:*
-        version: link:../../packages/evm
-      '@apibara/indexer':
-        specifier: workspace:*
-        version: link:../../packages/indexer
-      '@apibara/protocol':
-        specifier: workspace:*
-        version: link:../../packages/protocol
-      '@opentelemetry/api':
-        specifier: ^1.9.0
-        version: 1.9.0
-      '@opentelemetry/exporter-trace-otlp-proto':
-        specifier: ^0.52.0
-        version: 0.52.0(@opentelemetry/api@1.9.0)
-      '@opentelemetry/resources':
-        specifier: ^1.25.0
-        version: 1.25.0(@opentelemetry/api@1.9.0)
-      '@opentelemetry/sdk-node':
-        specifier: ^0.52.0
-        version: 0.52.0(@opentelemetry/api@1.9.0)
-      '@opentelemetry/sdk-trace-base':
-        specifier: ^1.25.0
-        version: 1.25.0(@opentelemetry/api@1.9.0)
-      '@opentelemetry/semantic-conventions':
-        specifier: ^1.25.0
-        version: 1.25.0
-      apibara:
-        specifier: workspace:*
-        version: link:../../packages/cli
-      better-sqlite3:
-        specifier: ^11.1.2
-        version: 11.1.2
-      citty:
-        specifier: ^0.1.6
-        version: 0.1.6
-      consola:
-        specifier: ^3.2.3
-        version: 3.2.3
-      csv-stringify:
-        specifier: ^6.5.0
-        version: 6.5.0
-      viem:
-        specifier: ^2.12.4
-        version: 2.13.8(typescript@5.4.5)
-    devDependencies:
-      '@types/better-sqlite3':
-        specifier: ^7.6.11
-        version: 7.6.11
-      '@types/node':
-        specifier: ^20.12.12
-        version: 20.14.0
-      jiti:
-        specifier: ^1.21.0
-        version: 1.21.6
-
   examples/evm-client:
     dependencies:
       '@apibara/evm':
@@ -312,9 +254,15 @@ importers:
 
   packages/cli:
     dependencies:
+      '@apibara/evm':
+        specifier: workspace:*
+        version: link:../evm
       '@apibara/indexer':
         specifier: workspace:*
         version: link:../indexer
+      '@apibara/protocol':
+        specifier: workspace:*
+        version: link:../protocol
       '@rollup/plugin-commonjs':
         specifier: ^26.0.1
         version: 26.0.1(rollup@4.18.1)
@@ -385,6 +333,9 @@ importers:
       unbuild:
         specifier: ^2.0.0
         version: 2.0.0(typescript@5.4.5)
+      viem:
+        specifier: ^2.12.4
+        version: 2.13.8(typescript@5.4.5)
       vitest:
         specifier: ^1.6.0
         version: 1.6.0(@types/node@20.14.0)

@@ -41,9 +41,7 @@ async function _loadUserConfig(
     : loadConfig<ApibaraConfig>)({
     name: "apibara",
     dotenv: dev,
-    // path from where apibara.config.ts is loaded
-    // defautl is "." path
-    // cwd: configOverrides.rootDir,
+    cwd: configOverrides.rootDir,
     overrides: {
       ...configOverrides,
     },

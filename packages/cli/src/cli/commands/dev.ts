@@ -73,8 +73,8 @@ export default defineCommand({
       );
       apibara.hooks.hookOnce("restart", reload);
 
-      await writeTypes(apibara);
       await prepare(apibara);
+      await writeTypes(apibara);
       await build(apibara);
 
       apibara.hooks.hook("dev:reload", () => {
