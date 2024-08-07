@@ -5,7 +5,8 @@
     "declarationDir": "dist",
     "noEmit": false,
     "rootDir": "src",
-    "types": ["jest", "node"]
+    "exactOptionalPropertyTypes": true,
+    "types": ["node"]
   },
   "include": ["src/"]
 }

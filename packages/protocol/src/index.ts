@@ -1,4 +1,11 @@
-export * from "./proto";
+export * as proto from "./proto";
+export { type DnaStreamClient, DnaStreamDefinition } from "./proto/stream";
+
+export * from "./common";
+export * from "./status";
+export * from "./stream";
+
+export * from "./config";
 export * from "./client";
-export * from "./request";
-export * from "./cursor";
+
+export * from "./rate";

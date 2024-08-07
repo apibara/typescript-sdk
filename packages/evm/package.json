@@ -1,0 +1,47 @@
+{
+  "name": "@apibara/evm",
+  "version": "2.0.0",
+  "type": "module",
+  "source": "./src/index.ts",
+  "main": "./src/index.ts",
+  "exports": "./src/index.ts",
+  "publishConfig": {
+    "files": ["dist", "src", "README.md"],
+    "main": "./dist/index.mjs",
+    "types": "./dist/index.d.ts",
+    "exports": {
+      ".": {
+        "types": "./dist/index.d.ts",
+        "import": "./dist/index.mjs",
+        "require": "./dist/index.cjs",
+        "default": "./dist/index.mjs"
+      }
+    }
+  },
+  "scripts": {
+    "build": "pnpm build:proto && unbuild",
+    "build:proto": "buf generate proto",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest",
+    "test:ci": "vitest run",
+    "lint": "biome check .",
+    "lint:fix": "pnpm lint --write",
+    "format": "biome format . --write"
+  },
+  "devDependencies": {
+    "@bufbuild/buf": "^1.32.1",
+    "@types/long": "^5.0.0",
+    "@types/node": "^20.12.12",
+    "unbuild": "^2.0.0",
+    "vitest": "^1.6.0"
+  },
+  "dependencies": {
+    "@apibara/protocol": "workspace:*",
+    "@effect/schema": "^0.67.15",
+    "effect": "^3.2.6",
+    "long": "^5.2.1",
+    "nice-grpc-common": "^2.0.2",
+    "protobufjs": "^7.1.2",
+    "viem": "^2.12.4"
+  }
+}

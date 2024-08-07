@@ -1,29 +1,56 @@
 {
   "name": "@apibara/protocol",
-  "version": "0.4.9",
-  "source": "src/index.ts",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
-  "files": ["dist", "src", "README.md"],
-  "scripts": {
-    "prebuild": "pnpm run protobuf && pnpm run gen-types",
-    "build": "tsc",
-    "test": "jest src/",
-    "lint": "biome check .",
-    "lint:fix": "pnpm lint --apply",
-    "format": "biome format . --write",
-    "protobuf": "mkdir -p dist/proto && cp src/proto/*.proto dist/proto",
-    "gen-types": "proto-loader-gen-types --bytes=Array --longs=Long --enums=String --defaults --oneofs --grpcLib=@grpc/grpc-js --outDir=src/proto src/proto/*.proto"
+  "version": "2.0.0-beta.1",
+  "type": "module",
+  "source": "./src/index.ts",
+  "main": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./testing": "./src/testing/index.ts"
   },
-  "dependencies": {
-    "@grpc/grpc-js": "^1.7.3",
-    "@grpc/proto-loader": "^0.7.3",
-    "google-protobuf": "^3.21.2",
-    "long": "^5.2.1",
-    "protobufjs": "^7.1.2"
+  "publishConfig": {
+    "files": ["dist", "src", "README.md"],
+    "main": "./dist/index.mjs",
+    "types": "./dist/index.d.ts",
+    "exports": {
+      ".": {
+        "types": "./dist/index.d.ts",
+        "import": "./dist/index.mjs",
+        "require": "./dist/index.cjs",
+        "default": "./dist/index.mjs"
+      },
+      "./testing": {
+        "types": "./dist/testing/index.d.ts",
+        "import": "./dist/testing/index.mjs",
+        "require": "./dist/testing/index.cjs",
+        "default": "./dist/testing/index.mjs"
+      }
+    }
+  },
+  "scripts": {
+    "build": "pnpm build:proto && unbuild",
+    "build:proto": "buf generate proto",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest",
+    "test:ci": "vitest run",
+    "lint": "biome check .",
+    "lint:fix": "pnpm lint --write",
+    "format": "biome format . --write"
   },
   "devDependencies": {
+    "@bufbuild/buf": "^1.32.2",
     "@types/long": "^5.0.0",
-    "@types/node": "^18.11.9"
+    "@types/node": "^20.12.13",
+    "unbuild": "^2.0.0",
+    "vitest": "^1.6.0"
+  },
+  "dependencies": {
+    "@effect/schema": "^0.67.15",
+    "effect": "^3.2.6",
+    "long": "^5.2.3",
+    "nice-grpc": "^2.1.8",
+    "nice-grpc-common": "^2.0.2",
+    "protobufjs": "^7.3.0",
+    "viem": "^2.13.2"
   }
 }

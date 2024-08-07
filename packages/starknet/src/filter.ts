@@ -1,781 +1,224 @@
-import { v1alpha2 } from "./proto";
+import { Schema } from "@effect/schema";
 
-/**
- * Helper functions to create StarkNet data filters.
+import { FieldElement, FieldElementProto } from "./common";
+import { tag } from "./helpers";
+import * as proto from "./proto";
+
+/** Header options.
+ *
+ * Change `always` to `true` to receive headers even if no other data matches.
  */
-export const Filter = {
-  /**
-   * Creates the root filter object.
-   */
-  create: () => new FilterBuilder(),
+export const HeaderFilter = Schema.Struct({
+  always: Schema.optional(Schema.Boolean),
+});
 
-  /**
-   * Creates a transaction filter.
-   */
-  transaction: () => new TransactionFilter(),
+export type HeaderFilter = typeof HeaderFilter.Type;
 
-  /**
-   * Creates an event filter.
-   */
-  event: () => new EventFilter(),
+/** An event key filter. Use `null` to match any event key. */
+export const Key = Schema.transform(
+  Schema.Struct({ value: Schema.UndefinedOr(FieldElementProto) }),
+  Schema.NullOr(FieldElement),
+  {
+    decode({ value }) {
+      if (value === undefined) {
+        return null;
+      }
+      return value;
+    },
+    encode(value) {
+      if (value === null) {
+        return { value: undefined };
+      }
+      return { value };
+    },
+  },
+);
 
-  /**
-   * Creates an L2 to L1 message filter.
-   */
-  message: () => new L2ToL1MessageFilter(),
+export type Key = typeof Key.Type;
 
-  /**
-   * Creates a new state update filter.
-   */
-  stateUpdate: () => new StateUpdateFilter(),
-};
+/** Filter events.
+ *
+ * @prop fromAddress Filter events by the sender address.
+ * @prop keys Filter events by the event keys. Use `null` to match any key.
+ * @prop strict If `true`, then the filter will only match events that have exactly the
+ * same number of keys as specified in `keys`.
+ * @prop includeReverted Include events from reverted transactions. In most
+ * cases, this will be the fee payment Transfer event.
+ * @prop includeTransaction Include the transaction that emitted the event.
+ * @prop includeReceipt Include the transaction receipt.
+ * @prop includeMessages Include the messages that were sent to L1 in the same transaction.
+ * @prop includeSiblings Include the sibling events of the matched events.
+ */
+export const EventFilter = Schema.Struct({
+  fromAddress: Schema.optional(FieldElement),
+  keys: Schema.optional(Schema.Array(Key)),
+  strict: Schema.optional(Schema.Boolean),
+  includeReverted: Schema.optional(Schema.Boolean),
+  includeTransaction: Schema.optional(Schema.Boolean),
+  includeReceipt: Schema.optional(Schema.Boolean),
+  includeMessages: Schema.optional(Schema.Boolean),
+  includeSiblings: Schema.optional(Schema.Boolean),
+});
 
-export class FilterBuilder {
-  private inner: v1alpha2.Filter;
+export type EventFilter = typeof EventFilter.Type;
 
-  constructor() {
-    this.inner = new v1alpha2.Filter();
-  }
+/** Filter messages to L1.
+ *
+ * @prop fromAddress Filter messages by the sender address (on L2).
+ * @prop toAddress Filter messages by the recipient address (on L1).
+ * @prop includeReverted Include messages from reverted transactions.
+ * @prop includeTransaction Include the transaction that sent the message.
+ * @prop includeReceipt Include the transaction receipt.
+ * @prop includeEvents Include events from the same transaction.
+ */
+export const MessageToL1Filter = Schema.Struct({
+  fromAddress: Schema.optional(FieldElement),
+  toAddress: Schema.optional(FieldElement),
+  includeReverted: Schema.optional(Schema.Boolean),
+  includeTransaction: Schema.optional(Schema.Boolean),
+  includeReceipt: Schema.optional(Schema.Boolean),
+  includeEvents: Schema.optional(Schema.Boolean),
+});
 
-  /**
-   * Include header in the returned data.
-   *
-   * If the `weak` flag is set, the block header will be included only if any
-   * other filter matches.
-   */
-  withHeader(args?: { weak?: boolean }) {
-    const { weak } = args ?? {};
-    this.inner.header = { weak };
-    return this;
-  }
+export type MessageToL1Filter = typeof MessageToL1Filter.Type;
 
-  /**
-   * Include transaction data. Use an empty filter to return all transactions.
-   */
-  addTransaction(
-    filterOrBuilder:
-      | IEncodableTransactionFilter
-      | ((builder: TransactionFilter) => IEncodableTransactionFilter),
-  ) {
-    this.inner.transactions.push(
-      createFilter(filterOrBuilder, () => new TransactionFilter()),
-    );
-    return this;
-  }
+export const InvokeTransactionV0Filter = Schema.Struct({
+  _tag: tag("invokeV0"),
+  invokeV0: Schema.Struct({}),
+});
 
-  /**
-   * Include event data. Use an empty filter to include all events.
-   */
-  addEvent(
-    filterOrBuilder:
-      | IEncodable<v1alpha2.IEventFilter>
-      | ((builder: EventFilter) => IEncodable<v1alpha2.IEventFilter>),
-  ) {
-    this.inner.events.push(
-      createFilter(filterOrBuilder, () => new EventFilter()),
-    );
-    return this;
-  }
+export const InvokeTransactionV1Filter = Schema.Struct({
+  _tag: tag("invokeV1"),
+  invokeV1: Schema.Struct({}),
+});
 
-  /**
-   * Include messages from L2 to L1. Use an empty filter to include all messages.
-   */
-  addMessage(
-    filterOrBuilder:
-      | IEncodable<v1alpha2.IL2ToL1MessageFilter>
-      | ((
-          builder: L2ToL1MessageFilter,
-        ) => IEncodable<v1alpha2.IL2ToL1MessageFilter>),
-  ) {
-    this.inner.messages.push(
-      createFilter(filterOrBuilder, () => new L2ToL1MessageFilter()),
-    );
-    return this;
-  }
+export const InvokeTransactionV3Filter = Schema.Struct({
+  _tag: tag("invokeV3"),
+  invokeV3: Schema.Struct({}),
+});
 
-  /**
-   * Include state updates.
-   */
-  withStateUpdate(
-    filterOrBuilder:
-      | IEncodable<v1alpha2.IStateUpdateFilter>
-      | ((
-          filter: StateUpdateFilter,
-        ) => IEncodable<v1alpha2.IStateUpdateFilter>),
-  ) {
-    this.inner.stateUpdate = createFilter(
-      filterOrBuilder,
-      () => new StateUpdateFilter(),
-    );
-    return this;
-  }
+export const DeployTransactionFilter = Schema.Struct({
+  _tag: tag("deploy"),
+  deploy: Schema.Struct({}),
+});
 
-  /**
-   * Returns the filter in encoded form, ready to be added to a request.
-   */
-  encode(): Uint8Array {
-    return v1alpha2.Filter.encode(this.inner).finish();
-  }
+export const DeclareV0TransactionFilter = Schema.Struct({
+  _tag: tag("declareV0"),
+  declareV0: Schema.Struct({}),
+});
 
-  /**
-   * Returns the filter as a plain object.
-   */
-  toObject(): v1alpha2.IFilter {
-    return this.inner;
-  }
+export const DeclareV1TransactionFilter = Schema.Struct({
+  _tag: tag("declareV1"),
+  declareV1: Schema.Struct({}),
+});
+
+export const DeclareV2TransactionFilter = Schema.Struct({
+  _tag: tag("declareV2"),
+  declareV2: Schema.Struct({}),
+});
+
+export const DeclareV3TransactionFilter = Schema.Struct({
+  _tag: tag("declareV3"),
+  declareV3: Schema.Struct({}),
+});
+
+export const L1HandlerTransactionFilter = Schema.Struct({
+  _tag: tag("l1Handler"),
+  l1Handler: Schema.Struct({}),
+});
+
+export const DeployAccountV1TransactionFilter = Schema.Struct({
+  _tag: tag("deployAccountV1"),
+  deployAccountV1: Schema.Struct({}),
+});
+
+export const DeployAccountV3TransactionFilter = Schema.Struct({
+  _tag: tag("deployAccountV3"),
+  deployAccountV3: Schema.Struct({}),
+});
+
+/** Filter transactions.
+ *
+ * @prop includeReverted Include messages from reverted transactions.
+ * @prop includeReceipt Include the transaction receipt.
+ * @prop includeEvents Include events from the same transaction.
+ * @prop includeMessages Include messages sent in the transaction.
+ */
+export const TransactionFilter = Schema.Struct({
+  includeReverted: Schema.optional(Schema.Boolean),
+  includeReceipt: Schema.optional(Schema.Boolean),
+  includeMessages: Schema.optional(Schema.Boolean),
+  includeEvents: Schema.optional(Schema.Boolean),
+  transactionType: Schema.optional(
+    Schema.Union(
+      InvokeTransactionV0Filter,
+      InvokeTransactionV1Filter,
+      InvokeTransactionV3Filter,
+      DeployTransactionFilter,
+      DeclareV0TransactionFilter,
+      DeclareV1TransactionFilter,
+      DeclareV2TransactionFilter,
+      DeclareV3TransactionFilter,
+      DeclareV3TransactionFilter,
+      L1HandlerTransactionFilter,
+      DeployAccountV1TransactionFilter,
+      DeployAccountV3TransactionFilter,
+    ),
+  ),
+});
+
+export type TransactionFilter = typeof TransactionFilter.Type;
+
+export const Filter = Schema.Struct({
+  header: Schema.optional(HeaderFilter),
+  transactions: Schema.optional(Schema.Array(TransactionFilter)),
+  events: Schema.optional(Schema.Array(EventFilter)),
+  messages: Schema.optional(Schema.Array(MessageToL1Filter)),
+});
+
+export type Filter = typeof Filter.Type;
+
+export const filterToProto = Schema.encodeSync(Filter);
+export const filterFromProto = Schema.decodeSync(Filter);
+
+export const FilterFromBytes = Schema.transform(
+  Schema.Uint8ArrayFromSelf,
+  Filter,
+  {
+    strict: false,
+    decode(value) {
+      return proto.filter.Filter.decode(value);
+    },
+    encode(value) {
+      return proto.filter.Filter.encode(value).finish();
+    },
+  },
+);
+
+export const filterToBytes = Schema.encodeSync(FilterFromBytes);
+export const filterFromBytes = Schema.decodeSync(FilterFromBytes);
+
+export function mergeFilter(a: Filter, b: Filter): Filter {
+  const header = mergeHeaderFilter(a.header, b.header);
+  return {
+    header,
+    transactions: [...(a.transactions ?? []), ...(b.transactions ?? [])],
+    events: [...(a.events ?? []), ...(b.events ?? [])],
+    messages: [...(a.messages ?? []), ...(b.messages ?? [])],
+  };
 }
 
-export class TransactionFilter {
-  /**
-   * Includes any transaction type.
-   */
-  any() {
-    return new AnyTransactionFilter();
-  }
-  /**
-   * Include invoke transactions, V0
-   */
-  invokeV0() {
-    return new InvokeV0TransactionFilter();
-  }
-
-  /**
-   * Include invoke transactions, V1
-   */
-  invokeV1() {
-    return new InvokeV1TransactionFilter();
-  }
-
-  /**
-   * Include deploy transactions
-   */
-  deploy() {
-    return new DeployTransactionFilter();
-  }
-
-  /**
-   * Include declare transactions
-   */
-  declare() {
-    return new DeclareTransactionFilter();
-  }
-
-  /**
-   * Include l1 handler transactions
-   */
-  l1Handler() {
-    return new L1HandlerTransactionFilter();
-  }
-
-  /**
-   * Include deploy account transactions
-   */
-  deployAccount() {
-    return new DeployAccountTransactionFilter();
-  }
-}
-
-export interface IEncodable<T> {
-  encode(): T;
-}
-
-export class AnyTransactionFilter
-  implements IEncodable<v1alpha2.ITransactionFilter>
-{
-  encode(): v1alpha2.ITransactionFilter {
-    return {};
-  }
-}
-
-type IEncodableTransactionFilter = IEncodable<v1alpha2.ITransactionFilter>;
-
-export class InvokeV0TransactionFilter implements IEncodableTransactionFilter {
-  private inner: v1alpha2.IInvokeTransactionV0Filter;
-
-  constructor() {
-    this.inner = {};
-  }
-
-  /**
-   * Filter by contract address.
-   */
-  withContractAddress(address: v1alpha2.IFieldElement) {
-    this.inner.contractAddress = address;
-    return this;
-  }
-
-  /**
-   * Filter by entry point selector.
-   */
-  withEntryPointSelector(selector: v1alpha2.IFieldElement) {
-    this.inner.entryPointSelector = selector;
-    return this;
-  }
-
-  /**
-   * Filter by calldata prefix.
-   */
-  withCalldata(calldata: v1alpha2.IFieldElement[]) {
-    this.inner.calldata = calldata;
-    return this;
-  }
-
-  encode(): v1alpha2.ITransactionFilter {
-    return {
-      invokeV0: this.inner,
-    };
-  }
-}
-
-export class InvokeV1TransactionFilter implements IEncodableTransactionFilter {
-  private inner: v1alpha2.IInvokeTransactionV1Filter;
-
-  constructor() {
-    this.inner = {};
-  }
-
-  /**
-   * Filter by sender address.
-   */
-  withSenderAddress(address: v1alpha2.IFieldElement) {
-    this.inner.senderAddress = address;
-    return this;
-  }
-
-  /**
-   * Filter by calldata prefix.
-   */
-  withCalldata(calldata: v1alpha2.IFieldElement[]) {
-    this.inner.calldata = calldata;
-    return this;
-  }
-
-  encode(): v1alpha2.ITransactionFilter {
-    return {
-      invokeV1: this.inner,
-    };
-  }
-}
-
-export class DeployTransactionFilter implements IEncodableTransactionFilter {
-  private inner: v1alpha2.IDeployTransactionFilter;
-
-  constructor() {
-    this.inner = {};
-  }
-
-  /**
-   * Filter by contract address salt.
-   */
-  withContractAddressSalt(salt: v1alpha2.IFieldElement) {
-    this.inner.contractAddressSalt = salt;
-    return this;
-  }
-
-  /**
-   * Filter by class hash.
-   */
-  withClassHash(hash: v1alpha2.IFieldElement) {
-    this.inner.classHash = hash;
-    return this;
-  }
-
-  /**
-   * Filter by constructor calldata prefix.
-   */
-  withConstructorCalldata(calldata: v1alpha2.IFieldElement[]) {
-    this.inner.constructorCalldata = calldata;
-    return this;
-  }
-
-  encode(): v1alpha2.ITransactionFilter {
-    return {
-      deploy: this.inner,
-    };
-  }
-}
-
-export class DeclareTransactionFilter implements IEncodableTransactionFilter {
-  private inner: v1alpha2.IDeclareTransactionFilter;
-
-  constructor() {
-    this.inner = {};
-  }
-
-  /**
-   * Filter by sender address.
-   */
-  withSenderAddress(address: v1alpha2.IFieldElement) {
-    this.inner.senderAddress = address;
-    return this;
-  }
-
-  /**
-   * Filter by class hash.
-   */
-  withClassHash(hash: v1alpha2.IFieldElement) {
-    this.inner.classHash = hash;
-    return this;
-  }
-
-  encode(): v1alpha2.ITransactionFilter {
-    return {
-      declare: this.inner,
-    };
-  }
-}
-
-export class L1HandlerTransactionFilter implements IEncodableTransactionFilter {
-  private inner: v1alpha2.IL1HandlerTransactionFilter;
-
-  constructor() {
-    this.inner = {};
-  }
-
-  /**
-   * Filter by contract address.
-   */
-  withContractAddress(address: v1alpha2.IFieldElement) {
-    this.inner.contractAddress = address;
-    return this;
-  }
-
-  /**
-   * Filter by entry point selector.
-   */
-  withEntryPointSelector(selector: v1alpha2.IFieldElement) {
-    this.inner.entryPointSelector = selector;
-    return this;
-  }
-
-  /**
-   * Filter by calldata prefix.
-   */
-  withCalldata(calldata: v1alpha2.IFieldElement[]) {
-    this.inner.calldata = calldata;
-    return this;
-  }
-
-  encode(): v1alpha2.ITransactionFilter {
-    return {
-      l1Handler: this.inner,
-    };
-  }
-}
-
-export class DeployAccountTransactionFilter
-  implements IEncodableTransactionFilter
-{
-  private inner: v1alpha2.IDeployAccountTransactionFilter;
-
-  constructor() {
-    this.inner = {};
-  }
-
-  /**
-   * Filter by contract address salt.
-   */
-  withContractAddressSalt(salt: v1alpha2.IFieldElement) {
-    this.inner.contractAddressSalt = salt;
-    return this;
-  }
-
-  /**
-   * Filter by class hash.
-   */
-  withClassHash(hash: v1alpha2.IFieldElement) {
-    this.inner.classHash = hash;
-    return this;
-  }
-
-  /**
-   * Filter by constructor calldata prefix.
-   */
-  withConstructorCalldata(calldata: v1alpha2.IFieldElement[]) {
-    this.inner.constructorCalldata = calldata;
-    return this;
-  }
-
-  encode(): v1alpha2.ITransactionFilter {
-    return {
-      deployAccount: this.inner,
-    };
-  }
-}
-
-export class EventFilter implements IEncodable<v1alpha2.IEventFilter> {
-  private inner: v1alpha2.IEventFilter;
-
-  constructor() {
-    this.inner = {};
-  }
-
-  /**
-   * Filter by address emitting the event.
-   */
-  withFromAddress(address: v1alpha2.IFieldElement) {
-    this.inner.fromAddress = address;
-    return this;
-  }
-
-  /**
-   * Filter by keys prefix.
-   */
-  withKeys(keys: v1alpha2.IFieldElement[]) {
-    this.inner.keys = keys;
-    return this;
-  }
-
-  /**
-   * Filter by data prefix.
-   */
-  withData(data: v1alpha2.IFieldElement[]) {
-    this.inner.data = data;
-    return this;
-  }
-
-  /**
-   * Include events emitted by reverted transactions.
-   */
-  withIncludeReverted(includeReverted: boolean) {
-    this.inner.includeReverted = includeReverted;
-    return this;
-  }
-
-  /**
-   * Include the transaction that emitted the event. Defaults to true.
-   */
-  withIncludeTransaction(includeTransaction: boolean) {
-    this.inner.includeTransaction = includeTransaction;
-    return this;
-  }
-
-  /**
-   * Include the receipt of the transaction that emitted the event. Defaults to true.
-   */
-  withIncludeReceipt(includeReceipt: boolean) {
-    this.inner.includeReceipt = includeReceipt;
-    return this;
-  }
-
-  encode(): v1alpha2.IEventFilter {
-    return this.inner;
-  }
-}
-
-export class L2ToL1MessageFilter
-  implements IEncodable<v1alpha2.IL2ToL1MessageFilter>
-{
-  private inner: v1alpha2.IL2ToL1MessageFilter;
-
-  constructor() {
-    this.inner = {};
-  }
-
-  /**
-   * Filter by destination address.
-   */
-  withToAddress(address: v1alpha2.IFieldElement) {
-    this.inner.toAddress = address;
-    return this;
-  }
-
-  /**
-   * Filter by payload prefix.
-   */
-  withPayload(payload: v1alpha2.IFieldElement[]) {
-    this.inner.payload = payload;
-    return this;
-  }
-
-  encode(): v1alpha2.IL2ToL1MessageFilter {
-    return this.inner;
-  }
-}
-
-export class StateUpdateFilter
-  implements IEncodable<v1alpha2.IStateUpdateFilter>
-{
-  private inner: v1alpha2.StateUpdateFilter;
-
-  constructor() {
-    this.inner = new v1alpha2.StateUpdateFilter();
-  }
-
-  /**
-   * Includes all storage changes that match the filter.
-   */
-  addStorageDiff(
-    filterOrBuilder:
-      | IEncodable<v1alpha2.IStorageDiffFilter>
-      | ((
-          builder: StorageDiffFilter,
-        ) => IEncodable<v1alpha2.IStorageDiffFilter>),
-  ) {
-    this.inner.storageDiffs.push(
-      createFilter(filterOrBuilder, () => new StorageDiffFilter()),
-    );
-    return this;
-  }
-
-  /**
-   * Includes all declared contracts that match the filter.
-   */
-  addDeclaredContract(
-    filterOrBuilder:
-      | IEncodable<v1alpha2.IDeclaredContractFilter>
-      | ((
-          builder: DeclaredContractFilter,
-        ) => IEncodable<v1alpha2.IDeclaredContractFilter>),
-  ) {
-    this.inner.declaredContracts.push(
-      createFilter(filterOrBuilder, () => new DeclaredContractFilter()),
-    );
-    return this;
-  }
-
-  /**
-   * Includes all deployed contracts that match the filter.
-   */
-  addDeployedContract(
-    filterOrBuilder:
-      | IEncodable<v1alpha2.IDeployedContractFilter>
-      | ((
-          builder: DeployedContractFilter,
-        ) => IEncodable<v1alpha2.IDeployedContractFilter>),
-  ) {
-    this.inner.deployedContracts.push(
-      createFilter(filterOrBuilder, () => new DeployedContractFilter()),
-    );
-    return this;
-  }
-
-  /**
-   * Includes all declared classes that match the filter.
-   */
-  addDeclaredClass(
-    filterOrBuilder:
-      | IEncodable<v1alpha2.IDeclaredClassFilter>
-      | ((
-          builder: DeclaredClassFilter,
-        ) => IEncodable<v1alpha2.IDeclaredClassFilter>),
-  ) {
-    this.inner.declaredClasses.push(
-      createFilter(filterOrBuilder, () => new DeclaredClassFilter()),
-    );
-    return this;
-  }
-
-  /**
-   * Includes all replaced classes that match the filter.
-   */
-  addReplacedClass(
-    filterOrBuilder:
-      | IEncodable<v1alpha2.IReplacedClassFilter>
-      | ((
-          builder: ReplacedClassFilter,
-        ) => IEncodable<v1alpha2.IReplacedClassFilter>),
-  ) {
-    this.inner.replacedClasses.push(
-      createFilter(filterOrBuilder, () => new ReplacedClassFilter()),
-    );
-    return this;
-  }
-
-  /**
-   * Includes all nonce updates that match the filter.
-   */
-  addNonceUpdate(
-    filterOrBuilder:
-      | IEncodable<v1alpha2.INonceUpdateFilter>
-      | ((
-          builder: NonceUpdateFilter,
-        ) => IEncodable<v1alpha2.INonceUpdateFilter>),
-  ) {
-    this.inner.nonces.push(
-      createFilter(filterOrBuilder, () => new NonceUpdateFilter()),
-    );
-    return this;
-  }
-
-  encode(): v1alpha2.IStateUpdateFilter {
-    return this.inner;
-  }
-}
-
-export class StorageDiffFilter
-  implements IEncodable<v1alpha2.IStorageDiffFilter>
-{
-  private inner: v1alpha2.StorageDiffFilter;
-
-  constructor() {
-    this.inner = new v1alpha2.StorageDiffFilter();
-  }
-
-  /**
-   * Filter by contract address.
-   */
-  withContractAddress(address: v1alpha2.IFieldElement) {
-    this.inner.contractAddress = address;
-    return this;
-  }
-
-  encode(): v1alpha2.IStorageDiffFilter {
-    return this.inner;
-  }
-}
-
-export class DeclaredContractFilter
-  implements IEncodable<v1alpha2.IDeclaredContractFilter>
-{
-  private inner: v1alpha2.DeclaredContractFilter;
-
-  constructor() {
-    this.inner = new v1alpha2.DeclaredContractFilter();
-  }
-
-  /**
-   * Filter by class hash.
-   */
-  withClassHash(hash: v1alpha2.IFieldElement) {
-    this.inner.classHash = hash;
-    return this;
-  }
-
-  encode(): v1alpha2.IDeclaredContractFilter {
-    return this.inner;
-  }
-}
-
-export class DeployedContractFilter
-  implements IEncodable<v1alpha2.IDeployedContractFilter>
-{
-  private inner: v1alpha2.DeployedContractFilter;
-
-  constructor() {
-    this.inner = new v1alpha2.DeployedContractFilter();
-  }
-
-  /**
-   * Filter by contract address.
-   */
-  withContractAddress(address: v1alpha2.IFieldElement) {
-    this.inner.contractAddress = address;
-    return this;
-  }
-
-  /**
-   * Filter by class hash.
-   */
-  withClassHash(hash: v1alpha2.IFieldElement) {
-    this.inner.classHash = hash;
-    return this;
-  }
-
-  encode(): v1alpha2.IDeployedContractFilter {
-    return this.inner;
-  }
-}
-
-export class DeclaredClassFilter
-  implements IEncodable<v1alpha2.IDeclaredClassFilter>
-{
-  private inner: v1alpha2.DeclaredClassFilter;
-
-  constructor() {
-    this.inner = new v1alpha2.DeclaredClassFilter();
-  }
-
-  /**
-   * Filter by class hash.
-   */
-  withCompiledClassHash(classHash: v1alpha2.IFieldElement) {
-    this.inner.compiledClassHash = classHash;
-    return this;
-  }
-
-  /**
-   * Filter by class hash.
-   */
-  withClassHash(hash: v1alpha2.IFieldElement) {
-    this.inner.classHash = hash;
-    return this;
-  }
-
-  encode(): v1alpha2.IDeclaredClassFilter {
-    return this.inner;
-  }
-}
-
-export class ReplacedClassFilter
-  implements IEncodable<v1alpha2.IReplacedClassFilter>
-{
-  private inner: v1alpha2.ReplacedClassFilter;
-
-  constructor() {
-    this.inner = new v1alpha2.ReplacedClassFilter();
-  }
-
-  /**
-   * Filter by contract address.
-   */
-  withContractAddress(address: v1alpha2.IFieldElement) {
-    this.inner.contractAddress = address;
-    return this;
-  }
-
-  /**
-   * Filter by class hash.
-   */
-  withClassHash(hash: v1alpha2.IFieldElement) {
-    this.inner.classHash = hash;
-    return this;
-  }
-
-  encode(): v1alpha2.IReplacedClassFilter {
-    return this.inner;
-  }
-}
-
-export class NonceUpdateFilter
-  implements IEncodable<v1alpha2.INonceUpdateFilter>
-{
-  private inner: v1alpha2.NonceUpdateFilter;
-
-  constructor() {
-    this.inner = new v1alpha2.NonceUpdateFilter();
-  }
-
-  /**
-   * Filter by contract address.
-   */
-  withContractAddress(address: v1alpha2.IFieldElement) {
-    this.inner.contractAddress = address;
-    return this;
-  }
-
-  /**
-   * Filter by nonce.
-   */
-  withNonce(nonce: v1alpha2.IFieldElement) {
-    this.inner.nonce = nonce;
-    return this;
-  }
-
-  encode(): v1alpha2.INonceUpdateFilter {
-    return this.inner;
-  }
-}
-
-function createFilter<T, B>(
-  filterOrBuilder: IEncodable<T> | ((builder: B) => IEncodable<T>),
-  mk: () => B,
-) {
-  let filter: IEncodable<T>;
-  if (typeof filterOrBuilder === "function") {
-    filter = filterOrBuilder(mk());
-  } else {
-    filter = filterOrBuilder;
-  }
-  return filter.encode();
+function mergeHeaderFilter(
+  a?: HeaderFilter,
+  b?: HeaderFilter,
+): HeaderFilter | undefined {
+  if (a === undefined) {
+    return b;
+  }
+  if (b === undefined) {
+    return a;
+  }
+  return {
+    always: a.always || b.always,
+  };
 }

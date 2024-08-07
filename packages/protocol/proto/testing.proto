@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package dna.v2.testing;
+
+message MockFilter {
+  optional string filter = 1;
+}
+
+message MockBlock {
+  optional string data = 1;
+}

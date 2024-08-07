@@ -13,12 +13,13 @@
       in
         {
           devShells.default = pkgs.mkShell {
-            nativeBuildInputs = [
-              pkgs.protobuf
-              pkgs.nodejs
-              pkgs.nodePackages.pnpm
-              pkgs.nodePackages.typescript
-              pkgs.nodePackages.typescript-language-server
+            nativeBuildInputs = with pkgs; [
+              protobuf
+              nodejs
+              bun
+              nodePackages.pnpm
+              nodePackages.typescript
+              nodePackages.typescript-language-server
             ];
           };
         }

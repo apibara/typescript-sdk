@@ -1,0 +1,19 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "outDir": "dist",
+    "declarationDir": "dist",
+    "noEmit": false,
+    "rootDir": "src",
+    "types": ["node"],
+    "paths": {
+      "apibara/cli": ["./src/cli"],
+      "apibara/config": ["./src/config"],
+      "apibara/core": ["./src/core"],
+      "apibara/rollup": ["./src/rollup"],
+      "apibara/types": ["./src/types"],
+      "apibara/hooks": ["./src/hooks"]
+    }
+  },
+  "include": ["src/"]
+}
