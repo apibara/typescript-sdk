@@ -48,12 +48,13 @@
     "playground:prepare": "pnpm playground prepare --dir playground",
     "playground:dev": "pnpm playground dev --dir playground",
     "playground:build": "pnpm playground build --dir playground",
-    "playground:start": "jiti ./playground/.apibara/build/main.mjs"
+    "playground:start": "JITI_ESM_RESOLVE=1 NODE_OPTIONS=\"--enable-source-maps\" jiti ./playground/.apibara/build/main.mjs"
   },
   "devDependencies": {
     "@types/fs-extra": "^11.0.4",
     "@types/node": "^20.14.0",
     "jiti": "^1.21.0",
+    "starknet": "^6.11.0",
     "unbuild": "^2.0.0",
     "viem": "^2.12.4",
     "vitest": "^1.6.0"
@@ -62,6 +63,7 @@
     "@apibara/evm": "workspace:*",
     "@apibara/indexer": "workspace:*",
     "@apibara/protocol": "workspace:*",
+    "@apibara/starknet": "workspace:*",
     "@rollup/plugin-commonjs": "^26.0.1",
     "@rollup/plugin-json": "^6.1.0",
     "@rollup/plugin-node-resolve": "^15.2.3",

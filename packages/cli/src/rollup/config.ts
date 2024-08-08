@@ -122,7 +122,7 @@ const command = defineCommand({
       const sink = sinkFunction();
 
       try {
-      consola.log("Running Indexer: ", name);
+        consola.log("Running Indexer: ", name);
         await run(client, indexer, sink);
       } catch (error) {
         consola.error(\`Error in indexer \${name}:\`, error);
@@ -188,7 +188,8 @@ runMain(command);
     onwarn(warning, rollupWarn) {
       if (
         !["CIRCULAR_DEPENDENCY", "EVAL"].includes(warning.code || "") &&
-        !warning.message.includes("Unsupported source map comment")
+        !warning.message.includes("Unsupported source map comment") &&
+        !warning.message.includes("@__PURE__")
       ) {
         rollupWarn(warning);
       }

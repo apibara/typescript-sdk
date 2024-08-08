@@ -43,7 +43,8 @@
       "pnpm-lock.yaml",
       "generated.js",
       "generated.d.ts",
-      "src/proto"
+      "src/proto",
+      "**/.apibara"
     ]
   }
 }
