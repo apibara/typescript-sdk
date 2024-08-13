@@ -5,6 +5,7 @@ export default defineBuildConfig({
     "./src/index.ts",
     "./src/sinks/sqlite.ts",
     "./src/sinks/csv.ts",
+    "./src/sinks/drizzle.ts",
     "./src/testing/index.ts",
   ],
   clean: true,

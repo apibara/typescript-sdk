@@ -23,6 +23,8 @@
     "citty": "^0.1.6",
     "consola": "^3.2.3",
     "csv-stringify": "^6.5.0",
+    "drizzle-orm": "^0.33.0",
+    "postgres": "^3.4.4",
     "viem": "^2.12.4"
   },
   "devDependencies": {

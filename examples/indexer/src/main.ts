@@ -6,6 +6,10 @@ import consola from "consola";
 import { createIndexerConfig } from "./indexer";
 
 import "./instrumentation";
+import { drizzle as drizzleSink } from "@apibara/indexer/sinks/drizzle";
+import { pgTable, serial, text, varchar } from "drizzle-orm/pg-core";
+import { drizzle } from "drizzle-orm/postgres-js";
+import postgres from "postgres";
 
 const command = defineCommand({
   meta: {
@@ -33,7 +37,24 @@ const command = defineCommand({
       indexer.options.streamUrl,
     );
 
-    await run(client, indexer);
+    /** TEMPORARY EXAMPLE OF DRIZZLE SINK - WILL BE REMOVED */
+    const users = pgTable("users", {
+      id: serial("id").primaryKey(),
+      fullName: text("full_name"),
+      phone: varchar("phone", { length: 256 }),
+    });
+
+    const pgClient = postgres("your_connection_string");
+    const db = drizzle(pgClient);
+
+    const sink = drizzleSink({ database: db, table: users });
+
+    // Demo of how we can infer type for the transform function
+    async function _transform(): typeof sink.$inferTransform {
+      return [{ id: 1, fullName: "John Doe", phone: "1234567890" }];
+    }
+
+    await run(client, indexer, sink);
   },
 });
 
