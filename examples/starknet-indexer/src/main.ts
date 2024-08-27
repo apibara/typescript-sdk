@@ -14,7 +14,7 @@ const command = defineCommand({
   args: {
     stream: {
       type: "string",
-      default: "http://127.0.0.1:7007",
+      default: "http://mainnet-v2.starknet.a5a.ch:7007",
       description: "Starknet stream URL",
     },
     authToken: {

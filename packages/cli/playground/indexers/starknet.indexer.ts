@@ -23,19 +23,11 @@ export default function indexer(runtimeConfig: ApibaraRuntimeConfig) {
       ],
     },
     async transform({ block: { header, events } }) {
-      return [
-        {
-          blockNumber: header.blockNumber,
-          events,
-        },
-      ];
+      consola.info("Transforming block ", header?.blockNumber);
     },
     hooks: {
-      "sink:write"({ data }) {
-        consola.log("Wrote:", data[0].events.length, "Tranfer events");
-      },
-      "sink:flush"({ endCursor }) {
-        consola.log("Flushing", endCursor.orderKey);
+      "handler:after": ({ endCursor }) => {
+        consola.info("Handler After ", endCursor?.orderKey);
       },
     },
   });
