@@ -4,3 +4,4 @@ export { useIndexerContext } from "./context";
 
 export * from "./plugins";
 export * from "./vcr";
+export * from "./hooks";
