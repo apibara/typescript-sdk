@@ -3,10 +3,10 @@ import type { Database as SqliteDatabase, Statement } from "better-sqlite3";
 import { deserialize, serialize } from "../vcr";
 import { defineIndexerPlugin } from "./config";
 
-export function sqlitePersistence<TFilter, TBlock, TRet>({
+export function sqlitePersistence<TFilter, TBlock, TTxnParams>({
   database,
 }: { database: SqliteDatabase }) {
-  return defineIndexerPlugin<TFilter, TBlock, TRet>((indexer) => {
+  return defineIndexerPlugin<TFilter, TBlock, TTxnParams>((indexer) => {
     let store: SqlitePersistence<TFilter>;
 
     indexer.hooks.hook("run:before", () => {
@@ -27,7 +27,7 @@ export function sqlitePersistence<TFilter, TBlock, TRet>({
       }
     });
 
-    indexer.hooks.hook("sink:flush", ({ endCursor }) => {
+    indexer.hooks.hook("handler:after", ({ endCursor }) => {
       if (endCursor) {
         store.put({ cursor: endCursor });
       }

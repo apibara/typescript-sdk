@@ -16,12 +16,16 @@ import {
 } from "hookable";
 
 import assert from "node:assert";
-import { indexerAsyncContext } from "./context";
+import {
+  type IndexerContext,
+  indexerAsyncContext,
+  useIndexerContext,
+} from "./context";
 import { tracer } from "./otel";
 import type { IndexerPlugin } from "./plugins";
-import { type Sink, type SinkData, defaultSink } from "./sink";
+import { type Sink, defaultSink } from "./sink";
 
-export interface IndexerHooks<TFilter, TBlock, TRet> {
+export interface IndexerHooks<TFilter, TBlock> {
   "run:before": () => void;
   "run:after": () => void;
   "connect:before": ({
@@ -48,63 +52,73 @@ export interface IndexerHooks<TFilter, TBlock, TRet> {
     finality: DataFinality;
     endCursor?: Cursor;
   }) => void;
-  "handler:after": ({ output }: { output: TRet[] }) => void;
-  "handler:exception": ({ error }: { error: Error }) => void;
-  "sink:write": ({ data }: { data: TRet[] }) => void;
-  "sink:flush": ({
-    endCursor,
+  "handler:after": ({
+    block,
     finality,
-  }: { endCursor?: Cursor; finality: DataFinality }) => void;
+    endCursor,
+  }: {
+    block: TBlock;
+    finality: DataFinality;
+    endCursor?: Cursor;
+  }) => void;
+  "handler:exception": ({ error }: { error: Error }) => void;
   message: ({ message }: { message: StreamDataResponse<TBlock> }) => void;
 }
 
-export interface IndexerConfig<TFilter, TBlock, TRet> {
+export interface IndexerConfig<TFilter, TBlock, TTxnParams> {
   streamUrl: string;
   filter: TFilter;
   finality?: DataFinality;
   startingCursor?: Cursor;
-  factory?: (block: TBlock) => Promise<{ filter?: TFilter; data?: TRet[] }>;
+  sink?: Sink<TTxnParams>;
+  factory?: ({
+    block,
+    context,
+  }: { block: TBlock; context: IndexerContext<TTxnParams> }) => Promise<{
+    filter?: TFilter;
+  }>;
   transform: (args: {
     block: TBlock;
     cursor?: Cursor | undefined;
     endCursor?: Cursor | undefined;
     finality: DataFinality;
-  }) => Promise<TRet[]>;
-  hooks?: NestedHooks<IndexerHooks<TFilter, TBlock, TRet>>;
-  plugins?: ReadonlyArray<IndexerPlugin<TFilter, TBlock, TRet>>;
+    context: IndexerContext<TTxnParams>;
+  }) => Promise<void>;
+  hooks?: NestedHooks<IndexerHooks<TFilter, TBlock>>;
+  plugins?: ReadonlyArray<IndexerPlugin<TFilter, TBlock, TTxnParams>>;
   debug?: boolean;
 }
 
-export interface IndexerWithStreamConfig<TFilter, TBlock, TRet>
-  extends IndexerConfig<TFilter, TBlock, TRet> {
+export interface IndexerWithStreamConfig<TFilter, TBlock, TTxnParams>
+  extends IndexerConfig<TFilter, TBlock, TTxnParams> {
   streamConfig: StreamConfig<TFilter, TBlock>;
 }
 
 export function defineIndexer<TFilter, TBlock>(
   streamConfig: StreamConfig<TFilter, TBlock>,
 ) {
-  return <TRet>(
-    config: IndexerConfig<TFilter, TBlock, TRet>,
-  ): IndexerWithStreamConfig<TFilter, TBlock, TRet> => ({
+  return <TTxnParams>(
+    config: IndexerConfig<TFilter, TBlock, TTxnParams>,
+  ): IndexerWithStreamConfig<TFilter, TBlock, TTxnParams> => ({
     streamConfig,
     ...config,
   });
 }
 
-export interface Indexer<TFilter, TBlock, TRet> {
+export interface Indexer<TFilter, TBlock, TTxnParams> {
   streamConfig: StreamConfig<TFilter, TBlock>;
-  options: IndexerConfig<TFilter, TBlock, TRet>;
-  hooks: Hookable<IndexerHooks<TFilter, TBlock, TRet>>;
+  options: IndexerConfig<TFilter, TBlock, TTxnParams>;
+  hooks: Hookable<IndexerHooks<TFilter, TBlock>>;
 }
 
-export function createIndexer<TFilter, TBlock, TRet>({
+export function createIndexer<TFilter, TBlock, TTxnParams>({
   streamConfig,
   ...options
-}: IndexerWithStreamConfig<TFilter, TBlock, TRet>) {
-  const indexer: Indexer<TFilter, TBlock, TRet> = {
+}: IndexerWithStreamConfig<TFilter, TBlock, TTxnParams>) {
+  const indexer: Indexer<TFilter, TBlock, TTxnParams> = {
     options,
     streamConfig,
-    hooks: createHooks<IndexerHooks<TFilter, TBlock, TRet>>(),
+    hooks: createHooks<IndexerHooks<TFilter, TBlock>>(),
   };
 
   if (indexer.options.debug) {
@@ -120,22 +134,18 @@ export function createIndexer<TFilter, TBlock, TRet>({
   return indexer;
 }
 
-export async function run<TFilter, TBlock, TRet>(
+export async function run<TFilter, TBlock, TTxnParams>(
   client: Client<TFilter, TBlock>,
-  indexer: Indexer<TFilter, TBlock, TRet>,
-  sinkArg?: Sink,
+  indexer: Indexer<TFilter, TBlock, TTxnParams>,
 ) {
   await indexerAsyncContext.callAsync({}, async () => {
+    const context = useIndexerContext<TTxnParams>();
+
+    const sink = indexer.options.sink ?? defaultSink();
+
+    context.sink = sink as Sink<TTxnParams>;
+
     await indexer.hooks.callHook("run:before");
-
-    const sink = sinkArg ?? defaultSink();
-
-    sink.hook("write", async ({ data }) => {
-      await indexer.hooks.callHook("sink:write", { data: data as TRet[] });
-    });
-    sink.hook("flush", async ({ endCursor, finality }) => {
-      await indexer.hooks.callHook("sink:flush", { endCursor, finality });
-    });
 
     // Check if the it's factory mode or not
     const isFactoryMode = indexer.options.factory !== undefined;
@@ -151,7 +161,6 @@ export async function run<TFilter, TBlock, TRet>(
 
     const options: StreamDataOptions = {};
 
-    // TODO persistence plugin filter
     await indexer.hooks.callHook("connect:before", { request, options });
 
     // store main filter, so later it can be merged
@@ -161,31 +170,33 @@ export async function run<TFilter, TBlock, TRet>(
     }
 
     // create stream
-    let stream = client.streamData(request, options);
+    let stream: AsyncIterator<
+      StreamDataResponse<TBlock>,
+      StreamDataResponse<TBlock>
+    > = client.streamData(request, options)[Symbol.asyncIterator]();
 
     await indexer.hooks.callHook("connect:after");
 
-    // on state ->
-    // normal: iterate as usual
-    // recover: reconnect after updating filter
-    let state: { _tag: "normal" } | { _tag: "recover"; data?: TRet[] } = {
-      _tag: "normal",
-    };
-
     while (true) {
-      for await (const message of stream) {
-        await indexer.hooks.callHook("message", { message });
+      const { value: message, done } = await stream.next();
 
-        switch (message._tag) {
-          case "data": {
-            await tracer.startActiveSpan("message data", async (span) => {
+      if (done) {
+        break;
+      }
+
+      await indexer.hooks.callHook("message", { message });
+
+      switch (message._tag) {
+        case "data": {
+          await tracer.startActiveSpan("message data", async (span) => {
+            await sink.transaction(async (txn) => {
+              // attach transaction to context
+              context.sinkTransaction = txn as TTxnParams;
+
               const blocks = message.data.data;
               const { cursor, endCursor, finality } = message.data;
 
               let block: TBlock | null;
-
-              // combine output of factory and transform function
-              const output: TRet[] = [];
 
               // when factory mode
               if (isFactoryMode) {
@@ -195,14 +206,14 @@ export async function run<TFilter, TBlock, TRet>(
 
                 block = mainBlock;
 
-                if (state._tag === "normal" && factoryBlock !== null) {
-                  const { data, filter } =
-                    await indexer.options.factory(factoryBlock);
+                if (factoryBlock !== null) {
+                  const { filter } = await indexer.options.factory({
+                    block: factoryBlock,
+                    context,
+                  });
 
                   // write returned data from factory function if filter is not defined
-                  if (!filter) {
-                    output.push(...(data ?? []));
-                  } else {
+                  if (filter) {
                     // when filter is defined
                     // merge old and new filters
                     mainFilter = indexer.streamConfig.mergeFilter(
@@ -223,23 +234,18 @@ export async function run<TFilter, TBlock, TRet>(
                     });
 
                     // create new stream with new request
-                    stream = client.streamData(request, options);
+                    stream = client
+                      .streamData(request, options)
+                      [Symbol.asyncIterator]();
 
-                    // change state to recover mode
-                    state = {
-                      _tag: "recover",
-                      data,
-                    };
+                    const { value: message } = await stream.next();
 
-                    return;
+                    assert(message._tag === "data");
+
+                    const [_factoryBlock, _block] = message.data.data;
+
+                    block = _block;
                   }
-                }
-                // after restart when state in recover mode
-                else if (state._tag === "recover") {
-                  // we write data to output
-                  output.push(...(state.data ?? []));
-                  // change state back to normal to avoid infinite loop
-                  state = { _tag: "normal" };
                 }
               } else {
                 // when not in factory mode
@@ -256,17 +262,18 @@ export async function run<TFilter, TBlock, TRet>(
                   });
 
                   try {
-                    const transformOutput = await indexer.options.transform({
+                    await indexer.options.transform({
                       block,
                       cursor,
                       endCursor,
                       finality,
+                      context,
                     });
-
-                    // write transformed data to output
-                    output.push(...transformOutput);
-
-                    await indexer.hooks.callHook("handler:after", { output });
+                    await indexer.hooks.callHook("handler:after", {
+                      block,
+                      finality,
+                      endCursor,
+                    });
                   } catch (error) {
                     assert(error instanceof Error);
                     await indexer.hooks.callHook("handler:exception", {
@@ -278,45 +285,18 @@ export async function run<TFilter, TBlock, TRet>(
                   span.end();
                 });
               }
-
-              // if output has data, write it to sink
-              if (output.length > 0) {
-                await tracer.startActiveSpan("sink write", async (span) => {
-                  await sink.write({
-                    data: output as SinkData[],
-                    cursor,
-                    endCursor,
-                    finality,
-                  });
-
-                  span.end();
-                });
-              }
-              span.end();
             });
-            break;
-          }
-          default: {
-            consola.warn("unexpected message", message);
-            throw new Error("not implemented");
-          }
-        }
-
-        // if stream needs a restart
-        // break out of the current stream iterator
-        if (state._tag !== "normal") {
+            span.end();
+          });
           break;
         }
-      }
-
-      // when restarting stream we continue while loop again
-      if (state._tag !== "normal") {
-        continue;
+        default: {
+          consola.warn("unexpected message", message);
+          throw new Error("not implemented");
+        }
       }
 
       await indexer.hooks.callHook("run:after");
-
-      break;
     }
   });
 }
