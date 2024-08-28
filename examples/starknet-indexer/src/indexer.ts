@@ -6,20 +6,20 @@ import { pgTable, serial, text, varchar } from "drizzle-orm/pg-core";
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
 
-export function createIndexerConfig(streamUrl: string) {
-  const users = pgTable("users", {
-    id: serial("id").primaryKey(),
-    firstName: text("full_name"),
-    phone: varchar("phone", { length: 256 }),
-  });
+const users = pgTable("users", {
+  id: serial("id").primaryKey(),
+  firstName: text("full_name"),
+  phone: varchar("phone", { length: 256 }),
+});
 
+export function createIndexerConfig(streamUrl: string) {
   const pgClient = postgres(
     "postgresql://postgres.......supabase.com:6543/postgres",
     { prepare: false },
   );
   const db = drizzle(pgClient);
 
-  const sink = drizzleSink({ database: db, tables: { users } });
+  const sink = drizzleSink({ database: db });
 
   return defineIndexer(StarknetStream)({
     streamUrl,
@@ -41,19 +41,17 @@ export function createIndexerConfig(streamUrl: string) {
     async transform({ block: { header }, context }) {
       consola.info("Transforming block ", header?.blockNumber);
 
-      const { db, tables } = useSink({ context }) || {};
+      const { db } = useSink({ context });
 
-      if (db && tables) {
-        await db.insert(tables.users).values([
-          {
-            id: Number(header?.blockNumber),
-            firstName: `John Doe ${Number(header?.blockNumber)}`,
-            phone: "+91 1234567890",
-          },
-        ]);
+      await db.insert(users).values([
+        {
+          id: Number(header?.blockNumber),
+          firstName: `John Doe ${Number(header?.blockNumber)}`,
+          phone: "+91 1234567890",
+        },
+      ]);
 
-        consola.info("Inserted Data ", header?.blockNumber);
-      }
+      consola.info("Inserted Data ", header?.blockNumber);
     },
   });
 }

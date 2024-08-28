@@ -5,5 +5,9 @@ export function useSink<TTxnParams>({
 }: {
   context: IndexerContext<TTxnParams>;
 }) {
+  if (!context.sinkTransaction) {
+    throw new Error("Transaction context doesn't exist!");
+  }
+
   return context.sinkTransaction;
 }

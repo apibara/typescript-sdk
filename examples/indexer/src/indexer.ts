@@ -11,17 +11,17 @@ const abi = parseAbi([
   "event Transfer(address indexed from, address indexed to, uint256 value)",
 ]);
 
-export function createIndexerConfig(streamUrl: string) {
-  const users = pgTable("users", {
-    id: serial("id").primaryKey(),
-    firstName: text("full_name"),
-    phone: varchar("phone", { length: 256 }),
-  });
+const users = pgTable("users", {
+  id: serial("id").primaryKey(),
+  firstName: text("full_name"),
+  phone: varchar("phone", { length: 256 }),
+});
 
+export function createIndexerConfig(streamUrl: string) {
   const pgClient = postgres("your_connection_string");
   const db = drizzle(pgClient);
 
-  const sink = drizzleSink({ database: db, tables: { users } });
+  const sink = drizzleSink({ database: db });
 
   return defineIndexer(EvmStream)({
     streamUrl,
@@ -43,9 +43,15 @@ export function createIndexerConfig(streamUrl: string) {
     },
     sink,
     async transform({ block: { header }, context }) {
-      const { db } = useSink({ context }) || {};
+      const { db } = useSink({ context });
 
-      // TODO write using transactions from useSink
+      await db.insert(users).values([
+        {
+          id: Number(header?.number),
+          firstName: `John Doe ${Number(header?.number)}`,
+          phone: "+91 1234567890",
+        },
+      ]);
 
       consola.info("Transforming block", header?.number);
     },
