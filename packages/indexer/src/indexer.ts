@@ -61,6 +61,13 @@ export interface IndexerHooks<TFilter, TBlock> {
     finality: DataFinality;
     endCursor?: Cursor;
   }) => void;
+  "transaction:commit": ({
+    finality,
+    endCursor,
+  }: {
+    finality: DataFinality;
+    endCursor?: Cursor;
+  }) => void;
   "handler:exception": ({ error }: { error: Error }) => void;
   message: ({ message }: { message: StreamDataResponse<TBlock> }) => void;
 }
@@ -189,12 +196,12 @@ export async function run<TFilter, TBlock, TTxnParams>(
       switch (message._tag) {
         case "data": {
           await tracer.startActiveSpan("message data", async (span) => {
+            const blocks = message.data.data;
+            const { cursor, endCursor, finality } = message.data;
+
             await sink.transaction(async (txn) => {
               // attach transaction to context
               context.sinkTransaction = txn as TTxnParams;
-
-              const blocks = message.data.data;
-              const { cursor, endCursor, finality } = message.data;
 
               let block: TBlock | null;
 
@@ -285,6 +292,10 @@ export async function run<TFilter, TBlock, TTxnParams>(
                   span.end();
                 });
               }
+            });
+            await indexer.hooks.callHook("transaction:commit", {
+              finality,
+              endCursor,
             });
             span.end();
           });

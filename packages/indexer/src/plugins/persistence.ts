@@ -27,7 +27,7 @@ export function sqlitePersistence<TFilter, TBlock, TTxnParams>({
       }
     });
 
-    indexer.hooks.hook("handler:after", ({ endCursor }) => {
+    indexer.hooks.hook("transaction:commit", ({ endCursor }) => {
       if (endCursor) {
         store.put({ cursor: endCursor });
       }
