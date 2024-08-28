@@ -9,16 +9,16 @@ import { vcr } from "../testing/vcr";
 import { type CassetteDataType, deserialize } from "../vcr";
 import type { VcrConfig } from "./config";
 
-export async function replay<TFilter, TBlock, TRet>(
+export async function replay<TFilter, TBlock, TTxnParams>(
   vcrConfig: VcrConfig,
-  indexer: Indexer<TFilter, TBlock, TRet>,
+  indexer: Indexer<TFilter, TBlock, TTxnParams>,
   cassetteName: string,
 ): Promise<VcrReplayResult> {
   const client = loadCassette<TFilter, TBlock>(vcrConfig, cassetteName);
 
   const sink = vcr();
 
-  await run(client, indexer, sink);
+  await run(client, indexer);
 
   return {
     outputs: sink.result,

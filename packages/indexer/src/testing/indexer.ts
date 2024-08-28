@@ -33,5 +33,3 @@ export const getMockIndexer = <TTxnParams>({
 export type MockRet = {
   data: string;
 };
-
-export type MockTxnParams = unknown;

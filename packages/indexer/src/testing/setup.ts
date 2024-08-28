@@ -16,17 +16,17 @@ export const test = viTest.extend({
   },
 });
 
-type WithClientContext<TFilter, TBlock, TRet> = {
+type WithClientContext<TFilter, TBlock, TTxnParams> = {
   run: (
-    indexerArgs: Indexer<TFilter, TBlock, TRet>,
+    indexerArgs: Indexer<TFilter, TBlock, TTxnParams>,
   ) => Promise<VcrReplayResult>;
 };
 
-async function withClient<TFilter, TBlock, TRet>(
+async function withClient<TFilter, TBlock, TTxnParams>(
   cassetteName: string,
   range: { fromBlock: bigint; toBlock: bigint },
   callback: (
-    context: WithClientContext<TFilter, TBlock, TRet>,
+    context: WithClientContext<TFilter, TBlock, TTxnParams>,
   ) => Promise<void>,
 ) {
   const vcrConfig: VcrConfig = {
@@ -43,7 +43,7 @@ async function withClient<TFilter, TBlock, TRet>(
     },
   };
 
-  const context: WithClientContext<TFilter, TBlock, TRet> = {
+  const context: WithClientContext<TFilter, TBlock, TTxnParams> = {
     async run(indexer) {
       const client = loadCassette<TFilter, TBlock>(vcrConfig, cassetteName);
 

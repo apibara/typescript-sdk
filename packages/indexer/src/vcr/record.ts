@@ -11,10 +11,10 @@ export type CassetteDataType<TFilter, TBlock> = {
   messages: StreamDataResponse<TBlock>[];
 };
 
-export async function record<TFilter, TBlock, TRet>(
+export async function record<TFilter, TBlock, TTxnParams>(
   vcrConfig: VcrConfig,
   client: Client<TFilter, TBlock>,
-  indexerArg: Indexer<TFilter, TBlock, TRet>,
+  indexerArg: Indexer<TFilter, TBlock, TTxnParams>,
   cassetteOptions: CassetteOptions,
 ) {
   const indexer = klona(indexerArg);

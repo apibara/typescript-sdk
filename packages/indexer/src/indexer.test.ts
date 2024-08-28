@@ -4,12 +4,12 @@ import {
   type MockFilter,
 } from "@apibara/protocol/testing";
 import Database from "better-sqlite3";
-import { klona } from "klona/full";
 import { describe, expect, it } from "vitest";
+import { useSink } from "./hooks";
 import { run } from "./indexer";
 import { SqlitePersistence, sqlitePersistence } from "./plugins/persistence";
 import { generateMockMessages, vcr } from "./testing";
-import { type MockRet, getMockIndexer } from "./testing/indexer";
+import { getMockIndexer } from "./testing/indexer";
 
 describe("Run Test", () => {
   it("should stream messages", async () => {
@@ -18,7 +18,19 @@ describe("Run Test", () => {
     });
 
     const sink = vcr();
-    await run(client, getMockIndexer(), sink);
+
+    const indexer = getMockIndexer({
+      sink,
+      override: {
+        transform: async ({ context, endCursor, block: { data } }) => {
+          const { writer } = useSink({ context });
+          const insertHelper = writer(endCursor);
+          insertHelper.insert([{ data }]);
+        },
+      },
+    });
+
+    await run(client, indexer);
 
     expect(sink.result).toMatchInlineSnapshot(`
       [
@@ -246,28 +258,38 @@ describe("Run Test", () => {
 
     const db = Database(":memory:");
 
-    const persistence = sqlitePersistence<MockFilter, MockBlock, MockRet>({
-      database: db,
-    });
-
-    // create mock indexer with persistence plugin
-    const indexer = klona(getMockIndexer([persistence]));
-    indexer.options.startingCursor = { orderKey: 100n };
-    indexer.options.factory = async (block) => {
-      if (block.data === "B") {
-        return { filter: { filter: "B" } };
-      }
-
-      if (block.data === "C") {
-        return { filter: { filter: "C" } };
-      }
-
-      return {};
-    };
-
     const sink = vcr();
 
-    await run(client, indexer, sink);
+    // create mock indexer with persistence plugin
+    const indexer = getMockIndexer({
+      plugins: [
+        sqlitePersistence({
+          database: db,
+        }),
+      ],
+      sink,
+      override: {
+        startingCursor: { orderKey: 100n },
+        factory: async ({ block }) => {
+          if (block.data === "B") {
+            return { filter: { filter: "B" } };
+          }
+
+          if (block.data === "C") {
+            return { filter: { filter: "C" } };
+          }
+
+          return {};
+        },
+        transform: async ({ context, endCursor, block: { data } }) => {
+          const { writer } = useSink({ context });
+          const insertHelper = writer(endCursor);
+          insertHelper.insert([{ data }]);
+        },
+      },
+    });
+
+    await run(client, indexer);
 
     const store = new SqlitePersistence<MockFilter>(db);
 
@@ -423,28 +445,38 @@ describe("Run Test", () => {
 
     const db = Database(":memory:");
 
-    const persistence = sqlitePersistence<MockFilter, MockBlock, MockRet>({
-      database: db,
-    });
-
-    // create mock indexer with persistence plugin
-    const indexer = klona(getMockIndexer([persistence]));
-    indexer.options.startingCursor = { orderKey: 100n };
-    indexer.options.factory = async (block) => {
-      if (block.data === "B") {
-        return { filter: { filter: "B" } };
-      }
-
-      if (block.data === "C") {
-        return { filter: { filter: "C" } };
-      }
-
-      return {};
-    };
-
     const sink = vcr();
 
-    await expect(() => run(client, indexer, sink)).rejects.toThrowError(
+    // create mock indexer with persistence plugin
+    const indexer = getMockIndexer({
+      plugins: [
+        sqlitePersistence({
+          database: db,
+        }),
+      ],
+      sink,
+      override: {
+        startingCursor: { orderKey: 100n },
+        factory: async ({ block }) => {
+          if (block.data === "B") {
+            return { filter: { filter: "B" } };
+          }
+
+          if (block.data === "C") {
+            return { filter: { filter: "C" } };
+          }
+
+          return {};
+        },
+        transform: async ({ context, endCursor, block: { data } }) => {
+          const { writer } = useSink({ context });
+          const insertHelper = writer(endCursor);
+          insertHelper.insert([{ data }]);
+        },
+      },
+    });
+
+    await expect(() => run(client, indexer)).rejects.toThrowError(
       "this error should occurr!",
     );
 
