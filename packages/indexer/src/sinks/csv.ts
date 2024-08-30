@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import type { Cursor } from "@apibara/protocol";
 import { type Options, type Stringifier, stringify } from "csv-stringify";
-import { Sink, type SinkData, type SinkWriteArgs } from "../sink";
+import { Sink, type SinkData } from "../sink";
 
 export type CsvArgs = {
   /**
@@ -23,6 +23,52 @@ export type CsvSinkOptions = {
   cursorColumn?: string;
 };
 
+type TxnContext = {
+  buffer: SinkData[];
+  endCursor?: Cursor;
+};
+
+type TxnParams = {
+  writer: (endCursor?: Cursor | undefined) => {
+    insert: (data: SinkData[]) => void;
+  };
+};
+
+const transactionHelper = (context: TxnContext) => (endCursor?: Cursor) => {
+  return {
+    insert: (data: SinkData[]) => {
+      context.buffer.push(...data);
+      context.endCursor = endCursor;
+    },
+  };
+};
+
+/**
+ * A sink that writes data to a CSV file.
+ *
+ * @example
+ *
+ * ```ts
+ * const sink = csv({
+ *   filepath: "./data.csv",
+ *   csvOptions: {
+ *     header: true,
+ *   },
+ * });
+ *
+ * ...
+ * async transform({context, endCursor}){
+ *  const { writer } = useSink(context);
+ *  const insertHelper = writer(endCursor);
+ *
+ *  insertHelper.insert([
+ *    { id: 1, name: "John" },
+ *    { id: 2, name: "Jane" },
+ *  ]);
+ * }
+ *
+ * ```
+ */
 export class CsvSink extends Sink {
   constructor(
     private _stringifier: Stringifier,
@@ -31,14 +77,26 @@ export class CsvSink extends Sink {
     super();
   }
 
-  async write({ data, endCursor, finality }: SinkWriteArgs) {
-    await this.callHook("write", { data });
+  private async write({
+    data,
+    endCursor,
+  }: { data: SinkData[]; endCursor?: Cursor }) {
     // adds a "_cursor" property if "cursorColumn" is not specified by user
     data = this.processCursorColumn(data, endCursor);
     // Insert the data into csv
     await this.insertToCSV(data);
+  }
 
-    await this.callHook("flush", { endCursor, finality });
+  async transaction(cb: (params: TxnParams) => Promise<void>) {
+    const context: TxnContext = {
+      buffer: [],
+      endCursor: undefined,
+    };
+
+    const writer = transactionHelper(context);
+
+    await cb({ writer });
+    await this.write({ data: context.buffer, endCursor: context.endCursor });
   }
 
   private async insertToCSV(data: SinkData[]) {
@@ -86,9 +144,7 @@ export class CsvSink extends Sink {
   }
 }
 
-export const csv = <TData extends Record<string, unknown>>(
-  args: CsvArgs & CsvSinkOptions,
-) => {
+export const csv = (args: CsvArgs & CsvSinkOptions) => {
   const { csvOptions, filepath, ...sinkOptions } = args;
   const stringifier = stringify({ ...csvOptions });
 

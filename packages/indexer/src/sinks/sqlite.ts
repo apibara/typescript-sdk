@@ -1,6 +1,6 @@
 import type { Cursor } from "@apibara/protocol";
 import type { Database as SqliteDatabase } from "better-sqlite3";
-import { Sink, type SinkData, type SinkWriteArgs } from "../sink";
+import { Sink, type SinkData } from "../sink";
 
 export type SqliteSinkOptions = {
   /**
@@ -24,6 +24,50 @@ export type SqliteSinkOptions = {
   onConflict?: { on: string; update: string[] };
 };
 
+type TxnContext = {
+  buffer: SinkData[];
+  endCursor?: Cursor;
+};
+
+type TxnParams = {
+  writer: (endCursor?: Cursor | undefined) => {
+    insert: (data: SinkData[]) => void;
+  };
+};
+const transactionHelper = (context: TxnContext) => (endCursor?: Cursor) => {
+  return {
+    insert: (data: SinkData[]) => {
+      context.buffer.push(...data);
+      context.endCursor = endCursor;
+    },
+  };
+};
+
+/**
+ * A sink that writes data to a SQLite database.
+ *
+ * @example
+ *
+ * ```ts
+ * const sink = sqlite({
+ *   database: db,
+ *   tableName: "test",
+ * });
+ *
+ * ...
+ * async transform({context, endCursor}){
+ *  const { writer } = useSink(context);
+ *  const insertHelper = writer(endCursor);
+ *
+ *  insertHelper.insert([
+ *    { id: 1, name: "John" },
+ *    { id: 2, name: "Jane" },
+ *  ]);
+ * }
+ *
+ * ```
+ */
+
 export class SqliteSink extends Sink {
   private _config: Omit<SqliteSinkOptions, "database">;
   private _db: SqliteDatabase;
@@ -35,13 +79,24 @@ export class SqliteSink extends Sink {
     this._db = database;
   }
 
-  async write({ data, endCursor, finality }: SinkWriteArgs) {
-    await this.callHook("write", { data });
-
+  private async write({
+    data,
+    endCursor,
+  }: { data: SinkData[]; endCursor?: Cursor }) {
     data = this.processCursorColumn(data, endCursor);
     await this.insertJsonArray(data);
+  }
 
-    await this.callHook("flush", { endCursor, finality });
+  async transaction(cb: (params: TxnParams) => Promise<void>) {
+    const context: TxnContext = {
+      buffer: [],
+      endCursor: undefined,
+    };
+
+    const writer = transactionHelper(context);
+
+    await cb({ writer });
+    await this.write({ data: context.buffer, endCursor: context.endCursor });
   }
 
   private async insertJsonArray(data: SinkData[]) {

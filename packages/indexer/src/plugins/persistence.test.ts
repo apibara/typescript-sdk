@@ -9,7 +9,7 @@ import { klona } from "klona/full";
 import { describe, expect, it } from "vitest";
 import { run } from "../indexer";
 import { generateMockMessages } from "../testing";
-import { type MockRet, getMockIndexer } from "../testing/indexer";
+import { getMockIndexer } from "../testing/indexer";
 import { SqlitePersistence, sqlitePersistence } from "./persistence";
 
 describe("Persistence", () => {
@@ -120,12 +120,16 @@ describe("Persistence", () => {
 
     const db = new Database(":memory:");
 
-    const persistence = sqlitePersistence<MockFilter, MockBlock, MockRet>({
-      database: db,
-    });
-
     // create mock indexer with persistence plugin
-    const indexer = klona(getMockIndexer([persistence]));
+    const indexer = klona(
+      getMockIndexer({
+        plugins: [
+          sqlitePersistence({
+            database: db,
+          }),
+        ],
+      }),
+    );
 
     await run(client, indexer);
 

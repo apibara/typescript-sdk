@@ -5,6 +5,7 @@ import {
 } from "@apibara/protocol/testing";
 import Database from "better-sqlite3";
 import { describe, expect, it } from "vitest";
+import { useSink } from "../hooks";
 import { run } from "../indexer";
 import {} from "../plugins/persistence";
 import { generateMockMessages } from "../testing";
@@ -33,7 +34,19 @@ describe("Run Test", () => {
       database: db,
       tableName: "test",
     });
-    await run(client, getMockIndexer(), sink);
+    await run(
+      client,
+      getMockIndexer({
+        sink,
+        override: {
+          transform: async ({ context, endCursor, block: { data } }) => {
+            const { writer } = useSink({ context });
+            const insertHelper = writer(endCursor);
+            insertHelper.insert([{ data }]);
+          },
+        },
+      }),
+    );
 
     const sinkData = db.prepare("SELECT * FROM test").all();
 

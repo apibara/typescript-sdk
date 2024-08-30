@@ -5,10 +5,10 @@ import { useIndexerContext } from "../context";
 import { deserialize, serialize } from "../vcr";
 import { defineIndexerPlugin } from "./config";
 
-export function kv<TFilter, TBlock, TRet>({
+export function kv<TFilter, TBlock, TTxnParams>({
   database,
 }: { database: SqliteDatabase }) {
-  return defineIndexerPlugin<TFilter, TBlock, TRet>((indexer) => {
+  return defineIndexerPlugin<TFilter, TBlock, TTxnParams>((indexer) => {
     indexer.hooks.hook("run:before", () => {
       KVStore.initialize(database);
     });
