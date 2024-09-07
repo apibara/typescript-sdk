@@ -9,7 +9,7 @@
     "./plugins": "./src/plugins/index.ts",
     "./sinks/sqlite": "./src/sinks/sqlite.ts",
     "./sinks/csv": "./src/sinks/csv.ts",
-    "./sinks/drizzle": "./src/sinks/drizzle.ts",
+    "./sinks/drizzle": "./src/sinks/drizzle/index.ts",
     "./testing": "./src/testing/index.ts"
   },
   "publishConfig": {
@@ -36,10 +36,10 @@
         "default": "./dist/sinks/csv.mjs"
       },
       "./sinks/drizzle": {
-        "types": "./dist/sinks/drizzle.d.ts",
-        "import": "./dist/sinks/drizzle.mjs",
-        "require": "./dist/sinks/drizzle.cjs",
-        "default": "./dist/sinks/drizzle.mjs"
+        "types": "./dist/sinks/drizzle/index.d.ts",
+        "import": "./dist/sinks/drizzle/index.mjs",
+        "require": "./dist/sinks/drizzle/index.cjs",
+        "default": "./dist/sinks/drizzle/index.mjs"
       },
       "./testing": {
         "types": "./dist/testing/index.d.ts",
@@ -64,6 +64,7 @@
     "better-sqlite3": "^11.1.2",
     "csv-stringify": "^6.5.0",
     "drizzle-orm": "^0.33.0",
+    "postgres-range": "^1.1.4",
     "unbuild": "^2.0.0",
     "vitest": "^1.6.0"
   },
@@ -80,6 +81,7 @@
     "better-sqlite3": "^11.1.2",
     "csv-stringify": "^6.5.0",
     "drizzle-orm": "^0.33.0",
+    "postgres-range": "^1.1.4",
     "vitest": "^1.6.0"
   }
 }
