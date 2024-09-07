@@ -1,3 +1,4 @@
+import assert from "node:assert";
 import { EvmStream } from "@apibara/evm";
 import { defineIndexer, useSink } from "@apibara/indexer";
 import { drizzle as drizzleSink } from "@apibara/indexer/sinks/drizzle";
@@ -43,7 +44,11 @@ export function createIndexerConfig(streamUrl: string) {
     },
     sink,
     async transform({ block: { header }, context }) {
-      const { db } = useSink({ context });
+      const { transaction } = useSink({ context });
+
+      assert(header !== undefined);
+
+      const db = transaction({ orderKey: header?.number });
 
       await db.insert(users).values([
         {

@@ -1,3 +1,4 @@
+import assert from "node:assert";
 import { defineIndexer, useSink } from "@apibara/indexer";
 import { drizzle as drizzleSink } from "@apibara/indexer/sinks/drizzle";
 import { StarknetStream } from "@apibara/starknet";
@@ -41,7 +42,11 @@ export function createIndexerConfig(streamUrl: string) {
     async transform({ block: { header }, context }) {
       consola.info("Transforming block ", header?.blockNumber);
 
-      const { db } = useSink({ context });
+      const { transaction } = useSink({ context });
+
+      assert(header !== undefined);
+
+      const db = transaction({ orderKey: header?.blockNumber });
 
       await db.insert(users).values([
         {

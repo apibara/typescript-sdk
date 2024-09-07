@@ -1,3 +1,4 @@
+import type { Cursor } from "@apibara/protocol";
 import type {
   ExtractTablesWithRelations,
   TablesRelationalConfig,
@@ -6,10 +7,10 @@ import type {
   PgDatabase,
   PgQueryResultHKT,
   PgTableWithColumns,
-  PgTransaction,
   TableConfig,
 } from "drizzle-orm/pg-core";
-import { Sink } from "../sink";
+import { Sink } from "../../sink";
+import { DrizzleSinkTransaction } from "./transaction";
 
 export type DrizzleSinkTables<
   TTableConfig extends Record<string, TableConfig>,
@@ -29,6 +30,29 @@ export type DrizzleSinkOptions<
   database: PgDatabase<TQueryResult, TFullSchema, TSchema>;
 };
 
+/**
+ * A sink that writes data to a PostgreSQL database using Drizzle ORM.
+ *
+ * @example
+ *
+ * ```ts
+ * const sink = drizzle({
+ *   database: db,
+ * });
+ *
+ * ...
+ * async transform({context, endCursor}){
+ *  const { transaction } = useSink(context);
+ *  const db = transaction(endCursor);
+ *
+ *  db.insert(users).values([
+ *    { id: 1, name: "John" },
+ *    { id: 2, name: "Jane" },
+ *  ]);
+ * }
+ *
+ * ```
+ */
 export class DrizzleSink<
   TQueryResult extends PgQueryResultHKT,
   TFullSchema extends Record<string, unknown> = Record<string, never>,
@@ -45,11 +69,17 @@ export class DrizzleSink<
 
   async transaction(
     cb: (params: {
-      db: PgTransaction<TQueryResult, TFullSchema, TSchema>;
+      transaction: (
+        endCursor?: Cursor,
+      ) => DrizzleSinkTransaction<TQueryResult, TFullSchema, TSchema>;
     }) => Promise<void>,
   ): Promise<void> {
     await this._db.transaction(async (db) => {
-      await cb({ db });
+      const transaction = (endCursor?: Cursor) => {
+        return new DrizzleSinkTransaction(db, endCursor);
+      };
+
+      await cb({ transaction });
     });
   }
 }
