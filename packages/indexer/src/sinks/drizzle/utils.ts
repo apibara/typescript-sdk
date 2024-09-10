@@ -1,4 +1,3 @@
-import type { Cursor } from "@apibara/protocol";
 import type { PgTableFn } from "drizzle-orm/pg-core";
 import { pgTable as drizzlePgTable } from "drizzle-orm/pg-core";
 import range from "postgres-range";
@@ -16,10 +15,7 @@ export const pgTable: PgTableFn = (name, columns, extraConfig?) => {
 };
 
 export const getDrizzleCursor = (
-  cursor_range:
-    | [Cursor | undefined | null, Cursor | undefined | null]
-    | Cursor
-    | undefined,
+  cursor_range: [bigint | undefined, bigint | undefined] | bigint | undefined,
 ) => {
   const isArray = Array.isArray(cursor_range);
   const [lower, upper] = isArray ? cursor_range : [cursor_range, undefined];
@@ -32,8 +28,8 @@ export const getDrizzleCursor = (
   }
   return new Int8Range(
     new range.Range(
-      Number(lower.orderKey),
-      Number(upper?.orderKey),
+      Number(lower),
+      Number(upper),
       range.RANGE_LB_INC | (isNoUpperBound ? range.RANGE_UB_INF : 0),
     ),
   );
