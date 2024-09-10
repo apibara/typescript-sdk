@@ -20,8 +20,10 @@ export type HeaderFilter = typeof HeaderFilter.Type;
  * @prop includeBlob Include any blob posted by the transaction..
  */
 export const TransactionFilter = Schema.Struct({
+  id: Schema.optional(Schema.Number),
   from: Schema.optional(Address),
   to: Schema.optional(Address),
+  create: Schema.optional(Schema.Boolean),
   includeBlob: Schema.optional(Schema.Boolean),
 });
 
@@ -33,6 +35,7 @@ export type TransactionFilter = typeof TransactionFilter.Type;
  * @prop status Filter validators by their status.
  */
 export const ValidatorFilter = Schema.Struct({
+  id: Schema.optional(Schema.Number),
   validatorIndex: Schema.optional(Schema.Number),
   status: Schema.optional(ValidatorStatus),
 });
@@ -44,6 +47,7 @@ export type ValidatorFilter = typeof ValidatorFilter.Type;
  * @prop includeTransaction Include the transaction that posted the blob.
  */
 export const BlobFilter = Schema.Struct({
+  id: Schema.optional(Schema.Number),
   includeTransaction: Schema.optional(Schema.Boolean),
 });
 

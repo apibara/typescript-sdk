@@ -34,6 +34,11 @@ export const DataFinality = Schema.transform(
 
 export type DataFinality = typeof DataFinality.Type;
 
+export const Duration = Schema.Struct({
+  seconds: Schema.BigIntFromSelf,
+  nanos: Schema.Number,
+});
+
 /** Create a `StreamDataRequest` with the given filter schema. */
 export const StreamDataRequest = <TA, TR>(
   filter: Schema.Schema<TA, Uint8Array, TR>,
@@ -42,6 +47,7 @@ export const StreamDataRequest = <TA, TR>(
     finality: Schema.optional(DataFinality),
     startingCursor: Schema.optional(Cursor),
     filter: Schema.mutable(Schema.Array(filter)),
+    heartbeatInterval: Schema.optional(Duration),
   });
 
 export type StreamDataRequest<TA> = {
@@ -58,6 +64,15 @@ export const Invalidate = Schema.Struct({
 });
 
 export type Invalidate = typeof Invalidate.Type;
+
+export const Finalize = Schema.Struct({
+  _tag: tag("finalize"),
+  finalize: Schema.Struct({
+    cursor: Schema.optional(Cursor),
+  }),
+});
+
+export type Finalize = typeof Finalize.Type;
 
 export const Heartbeat = Schema.Struct({
   _tag: tag("heartbeat"),
@@ -103,9 +118,14 @@ export const Data = <TA, TR>(
 
 export const StreamDataResponse = <TA, TR>(
   data: Schema.Schema<TA | null, Uint8Array, TR>,
-) => Schema.Union(Data(data), Invalidate, Heartbeat, SystemMessage);
+) => Schema.Union(Data(data), Invalidate, Finalize, Heartbeat, SystemMessage);
 
-const ResponseWithoutData = Schema.Union(Invalidate, Heartbeat, SystemMessage);
+const ResponseWithoutData = Schema.Union(
+  Invalidate,
+  Finalize,
+  Heartbeat,
+  SystemMessage,
+);
 type ResponseWithoutData = typeof ResponseWithoutData.Type;
 
 export type StreamDataResponse<TA> =

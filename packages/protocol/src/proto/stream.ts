@@ -5,9 +5,10 @@
 // source: stream.proto
 
 /* eslint-disable */
+import Long from "long";
 import { type CallContext, type CallOptions } from "nice-grpc-common";
 import _m0 from "protobufjs/minimal";
-import { Cursor, StatusRequest, StatusResponse } from "./common";
+import { Duration } from "./google/protobuf/duration";
 
 export const protobufPackage = "dna.v2.stream";
 
@@ -62,14 +63,58 @@ export function dataFinalityToJSON(object: DataFinality): string {
   }
 }
 
+/** A cursor over the stream content. */
+export interface Cursor {
+  /**
+   * Key used for ordering messages in the stream.
+   *
+   * This is usually the block or slot number.
+   */
+  readonly orderKey: bigint;
+  /**
+   * Key used to discriminate branches in the stream.
+   *
+   * This is usually the hash of the block.
+   */
+  readonly uniqueKey: Uint8Array;
+}
+
+/** Request for the `Status` method. */
+export interface StatusRequest {
+}
+
+/** Response for the `Status` method. */
+export interface StatusResponse {
+  /** The current head of the chain. */
+  readonly currentHead?:
+    | Cursor
+    | undefined;
+  /** The last cursor that was ingested by the node. */
+  readonly lastIngested?:
+    | Cursor
+    | undefined;
+  /** The finalized block. */
+  readonly finalized?:
+    | Cursor
+    | undefined;
+  /** The first block available. */
+  readonly starting?: Cursor | undefined;
+}
+
 /** Request data to be streamed. */
 export interface StreamDataRequest {
-  /** Cursor to start streaming from. */
+  /**
+   * Cursor to start streaming from.
+   *
+   * If not specified, starts from the genesis block.
+   * Use the data's message `end_cursor` field to resume streaming.
+   */
   readonly startingCursor?:
     | Cursor
     | undefined;
   /**
    * Return data with the specified finality.
+   *
    * If not specified, defaults to `DATA_FINALITY_ACCEPTED`.
    */
   readonly finality?:
@@ -77,6 +122,13 @@ export interface StreamDataRequest {
     | undefined;
   /** Filters used to generate data. */
   readonly filter: readonly Uint8Array[];
+  /**
+   * Heartbeat interval.
+   *
+   * Value must be between 10 and 60 seconds.
+   * If not specified, defaults to 30 seconds.
+   */
+  readonly heartbeatInterval?: Duration | undefined;
 }
 
 /** Contains a piece of streamed data. */
@@ -84,6 +136,7 @@ export interface StreamDataResponse {
   readonly message?:
     | { readonly $case: "data"; readonly data: Data }
     | { readonly $case: "invalidate"; readonly invalidate: Invalidate }
+    | { readonly $case: "finalize"; readonly finalize: Finalize }
     | { readonly $case: "heartbeat"; readonly heartbeat: Heartbeat }
     | { readonly $case: "systemMessage"; readonly systemMessage: SystemMessage }
     | undefined;
@@ -91,7 +144,25 @@ export interface StreamDataResponse {
 
 /** Invalidate data after the given cursor. */
 export interface Invalidate {
-  /** The cursor of the message before the now invalid data. */
+  /**
+   * The cursor of the new chain's head.
+   *
+   * All data after this cursor should be considered invalid.
+   */
+  readonly cursor?:
+    | Cursor
+    | undefined;
+  /** List of blocks that were removed from the chain. */
+  readonly removed: readonly Cursor[];
+}
+
+/** Move the finalized block forward. */
+export interface Finalize {
+  /**
+   * The cursor of the new finalized block.
+   *
+   * All data before this cursor cannot be invalidated.
+   */
   readonly cursor?: Cursor | undefined;
 }
 
@@ -115,7 +186,11 @@ export interface Data {
     | undefined;
   /** The finality status of the block. */
   readonly finality: DataFinality;
-  /** The block data. */
+  /**
+   * The block data.
+   *
+   * This message contains chain-specific data serialized using protobuf.
+   */
   readonly data: readonly Uint8Array[];
 }
 
@@ -131,8 +206,240 @@ export interface SystemMessage {
   } | undefined;
 }
 
+function createBaseCursor(): Cursor {
+  return { orderKey: BigInt("0"), uniqueKey: new Uint8Array(0) };
+}
+
+export const Cursor = {
+  encode(message: Cursor, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.orderKey !== BigInt("0")) {
+      if (BigInt.asUintN(64, message.orderKey) !== message.orderKey) {
+        throw new globalThis.Error("value provided for field message.orderKey of type uint64 too large");
+      }
+      writer.uint32(8).uint64(message.orderKey.toString());
+    }
+    if (message.uniqueKey.length !== 0) {
+      writer.uint32(18).bytes(message.uniqueKey);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): Cursor {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseCursor() as any;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 8) {
+            break;
+          }
+
+          message.orderKey = longToBigint(reader.uint64() as Long);
+          continue;
+        case 2:
+          if (tag !== 18) {
+            break;
+          }
+
+          message.uniqueKey = reader.bytes();
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): Cursor {
+    return {
+      orderKey: isSet(object.orderKey) ? BigInt(object.orderKey) : BigInt("0"),
+      uniqueKey: isSet(object.uniqueKey) ? bytesFromBase64(object.uniqueKey) : new Uint8Array(0),
+    };
+  },
+
+  toJSON(message: Cursor): unknown {
+    const obj: any = {};
+    if (message.orderKey !== BigInt("0")) {
+      obj.orderKey = message.orderKey.toString();
+    }
+    if (message.uniqueKey.length !== 0) {
+      obj.uniqueKey = base64FromBytes(message.uniqueKey);
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<Cursor>): Cursor {
+    return Cursor.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<Cursor>): Cursor {
+    const message = createBaseCursor() as any;
+    message.orderKey = object.orderKey ?? BigInt("0");
+    message.uniqueKey = object.uniqueKey ?? new Uint8Array(0);
+    return message;
+  },
+};
+
+function createBaseStatusRequest(): StatusRequest {
+  return {};
+}
+
+export const StatusRequest = {
+  encode(_: StatusRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): StatusRequest {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseStatusRequest() as any;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(_: any): StatusRequest {
+    return {};
+  },
+
+  toJSON(_: StatusRequest): unknown {
+    const obj: any = {};
+    return obj;
+  },
+
+  create(base?: DeepPartial<StatusRequest>): StatusRequest {
+    return StatusRequest.fromPartial(base ?? {});
+  },
+  fromPartial(_: DeepPartial<StatusRequest>): StatusRequest {
+    const message = createBaseStatusRequest() as any;
+    return message;
+  },
+};
+
+function createBaseStatusResponse(): StatusResponse {
+  return { currentHead: undefined, lastIngested: undefined, finalized: undefined, starting: undefined };
+}
+
+export const StatusResponse = {
+  encode(message: StatusResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.currentHead !== undefined) {
+      Cursor.encode(message.currentHead, writer.uint32(10).fork()).ldelim();
+    }
+    if (message.lastIngested !== undefined) {
+      Cursor.encode(message.lastIngested, writer.uint32(18).fork()).ldelim();
+    }
+    if (message.finalized !== undefined) {
+      Cursor.encode(message.finalized, writer.uint32(26).fork()).ldelim();
+    }
+    if (message.starting !== undefined) {
+      Cursor.encode(message.starting, writer.uint32(34).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): StatusResponse {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseStatusResponse() as any;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.currentHead = Cursor.decode(reader, reader.uint32());
+          continue;
+        case 2:
+          if (tag !== 18) {
+            break;
+          }
+
+          message.lastIngested = Cursor.decode(reader, reader.uint32());
+          continue;
+        case 3:
+          if (tag !== 26) {
+            break;
+          }
+
+          message.finalized = Cursor.decode(reader, reader.uint32());
+          continue;
+        case 4:
+          if (tag !== 34) {
+            break;
+          }
+
+          message.starting = Cursor.decode(reader, reader.uint32());
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): StatusResponse {
+    return {
+      currentHead: isSet(object.currentHead) ? Cursor.fromJSON(object.currentHead) : undefined,
+      lastIngested: isSet(object.lastIngested) ? Cursor.fromJSON(object.lastIngested) : undefined,
+      finalized: isSet(object.finalized) ? Cursor.fromJSON(object.finalized) : undefined,
+      starting: isSet(object.starting) ? Cursor.fromJSON(object.starting) : undefined,
+    };
+  },
+
+  toJSON(message: StatusResponse): unknown {
+    const obj: any = {};
+    if (message.currentHead !== undefined) {
+      obj.currentHead = Cursor.toJSON(message.currentHead);
+    }
+    if (message.lastIngested !== undefined) {
+      obj.lastIngested = Cursor.toJSON(message.lastIngested);
+    }
+    if (message.finalized !== undefined) {
+      obj.finalized = Cursor.toJSON(message.finalized);
+    }
+    if (message.starting !== undefined) {
+      obj.starting = Cursor.toJSON(message.starting);
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<StatusResponse>): StatusResponse {
+    return StatusResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<StatusResponse>): StatusResponse {
+    const message = createBaseStatusResponse() as any;
+    message.currentHead = (object.currentHead !== undefined && object.currentHead !== null)
+      ? Cursor.fromPartial(object.currentHead)
+      : undefined;
+    message.lastIngested = (object.lastIngested !== undefined && object.lastIngested !== null)
+      ? Cursor.fromPartial(object.lastIngested)
+      : undefined;
+    message.finalized = (object.finalized !== undefined && object.finalized !== null)
+      ? Cursor.fromPartial(object.finalized)
+      : undefined;
+    message.starting = (object.starting !== undefined && object.starting !== null)
+      ? Cursor.fromPartial(object.starting)
+      : undefined;
+    return message;
+  },
+};
+
 function createBaseStreamDataRequest(): StreamDataRequest {
-  return { startingCursor: undefined, finality: undefined, filter: [] };
+  return { startingCursor: undefined, finality: undefined, filter: [], heartbeatInterval: undefined };
 }
 
 export const StreamDataRequest = {
@@ -145,6 +452,9 @@ export const StreamDataRequest = {
     }
     for (const v of message.filter) {
       writer.uint32(26).bytes(v!);
+    }
+    if (message.heartbeatInterval !== undefined) {
+      Duration.encode(message.heartbeatInterval, writer.uint32(34).fork()).ldelim();
     }
     return writer;
   },
@@ -177,6 +487,13 @@ export const StreamDataRequest = {
 
           message.filter.push(reader.bytes());
           continue;
+        case 4:
+          if (tag !== 34) {
+            break;
+          }
+
+          message.heartbeatInterval = Duration.decode(reader, reader.uint32());
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -191,6 +508,7 @@ export const StreamDataRequest = {
       startingCursor: isSet(object.startingCursor) ? Cursor.fromJSON(object.startingCursor) : undefined,
       finality: isSet(object.finality) ? dataFinalityFromJSON(object.finality) : undefined,
       filter: globalThis.Array.isArray(object?.filter) ? object.filter.map((e: any) => bytesFromBase64(e)) : [],
+      heartbeatInterval: isSet(object.heartbeatInterval) ? Duration.fromJSON(object.heartbeatInterval) : undefined,
     };
   },
 
@@ -205,6 +523,9 @@ export const StreamDataRequest = {
     if (message.filter?.length) {
       obj.filter = message.filter.map((e) => base64FromBytes(e));
     }
+    if (message.heartbeatInterval !== undefined) {
+      obj.heartbeatInterval = Duration.toJSON(message.heartbeatInterval);
+    }
     return obj;
   },
 
@@ -218,6 +539,9 @@ export const StreamDataRequest = {
       : undefined;
     message.finality = object.finality ?? undefined;
     message.filter = object.filter?.map((e) => e) || [];
+    message.heartbeatInterval = (object.heartbeatInterval !== undefined && object.heartbeatInterval !== null)
+      ? Duration.fromPartial(object.heartbeatInterval)
+      : undefined;
     return message;
   },
 };
@@ -235,11 +559,14 @@ export const StreamDataResponse = {
       case "invalidate":
         Invalidate.encode(message.message.invalidate, writer.uint32(18).fork()).ldelim();
         break;
+      case "finalize":
+        Finalize.encode(message.message.finalize, writer.uint32(26).fork()).ldelim();
+        break;
       case "heartbeat":
-        Heartbeat.encode(message.message.heartbeat, writer.uint32(26).fork()).ldelim();
+        Heartbeat.encode(message.message.heartbeat, writer.uint32(34).fork()).ldelim();
         break;
       case "systemMessage":
-        SystemMessage.encode(message.message.systemMessage, writer.uint32(34).fork()).ldelim();
+        SystemMessage.encode(message.message.systemMessage, writer.uint32(42).fork()).ldelim();
         break;
     }
     return writer;
@@ -271,10 +598,17 @@ export const StreamDataResponse = {
             break;
           }
 
-          message.message = { $case: "heartbeat", heartbeat: Heartbeat.decode(reader, reader.uint32()) };
+          message.message = { $case: "finalize", finalize: Finalize.decode(reader, reader.uint32()) };
           continue;
         case 4:
           if (tag !== 34) {
+            break;
+          }
+
+          message.message = { $case: "heartbeat", heartbeat: Heartbeat.decode(reader, reader.uint32()) };
+          continue;
+        case 5:
+          if (tag !== 42) {
             break;
           }
 
@@ -295,6 +629,8 @@ export const StreamDataResponse = {
         ? { $case: "data", data: Data.fromJSON(object.data) }
         : isSet(object.invalidate)
         ? { $case: "invalidate", invalidate: Invalidate.fromJSON(object.invalidate) }
+        : isSet(object.finalize)
+        ? { $case: "finalize", finalize: Finalize.fromJSON(object.finalize) }
         : isSet(object.heartbeat)
         ? { $case: "heartbeat", heartbeat: Heartbeat.fromJSON(object.heartbeat) }
         : isSet(object.systemMessage)
@@ -310,6 +646,9 @@ export const StreamDataResponse = {
     }
     if (message.message?.$case === "invalidate") {
       obj.invalidate = Invalidate.toJSON(message.message.invalidate);
+    }
+    if (message.message?.$case === "finalize") {
+      obj.finalize = Finalize.toJSON(message.message.finalize);
     }
     if (message.message?.$case === "heartbeat") {
       obj.heartbeat = Heartbeat.toJSON(message.message.heartbeat);
@@ -336,6 +675,13 @@ export const StreamDataResponse = {
       message.message = { $case: "invalidate", invalidate: Invalidate.fromPartial(object.message.invalidate) };
     }
     if (
+      object.message?.$case === "finalize" &&
+      object.message?.finalize !== undefined &&
+      object.message?.finalize !== null
+    ) {
+      message.message = { $case: "finalize", finalize: Finalize.fromPartial(object.message.finalize) };
+    }
+    if (
       object.message?.$case === "heartbeat" &&
       object.message?.heartbeat !== undefined &&
       object.message?.heartbeat !== null
@@ -357,13 +703,16 @@ export const StreamDataResponse = {
 };
 
 function createBaseInvalidate(): Invalidate {
-  return { cursor: undefined };
+  return { cursor: undefined, removed: [] };
 }
 
 export const Invalidate = {
   encode(message: Invalidate, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.cursor !== undefined) {
       Cursor.encode(message.cursor, writer.uint32(10).fork()).ldelim();
+    }
+    for (const v of message.removed) {
+      Cursor.encode(v!, writer.uint32(18).fork()).ldelim();
     }
     return writer;
   },
@@ -372,6 +721,79 @@ export const Invalidate = {
     const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseInvalidate() as any;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.cursor = Cursor.decode(reader, reader.uint32());
+          continue;
+        case 2:
+          if (tag !== 18) {
+            break;
+          }
+
+          message.removed.push(Cursor.decode(reader, reader.uint32()));
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): Invalidate {
+    return {
+      cursor: isSet(object.cursor) ? Cursor.fromJSON(object.cursor) : undefined,
+      removed: globalThis.Array.isArray(object?.removed) ? object.removed.map((e: any) => Cursor.fromJSON(e)) : [],
+    };
+  },
+
+  toJSON(message: Invalidate): unknown {
+    const obj: any = {};
+    if (message.cursor !== undefined) {
+      obj.cursor = Cursor.toJSON(message.cursor);
+    }
+    if (message.removed?.length) {
+      obj.removed = message.removed.map((e) => Cursor.toJSON(e));
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<Invalidate>): Invalidate {
+    return Invalidate.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<Invalidate>): Invalidate {
+    const message = createBaseInvalidate() as any;
+    message.cursor = (object.cursor !== undefined && object.cursor !== null)
+      ? Cursor.fromPartial(object.cursor)
+      : undefined;
+    message.removed = object.removed?.map((e) => Cursor.fromPartial(e)) || [];
+    return message;
+  },
+};
+
+function createBaseFinalize(): Finalize {
+  return { cursor: undefined };
+}
+
+export const Finalize = {
+  encode(message: Finalize, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.cursor !== undefined) {
+      Cursor.encode(message.cursor, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): Finalize {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseFinalize() as any;
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -391,11 +813,11 @@ export const Invalidate = {
     return message;
   },
 
-  fromJSON(object: any): Invalidate {
+  fromJSON(object: any): Finalize {
     return { cursor: isSet(object.cursor) ? Cursor.fromJSON(object.cursor) : undefined };
   },
 
-  toJSON(message: Invalidate): unknown {
+  toJSON(message: Finalize): unknown {
     const obj: any = {};
     if (message.cursor !== undefined) {
       obj.cursor = Cursor.toJSON(message.cursor);
@@ -403,11 +825,11 @@ export const Invalidate = {
     return obj;
   },
 
-  create(base?: DeepPartial<Invalidate>): Invalidate {
-    return Invalidate.fromPartial(base ?? {});
+  create(base?: DeepPartial<Finalize>): Finalize {
+    return Finalize.fromPartial(base ?? {});
   },
-  fromPartial(object: DeepPartial<Invalidate>): Invalidate {
-    const message = createBaseInvalidate() as any;
+  fromPartial(object: DeepPartial<Finalize>): Finalize {
+    const message = createBaseFinalize() as any;
     message.cursor = (object.cursor !== undefined && object.cursor !== null)
       ? Cursor.fromPartial(object.cursor)
       : undefined;
@@ -729,6 +1151,15 @@ export type DeepPartial<T> = T extends Builtin ? T
     ? { [K in keyof Omit<T, "$case">]?: DeepPartial<T[K]> } & { readonly $case: T["$case"] }
   : T extends {} ? { [K in keyof T]?: DeepPartial<T[K]> }
   : Partial<T>;
+
+function longToBigint(long: Long) {
+  return BigInt(long.toString());
+}
+
+if (_m0.util.Long !== Long) {
+  _m0.util.Long = Long as any;
+  _m0.configure();
+}
 
 function isSet(value: any): boolean {
   return value !== null && value !== undefined;

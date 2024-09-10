@@ -14,6 +14,8 @@ export const statusRequestFromProto = Schema.decodeSync(StatusRequest);
 export const StatusResponse = Schema.Struct({
   currentHead: Schema.optional(Cursor),
   lastIngested: Schema.optional(Cursor),
+  finalized: Schema.optional(Cursor),
+  starting: Schema.optional(Cursor),
 });
 
 export type StatusResponse = typeof StatusResponse.Type;

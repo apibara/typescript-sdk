@@ -35,6 +35,7 @@ export const BlockHeader = Schema.Struct({
 export type BlockHeader = typeof BlockHeader.Type;
 
 export const Validator = Schema.Struct({
+  filterIds: Schema.optional(Schema.Array(Schema.Number)),
   validatorIndex: Schema.optional(Schema.Number),
   balance: Schema.optional(Schema.BigIntFromSelf),
   status: Schema.optional(ValidatorStatus),
@@ -49,6 +50,7 @@ export const Validator = Schema.Struct({
 });
 
 export const Blob = Schema.Struct({
+  filterIds: Schema.optional(Schema.Array(Schema.Number)),
   blobIndex: Schema.optional(Schema.Number),
   blob: Schema.optional(Schema.Uint8ArrayFromSelf),
   kzgCommitment: Schema.optional(B384),
@@ -60,6 +62,7 @@ export const Blob = Schema.Struct({
 });
 
 export const Transaction = Schema.Struct({
+  filterIds: Schema.optional(Schema.Array(Schema.Number)),
   transactionHash: Schema.optional(B256),
   nonce: Schema.optional(Schema.BigIntFromSelf),
   transactionIndex: Schema.optional(Schema.Number),

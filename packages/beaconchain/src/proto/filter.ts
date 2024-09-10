@@ -35,6 +35,9 @@ export interface HeaderFilter {
 }
 
 export interface TransactionFilter {
+  readonly id?:
+    | number
+    | undefined;
   /** Filter based on the transaction's sender address. */
   readonly from?:
     | Address
@@ -43,11 +46,18 @@ export interface TransactionFilter {
   readonly to?:
     | Address
     | undefined;
+  /** Only return `creat` transactions. Defaults to `false`. */
+  readonly create?:
+    | boolean
+    | undefined;
   /** Include the transaction's blob. Defaults to `false`. */
   readonly includeBlob?: boolean | undefined;
 }
 
 export interface ValidatorFilter {
+  readonly id?:
+    | number
+    | undefined;
   /** Filter the validator based on its index. */
   readonly validatorIndex?:
     | number
@@ -57,6 +67,9 @@ export interface ValidatorFilter {
 }
 
 export interface BlobFilter {
+  readonly id?:
+    | number
+    | undefined;
   /** Include the transaction that posted the blob. */
   readonly includeTransaction?: boolean | undefined;
 }
@@ -235,19 +248,25 @@ export const HeaderFilter = {
 };
 
 function createBaseTransactionFilter(): TransactionFilter {
-  return { from: undefined, to: undefined, includeBlob: undefined };
+  return { id: 0, from: undefined, to: undefined, create: undefined, includeBlob: undefined };
 }
 
 export const TransactionFilter = {
   encode(message: TransactionFilter, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.id !== undefined && message.id !== 0) {
+      writer.uint32(8).uint32(message.id);
+    }
     if (message.from !== undefined) {
-      Address.encode(message.from, writer.uint32(10).fork()).ldelim();
+      Address.encode(message.from, writer.uint32(18).fork()).ldelim();
     }
     if (message.to !== undefined) {
-      Address.encode(message.to, writer.uint32(18).fork()).ldelim();
+      Address.encode(message.to, writer.uint32(26).fork()).ldelim();
+    }
+    if (message.create !== undefined) {
+      writer.uint32(32).bool(message.create);
     }
     if (message.includeBlob !== undefined) {
-      writer.uint32(24).bool(message.includeBlob);
+      writer.uint32(40).bool(message.includeBlob);
     }
     return writer;
   },
@@ -260,21 +279,35 @@ export const TransactionFilter = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          if (tag !== 10) {
+          if (tag !== 8) {
             break;
           }
 
-          message.from = Address.decode(reader, reader.uint32());
+          message.id = reader.uint32();
           continue;
         case 2:
           if (tag !== 18) {
             break;
           }
 
-          message.to = Address.decode(reader, reader.uint32());
+          message.from = Address.decode(reader, reader.uint32());
           continue;
         case 3:
-          if (tag !== 24) {
+          if (tag !== 26) {
+            break;
+          }
+
+          message.to = Address.decode(reader, reader.uint32());
+          continue;
+        case 4:
+          if (tag !== 32) {
+            break;
+          }
+
+          message.create = reader.bool();
+          continue;
+        case 5:
+          if (tag !== 40) {
             break;
           }
 
@@ -291,19 +324,27 @@ export const TransactionFilter = {
 
   fromJSON(object: any): TransactionFilter {
     return {
+      id: isSet(object.id) ? globalThis.Number(object.id) : 0,
       from: isSet(object.from) ? Address.fromJSON(object.from) : undefined,
       to: isSet(object.to) ? Address.fromJSON(object.to) : undefined,
+      create: isSet(object.create) ? globalThis.Boolean(object.create) : undefined,
       includeBlob: isSet(object.includeBlob) ? globalThis.Boolean(object.includeBlob) : undefined,
     };
   },
 
   toJSON(message: TransactionFilter): unknown {
     const obj: any = {};
+    if (message.id !== undefined && message.id !== 0) {
+      obj.id = Math.round(message.id);
+    }
     if (message.from !== undefined) {
       obj.from = Address.toJSON(message.from);
     }
     if (message.to !== undefined) {
       obj.to = Address.toJSON(message.to);
+    }
+    if (message.create !== undefined) {
+      obj.create = message.create;
     }
     if (message.includeBlob !== undefined) {
       obj.includeBlob = message.includeBlob;
@@ -316,24 +357,29 @@ export const TransactionFilter = {
   },
   fromPartial(object: DeepPartial<TransactionFilter>): TransactionFilter {
     const message = createBaseTransactionFilter() as any;
+    message.id = object.id ?? 0;
     message.from = (object.from !== undefined && object.from !== null) ? Address.fromPartial(object.from) : undefined;
     message.to = (object.to !== undefined && object.to !== null) ? Address.fromPartial(object.to) : undefined;
+    message.create = object.create ?? undefined;
     message.includeBlob = object.includeBlob ?? undefined;
     return message;
   },
 };
 
 function createBaseValidatorFilter(): ValidatorFilter {
-  return { validatorIndex: undefined, status: 0 };
+  return { id: 0, validatorIndex: undefined, status: undefined };
 }
 
 export const ValidatorFilter = {
   encode(message: ValidatorFilter, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.validatorIndex !== undefined) {
-      writer.uint32(8).uint32(message.validatorIndex);
+    if (message.id !== undefined && message.id !== 0) {
+      writer.uint32(8).uint32(message.id);
     }
-    if (message.status !== undefined && message.status !== 0) {
-      writer.uint32(16).int32(message.status);
+    if (message.validatorIndex !== undefined) {
+      writer.uint32(16).uint32(message.validatorIndex);
+    }
+    if (message.status !== undefined) {
+      writer.uint32(24).int32(message.status);
     }
     return writer;
   },
@@ -350,10 +396,17 @@ export const ValidatorFilter = {
             break;
           }
 
-          message.validatorIndex = reader.uint32();
+          message.id = reader.uint32();
           continue;
         case 2:
           if (tag !== 16) {
+            break;
+          }
+
+          message.validatorIndex = reader.uint32();
+          continue;
+        case 3:
+          if (tag !== 24) {
             break;
           }
 
@@ -370,17 +423,21 @@ export const ValidatorFilter = {
 
   fromJSON(object: any): ValidatorFilter {
     return {
+      id: isSet(object.id) ? globalThis.Number(object.id) : 0,
       validatorIndex: isSet(object.validatorIndex) ? globalThis.Number(object.validatorIndex) : undefined,
-      status: isSet(object.status) ? validatorStatusFromJSON(object.status) : 0,
+      status: isSet(object.status) ? validatorStatusFromJSON(object.status) : undefined,
     };
   },
 
   toJSON(message: ValidatorFilter): unknown {
     const obj: any = {};
+    if (message.id !== undefined && message.id !== 0) {
+      obj.id = Math.round(message.id);
+    }
     if (message.validatorIndex !== undefined) {
       obj.validatorIndex = Math.round(message.validatorIndex);
     }
-    if (message.status !== undefined && message.status !== 0) {
+    if (message.status !== undefined) {
       obj.status = validatorStatusToJSON(message.status);
     }
     return obj;
@@ -391,20 +448,24 @@ export const ValidatorFilter = {
   },
   fromPartial(object: DeepPartial<ValidatorFilter>): ValidatorFilter {
     const message = createBaseValidatorFilter() as any;
+    message.id = object.id ?? 0;
     message.validatorIndex = object.validatorIndex ?? undefined;
-    message.status = object.status ?? 0;
+    message.status = object.status ?? undefined;
     return message;
   },
 };
 
 function createBaseBlobFilter(): BlobFilter {
-  return { includeTransaction: undefined };
+  return { id: 0, includeTransaction: undefined };
 }
 
 export const BlobFilter = {
   encode(message: BlobFilter, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.id !== undefined && message.id !== 0) {
+      writer.uint32(8).uint32(message.id);
+    }
     if (message.includeTransaction !== undefined) {
-      writer.uint32(8).bool(message.includeTransaction);
+      writer.uint32(16).bool(message.includeTransaction);
     }
     return writer;
   },
@@ -421,6 +482,13 @@ export const BlobFilter = {
             break;
           }
 
+          message.id = reader.uint32();
+          continue;
+        case 2:
+          if (tag !== 16) {
+            break;
+          }
+
           message.includeTransaction = reader.bool();
           continue;
       }
@@ -434,12 +502,16 @@ export const BlobFilter = {
 
   fromJSON(object: any): BlobFilter {
     return {
+      id: isSet(object.id) ? globalThis.Number(object.id) : 0,
       includeTransaction: isSet(object.includeTransaction) ? globalThis.Boolean(object.includeTransaction) : undefined,
     };
   },
 
   toJSON(message: BlobFilter): unknown {
     const obj: any = {};
+    if (message.id !== undefined && message.id !== 0) {
+      obj.id = Math.round(message.id);
+    }
     if (message.includeTransaction !== undefined) {
       obj.includeTransaction = message.includeTransaction;
     }
@@ -451,6 +523,7 @@ export const BlobFilter = {
   },
   fromPartial(object: DeepPartial<BlobFilter>): BlobFilter {
     const message = createBaseBlobFilter() as any;
+    message.id = object.id ?? 0;
     message.includeTransaction = object.includeTransaction ?? undefined;
     return message;
   },

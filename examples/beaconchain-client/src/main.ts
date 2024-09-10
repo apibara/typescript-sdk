@@ -13,7 +13,7 @@ const command = defineCommand({
   args: {
     stream: {
       type: "string",
-      default: "http://localhost:7007",
+      default: "https://beaconchain-sepolia.preview.apibara.org",
       description: "Beacon Chain stream URL",
     },
     authToken: {
@@ -34,23 +34,18 @@ const command = defineCommand({
     console.log(response);
 
     const filter = Filter.make({
-      blobs: [
+      transactions: [
         {
-          includeTransaction: true,
+          includeBlob: true,
         },
       ],
-      // transactions: [{
-      //   to: "0xff00000000000000000000000000000000042069",
-      //   includeBlob: true,
-      // }]
-      // validators: [{}],
     });
 
     const request = BeaconChainStream.Request.make({
       filter: [filter],
       finality: "accepted",
       startingCursor: {
-        orderKey: 5_200_000n,
+        orderKey: 5_880_000n,
       },
     });
 
@@ -63,21 +58,29 @@ const command = defineCommand({
           for (const block of message.data.data) {
             assert(block !== null);
             const transactions = block.transactions ?? [];
-            for (const blob of block.blobs) {
-              if (blob.blob === undefined) continue;
-              let i = blob.blob.length - 1;
-              while (i >= 0 && blob.blob[i] === 0) i--;
-              const utilization = (i / maxBlobSize) * 100;
-              const tx = transactions.find(
-                (tx) => tx.transactionIndex === blob.transactionIndex,
+            const blobs = block.blobs ?? [];
+            for (const tx of transactions) {
+              const blob = blobs.find(
+                (b) => b.transactionIndex === tx.transactionIndex,
               );
-              consola.info(
-                `${blob.transactionHash} - ${utilization.toFixed(2)}%`,
-              );
-              consola.info(`    ${tx?.to}`);
+              if (blob) {
+                consola.info(
+                  `${tx.transactionHash} - ${blob.blob?.length ?? 0} bytes`,
+                );
+              } else {
+                consola.info(`${tx.transactionHash} - no blob`);
+              }
             }
           }
 
+          break;
+        }
+        case "finalize": {
+          consola.info("Finalize", message.finalize.cursor);
+          break;
+        }
+        case "heartbeat": {
+          consola.info("Heartbeat");
           break;
         }
         case "systemMessage": {
