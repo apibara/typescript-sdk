@@ -1,16 +1,17 @@
 import assert from "node:assert";
 import { defineIndexer, useSink } from "@apibara/indexer";
-import { drizzle as drizzleSink } from "@apibara/indexer/sinks/drizzle";
+import {
+  drizzle as drizzleSink,
+  pgTable,
+} from "@apibara/indexer/sinks/drizzle";
 import { StarknetStream } from "@apibara/starknet";
 import consola from "consola";
-import { pgTable, serial, text, varchar } from "drizzle-orm/pg-core";
+import { bigint } from "drizzle-orm/pg-core";
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
 
-const users = pgTable("users", {
-  id: serial("id").primaryKey(),
-  firstName: text("full_name"),
-  phone: varchar("phone", { length: 256 }),
+const headers = pgTable("headers", {
+  number: bigint("number", { mode: "bigint" }),
 });
 
 export function createIndexerConfig(streamUrl: string) {
@@ -48,11 +49,9 @@ export function createIndexerConfig(streamUrl: string) {
 
       const db = transaction({ orderKey: header?.blockNumber });
 
-      await db.insert(users).values([
+      await db.insert(headers).values([
         {
-          id: Number(header?.blockNumber),
-          firstName: `John Doe ${Number(header?.blockNumber)}`,
-          phone: "+91 1234567890",
+          number: header?.blockNumber,
         },
       ]);
 
