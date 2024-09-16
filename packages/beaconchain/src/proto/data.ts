@@ -42,20 +42,54 @@ export interface Block {
 }
 
 export interface BlockHeader {
-  readonly slot?: bigint | undefined;
-  readonly proposerIndex?: number | undefined;
-  readonly parentRoot?: B256 | undefined;
-  readonly stateRoot?: B256 | undefined;
-  readonly randaoReveal?: Uint8Array | undefined;
-  readonly depositCount?: bigint | undefined;
-  readonly depositRoot?: B256 | undefined;
-  readonly blockHash?: B256 | undefined;
-  readonly graffiti?: B256 | undefined;
-  readonly executionPayload?: ExecutionPayload | undefined;
+  /** Block slot. */
+  readonly slot?:
+    | bigint
+    | undefined;
+  /** Proposer index. */
+  readonly proposerIndex?:
+    | number
+    | undefined;
+  /** Parent root. */
+  readonly parentRoot?:
+    | B256
+    | undefined;
+  /** State root. */
+  readonly stateRoot?:
+    | B256
+    | undefined;
+  /** Randao reveal. */
+  readonly randaoReveal?:
+    | Uint8Array
+    | undefined;
+  /** Deposit count. */
+  readonly depositCount?:
+    | bigint
+    | undefined;
+  /** Deposit state root. */
+  readonly depositRoot?:
+    | B256
+    | undefined;
+  /** Block hash. */
+  readonly blockHash?:
+    | B256
+    | undefined;
+  /** Graffiti. */
+  readonly graffiti?:
+    | B256
+    | undefined;
+  /** Execution payload. */
+  readonly executionPayload?:
+    | ExecutionPayload
+    | undefined;
+  /** Blob kzg commitments. */
   readonly blobKzgCommitments?: readonly B384[] | undefined;
 }
 
 export interface Transaction {
+  readonly filterIds?:
+    | readonly number[]
+    | undefined;
   /** Transaction hash. */
   readonly transactionHash?:
     | B256
@@ -125,6 +159,7 @@ export interface Transaction {
 }
 
 export interface Validator {
+  readonly filterIds?: readonly number[] | undefined;
   readonly validatorIndex?: number | undefined;
   readonly balance?: bigint | undefined;
   readonly status?: ValidatorStatus | undefined;
@@ -139,6 +174,9 @@ export interface Validator {
 }
 
 export interface Blob {
+  readonly filterIds?:
+    | readonly number[]
+    | undefined;
   /** Blob index in the block. */
   readonly blobIndex?:
     | number
@@ -210,15 +248,7 @@ export interface Signature {
     | U256
     | undefined;
   /** The signature's s value. */
-  readonly s?:
-    | U256
-    | undefined;
-  /** The signature's v value. */
-  readonly v?:
-    | U256
-    | undefined;
-  /** The signature's parity byte. */
-  readonly yParity?: boolean | undefined;
+  readonly s?: U256 | undefined;
 }
 
 export interface AccessListItem {
@@ -591,6 +621,7 @@ export const BlockHeader = {
 
 function createBaseTransaction(): Transaction {
   return {
+    filterIds: [],
     transactionHash: undefined,
     nonce: BigInt("0"),
     transactionIndex: 0,
@@ -613,68 +644,75 @@ function createBaseTransaction(): Transaction {
 
 export const Transaction = {
   encode(message: Transaction, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.filterIds !== undefined && message.filterIds.length !== 0) {
+      writer.uint32(10).fork();
+      for (const v of message.filterIds) {
+        writer.uint32(v);
+      }
+      writer.ldelim();
+    }
     if (message.transactionHash !== undefined) {
-      B256.encode(message.transactionHash, writer.uint32(10).fork()).ldelim();
+      B256.encode(message.transactionHash, writer.uint32(18).fork()).ldelim();
     }
     if (message.nonce !== undefined && message.nonce !== BigInt("0")) {
       if (BigInt.asUintN(64, message.nonce) !== message.nonce) {
         throw new globalThis.Error("value provided for field message.nonce of type uint64 too large");
       }
-      writer.uint32(16).uint64(message.nonce.toString());
+      writer.uint32(24).uint64(message.nonce.toString());
     }
     if (message.transactionIndex !== undefined && message.transactionIndex !== 0) {
-      writer.uint32(24).uint32(message.transactionIndex);
+      writer.uint32(32).uint32(message.transactionIndex);
     }
     if (message.from !== undefined) {
-      Address.encode(message.from, writer.uint32(34).fork()).ldelim();
+      Address.encode(message.from, writer.uint32(42).fork()).ldelim();
     }
     if (message.to !== undefined) {
-      Address.encode(message.to, writer.uint32(42).fork()).ldelim();
+      Address.encode(message.to, writer.uint32(50).fork()).ldelim();
     }
     if (message.value !== undefined) {
-      U256.encode(message.value, writer.uint32(50).fork()).ldelim();
+      U256.encode(message.value, writer.uint32(58).fork()).ldelim();
     }
     if (message.gasPrice !== undefined) {
-      U128.encode(message.gasPrice, writer.uint32(58).fork()).ldelim();
+      U128.encode(message.gasPrice, writer.uint32(66).fork()).ldelim();
     }
     if (message.gasLimit !== undefined) {
-      U128.encode(message.gasLimit, writer.uint32(66).fork()).ldelim();
+      U128.encode(message.gasLimit, writer.uint32(74).fork()).ldelim();
     }
     if (message.maxFeePerGas !== undefined) {
-      U128.encode(message.maxFeePerGas, writer.uint32(74).fork()).ldelim();
+      U128.encode(message.maxFeePerGas, writer.uint32(82).fork()).ldelim();
     }
     if (message.maxPriorityFeePerGas !== undefined) {
-      U128.encode(message.maxPriorityFeePerGas, writer.uint32(82).fork()).ldelim();
+      U128.encode(message.maxPriorityFeePerGas, writer.uint32(90).fork()).ldelim();
     }
     if (message.input !== undefined && message.input.length !== 0) {
-      writer.uint32(90).bytes(message.input);
+      writer.uint32(98).bytes(message.input);
     }
     if (message.signature !== undefined) {
-      Signature.encode(message.signature, writer.uint32(98).fork()).ldelim();
+      Signature.encode(message.signature, writer.uint32(106).fork()).ldelim();
     }
     if (message.chainId !== undefined) {
       if (BigInt.asUintN(64, message.chainId) !== message.chainId) {
         throw new globalThis.Error("value provided for field message.chainId of type uint64 too large");
       }
-      writer.uint32(104).uint64(message.chainId.toString());
+      writer.uint32(112).uint64(message.chainId.toString());
     }
     if (message.accessList !== undefined && message.accessList.length !== 0) {
       for (const v of message.accessList) {
-        AccessListItem.encode(v!, writer.uint32(114).fork()).ldelim();
+        AccessListItem.encode(v!, writer.uint32(122).fork()).ldelim();
       }
     }
     if (message.transactionType !== undefined && message.transactionType !== BigInt("0")) {
       if (BigInt.asUintN(64, message.transactionType) !== message.transactionType) {
         throw new globalThis.Error("value provided for field message.transactionType of type uint64 too large");
       }
-      writer.uint32(120).uint64(message.transactionType.toString());
+      writer.uint32(128).uint64(message.transactionType.toString());
     }
     if (message.maxFeePerBlobGas !== undefined) {
-      U128.encode(message.maxFeePerBlobGas, writer.uint32(130).fork()).ldelim();
+      U128.encode(message.maxFeePerBlobGas, writer.uint32(138).fork()).ldelim();
     }
     if (message.blobVersionedHashes !== undefined && message.blobVersionedHashes.length !== 0) {
       for (const v of message.blobVersionedHashes) {
-        B256.encode(v!, writer.uint32(138).fork()).ldelim();
+        B256.encode(v!, writer.uint32(146).fork()).ldelim();
       }
     }
     return writer;
@@ -688,119 +726,136 @@ export const Transaction = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          if (tag !== 10) {
+          if (tag === 8) {
+            message.filterIds!.push(reader.uint32());
+
+            continue;
+          }
+
+          if (tag === 10) {
+            const end2 = reader.uint32() + reader.pos;
+            while (reader.pos < end2) {
+              message.filterIds!.push(reader.uint32());
+            }
+
+            continue;
+          }
+
+          break;
+        case 2:
+          if (tag !== 18) {
             break;
           }
 
           message.transactionHash = B256.decode(reader, reader.uint32());
-          continue;
-        case 2:
-          if (tag !== 16) {
-            break;
-          }
-
-          message.nonce = longToBigint(reader.uint64() as Long);
           continue;
         case 3:
           if (tag !== 24) {
             break;
           }
 
-          message.transactionIndex = reader.uint32();
+          message.nonce = longToBigint(reader.uint64() as Long);
           continue;
         case 4:
-          if (tag !== 34) {
+          if (tag !== 32) {
             break;
           }
 
-          message.from = Address.decode(reader, reader.uint32());
+          message.transactionIndex = reader.uint32();
           continue;
         case 5:
           if (tag !== 42) {
             break;
           }
 
-          message.to = Address.decode(reader, reader.uint32());
+          message.from = Address.decode(reader, reader.uint32());
           continue;
         case 6:
           if (tag !== 50) {
             break;
           }
 
-          message.value = U256.decode(reader, reader.uint32());
+          message.to = Address.decode(reader, reader.uint32());
           continue;
         case 7:
           if (tag !== 58) {
             break;
           }
 
-          message.gasPrice = U128.decode(reader, reader.uint32());
+          message.value = U256.decode(reader, reader.uint32());
           continue;
         case 8:
           if (tag !== 66) {
             break;
           }
 
-          message.gasLimit = U128.decode(reader, reader.uint32());
+          message.gasPrice = U128.decode(reader, reader.uint32());
           continue;
         case 9:
           if (tag !== 74) {
             break;
           }
 
-          message.maxFeePerGas = U128.decode(reader, reader.uint32());
+          message.gasLimit = U128.decode(reader, reader.uint32());
           continue;
         case 10:
           if (tag !== 82) {
             break;
           }
 
-          message.maxPriorityFeePerGas = U128.decode(reader, reader.uint32());
+          message.maxFeePerGas = U128.decode(reader, reader.uint32());
           continue;
         case 11:
           if (tag !== 90) {
             break;
           }
 
-          message.input = reader.bytes();
+          message.maxPriorityFeePerGas = U128.decode(reader, reader.uint32());
           continue;
         case 12:
           if (tag !== 98) {
             break;
           }
 
-          message.signature = Signature.decode(reader, reader.uint32());
+          message.input = reader.bytes();
           continue;
         case 13:
-          if (tag !== 104) {
+          if (tag !== 106) {
+            break;
+          }
+
+          message.signature = Signature.decode(reader, reader.uint32());
+          continue;
+        case 14:
+          if (tag !== 112) {
             break;
           }
 
           message.chainId = longToBigint(reader.uint64() as Long);
           continue;
-        case 14:
-          if (tag !== 114) {
+        case 15:
+          if (tag !== 122) {
             break;
           }
 
           message.accessList!.push(AccessListItem.decode(reader, reader.uint32()));
           continue;
-        case 15:
-          if (tag !== 120) {
+        case 16:
+          if (tag !== 128) {
             break;
           }
 
           message.transactionType = longToBigint(reader.uint64() as Long);
           continue;
-        case 16:
-          if (tag !== 130) {
+        case 17:
+          if (tag !== 138) {
             break;
           }
 
           message.maxFeePerBlobGas = U128.decode(reader, reader.uint32());
           continue;
-        case 17:
-          if (tag !== 138) {
+        case 18:
+          if (tag !== 146) {
             break;
           }
 
@@ -817,6 +872,9 @@ export const Transaction = {
 
   fromJSON(object: any): Transaction {
     return {
+      filterIds: globalThis.Array.isArray(object?.filterIds)
+        ? object.filterIds.map((e: any) => globalThis.Number(e))
+        : [],
       transactionHash: isSet(object.transactionHash) ? B256.fromJSON(object.transactionHash) : undefined,
       nonce: isSet(object.nonce) ? BigInt(object.nonce) : BigInt("0"),
       transactionIndex: isSet(object.transactionIndex) ? globalThis.Number(object.transactionIndex) : 0,
@@ -843,6 +901,9 @@ export const Transaction = {
 
   toJSON(message: Transaction): unknown {
     const obj: any = {};
+    if (message.filterIds?.length) {
+      obj.filterIds = message.filterIds.map((e) => Math.round(e));
+    }
     if (message.transactionHash !== undefined) {
       obj.transactionHash = B256.toJSON(message.transactionHash);
     }
@@ -902,6 +963,7 @@ export const Transaction = {
   },
   fromPartial(object: DeepPartial<Transaction>): Transaction {
     const message = createBaseTransaction() as any;
+    message.filterIds = object.filterIds?.map((e) => e) || [];
     message.transactionHash = (object.transactionHash !== undefined && object.transactionHash !== null)
       ? B256.fromPartial(object.transactionHash)
       : undefined;
@@ -939,6 +1001,7 @@ export const Transaction = {
 
 function createBaseValidator(): Validator {
   return {
+    filterIds: [],
     validatorIndex: 0,
     balance: BigInt("0"),
     status: 0,
@@ -955,32 +1018,39 @@ function createBaseValidator(): Validator {
 
 export const Validator = {
   encode(message: Validator, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.filterIds !== undefined && message.filterIds.length !== 0) {
+      writer.uint32(10).fork();
+      for (const v of message.filterIds) {
+        writer.uint32(v);
+      }
+      writer.ldelim();
+    }
     if (message.validatorIndex !== undefined && message.validatorIndex !== 0) {
-      writer.uint32(8).uint32(message.validatorIndex);
+      writer.uint32(16).uint32(message.validatorIndex);
     }
     if (message.balance !== undefined && message.balance !== BigInt("0")) {
       if (BigInt.asUintN(64, message.balance) !== message.balance) {
         throw new globalThis.Error("value provided for field message.balance of type uint64 too large");
       }
-      writer.uint32(16).uint64(message.balance.toString());
+      writer.uint32(24).uint64(message.balance.toString());
     }
     if (message.status !== undefined && message.status !== 0) {
-      writer.uint32(24).int32(message.status);
+      writer.uint32(32).int32(message.status);
     }
     if (message.pubkey !== undefined) {
-      B384.encode(message.pubkey, writer.uint32(34).fork()).ldelim();
+      B384.encode(message.pubkey, writer.uint32(42).fork()).ldelim();
     }
     if (message.withdrawalCredentials !== undefined) {
-      B256.encode(message.withdrawalCredentials, writer.uint32(42).fork()).ldelim();
+      B256.encode(message.withdrawalCredentials, writer.uint32(50).fork()).ldelim();
     }
     if (message.effectiveBalance !== undefined && message.effectiveBalance !== BigInt("0")) {
       if (BigInt.asUintN(64, message.effectiveBalance) !== message.effectiveBalance) {
         throw new globalThis.Error("value provided for field message.effectiveBalance of type uint64 too large");
       }
-      writer.uint32(48).uint64(message.effectiveBalance.toString());
+      writer.uint32(56).uint64(message.effectiveBalance.toString());
     }
     if (message.slashed !== undefined && message.slashed !== false) {
-      writer.uint32(56).bool(message.slashed);
+      writer.uint32(64).bool(message.slashed);
     }
     if (message.activationEligibilityEpoch !== undefined && message.activationEligibilityEpoch !== BigInt("0")) {
       if (BigInt.asUintN(64, message.activationEligibilityEpoch) !== message.activationEligibilityEpoch) {
@@ -988,25 +1058,25 @@ export const Validator = {
           "value provided for field message.activationEligibilityEpoch of type uint64 too large",
         );
       }
-      writer.uint32(64).uint64(message.activationEligibilityEpoch.toString());
+      writer.uint32(72).uint64(message.activationEligibilityEpoch.toString());
     }
     if (message.activationEpoch !== undefined && message.activationEpoch !== BigInt("0")) {
       if (BigInt.asUintN(64, message.activationEpoch) !== message.activationEpoch) {
         throw new globalThis.Error("value provided for field message.activationEpoch of type uint64 too large");
       }
-      writer.uint32(72).uint64(message.activationEpoch.toString());
+      writer.uint32(80).uint64(message.activationEpoch.toString());
     }
     if (message.exitEpoch !== undefined && message.exitEpoch !== BigInt("0")) {
       if (BigInt.asUintN(64, message.exitEpoch) !== message.exitEpoch) {
         throw new globalThis.Error("value provided for field message.exitEpoch of type uint64 too large");
       }
-      writer.uint32(80).uint64(message.exitEpoch.toString());
+      writer.uint32(88).uint64(message.exitEpoch.toString());
     }
     if (message.withdrawableEpoch !== undefined && message.withdrawableEpoch !== BigInt("0")) {
       if (BigInt.asUintN(64, message.withdrawableEpoch) !== message.withdrawableEpoch) {
         throw new globalThis.Error("value provided for field message.withdrawableEpoch of type uint64 too large");
       }
-      writer.uint32(88).uint64(message.withdrawableEpoch.toString());
+      writer.uint32(96).uint64(message.withdrawableEpoch.toString());
     }
     return writer;
   },
@@ -1019,77 +1089,94 @@ export const Validator = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          if (tag !== 8) {
-            break;
+          if (tag === 8) {
+            message.filterIds!.push(reader.uint32());
+
+            continue;
           }
 
-          message.validatorIndex = reader.uint32();
-          continue;
+          if (tag === 10) {
+            const end2 = reader.uint32() + reader.pos;
+            while (reader.pos < end2) {
+              message.filterIds!.push(reader.uint32());
+            }
+
+            continue;
+          }
+
+          break;
         case 2:
           if (tag !== 16) {
             break;
           }
 
-          message.balance = longToBigint(reader.uint64() as Long);
+          message.validatorIndex = reader.uint32();
           continue;
         case 3:
           if (tag !== 24) {
             break;
           }
 
-          message.status = reader.int32() as any;
+          message.balance = longToBigint(reader.uint64() as Long);
           continue;
         case 4:
-          if (tag !== 34) {
+          if (tag !== 32) {
             break;
           }
 
-          message.pubkey = B384.decode(reader, reader.uint32());
+          message.status = reader.int32() as any;
           continue;
         case 5:
           if (tag !== 42) {
             break;
           }
 
-          message.withdrawalCredentials = B256.decode(reader, reader.uint32());
+          message.pubkey = B384.decode(reader, reader.uint32());
           continue;
         case 6:
-          if (tag !== 48) {
+          if (tag !== 50) {
             break;
           }
 
-          message.effectiveBalance = longToBigint(reader.uint64() as Long);
+          message.withdrawalCredentials = B256.decode(reader, reader.uint32());
           continue;
         case 7:
           if (tag !== 56) {
             break;
           }
 
-          message.slashed = reader.bool();
+          message.effectiveBalance = longToBigint(reader.uint64() as Long);
           continue;
         case 8:
           if (tag !== 64) {
             break;
           }
 
-          message.activationEligibilityEpoch = longToBigint(reader.uint64() as Long);
+          message.slashed = reader.bool();
           continue;
         case 9:
           if (tag !== 72) {
             break;
           }
 
-          message.activationEpoch = longToBigint(reader.uint64() as Long);
+          message.activationEligibilityEpoch = longToBigint(reader.uint64() as Long);
           continue;
         case 10:
           if (tag !== 80) {
             break;
           }
 
-          message.exitEpoch = longToBigint(reader.uint64() as Long);
+          message.activationEpoch = longToBigint(reader.uint64() as Long);
           continue;
         case 11:
           if (tag !== 88) {
+            break;
+          }
+
+          message.exitEpoch = longToBigint(reader.uint64() as Long);
+          continue;
+        case 12:
+          if (tag !== 96) {
             break;
           }
 
@@ -1106,6 +1193,9 @@ export const Validator = {
 
   fromJSON(object: any): Validator {
     return {
+      filterIds: globalThis.Array.isArray(object?.filterIds)
+        ? object.filterIds.map((e: any) => globalThis.Number(e))
+        : [],
       validatorIndex: isSet(object.validatorIndex) ? globalThis.Number(object.validatorIndex) : 0,
       balance: isSet(object.balance) ? BigInt(object.balance) : BigInt("0"),
       status: isSet(object.status) ? validatorStatusFromJSON(object.status) : 0,
@@ -1126,6 +1216,9 @@ export const Validator = {
 
   toJSON(message: Validator): unknown {
     const obj: any = {};
+    if (message.filterIds?.length) {
+      obj.filterIds = message.filterIds.map((e) => Math.round(e));
+    }
     if (message.validatorIndex !== undefined && message.validatorIndex !== 0) {
       obj.validatorIndex = Math.round(message.validatorIndex);
     }
@@ -1167,6 +1260,7 @@ export const Validator = {
   },
   fromPartial(object: DeepPartial<Validator>): Validator {
     const message = createBaseValidator() as any;
+    message.filterIds = object.filterIds?.map((e) => e) || [];
     message.validatorIndex = object.validatorIndex ?? 0;
     message.balance = object.balance ?? BigInt("0");
     message.status = object.status ?? 0;
@@ -1189,6 +1283,7 @@ export const Validator = {
 
 function createBaseBlob(): Blob {
   return {
+    filterIds: [],
     blobIndex: 0,
     blob: new Uint8Array(0),
     kzgCommitment: undefined,
@@ -1202,31 +1297,38 @@ function createBaseBlob(): Blob {
 
 export const Blob = {
   encode(message: Blob, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.filterIds !== undefined && message.filterIds.length !== 0) {
+      writer.uint32(10).fork();
+      for (const v of message.filterIds) {
+        writer.uint32(v);
+      }
+      writer.ldelim();
+    }
     if (message.blobIndex !== undefined && message.blobIndex !== 0) {
-      writer.uint32(8).uint32(message.blobIndex);
+      writer.uint32(16).uint32(message.blobIndex);
     }
     if (message.blob !== undefined && message.blob.length !== 0) {
-      writer.uint32(18).bytes(message.blob);
+      writer.uint32(26).bytes(message.blob);
     }
     if (message.kzgCommitment !== undefined) {
-      B384.encode(message.kzgCommitment, writer.uint32(26).fork()).ldelim();
+      B384.encode(message.kzgCommitment, writer.uint32(34).fork()).ldelim();
     }
     if (message.kzgProof !== undefined) {
-      B384.encode(message.kzgProof, writer.uint32(34).fork()).ldelim();
+      B384.encode(message.kzgProof, writer.uint32(42).fork()).ldelim();
     }
     if (message.kzgCommitmentInclusionProof !== undefined && message.kzgCommitmentInclusionProof.length !== 0) {
       for (const v of message.kzgCommitmentInclusionProof) {
-        B256.encode(v!, writer.uint32(42).fork()).ldelim();
+        B256.encode(v!, writer.uint32(50).fork()).ldelim();
       }
     }
     if (message.blobHash !== undefined) {
-      B256.encode(message.blobHash, writer.uint32(50).fork()).ldelim();
+      B256.encode(message.blobHash, writer.uint32(58).fork()).ldelim();
     }
     if (message.transactionIndex !== undefined && message.transactionIndex !== 0) {
-      writer.uint32(56).uint32(message.transactionIndex);
+      writer.uint32(64).uint32(message.transactionIndex);
     }
     if (message.transactionHash !== undefined) {
-      B256.encode(message.transactionHash, writer.uint32(66).fork()).ldelim();
+      B256.encode(message.transactionHash, writer.uint32(74).fork()).ldelim();
     }
     return writer;
   },
@@ -1239,56 +1341,73 @@ export const Blob = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          if (tag !== 8) {
+          if (tag === 8) {
+            message.filterIds!.push(reader.uint32());
+
+            continue;
+          }
+
+          if (tag === 10) {
+            const end2 = reader.uint32() + reader.pos;
+            while (reader.pos < end2) {
+              message.filterIds!.push(reader.uint32());
+            }
+
+            continue;
+          }
+
+          break;
+        case 2:
+          if (tag !== 16) {
             break;
           }
 
           message.blobIndex = reader.uint32();
-          continue;
-        case 2:
-          if (tag !== 18) {
-            break;
-          }
-
-          message.blob = reader.bytes();
           continue;
         case 3:
           if (tag !== 26) {
             break;
           }
 
-          message.kzgCommitment = B384.decode(reader, reader.uint32());
+          message.blob = reader.bytes();
           continue;
         case 4:
           if (tag !== 34) {
             break;
           }
 
-          message.kzgProof = B384.decode(reader, reader.uint32());
+          message.kzgCommitment = B384.decode(reader, reader.uint32());
           continue;
         case 5:
           if (tag !== 42) {
             break;
           }
 
-          message.kzgCommitmentInclusionProof!.push(B256.decode(reader, reader.uint32()));
+          message.kzgProof = B384.decode(reader, reader.uint32());
           continue;
         case 6:
           if (tag !== 50) {
             break;
           }
 
-          message.blobHash = B256.decode(reader, reader.uint32());
+          message.kzgCommitmentInclusionProof!.push(B256.decode(reader, reader.uint32()));
           continue;
         case 7:
-          if (tag !== 56) {
+          if (tag !== 58) {
+            break;
+          }
+
+          message.blobHash = B256.decode(reader, reader.uint32());
+          continue;
+        case 8:
+          if (tag !== 64) {
             break;
           }
 
           message.transactionIndex = reader.uint32();
           continue;
-        case 8:
-          if (tag !== 66) {
+        case 9:
+          if (tag !== 74) {
             break;
           }
 
@@ -1305,6 +1424,9 @@ export const Blob = {
 
   fromJSON(object: any): Blob {
     return {
+      filterIds: globalThis.Array.isArray(object?.filterIds)
+        ? object.filterIds.map((e: any) => globalThis.Number(e))
+        : [],
       blobIndex: isSet(object.blobIndex) ? globalThis.Number(object.blobIndex) : 0,
       blob: isSet(object.blob) ? bytesFromBase64(object.blob) : new Uint8Array(0),
       kzgCommitment: isSet(object.kzgCommitment) ? B384.fromJSON(object.kzgCommitment) : undefined,
@@ -1320,6 +1442,9 @@ export const Blob = {
 
   toJSON(message: Blob): unknown {
     const obj: any = {};
+    if (message.filterIds?.length) {
+      obj.filterIds = message.filterIds.map((e) => Math.round(e));
+    }
     if (message.blobIndex !== undefined && message.blobIndex !== 0) {
       obj.blobIndex = Math.round(message.blobIndex);
     }
@@ -1352,6 +1477,7 @@ export const Blob = {
   },
   fromPartial(object: DeepPartial<Blob>): Blob {
     const message = createBaseBlob() as any;
+    message.filterIds = object.filterIds?.map((e) => e) || [];
     message.blobIndex = object.blobIndex ?? 0;
     message.blob = object.blob ?? new Uint8Array(0);
     message.kzgCommitment = (object.kzgCommitment !== undefined && object.kzgCommitment !== null)
@@ -1559,7 +1685,7 @@ export const ExecutionPayload = {
 };
 
 function createBaseSignature(): Signature {
-  return { r: undefined, s: undefined, v: undefined, yParity: false };
+  return { r: undefined, s: undefined };
 }
 
 export const Signature = {
@@ -1569,12 +1695,6 @@ export const Signature = {
     }
     if (message.s !== undefined) {
       U256.encode(message.s, writer.uint32(18).fork()).ldelim();
-    }
-    if (message.v !== undefined) {
-      U256.encode(message.v, writer.uint32(26).fork()).ldelim();
-    }
-    if (message.yParity !== undefined && message.yParity !== false) {
-      writer.uint32(32).bool(message.yParity);
     }
     return writer;
   },
@@ -1600,20 +1720,6 @@ export const Signature = {
 
           message.s = U256.decode(reader, reader.uint32());
           continue;
-        case 3:
-          if (tag !== 26) {
-            break;
-          }
-
-          message.v = U256.decode(reader, reader.uint32());
-          continue;
-        case 4:
-          if (tag !== 32) {
-            break;
-          }
-
-          message.yParity = reader.bool();
-          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -1627,8 +1733,6 @@ export const Signature = {
     return {
       r: isSet(object.r) ? U256.fromJSON(object.r) : undefined,
       s: isSet(object.s) ? U256.fromJSON(object.s) : undefined,
-      v: isSet(object.v) ? U256.fromJSON(object.v) : undefined,
-      yParity: isSet(object.yParity) ? globalThis.Boolean(object.yParity) : false,
     };
   },
 
@@ -1640,12 +1744,6 @@ export const Signature = {
     if (message.s !== undefined) {
       obj.s = U256.toJSON(message.s);
     }
-    if (message.v !== undefined) {
-      obj.v = U256.toJSON(message.v);
-    }
-    if (message.yParity !== undefined && message.yParity !== false) {
-      obj.yParity = message.yParity;
-    }
     return obj;
   },
 
@@ -1656,8 +1754,6 @@ export const Signature = {
     const message = createBaseSignature() as any;
     message.r = (object.r !== undefined && object.r !== null) ? U256.fromPartial(object.r) : undefined;
     message.s = (object.s !== undefined && object.s !== null) ? U256.fromPartial(object.s) : undefined;
-    message.v = (object.v !== undefined && object.v !== null) ? U256.fromPartial(object.v) : undefined;
-    message.yParity = object.yParity ?? false;
     return message;
   },
 };

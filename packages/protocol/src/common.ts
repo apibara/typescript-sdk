@@ -53,10 +53,10 @@ export const CursorFromBytes = Schema.transform(
   Cursor,
   {
     decode(value) {
-      return proto.common.Cursor.decode(value);
+      return proto.stream.Cursor.decode(value);
     },
     encode(value) {
-      return proto.common.Cursor.encode(value).finish();
+      return proto.stream.Cursor.encode(value).finish();
     },
   },
 );
