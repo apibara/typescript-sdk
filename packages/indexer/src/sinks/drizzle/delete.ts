@@ -31,16 +31,12 @@ export class DrizzleSinkDelete<
     PgUpdateBase<TTable, TQueryResult, undefined, false, "where">,
     "where"
   > {
-    const updatedRows = this.db
+    return this.db
       .update(this.table)
       .set({
         // @ts-ignore
-        _cursor: sql`int8range(lower(_cursor), ${this.endCursor?.orderKey!}, '[]')`,
+        _cursor: sql`int8range(lower(_cursor), ${Number(this.endCursor?.orderKey!)}, '[)')`,
       })
       .where(where);
-
-    return {
-      ...updatedRows,
-    };
   }
 }
