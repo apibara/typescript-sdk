@@ -1,20 +1,26 @@
+import type { Cursor } from "@apibara/protocol";
 import {
   type MockBlock,
   MockClient,
   type MockFilter,
 } from "@apibara/protocol/testing";
-import { eq, sql } from "drizzle-orm";
+import { asc, eq, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/node-postgres";
 import { serial, text } from "drizzle-orm/pg-core";
 import { Client } from "pg";
 import { beforeAll, beforeEach, describe, expect, it } from "vitest";
-import { type Int8Range, drizzle as drizzleSink, pgTable } from ".";
+import {
+  type Int8Range,
+  drizzle as drizzleSink,
+  getDrizzleCursor,
+  pgTable,
+} from ".";
 import { useSink } from "../../hooks";
 import { run } from "../../indexer";
 import { generateMockMessages } from "../../testing";
 import { getMockIndexer } from "../../testing/indexer";
 
-const test_table = pgTable("test_table", {
+const testTable = pgTable("test_table", {
   id: serial("id").primaryKey(),
   data: text("data"),
 });
@@ -38,7 +44,7 @@ describe("Drizzle Test", () => {
   });
 
   beforeEach(async () => {
-    await db.delete(test_table).execute();
+    await db.delete(testTable).execute();
   });
 
   it("should insert data", async () => {
@@ -46,21 +52,18 @@ describe("Drizzle Test", () => {
       return generateMockMessages(5);
     });
 
-    const sink = drizzleSink({ database: db });
+    const sink = drizzleSink({ database: db, tables: [testTable] });
 
     const indexer = getMockIndexer({
       sink,
       override: {
         transform: async ({ context, endCursor, block: { data } }) => {
-          const { transaction } = useSink({ context });
-
-          const db = transaction(endCursor);
-
+          const { db } = useSink({ context });
           // Insert a new row into the test_table
           // The id is set to the current cursor's orderKey
           // The data is set to the block data
           await db
-            .insert(test_table)
+            .insert(testTable)
             .values([{ id: Number(endCursor?.orderKey), data }]);
         },
       },
@@ -68,7 +71,7 @@ describe("Drizzle Test", () => {
 
     await run(client, indexer);
 
-    const result = await db.select().from(test_table);
+    const result = await db.select().from(testTable).orderBy(asc(testTable.id));
 
     expect(result).toHaveLength(5);
     expect(result[0].data).toBe("5000000");
@@ -80,28 +83,26 @@ describe("Drizzle Test", () => {
       return generateMockMessages(5);
     });
 
-    const sink = drizzleSink({ database: db });
+    const sink = drizzleSink({ database: db, tables: [testTable] });
 
     const indexer = getMockIndexer({
       sink,
       override: {
         transform: async ({ context, endCursor, block: { data } }) => {
-          const { transaction } = useSink({ context });
-
-          const db = transaction(endCursor);
+          const { db } = useSink({ context });
 
           // insert data for each message in db
           await db
-            .insert(test_table)
+            .insert(testTable)
             .values([{ id: Number(endCursor?.orderKey), data }]);
 
           // update data for id 5000002 when orderKey is 5000004
           // this is to test if the update query is working
           if (endCursor?.orderKey === 5000004n) {
             await db
-              .update(test_table)
+              .update(testTable)
               .set({ data: "0000000" })
-              .where(eq(test_table.id, 5000002));
+              .where(eq(testTable.id, 5000002));
           }
         },
       },
@@ -109,10 +110,10 @@ describe("Drizzle Test", () => {
 
     await run(client, indexer);
 
-    const result = await db.select().from(test_table);
+    const result = await db.select().from(testTable).orderBy(asc(testTable.id));
 
     expect(result).toHaveLength(5);
-    expect(result.find((r) => r.id === 5000002)?.data).toBe("0000000");
+    expect(result[2].data).toBe("0000000");
   });
 
   it("should delete data", async () => {
@@ -120,25 +121,23 @@ describe("Drizzle Test", () => {
       return generateMockMessages(5);
     });
 
-    const sink = drizzleSink({ database: db });
+    const sink = drizzleSink({ database: db, tables: [testTable] });
 
     const indexer = getMockIndexer({
       sink,
       override: {
         transform: async ({ context, endCursor, block: { data } }) => {
-          const { transaction } = useSink({ context });
-
-          const db = transaction(endCursor);
+          const { db } = useSink({ context });
 
           // insert data for each message in db
           await db
-            .insert(test_table)
+            .insert(testTable)
             .values([{ id: Number(endCursor?.orderKey), data }]);
 
           // delete data for id 5000002 when orderKey is 5000004
           // this is to test if the delete query is working
           if (endCursor?.orderKey === 5000004n) {
-            await db.delete(test_table).where(eq(test_table.id, 5000002));
+            await db.delete(testTable).where(eq(testTable.id, 5000002));
           }
         },
       },
@@ -146,19 +145,15 @@ describe("Drizzle Test", () => {
 
     await run(client, indexer);
 
-    const result = await db.select().from(test_table);
+    const result = await db.select().from(testTable).orderBy(asc(testTable.id));
 
     expect(result).toHaveLength(5);
 
     // as when you run delete query on a data, it isnt literally deleted from the db,
     // instead, we just update the upper bound of that row to the current cursor
     // check if the cursor upper bound has been set correctly
-    expect(
-      (
-        (result.find((r) => r.id === 5000002) as Record<string, unknown>)
-          ._cursor as Int8Range
-      ).range.upper,
-    ).toBe(5000004);
+    // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+    expect(((result[2] as any)._cursor as Int8Range).range.upper).toBe(5000004);
   });
 
   it("should select data", async () => {
@@ -166,21 +161,19 @@ describe("Drizzle Test", () => {
       return generateMockMessages(5);
     });
 
-    const sink = drizzleSink({ database: db });
+    const sink = drizzleSink({ database: db, tables: [testTable] });
 
-    let result: (typeof test_table.$inferSelect)[] = [];
+    let result: (typeof testTable.$inferSelect)[] = [];
 
     const indexer = getMockIndexer({
       sink,
       override: {
         transform: async ({ context, endCursor, block: { data } }) => {
-          const { transaction } = useSink({ context });
-
-          const db = transaction(endCursor);
+          const { db } = useSink({ context });
 
           // insert data for each message in db
           await db
-            .insert(test_table)
+            .insert(testTable)
             .values([{ id: Number(endCursor?.orderKey), data }]);
 
           // delete data for id 5000002 when orderKey is 5000004
@@ -188,12 +181,15 @@ describe("Drizzle Test", () => {
           // so when we select all rows, row with id 5000002 will not be included
           // as when we run select query it should only return rows with upper bound infinity
           if (endCursor?.orderKey === 5000003n) {
-            await db.delete(test_table).where(eq(test_table.id, 5000002));
+            await db.delete(testTable).where(eq(testTable.id, 5000002));
           }
 
           // when on last message of mock stream, select all rows from db
           if (endCursor?.orderKey === 5000004n) {
-            result = await db.select().from(test_table);
+            result = await db
+              .select()
+              .from(testTable)
+              .orderBy(asc(testTable.id));
           }
         },
       },
@@ -203,5 +199,41 @@ describe("Drizzle Test", () => {
 
     expect(result).toHaveLength(4);
     expect(result.find((r) => r.id === 5000002)).toBeUndefined();
+    // check if all rows are still in db
+    const allRows = await db.select().from(testTable);
+    expect(allRows).toHaveLength(5);
+  });
+
+  it("should invalidate data correctly", async () => {
+    const sink = drizzleSink({ database: db, tables: [testTable] });
+
+    // Insert some test data
+    await db.insert(testTable).values(
+      // @ts-ignore
+      [
+        { id: 1, data: "data1", _cursor: getDrizzleCursor([1n, 5n]) },
+        { id: 2, data: "data2", _cursor: getDrizzleCursor([2n, 5n]) },
+        { id: 3, data: "data3", _cursor: getDrizzleCursor(3n) },
+        { id: 4, data: "data4", _cursor: getDrizzleCursor(4n) },
+        { id: 5, data: "data5", _cursor: getDrizzleCursor(5n) },
+      ],
+    );
+
+    // Create a cursor at position 3
+    const cursor: Cursor = { orderKey: 3n };
+
+    // Invalidate data
+    await sink.invalidate(cursor);
+
+    // Check the results
+    const result = await db.select().from(testTable).orderBy(asc(testTable.id));
+
+    expect(result).toHaveLength(3);
+    // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+    expect(((result[0] as any)._cursor as Int8Range).range.upper).toBe(null);
+    // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+    expect(((result[1] as any)._cursor as Int8Range).range.upper).toBe(null);
+    // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+    expect(((result[2] as any)._cursor as Int8Range).range.upper).toBe(null);
   });
 });

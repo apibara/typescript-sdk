@@ -1,15 +1,18 @@
 import type { Cursor } from "@apibara/protocol";
-import type {
-  ExtractTablesWithRelations,
-  TablesRelationalConfig,
+import {
+  type ExtractTablesWithRelations,
+  type TablesRelationalConfig,
+  gt,
+  sql,
 } from "drizzle-orm";
 import type {
+  AnyPgTable,
   PgDatabase,
   PgQueryResultHKT,
   PgTableWithColumns,
   TableConfig,
 } from "drizzle-orm/pg-core";
-import { Sink } from "../../sink";
+import { Sink, type SinkCursorParams } from "../../sink";
 import { DrizzleSinkTransaction } from "./transaction";
 
 export type DrizzleSinkTables<
@@ -28,6 +31,7 @@ export type DrizzleSinkOptions<
    * Database instance of drizzle-orm
    */
   database: PgDatabase<TQueryResult, TFullSchema, TSchema>;
+  tables: AnyPgTable[];
 };
 
 /**
@@ -60,26 +64,41 @@ export class DrizzleSink<
     TablesRelationalConfig = ExtractTablesWithRelations<TFullSchema>,
 > extends Sink {
   private _db: PgDatabase<TQueryResult, TFullSchema, TSchema>;
-
+  private _tables: AnyPgTable[];
   constructor(options: DrizzleSinkOptions<TQueryResult, TFullSchema, TSchema>) {
     super();
-    const { database } = options;
+    const { database, tables } = options;
     this._db = database;
+    this._tables = tables;
   }
 
   async transaction(
+    { cursor, endCursor, finality }: SinkCursorParams,
     cb: (params: {
-      transaction: (
-        endCursor?: Cursor,
-      ) => DrizzleSinkTransaction<TQueryResult, TFullSchema, TSchema>;
+      db: DrizzleSinkTransaction<TQueryResult, TFullSchema, TSchema>;
     }) => Promise<void>,
   ): Promise<void> {
     await this._db.transaction(async (db) => {
-      const transaction = (endCursor?: Cursor) => {
-        return new DrizzleSinkTransaction(db, endCursor);
-      };
+      await cb({ db: new DrizzleSinkTransaction(db, endCursor) });
+    });
+  }
 
-      await cb({ transaction });
+  async invalidate(cursor?: Cursor) {
+    await this._db.transaction(async (db) => {
+      for (const table of this._tables) {
+        // delete all rows whose lowerbound of "_cursor" (int8range) column is greater than the invalidate cursor
+        await db
+          .delete(table)
+          .where(gt(sql`lower(_cursor)`, sql`${Number(cursor?.orderKey)}`))
+          .returning();
+        // and for rows whose upperbound of "_cursor" (int8range) column is greater than the invalidate cursor, set the upperbound to infinity
+        await db
+          .update(table)
+          .set({
+            _cursor: sql`int8range(lower(_cursor), NULL, '[)')`,
+          })
+          .where(gt(sql`upper(_cursor)`, sql`${Number(cursor?.orderKey)}`));
+      }
     });
   }
 }
