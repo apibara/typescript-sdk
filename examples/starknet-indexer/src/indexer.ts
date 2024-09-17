@@ -1,4 +1,3 @@
-import assert from "node:assert";
 import { defineIndexer, useSink } from "@apibara/indexer";
 import {
   drizzle as drizzleSink,
@@ -21,7 +20,7 @@ export function createIndexerConfig(streamUrl: string) {
   );
   const db = drizzle(pgClient);
 
-  const sink = drizzleSink({ database: db });
+  const sink = drizzleSink({ database: db, tables: [headers] });
 
   return defineIndexer(StarknetStream)({
     streamUrl,
@@ -43,11 +42,7 @@ export function createIndexerConfig(streamUrl: string) {
     async transform({ block: { header }, context }) {
       consola.info("Transforming block ", header?.blockNumber);
 
-      const { transaction } = useSink({ context });
-
-      assert(header !== undefined);
-
-      const db = transaction({ orderKey: header?.blockNumber });
+      const { db } = useSink({ context });
 
       await db.insert(headers).values([
         {

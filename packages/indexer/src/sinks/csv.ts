@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import type { Cursor } from "@apibara/protocol";
 import { type Options, type Stringifier, stringify } from "csv-stringify";
-import { Sink, type SinkData } from "../sink";
+import { Sink, type SinkCursorParams, type SinkData } from "../sink";
 
 export type CsvArgs = {
   /**
@@ -25,20 +25,18 @@ export type CsvSinkOptions = {
 
 type TxnContext = {
   buffer: SinkData[];
-  endCursor?: Cursor;
 };
 
 type TxnParams = {
-  writer: (endCursor?: Cursor | undefined) => {
+  writer: {
     insert: (data: SinkData[]) => void;
   };
 };
 
-const transactionHelper = (context: TxnContext) => (endCursor?: Cursor) => {
+const transactionHelper = (context: TxnContext) => {
   return {
     insert: (data: SinkData[]) => {
       context.buffer.push(...data);
-      context.endCursor = endCursor;
     },
   };
 };
@@ -87,16 +85,23 @@ export class CsvSink extends Sink {
     await this.insertToCSV(data);
   }
 
-  async transaction(cb: (params: TxnParams) => Promise<void>) {
+  async transaction(
+    { cursor, endCursor, finality }: SinkCursorParams,
+    cb: (params: TxnParams) => Promise<void>,
+  ) {
     const context: TxnContext = {
       buffer: [],
-      endCursor: undefined,
     };
 
     const writer = transactionHelper(context);
 
     await cb({ writer });
-    await this.write({ data: context.buffer, endCursor: context.endCursor });
+    await this.write({ data: context.buffer, endCursor });
+  }
+
+  async invalidate(cursor?: Cursor) {
+    // TODO: Implement
+    throw new Error("Not implemented");
   }
 
   private async insertToCSV(data: SinkData[]) {

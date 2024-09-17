@@ -1,23 +1,21 @@
 import type { Cursor } from "@apibara/protocol";
-import { Sink, type SinkData } from "../sink";
+import { Sink, type SinkCursorParams, type SinkData } from "../sink";
 import type { VcrReplayResult } from "../vcr";
 
 type TxnContext = {
   buffer: SinkData[];
-  endCursor?: Cursor;
 };
 
 type TxnParams = {
-  writer: (endCursor?: Cursor | undefined) => {
+  writer: {
     insert: (data: SinkData[]) => void;
   };
 };
 
-const transactionHelper = (context: TxnContext) => (endCursor?: Cursor) => {
+const transactionHelper = (context: TxnContext) => {
   return {
     insert: (data: SinkData[]) => {
       context.buffer.push(...data);
-      context.endCursor = endCursor;
     },
   };
 };
@@ -31,16 +29,23 @@ export class VcrSink extends Sink {
     this.result.push({ data, endCursor });
   }
 
-  async transaction(cb: (params: TxnParams) => Promise<void>) {
+  async transaction(
+    { cursor, endCursor, finality }: SinkCursorParams,
+    cb: (params: TxnParams) => Promise<void>,
+  ) {
     const context: TxnContext = {
       buffer: [],
-      endCursor: undefined,
     };
 
     const writer = transactionHelper(context);
 
     await cb({ writer });
-    this.write({ data: context.buffer, endCursor: context.endCursor });
+    this.write({ data: context.buffer, endCursor });
+  }
+
+  async invalidate(cursor?: Cursor) {
+    // TODO: Implement
+    throw new Error("Not implemented");
   }
 }
 

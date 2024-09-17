@@ -1,6 +1,6 @@
 import type { Cursor } from "@apibara/protocol";
 import type { Database as SqliteDatabase } from "better-sqlite3";
-import { Sink, type SinkData } from "../sink";
+import { Sink, type SinkCursorParams, type SinkData } from "../sink";
 
 export type SqliteSinkOptions = {
   /**
@@ -26,19 +26,17 @@ export type SqliteSinkOptions = {
 
 type TxnContext = {
   buffer: SinkData[];
-  endCursor?: Cursor;
 };
 
 type TxnParams = {
-  writer: (endCursor?: Cursor | undefined) => {
+  writer: {
     insert: (data: SinkData[]) => void;
   };
 };
-const transactionHelper = (context: TxnContext) => (endCursor?: Cursor) => {
+const transactionHelper = (context: TxnContext) => {
   return {
     insert: (data: SinkData[]) => {
       context.buffer.push(...data);
-      context.endCursor = endCursor;
     },
   };
 };
@@ -87,16 +85,23 @@ export class SqliteSink extends Sink {
     await this.insertJsonArray(data);
   }
 
-  async transaction(cb: (params: TxnParams) => Promise<void>) {
+  async transaction(
+    { cursor, endCursor, finality }: SinkCursorParams,
+    cb: (params: TxnParams) => Promise<void>,
+  ) {
     const context: TxnContext = {
       buffer: [],
-      endCursor: undefined,
     };
 
     const writer = transactionHelper(context);
 
     await cb({ writer });
-    await this.write({ data: context.buffer, endCursor: context.endCursor });
+    await this.write({ data: context.buffer, endCursor });
+  }
+
+  async invalidate(cursor?: Cursor) {
+    // TODO: Implement
+    throw new Error("Not implemented");
   }
 
   private async insertJsonArray(data: SinkData[]) {
