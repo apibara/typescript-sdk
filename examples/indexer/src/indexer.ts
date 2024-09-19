@@ -21,7 +21,7 @@ export function createIndexerConfig(streamUrl: string) {
   const pgClient = postgres("your_connection_string");
   const db = drizzle(pgClient);
 
-  const sink = drizzleSink({ database: db });
+  const sink = drizzleSink({ database: db, tables: [users] });
 
   return defineIndexer(EvmStream)({
     streamUrl,

@@ -41,8 +41,7 @@ describe("Run Test", () => {
         override: {
           transform: async ({ context, endCursor, block: { data } }) => {
             const { writer } = useSink({ context });
-            const insertHelper = writer(endCursor);
-            insertHelper.insert([{ data }]);
+            writer.insert([{ data }]);
           },
         },
       }),
