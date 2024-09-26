@@ -12,6 +12,51 @@ export const protobufPackage = "starknet.v2";
 
 /** Starknet DNA definitions (filter). */
 
+export enum TransactionStatusFilter {
+  UNSPECIFIED = 0,
+  SUCCEEDED = 1,
+  REVERTED = 2,
+  ALL = 3,
+  UNRECOGNIZED = -1,
+}
+
+export function transactionStatusFilterFromJSON(object: any): TransactionStatusFilter {
+  switch (object) {
+    case 0:
+    case "TRANSACTION_STATUS_FILTER_UNSPECIFIED":
+      return TransactionStatusFilter.UNSPECIFIED;
+    case 1:
+    case "TRANSACTION_STATUS_FILTER_SUCCEEDED":
+      return TransactionStatusFilter.SUCCEEDED;
+    case 2:
+    case "TRANSACTION_STATUS_FILTER_REVERTED":
+      return TransactionStatusFilter.REVERTED;
+    case 3:
+    case "TRANSACTION_STATUS_FILTER_ALL":
+      return TransactionStatusFilter.ALL;
+    case -1:
+    case "UNRECOGNIZED":
+    default:
+      return TransactionStatusFilter.UNRECOGNIZED;
+  }
+}
+
+export function transactionStatusFilterToJSON(object: TransactionStatusFilter): string {
+  switch (object) {
+    case TransactionStatusFilter.UNSPECIFIED:
+      return "TRANSACTION_STATUS_FILTER_UNSPECIFIED";
+    case TransactionStatusFilter.SUCCEEDED:
+      return "TRANSACTION_STATUS_FILTER_SUCCEEDED";
+    case TransactionStatusFilter.REVERTED:
+      return "TRANSACTION_STATUS_FILTER_REVERTED";
+    case TransactionStatusFilter.ALL:
+      return "TRANSACTION_STATUS_FILTER_ALL";
+    case TransactionStatusFilter.UNRECOGNIZED:
+    default:
+      return "UNRECOGNIZED";
+  }
+}
+
 export interface Filter {
   /** Include header. */
   readonly header?:
@@ -36,8 +81,11 @@ export interface HeaderFilter {
 
 /** Filter events. */
 export interface EventFilter {
+  readonly id?:
+    | number
+    | undefined;
   /** Filter by contract emitting the event. */
-  readonly fromAddress?:
+  readonly address?:
     | FieldElement
     | undefined;
   /** Filter keys that prefix-match the given data. */
@@ -53,12 +101,12 @@ export interface EventFilter {
     | boolean
     | undefined;
   /**
-   * Include events emitted by reverted transactions.
+   * Filter based on the transaction status.
    *
-   * Defaults to false.
+   * Defaults to `Succeeded`.
    */
-  readonly includeReverted?:
-    | boolean
+  readonly transactionStatus?:
+    | TransactionStatusFilter
     | undefined;
   /**
    * Include the transaction that emitted the event.
@@ -93,11 +141,15 @@ export interface EventFilter {
 }
 
 export interface Key {
+  /** The event key. If empty, matches any event key. */
   readonly value?: FieldElement | undefined;
 }
 
 /** Filter messages to L1. */
 export interface MessageToL1Filter {
+  readonly id?:
+    | number
+    | undefined;
   /** Filter by sender address. */
   readonly fromAddress?:
     | FieldElement
@@ -107,12 +159,12 @@ export interface MessageToL1Filter {
     | FieldElement
     | undefined;
   /**
-   * Include messages sent by reverted transactions.
+   * Filter based on the transaction status.
    *
-   * Defaults to false.
+   * Defaults to `Succeeded`.
    */
-  readonly includeReverted?:
-    | boolean
+  readonly transactionStatus?:
+    | TransactionStatusFilter
     | undefined;
   /**
    * Include the transaction that sent the message.
@@ -135,18 +187,29 @@ export interface MessageToL1Filter {
    *
    * Defaults to false.
    */
-  readonly includeEvents?: boolean | undefined;
+  readonly includeEvents?:
+    | boolean
+    | undefined;
+  /**
+   * Include the messages of the transaction that sent the message.
+   *
+   * Defaults to false.
+   */
+  readonly includeSiblings?: boolean | undefined;
 }
 
 /** Filter transactions. */
 export interface TransactionFilter {
+  readonly id?:
+    | number
+    | undefined;
   /**
-   * Include reverted transactions.
+   * Filter based on the transaction status.
    *
-   * Defaults to false.
+   * Defaults to `Succeeded`.
    */
-  readonly includeReverted?:
-    | boolean
+  readonly transactionStatus?:
+    | TransactionStatusFilter
     | undefined;
   /**
    * Flag to request the transaction's receipt.
@@ -170,7 +233,7 @@ export interface TransactionFilter {
    * Defaults to `false`.
    */
   readonly includeMessages?: boolean | undefined;
-  readonly transactionType?:
+  readonly inner?:
     | { readonly $case: "invokeV0"; readonly invokeV0: InvokeTransactionV0Filter }
     | { readonly $case: "invokeV1"; readonly invokeV1: InvokeTransactionV1Filter }
     | { readonly $case: "invokeV3"; readonly invokeV3: InvokeTransactionV3Filter }
@@ -393,10 +456,11 @@ export const HeaderFilter = {
 
 function createBaseEventFilter(): EventFilter {
   return {
-    fromAddress: undefined,
+    id: 0,
+    address: undefined,
     keys: [],
     strict: undefined,
-    includeReverted: undefined,
+    transactionStatus: undefined,
     includeTransaction: undefined,
     includeReceipt: undefined,
     includeMessages: undefined,
@@ -406,31 +470,34 @@ function createBaseEventFilter(): EventFilter {
 
 export const EventFilter = {
   encode(message: EventFilter, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.fromAddress !== undefined) {
-      FieldElement.encode(message.fromAddress, writer.uint32(10).fork()).ldelim();
+    if (message.id !== undefined && message.id !== 0) {
+      writer.uint32(8).uint32(message.id);
+    }
+    if (message.address !== undefined) {
+      FieldElement.encode(message.address, writer.uint32(18).fork()).ldelim();
     }
     if (message.keys !== undefined && message.keys.length !== 0) {
       for (const v of message.keys) {
-        Key.encode(v!, writer.uint32(18).fork()).ldelim();
+        Key.encode(v!, writer.uint32(26).fork()).ldelim();
       }
     }
     if (message.strict !== undefined) {
-      writer.uint32(24).bool(message.strict);
+      writer.uint32(32).bool(message.strict);
     }
-    if (message.includeReverted !== undefined) {
-      writer.uint32(32).bool(message.includeReverted);
+    if (message.transactionStatus !== undefined) {
+      writer.uint32(40).int32(message.transactionStatus);
     }
     if (message.includeTransaction !== undefined) {
-      writer.uint32(40).bool(message.includeTransaction);
+      writer.uint32(48).bool(message.includeTransaction);
     }
     if (message.includeReceipt !== undefined) {
-      writer.uint32(48).bool(message.includeReceipt);
+      writer.uint32(56).bool(message.includeReceipt);
     }
     if (message.includeMessages !== undefined) {
-      writer.uint32(56).bool(message.includeMessages);
+      writer.uint32(64).bool(message.includeMessages);
     }
     if (message.includeSiblings !== undefined) {
-      writer.uint32(64).bool(message.includeSiblings);
+      writer.uint32(72).bool(message.includeSiblings);
     }
     return writer;
   },
@@ -443,56 +510,63 @@ export const EventFilter = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          if (tag !== 10) {
+          if (tag !== 8) {
             break;
           }
 
-          message.fromAddress = FieldElement.decode(reader, reader.uint32());
+          message.id = reader.uint32();
           continue;
         case 2:
           if (tag !== 18) {
             break;
           }
 
-          message.keys!.push(Key.decode(reader, reader.uint32()));
+          message.address = FieldElement.decode(reader, reader.uint32());
           continue;
         case 3:
-          if (tag !== 24) {
+          if (tag !== 26) {
             break;
           }
 
-          message.strict = reader.bool();
+          message.keys!.push(Key.decode(reader, reader.uint32()));
           continue;
         case 4:
           if (tag !== 32) {
             break;
           }
 
-          message.includeReverted = reader.bool();
+          message.strict = reader.bool();
           continue;
         case 5:
           if (tag !== 40) {
             break;
           }
 
-          message.includeTransaction = reader.bool();
+          message.transactionStatus = reader.int32() as any;
           continue;
         case 6:
           if (tag !== 48) {
             break;
           }
 
-          message.includeReceipt = reader.bool();
+          message.includeTransaction = reader.bool();
           continue;
         case 7:
           if (tag !== 56) {
             break;
           }
 
-          message.includeMessages = reader.bool();
+          message.includeReceipt = reader.bool();
           continue;
         case 8:
           if (tag !== 64) {
+            break;
+          }
+
+          message.includeMessages = reader.bool();
+          continue;
+        case 9:
+          if (tag !== 72) {
             break;
           }
 
@@ -509,10 +583,13 @@ export const EventFilter = {
 
   fromJSON(object: any): EventFilter {
     return {
-      fromAddress: isSet(object.fromAddress) ? FieldElement.fromJSON(object.fromAddress) : undefined,
+      id: isSet(object.id) ? globalThis.Number(object.id) : 0,
+      address: isSet(object.address) ? FieldElement.fromJSON(object.address) : undefined,
       keys: globalThis.Array.isArray(object?.keys) ? object.keys.map((e: any) => Key.fromJSON(e)) : [],
       strict: isSet(object.strict) ? globalThis.Boolean(object.strict) : undefined,
-      includeReverted: isSet(object.includeReverted) ? globalThis.Boolean(object.includeReverted) : undefined,
+      transactionStatus: isSet(object.transactionStatus)
+        ? transactionStatusFilterFromJSON(object.transactionStatus)
+        : undefined,
       includeTransaction: isSet(object.includeTransaction) ? globalThis.Boolean(object.includeTransaction) : undefined,
       includeReceipt: isSet(object.includeReceipt) ? globalThis.Boolean(object.includeReceipt) : undefined,
       includeMessages: isSet(object.includeMessages) ? globalThis.Boolean(object.includeMessages) : undefined,
@@ -522,8 +599,11 @@ export const EventFilter = {
 
   toJSON(message: EventFilter): unknown {
     const obj: any = {};
-    if (message.fromAddress !== undefined) {
-      obj.fromAddress = FieldElement.toJSON(message.fromAddress);
+    if (message.id !== undefined && message.id !== 0) {
+      obj.id = Math.round(message.id);
+    }
+    if (message.address !== undefined) {
+      obj.address = FieldElement.toJSON(message.address);
     }
     if (message.keys?.length) {
       obj.keys = message.keys.map((e) => Key.toJSON(e));
@@ -531,8 +611,8 @@ export const EventFilter = {
     if (message.strict !== undefined) {
       obj.strict = message.strict;
     }
-    if (message.includeReverted !== undefined) {
-      obj.includeReverted = message.includeReverted;
+    if (message.transactionStatus !== undefined) {
+      obj.transactionStatus = transactionStatusFilterToJSON(message.transactionStatus);
     }
     if (message.includeTransaction !== undefined) {
       obj.includeTransaction = message.includeTransaction;
@@ -554,12 +634,13 @@ export const EventFilter = {
   },
   fromPartial(object: DeepPartial<EventFilter>): EventFilter {
     const message = createBaseEventFilter() as any;
-    message.fromAddress = (object.fromAddress !== undefined && object.fromAddress !== null)
-      ? FieldElement.fromPartial(object.fromAddress)
+    message.id = object.id ?? 0;
+    message.address = (object.address !== undefined && object.address !== null)
+      ? FieldElement.fromPartial(object.address)
       : undefined;
     message.keys = object.keys?.map((e) => Key.fromPartial(e)) || [];
     message.strict = object.strict ?? undefined;
-    message.includeReverted = object.includeReverted ?? undefined;
+    message.transactionStatus = object.transactionStatus ?? undefined;
     message.includeTransaction = object.includeTransaction ?? undefined;
     message.includeReceipt = object.includeReceipt ?? undefined;
     message.includeMessages = object.includeMessages ?? undefined;
@@ -629,34 +710,42 @@ export const Key = {
 
 function createBaseMessageToL1Filter(): MessageToL1Filter {
   return {
+    id: 0,
     fromAddress: undefined,
     toAddress: undefined,
-    includeReverted: undefined,
+    transactionStatus: undefined,
     includeTransaction: undefined,
     includeReceipt: undefined,
     includeEvents: undefined,
+    includeSiblings: undefined,
   };
 }
 
 export const MessageToL1Filter = {
   encode(message: MessageToL1Filter, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.id !== undefined && message.id !== 0) {
+      writer.uint32(8).uint32(message.id);
+    }
     if (message.fromAddress !== undefined) {
-      FieldElement.encode(message.fromAddress, writer.uint32(10).fork()).ldelim();
+      FieldElement.encode(message.fromAddress, writer.uint32(18).fork()).ldelim();
     }
     if (message.toAddress !== undefined) {
-      FieldElement.encode(message.toAddress, writer.uint32(18).fork()).ldelim();
+      FieldElement.encode(message.toAddress, writer.uint32(26).fork()).ldelim();
     }
-    if (message.includeReverted !== undefined) {
-      writer.uint32(24).bool(message.includeReverted);
+    if (message.transactionStatus !== undefined) {
+      writer.uint32(32).int32(message.transactionStatus);
     }
     if (message.includeTransaction !== undefined) {
-      writer.uint32(32).bool(message.includeTransaction);
+      writer.uint32(40).bool(message.includeTransaction);
     }
     if (message.includeReceipt !== undefined) {
-      writer.uint32(40).bool(message.includeReceipt);
+      writer.uint32(48).bool(message.includeReceipt);
     }
     if (message.includeEvents !== undefined) {
-      writer.uint32(48).bool(message.includeEvents);
+      writer.uint32(56).bool(message.includeEvents);
+    }
+    if (message.includeSiblings !== undefined) {
+      writer.uint32(64).bool(message.includeSiblings);
     }
     return writer;
   },
@@ -669,46 +758,60 @@ export const MessageToL1Filter = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          if (tag !== 10) {
+          if (tag !== 8) {
             break;
           }
 
-          message.fromAddress = FieldElement.decode(reader, reader.uint32());
+          message.id = reader.uint32();
           continue;
         case 2:
           if (tag !== 18) {
             break;
           }
 
-          message.toAddress = FieldElement.decode(reader, reader.uint32());
+          message.fromAddress = FieldElement.decode(reader, reader.uint32());
           continue;
         case 3:
-          if (tag !== 24) {
+          if (tag !== 26) {
             break;
           }
 
-          message.includeReverted = reader.bool();
+          message.toAddress = FieldElement.decode(reader, reader.uint32());
           continue;
         case 4:
           if (tag !== 32) {
             break;
           }
 
-          message.includeTransaction = reader.bool();
+          message.transactionStatus = reader.int32() as any;
           continue;
         case 5:
           if (tag !== 40) {
             break;
           }
 
-          message.includeReceipt = reader.bool();
+          message.includeTransaction = reader.bool();
           continue;
         case 6:
           if (tag !== 48) {
             break;
           }
 
+          message.includeReceipt = reader.bool();
+          continue;
+        case 7:
+          if (tag !== 56) {
+            break;
+          }
+
           message.includeEvents = reader.bool();
+          continue;
+        case 8:
+          if (tag !== 64) {
+            break;
+          }
+
+          message.includeSiblings = reader.bool();
           continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
@@ -721,25 +824,32 @@ export const MessageToL1Filter = {
 
   fromJSON(object: any): MessageToL1Filter {
     return {
+      id: isSet(object.id) ? globalThis.Number(object.id) : 0,
       fromAddress: isSet(object.fromAddress) ? FieldElement.fromJSON(object.fromAddress) : undefined,
       toAddress: isSet(object.toAddress) ? FieldElement.fromJSON(object.toAddress) : undefined,
-      includeReverted: isSet(object.includeReverted) ? globalThis.Boolean(object.includeReverted) : undefined,
+      transactionStatus: isSet(object.transactionStatus)
+        ? transactionStatusFilterFromJSON(object.transactionStatus)
+        : undefined,
       includeTransaction: isSet(object.includeTransaction) ? globalThis.Boolean(object.includeTransaction) : undefined,
       includeReceipt: isSet(object.includeReceipt) ? globalThis.Boolean(object.includeReceipt) : undefined,
       includeEvents: isSet(object.includeEvents) ? globalThis.Boolean(object.includeEvents) : undefined,
+      includeSiblings: isSet(object.includeSiblings) ? globalThis.Boolean(object.includeSiblings) : undefined,
     };
   },
 
   toJSON(message: MessageToL1Filter): unknown {
     const obj: any = {};
+    if (message.id !== undefined && message.id !== 0) {
+      obj.id = Math.round(message.id);
+    }
     if (message.fromAddress !== undefined) {
       obj.fromAddress = FieldElement.toJSON(message.fromAddress);
     }
     if (message.toAddress !== undefined) {
       obj.toAddress = FieldElement.toJSON(message.toAddress);
     }
-    if (message.includeReverted !== undefined) {
-      obj.includeReverted = message.includeReverted;
+    if (message.transactionStatus !== undefined) {
+      obj.transactionStatus = transactionStatusFilterToJSON(message.transactionStatus);
     }
     if (message.includeTransaction !== undefined) {
       obj.includeTransaction = message.includeTransaction;
@@ -750,6 +860,9 @@ export const MessageToL1Filter = {
     if (message.includeEvents !== undefined) {
       obj.includeEvents = message.includeEvents;
     }
+    if (message.includeSiblings !== undefined) {
+      obj.includeSiblings = message.includeSiblings;
+    }
     return obj;
   },
 
@@ -758,79 +871,83 @@ export const MessageToL1Filter = {
   },
   fromPartial(object: DeepPartial<MessageToL1Filter>): MessageToL1Filter {
     const message = createBaseMessageToL1Filter() as any;
+    message.id = object.id ?? 0;
     message.fromAddress = (object.fromAddress !== undefined && object.fromAddress !== null)
       ? FieldElement.fromPartial(object.fromAddress)
       : undefined;
     message.toAddress = (object.toAddress !== undefined && object.toAddress !== null)
       ? FieldElement.fromPartial(object.toAddress)
       : undefined;
-    message.includeReverted = object.includeReverted ?? undefined;
+    message.transactionStatus = object.transactionStatus ?? undefined;
     message.includeTransaction = object.includeTransaction ?? undefined;
     message.includeReceipt = object.includeReceipt ?? undefined;
     message.includeEvents = object.includeEvents ?? undefined;
+    message.includeSiblings = object.includeSiblings ?? undefined;
     return message;
   },
 };
 
 function createBaseTransactionFilter(): TransactionFilter {
   return {
-    includeReverted: undefined,
+    id: 0,
+    transactionStatus: undefined,
     includeReceipt: undefined,
     includeEvents: undefined,
     includeMessages: undefined,
-    transactionType: undefined,
+    inner: undefined,
   };
 }
 
 export const TransactionFilter = {
   encode(message: TransactionFilter, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.includeReverted !== undefined) {
-      writer.uint32(8).bool(message.includeReverted);
+    if (message.id !== undefined && message.id !== 0) {
+      writer.uint32(8).uint32(message.id);
+    }
+    if (message.transactionStatus !== undefined) {
+      writer.uint32(16).int32(message.transactionStatus);
     }
     if (message.includeReceipt !== undefined) {
-      writer.uint32(16).bool(message.includeReceipt);
+      writer.uint32(24).bool(message.includeReceipt);
     }
     if (message.includeEvents !== undefined) {
-      writer.uint32(24).bool(message.includeEvents);
+      writer.uint32(32).bool(message.includeEvents);
     }
     if (message.includeMessages !== undefined) {
-      writer.uint32(32).bool(message.includeMessages);
+      writer.uint32(40).bool(message.includeMessages);
     }
-    switch (message.transactionType?.$case) {
+    switch (message.inner?.$case) {
       case "invokeV0":
-        InvokeTransactionV0Filter.encode(message.transactionType.invokeV0, writer.uint32(42).fork()).ldelim();
+        InvokeTransactionV0Filter.encode(message.inner.invokeV0, writer.uint32(50).fork()).ldelim();
         break;
       case "invokeV1":
-        InvokeTransactionV1Filter.encode(message.transactionType.invokeV1, writer.uint32(50).fork()).ldelim();
+        InvokeTransactionV1Filter.encode(message.inner.invokeV1, writer.uint32(58).fork()).ldelim();
         break;
       case "invokeV3":
-        InvokeTransactionV3Filter.encode(message.transactionType.invokeV3, writer.uint32(58).fork()).ldelim();
+        InvokeTransactionV3Filter.encode(message.inner.invokeV3, writer.uint32(66).fork()).ldelim();
         break;
       case "deploy":
-        DeployTransactionFilter.encode(message.transactionType.deploy, writer.uint32(66).fork()).ldelim();
+        DeployTransactionFilter.encode(message.inner.deploy, writer.uint32(74).fork()).ldelim();
         break;
       case "declareV0":
-        DeclareV0TransactionFilter.encode(message.transactionType.declareV0, writer.uint32(74).fork()).ldelim();
+        DeclareV0TransactionFilter.encode(message.inner.declareV0, writer.uint32(82).fork()).ldelim();
         break;
       case "declareV1":
-        DeclareV1TransactionFilter.encode(message.transactionType.declareV1, writer.uint32(82).fork()).ldelim();
+        DeclareV1TransactionFilter.encode(message.inner.declareV1, writer.uint32(90).fork()).ldelim();
         break;
       case "declareV2":
-        DeclareV2TransactionFilter.encode(message.transactionType.declareV2, writer.uint32(90).fork()).ldelim();
+        DeclareV2TransactionFilter.encode(message.inner.declareV2, writer.uint32(98).fork()).ldelim();
         break;
       case "declareV3":
-        DeclareV3TransactionFilter.encode(message.transactionType.declareV3, writer.uint32(98).fork()).ldelim();
+        DeclareV3TransactionFilter.encode(message.inner.declareV3, writer.uint32(106).fork()).ldelim();
         break;
       case "l1Handler":
-        L1HandlerTransactionFilter.encode(message.transactionType.l1Handler, writer.uint32(106).fork()).ldelim();
+        L1HandlerTransactionFilter.encode(message.inner.l1Handler, writer.uint32(114).fork()).ldelim();
         break;
       case "deployAccountV1":
-        DeployAccountV1TransactionFilter.encode(message.transactionType.deployAccountV1, writer.uint32(114).fork())
-          .ldelim();
+        DeployAccountV1TransactionFilter.encode(message.inner.deployAccountV1, writer.uint32(122).fork()).ldelim();
         break;
       case "deployAccountV3":
-        DeployAccountV3TransactionFilter.encode(message.transactionType.deployAccountV3, writer.uint32(122).fork())
-          .ldelim();
+        DeployAccountV3TransactionFilter.encode(message.inner.deployAccountV3, writer.uint32(130).fork()).ldelim();
         break;
     }
     return writer;
@@ -848,135 +965,115 @@ export const TransactionFilter = {
             break;
           }
 
-          message.includeReverted = reader.bool();
+          message.id = reader.uint32();
           continue;
         case 2:
           if (tag !== 16) {
             break;
           }
 
-          message.includeReceipt = reader.bool();
+          message.transactionStatus = reader.int32() as any;
           continue;
         case 3:
           if (tag !== 24) {
             break;
           }
 
-          message.includeEvents = reader.bool();
+          message.includeReceipt = reader.bool();
           continue;
         case 4:
           if (tag !== 32) {
             break;
           }
 
-          message.includeMessages = reader.bool();
+          message.includeEvents = reader.bool();
           continue;
         case 5:
-          if (tag !== 42) {
+          if (tag !== 40) {
             break;
           }
 
-          message.transactionType = {
-            $case: "invokeV0",
-            invokeV0: InvokeTransactionV0Filter.decode(reader, reader.uint32()),
-          };
+          message.includeMessages = reader.bool();
           continue;
         case 6:
           if (tag !== 50) {
             break;
           }
 
-          message.transactionType = {
-            $case: "invokeV1",
-            invokeV1: InvokeTransactionV1Filter.decode(reader, reader.uint32()),
-          };
+          message.inner = { $case: "invokeV0", invokeV0: InvokeTransactionV0Filter.decode(reader, reader.uint32()) };
           continue;
         case 7:
           if (tag !== 58) {
             break;
           }
 
-          message.transactionType = {
-            $case: "invokeV3",
-            invokeV3: InvokeTransactionV3Filter.decode(reader, reader.uint32()),
-          };
+          message.inner = { $case: "invokeV1", invokeV1: InvokeTransactionV1Filter.decode(reader, reader.uint32()) };
           continue;
         case 8:
           if (tag !== 66) {
             break;
           }
 
-          message.transactionType = {
-            $case: "deploy",
-            deploy: DeployTransactionFilter.decode(reader, reader.uint32()),
-          };
+          message.inner = { $case: "invokeV3", invokeV3: InvokeTransactionV3Filter.decode(reader, reader.uint32()) };
           continue;
         case 9:
           if (tag !== 74) {
             break;
           }
 
-          message.transactionType = {
-            $case: "declareV0",
-            declareV0: DeclareV0TransactionFilter.decode(reader, reader.uint32()),
-          };
+          message.inner = { $case: "deploy", deploy: DeployTransactionFilter.decode(reader, reader.uint32()) };
           continue;
         case 10:
           if (tag !== 82) {
             break;
           }
 
-          message.transactionType = {
-            $case: "declareV1",
-            declareV1: DeclareV1TransactionFilter.decode(reader, reader.uint32()),
-          };
+          message.inner = { $case: "declareV0", declareV0: DeclareV0TransactionFilter.decode(reader, reader.uint32()) };
           continue;
         case 11:
           if (tag !== 90) {
             break;
           }
 
-          message.transactionType = {
-            $case: "declareV2",
-            declareV2: DeclareV2TransactionFilter.decode(reader, reader.uint32()),
-          };
+          message.inner = { $case: "declareV1", declareV1: DeclareV1TransactionFilter.decode(reader, reader.uint32()) };
           continue;
         case 12:
           if (tag !== 98) {
             break;
           }
 
-          message.transactionType = {
-            $case: "declareV3",
-            declareV3: DeclareV3TransactionFilter.decode(reader, reader.uint32()),
-          };
+          message.inner = { $case: "declareV2", declareV2: DeclareV2TransactionFilter.decode(reader, reader.uint32()) };
           continue;
         case 13:
           if (tag !== 106) {
             break;
           }
 
-          message.transactionType = {
-            $case: "l1Handler",
-            l1Handler: L1HandlerTransactionFilter.decode(reader, reader.uint32()),
-          };
+          message.inner = { $case: "declareV3", declareV3: DeclareV3TransactionFilter.decode(reader, reader.uint32()) };
           continue;
         case 14:
           if (tag !== 114) {
             break;
           }
 
-          message.transactionType = {
-            $case: "deployAccountV1",
-            deployAccountV1: DeployAccountV1TransactionFilter.decode(reader, reader.uint32()),
-          };
+          message.inner = { $case: "l1Handler", l1Handler: L1HandlerTransactionFilter.decode(reader, reader.uint32()) };
           continue;
         case 15:
           if (tag !== 122) {
             break;
           }
 
-          message.transactionType = {
+          message.inner = {
+            $case: "deployAccountV1",
+            deployAccountV1: DeployAccountV1TransactionFilter.decode(reader, reader.uint32()),
+          };
+          continue;
+        case 16:
+          if (tag !== 130) {
+            break;
+          }
+
+          message.inner = {
             $case: "deployAccountV3",
             deployAccountV3: DeployAccountV3TransactionFilter.decode(reader, reader.uint32()),
           };
@@ -992,11 +1089,14 @@ export const TransactionFilter = {
 
   fromJSON(object: any): TransactionFilter {
     return {
-      includeReverted: isSet(object.includeReverted) ? globalThis.Boolean(object.includeReverted) : undefined,
+      id: isSet(object.id) ? globalThis.Number(object.id) : 0,
+      transactionStatus: isSet(object.transactionStatus)
+        ? transactionStatusFilterFromJSON(object.transactionStatus)
+        : undefined,
       includeReceipt: isSet(object.includeReceipt) ? globalThis.Boolean(object.includeReceipt) : undefined,
       includeEvents: isSet(object.includeEvents) ? globalThis.Boolean(object.includeEvents) : undefined,
       includeMessages: isSet(object.includeMessages) ? globalThis.Boolean(object.includeMessages) : undefined,
-      transactionType: isSet(object.invokeV0)
+      inner: isSet(object.invokeV0)
         ? { $case: "invokeV0", invokeV0: InvokeTransactionV0Filter.fromJSON(object.invokeV0) }
         : isSet(object.invokeV1)
         ? { $case: "invokeV1", invokeV1: InvokeTransactionV1Filter.fromJSON(object.invokeV1) }
@@ -1030,8 +1130,11 @@ export const TransactionFilter = {
 
   toJSON(message: TransactionFilter): unknown {
     const obj: any = {};
-    if (message.includeReverted !== undefined) {
-      obj.includeReverted = message.includeReverted;
+    if (message.id !== undefined && message.id !== 0) {
+      obj.id = Math.round(message.id);
+    }
+    if (message.transactionStatus !== undefined) {
+      obj.transactionStatus = transactionStatusFilterToJSON(message.transactionStatus);
     }
     if (message.includeReceipt !== undefined) {
       obj.includeReceipt = message.includeReceipt;
@@ -1042,38 +1145,38 @@ export const TransactionFilter = {
     if (message.includeMessages !== undefined) {
       obj.includeMessages = message.includeMessages;
     }
-    if (message.transactionType?.$case === "invokeV0") {
-      obj.invokeV0 = InvokeTransactionV0Filter.toJSON(message.transactionType.invokeV0);
+    if (message.inner?.$case === "invokeV0") {
+      obj.invokeV0 = InvokeTransactionV0Filter.toJSON(message.inner.invokeV0);
     }
-    if (message.transactionType?.$case === "invokeV1") {
-      obj.invokeV1 = InvokeTransactionV1Filter.toJSON(message.transactionType.invokeV1);
+    if (message.inner?.$case === "invokeV1") {
+      obj.invokeV1 = InvokeTransactionV1Filter.toJSON(message.inner.invokeV1);
     }
-    if (message.transactionType?.$case === "invokeV3") {
-      obj.invokeV3 = InvokeTransactionV3Filter.toJSON(message.transactionType.invokeV3);
+    if (message.inner?.$case === "invokeV3") {
+      obj.invokeV3 = InvokeTransactionV3Filter.toJSON(message.inner.invokeV3);
     }
-    if (message.transactionType?.$case === "deploy") {
-      obj.deploy = DeployTransactionFilter.toJSON(message.transactionType.deploy);
+    if (message.inner?.$case === "deploy") {
+      obj.deploy = DeployTransactionFilter.toJSON(message.inner.deploy);
     }
-    if (message.transactionType?.$case === "declareV0") {
-      obj.declareV0 = DeclareV0TransactionFilter.toJSON(message.transactionType.declareV0);
+    if (message.inner?.$case === "declareV0") {
+      obj.declareV0 = DeclareV0TransactionFilter.toJSON(message.inner.declareV0);
     }
-    if (message.transactionType?.$case === "declareV1") {
-      obj.declareV1 = DeclareV1TransactionFilter.toJSON(message.transactionType.declareV1);
+    if (message.inner?.$case === "declareV1") {
+      obj.declareV1 = DeclareV1TransactionFilter.toJSON(message.inner.declareV1);
     }
-    if (message.transactionType?.$case === "declareV2") {
-      obj.declareV2 = DeclareV2TransactionFilter.toJSON(message.transactionType.declareV2);
+    if (message.inner?.$case === "declareV2") {
+      obj.declareV2 = DeclareV2TransactionFilter.toJSON(message.inner.declareV2);
     }
-    if (message.transactionType?.$case === "declareV3") {
-      obj.declareV3 = DeclareV3TransactionFilter.toJSON(message.transactionType.declareV3);
+    if (message.inner?.$case === "declareV3") {
+      obj.declareV3 = DeclareV3TransactionFilter.toJSON(message.inner.declareV3);
     }
-    if (message.transactionType?.$case === "l1Handler") {
-      obj.l1Handler = L1HandlerTransactionFilter.toJSON(message.transactionType.l1Handler);
+    if (message.inner?.$case === "l1Handler") {
+      obj.l1Handler = L1HandlerTransactionFilter.toJSON(message.inner.l1Handler);
     }
-    if (message.transactionType?.$case === "deployAccountV1") {
-      obj.deployAccountV1 = DeployAccountV1TransactionFilter.toJSON(message.transactionType.deployAccountV1);
+    if (message.inner?.$case === "deployAccountV1") {
+      obj.deployAccountV1 = DeployAccountV1TransactionFilter.toJSON(message.inner.deployAccountV1);
     }
-    if (message.transactionType?.$case === "deployAccountV3") {
-      obj.deployAccountV3 = DeployAccountV3TransactionFilter.toJSON(message.transactionType.deployAccountV3);
+    if (message.inner?.$case === "deployAccountV3") {
+      obj.deployAccountV3 = DeployAccountV3TransactionFilter.toJSON(message.inner.deployAccountV3);
     }
     return obj;
   },
@@ -1083,118 +1186,66 @@ export const TransactionFilter = {
   },
   fromPartial(object: DeepPartial<TransactionFilter>): TransactionFilter {
     const message = createBaseTransactionFilter() as any;
-    message.includeReverted = object.includeReverted ?? undefined;
+    message.id = object.id ?? 0;
+    message.transactionStatus = object.transactionStatus ?? undefined;
     message.includeReceipt = object.includeReceipt ?? undefined;
     message.includeEvents = object.includeEvents ?? undefined;
     message.includeMessages = object.includeMessages ?? undefined;
-    if (
-      object.transactionType?.$case === "invokeV0" &&
-      object.transactionType?.invokeV0 !== undefined &&
-      object.transactionType?.invokeV0 !== null
-    ) {
-      message.transactionType = {
-        $case: "invokeV0",
-        invokeV0: InvokeTransactionV0Filter.fromPartial(object.transactionType.invokeV0),
-      };
+    if (object.inner?.$case === "invokeV0" && object.inner?.invokeV0 !== undefined && object.inner?.invokeV0 !== null) {
+      message.inner = { $case: "invokeV0", invokeV0: InvokeTransactionV0Filter.fromPartial(object.inner.invokeV0) };
+    }
+    if (object.inner?.$case === "invokeV1" && object.inner?.invokeV1 !== undefined && object.inner?.invokeV1 !== null) {
+      message.inner = { $case: "invokeV1", invokeV1: InvokeTransactionV1Filter.fromPartial(object.inner.invokeV1) };
+    }
+    if (object.inner?.$case === "invokeV3" && object.inner?.invokeV3 !== undefined && object.inner?.invokeV3 !== null) {
+      message.inner = { $case: "invokeV3", invokeV3: InvokeTransactionV3Filter.fromPartial(object.inner.invokeV3) };
+    }
+    if (object.inner?.$case === "deploy" && object.inner?.deploy !== undefined && object.inner?.deploy !== null) {
+      message.inner = { $case: "deploy", deploy: DeployTransactionFilter.fromPartial(object.inner.deploy) };
     }
     if (
-      object.transactionType?.$case === "invokeV1" &&
-      object.transactionType?.invokeV1 !== undefined &&
-      object.transactionType?.invokeV1 !== null
+      object.inner?.$case === "declareV0" && object.inner?.declareV0 !== undefined && object.inner?.declareV0 !== null
     ) {
-      message.transactionType = {
-        $case: "invokeV1",
-        invokeV1: InvokeTransactionV1Filter.fromPartial(object.transactionType.invokeV1),
-      };
+      message.inner = { $case: "declareV0", declareV0: DeclareV0TransactionFilter.fromPartial(object.inner.declareV0) };
     }
     if (
-      object.transactionType?.$case === "invokeV3" &&
-      object.transactionType?.invokeV3 !== undefined &&
-      object.transactionType?.invokeV3 !== null
+      object.inner?.$case === "declareV1" && object.inner?.declareV1 !== undefined && object.inner?.declareV1 !== null
     ) {
-      message.transactionType = {
-        $case: "invokeV3",
-        invokeV3: InvokeTransactionV3Filter.fromPartial(object.transactionType.invokeV3),
-      };
+      message.inner = { $case: "declareV1", declareV1: DeclareV1TransactionFilter.fromPartial(object.inner.declareV1) };
     }
     if (
-      object.transactionType?.$case === "deploy" &&
-      object.transactionType?.deploy !== undefined &&
-      object.transactionType?.deploy !== null
+      object.inner?.$case === "declareV2" && object.inner?.declareV2 !== undefined && object.inner?.declareV2 !== null
     ) {
-      message.transactionType = {
-        $case: "deploy",
-        deploy: DeployTransactionFilter.fromPartial(object.transactionType.deploy),
-      };
+      message.inner = { $case: "declareV2", declareV2: DeclareV2TransactionFilter.fromPartial(object.inner.declareV2) };
     }
     if (
-      object.transactionType?.$case === "declareV0" &&
-      object.transactionType?.declareV0 !== undefined &&
-      object.transactionType?.declareV0 !== null
+      object.inner?.$case === "declareV3" && object.inner?.declareV3 !== undefined && object.inner?.declareV3 !== null
     ) {
-      message.transactionType = {
-        $case: "declareV0",
-        declareV0: DeclareV0TransactionFilter.fromPartial(object.transactionType.declareV0),
-      };
+      message.inner = { $case: "declareV3", declareV3: DeclareV3TransactionFilter.fromPartial(object.inner.declareV3) };
     }
     if (
-      object.transactionType?.$case === "declareV1" &&
-      object.transactionType?.declareV1 !== undefined &&
-      object.transactionType?.declareV1 !== null
+      object.inner?.$case === "l1Handler" && object.inner?.l1Handler !== undefined && object.inner?.l1Handler !== null
     ) {
-      message.transactionType = {
-        $case: "declareV1",
-        declareV1: DeclareV1TransactionFilter.fromPartial(object.transactionType.declareV1),
-      };
+      message.inner = { $case: "l1Handler", l1Handler: L1HandlerTransactionFilter.fromPartial(object.inner.l1Handler) };
     }
     if (
-      object.transactionType?.$case === "declareV2" &&
-      object.transactionType?.declareV2 !== undefined &&
-      object.transactionType?.declareV2 !== null
+      object.inner?.$case === "deployAccountV1" &&
+      object.inner?.deployAccountV1 !== undefined &&
+      object.inner?.deployAccountV1 !== null
     ) {
-      message.transactionType = {
-        $case: "declareV2",
-        declareV2: DeclareV2TransactionFilter.fromPartial(object.transactionType.declareV2),
-      };
-    }
-    if (
-      object.transactionType?.$case === "declareV3" &&
-      object.transactionType?.declareV3 !== undefined &&
-      object.transactionType?.declareV3 !== null
-    ) {
-      message.transactionType = {
-        $case: "declareV3",
-        declareV3: DeclareV3TransactionFilter.fromPartial(object.transactionType.declareV3),
-      };
-    }
-    if (
-      object.transactionType?.$case === "l1Handler" &&
-      object.transactionType?.l1Handler !== undefined &&
-      object.transactionType?.l1Handler !== null
-    ) {
-      message.transactionType = {
-        $case: "l1Handler",
-        l1Handler: L1HandlerTransactionFilter.fromPartial(object.transactionType.l1Handler),
-      };
-    }
-    if (
-      object.transactionType?.$case === "deployAccountV1" &&
-      object.transactionType?.deployAccountV1 !== undefined &&
-      object.transactionType?.deployAccountV1 !== null
-    ) {
-      message.transactionType = {
+      message.inner = {
         $case: "deployAccountV1",
-        deployAccountV1: DeployAccountV1TransactionFilter.fromPartial(object.transactionType.deployAccountV1),
+        deployAccountV1: DeployAccountV1TransactionFilter.fromPartial(object.inner.deployAccountV1),
       };
     }
     if (
-      object.transactionType?.$case === "deployAccountV3" &&
-      object.transactionType?.deployAccountV3 !== undefined &&
-      object.transactionType?.deployAccountV3 !== null
+      object.inner?.$case === "deployAccountV3" &&
+      object.inner?.deployAccountV3 !== undefined &&
+      object.inner?.deployAccountV3 !== null
     ) {
-      message.transactionType = {
+      message.inner = {
         $case: "deployAccountV3",
-        deployAccountV3: DeployAccountV3TransactionFilter.fromPartial(object.transactionType.deployAccountV3),
+        deployAccountV3: DeployAccountV3TransactionFilter.fromPartial(object.inner.deployAccountV3),
       };
     }
     return message;

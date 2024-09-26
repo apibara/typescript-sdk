@@ -7,30 +7,30 @@ const _FieldElement = Schema.TemplateLiteral(
 
 /** Wire representation of `FieldElement`. */
 export const FieldElementProto = Schema.Struct({
-  loLo: Schema.BigIntFromSelf,
-  loHi: Schema.BigIntFromSelf,
-  hiLo: Schema.BigIntFromSelf,
-  hiHi: Schema.BigIntFromSelf,
+  x0: Schema.BigIntFromSelf,
+  x1: Schema.BigIntFromSelf,
+  x2: Schema.BigIntFromSelf,
+  x3: Schema.BigIntFromSelf,
 });
 
 /** Field element. */
 export const FieldElement = Schema.transform(FieldElementProto, _FieldElement, {
   decode(value) {
-    const loLo = value.loLo.toString(16).padStart(16, "0");
-    const loHi = value.loHi.toString(16).padStart(16, "0");
-    const hiLo = value.hiLo.toString(16).padStart(16, "0");
-    const hiHi = value.hiHi.toString(16).padStart(16, "0");
-    return `0x${loLo}${loHi}${hiLo}${hiHi}` as `0x${string}`;
+    const x0 = value.x0.toString(16).padStart(16, "0");
+    const x1 = value.x1.toString(16).padStart(16, "0");
+    const x2 = value.x2.toString(16).padStart(16, "0");
+    const x3 = value.x3.toString(16).padStart(16, "0");
+    return `0x${x0}${x1}${x2}${x3}` as `0x${string}`;
   },
   encode(value) {
     const bn = BigInt(value);
     const hex = bn.toString(16).padStart(64, "0");
     const s = hex.length;
-    const hiHi = BigInt(`0x${hex.slice(s - 16, s)}`);
-    const hiLo = BigInt(`0x${hex.slice(s - 32, s - 16)}`);
-    const loHi = BigInt(`0x${hex.slice(s - 48, s - 32)}`);
-    const loLo = BigInt(`0x${hex.slice(s - 64, s - 48)}`);
-    return { loLo, loHi, hiLo, hiHi };
+    const x3 = BigInt(`0x${hex.slice(s - 16, s)}`);
+    const x2 = BigInt(`0x${hex.slice(s - 32, s - 16)}`);
+    const x1 = BigInt(`0x${hex.slice(s - 48, s - 32)}`);
+    const x0 = BigInt(`0x${hex.slice(s - 64, s - 48)}`);
+    return { x0, x1, x2, x3 };
   },
 });
 

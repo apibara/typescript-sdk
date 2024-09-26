@@ -14,6 +14,45 @@ export const protobufPackage = "starknet.v2";
 
 /** Starknet DNA definitions (data). */
 
+export enum TransactionStatus {
+  UNSPECIFIED = 0,
+  SUCCEEDED = 1,
+  REVERTED = 2,
+  UNRECOGNIZED = -1,
+}
+
+export function transactionStatusFromJSON(object: any): TransactionStatus {
+  switch (object) {
+    case 0:
+    case "TRANSACTION_STATUS_UNSPECIFIED":
+      return TransactionStatus.UNSPECIFIED;
+    case 1:
+    case "TRANSACTION_STATUS_SUCCEEDED":
+      return TransactionStatus.SUCCEEDED;
+    case 2:
+    case "TRANSACTION_STATUS_REVERTED":
+      return TransactionStatus.REVERTED;
+    case -1:
+    case "UNRECOGNIZED":
+    default:
+      return TransactionStatus.UNRECOGNIZED;
+  }
+}
+
+export function transactionStatusToJSON(object: TransactionStatus): string {
+  switch (object) {
+    case TransactionStatus.UNSPECIFIED:
+      return "TRANSACTION_STATUS_UNSPECIFIED";
+    case TransactionStatus.SUCCEEDED:
+      return "TRANSACTION_STATUS_SUCCEEDED";
+    case TransactionStatus.REVERTED:
+      return "TRANSACTION_STATUS_REVERTED";
+    case TransactionStatus.UNRECOGNIZED:
+    default:
+      return "UNRECOGNIZED";
+  }
+}
+
 export enum L1DataAvailabilityMode {
   /** UNSPECIFIED - Unknown DA. */
   UNSPECIFIED = 0,
@@ -251,6 +290,9 @@ export interface BlockHeader {
 
 /** A transaction. */
 export interface Transaction {
+  readonly filterIds?:
+    | readonly number[]
+    | undefined;
   /** Common transaction metadata. */
   readonly meta?: TransactionMeta | undefined;
   readonly transaction?:
@@ -277,8 +319,8 @@ export interface TransactionMeta {
   readonly transactionHash?:
     | FieldElement
     | undefined;
-  /** Transaction reverted flag. */
-  readonly transactionReverted?: boolean | undefined;
+  /** Transaction status. */
+  readonly transactionStatus?: TransactionStatus | undefined;
 }
 
 export interface InvokeTransactionV0 {
@@ -384,6 +426,9 @@ export interface DeployAccountTransactionV3 {
 }
 
 export interface TransactionReceipt {
+  readonly filterIds?:
+    | readonly number[]
+    | undefined;
   /** Common transaction receipt metadata. */
   readonly meta?: TransactionReceiptMeta | undefined;
   readonly receipt?:
@@ -433,6 +478,9 @@ export interface DeployAccountTransactionReceipt {
 
 /** Transaction events. */
 export interface Event {
+  readonly filterIds?:
+    | readonly number[]
+    | undefined;
   /** The contract that emitted the event. */
   readonly fromAddress?:
     | FieldElement
@@ -457,11 +505,14 @@ export interface Event {
   readonly transactionHash?:
     | FieldElement
     | undefined;
-  /** Transaction reverted flag. */
-  readonly transactionReverted?: boolean | undefined;
+  /** Transaction status. */
+  readonly transactionStatus?: TransactionStatus | undefined;
 }
 
 export interface MessageToL1 {
+  readonly filterIds?:
+    | readonly number[]
+    | undefined;
   /** The contract sending the message. */
   readonly fromAddress?:
     | FieldElement
@@ -486,8 +537,8 @@ export interface MessageToL1 {
   readonly transactionHash?:
     | FieldElement
     | undefined;
-  /** Transaction reverted flag. */
-  readonly transactionReverted?: boolean | undefined;
+  /** Transaction status. */
+  readonly transactionStatus?: TransactionStatus | undefined;
 }
 
 /** Price of a unit of a resource. */
@@ -590,12 +641,8 @@ export interface ResourceBounds {
 }
 
 export interface Uint128 {
-  /** The low 64 bits of the number. */
-  readonly low?:
-    | bigint
-    | undefined;
-  /** The high 64 bits of the number. */
-  readonly high?: bigint | undefined;
+  readonly x0?: bigint | undefined;
+  readonly x1?: bigint | undefined;
 }
 
 function createBaseBlock(): Block {
@@ -956,47 +1003,54 @@ export const BlockHeader = {
 };
 
 function createBaseTransaction(): Transaction {
-  return { meta: undefined, transaction: undefined };
+  return { filterIds: [], meta: undefined, transaction: undefined };
 }
 
 export const Transaction = {
   encode(message: Transaction, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.filterIds !== undefined && message.filterIds.length !== 0) {
+      writer.uint32(10).fork();
+      for (const v of message.filterIds) {
+        writer.uint32(v);
+      }
+      writer.ldelim();
+    }
     if (message.meta !== undefined) {
-      TransactionMeta.encode(message.meta, writer.uint32(10).fork()).ldelim();
+      TransactionMeta.encode(message.meta, writer.uint32(18).fork()).ldelim();
     }
     switch (message.transaction?.$case) {
       case "invokeV0":
-        InvokeTransactionV0.encode(message.transaction.invokeV0, writer.uint32(18).fork()).ldelim();
+        InvokeTransactionV0.encode(message.transaction.invokeV0, writer.uint32(26).fork()).ldelim();
         break;
       case "invokeV1":
-        InvokeTransactionV1.encode(message.transaction.invokeV1, writer.uint32(26).fork()).ldelim();
+        InvokeTransactionV1.encode(message.transaction.invokeV1, writer.uint32(34).fork()).ldelim();
         break;
       case "invokeV3":
-        InvokeTransactionV3.encode(message.transaction.invokeV3, writer.uint32(34).fork()).ldelim();
+        InvokeTransactionV3.encode(message.transaction.invokeV3, writer.uint32(42).fork()).ldelim();
         break;
       case "l1Handler":
-        L1HandlerTransaction.encode(message.transaction.l1Handler, writer.uint32(42).fork()).ldelim();
+        L1HandlerTransaction.encode(message.transaction.l1Handler, writer.uint32(50).fork()).ldelim();
         break;
       case "deploy":
-        DeployTransaction.encode(message.transaction.deploy, writer.uint32(50).fork()).ldelim();
+        DeployTransaction.encode(message.transaction.deploy, writer.uint32(58).fork()).ldelim();
         break;
       case "declareV0":
-        DeclareTransactionV0.encode(message.transaction.declareV0, writer.uint32(58).fork()).ldelim();
+        DeclareTransactionV0.encode(message.transaction.declareV0, writer.uint32(66).fork()).ldelim();
         break;
       case "declareV1":
-        DeclareTransactionV1.encode(message.transaction.declareV1, writer.uint32(66).fork()).ldelim();
+        DeclareTransactionV1.encode(message.transaction.declareV1, writer.uint32(74).fork()).ldelim();
         break;
       case "declareV2":
-        DeclareTransactionV2.encode(message.transaction.declareV2, writer.uint32(74).fork()).ldelim();
+        DeclareTransactionV2.encode(message.transaction.declareV2, writer.uint32(82).fork()).ldelim();
         break;
       case "declareV3":
-        DeclareTransactionV3.encode(message.transaction.declareV3, writer.uint32(82).fork()).ldelim();
+        DeclareTransactionV3.encode(message.transaction.declareV3, writer.uint32(90).fork()).ldelim();
         break;
       case "deployAccountV1":
-        DeployAccountTransactionV1.encode(message.transaction.deployAccountV1, writer.uint32(90).fork()).ldelim();
+        DeployAccountTransactionV1.encode(message.transaction.deployAccountV1, writer.uint32(98).fork()).ldelim();
         break;
       case "deployAccountV3":
-        DeployAccountTransactionV3.encode(message.transaction.deployAccountV3, writer.uint32(98).fork()).ldelim();
+        DeployAccountTransactionV3.encode(message.transaction.deployAccountV3, writer.uint32(106).fork()).ldelim();
         break;
     }
     return writer;
@@ -1010,77 +1064,94 @@ export const Transaction = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          if (tag !== 10) {
-            break;
+          if (tag === 8) {
+            message.filterIds!.push(reader.uint32());
+
+            continue;
           }
 
-          message.meta = TransactionMeta.decode(reader, reader.uint32());
-          continue;
+          if (tag === 10) {
+            const end2 = reader.uint32() + reader.pos;
+            while (reader.pos < end2) {
+              message.filterIds!.push(reader.uint32());
+            }
+
+            continue;
+          }
+
+          break;
         case 2:
           if (tag !== 18) {
             break;
           }
 
-          message.transaction = { $case: "invokeV0", invokeV0: InvokeTransactionV0.decode(reader, reader.uint32()) };
+          message.meta = TransactionMeta.decode(reader, reader.uint32());
           continue;
         case 3:
           if (tag !== 26) {
             break;
           }
 
-          message.transaction = { $case: "invokeV1", invokeV1: InvokeTransactionV1.decode(reader, reader.uint32()) };
+          message.transaction = { $case: "invokeV0", invokeV0: InvokeTransactionV0.decode(reader, reader.uint32()) };
           continue;
         case 4:
           if (tag !== 34) {
             break;
           }
 
-          message.transaction = { $case: "invokeV3", invokeV3: InvokeTransactionV3.decode(reader, reader.uint32()) };
+          message.transaction = { $case: "invokeV1", invokeV1: InvokeTransactionV1.decode(reader, reader.uint32()) };
           continue;
         case 5:
           if (tag !== 42) {
             break;
           }
 
-          message.transaction = { $case: "l1Handler", l1Handler: L1HandlerTransaction.decode(reader, reader.uint32()) };
+          message.transaction = { $case: "invokeV3", invokeV3: InvokeTransactionV3.decode(reader, reader.uint32()) };
           continue;
         case 6:
           if (tag !== 50) {
             break;
           }
 
-          message.transaction = { $case: "deploy", deploy: DeployTransaction.decode(reader, reader.uint32()) };
+          message.transaction = { $case: "l1Handler", l1Handler: L1HandlerTransaction.decode(reader, reader.uint32()) };
           continue;
         case 7:
           if (tag !== 58) {
             break;
           }
 
-          message.transaction = { $case: "declareV0", declareV0: DeclareTransactionV0.decode(reader, reader.uint32()) };
+          message.transaction = { $case: "deploy", deploy: DeployTransaction.decode(reader, reader.uint32()) };
           continue;
         case 8:
           if (tag !== 66) {
             break;
           }
 
-          message.transaction = { $case: "declareV1", declareV1: DeclareTransactionV1.decode(reader, reader.uint32()) };
+          message.transaction = { $case: "declareV0", declareV0: DeclareTransactionV0.decode(reader, reader.uint32()) };
           continue;
         case 9:
           if (tag !== 74) {
             break;
           }
 
-          message.transaction = { $case: "declareV2", declareV2: DeclareTransactionV2.decode(reader, reader.uint32()) };
+          message.transaction = { $case: "declareV1", declareV1: DeclareTransactionV1.decode(reader, reader.uint32()) };
           continue;
         case 10:
           if (tag !== 82) {
             break;
           }
 
-          message.transaction = { $case: "declareV3", declareV3: DeclareTransactionV3.decode(reader, reader.uint32()) };
+          message.transaction = { $case: "declareV2", declareV2: DeclareTransactionV2.decode(reader, reader.uint32()) };
           continue;
         case 11:
           if (tag !== 90) {
+            break;
+          }
+
+          message.transaction = { $case: "declareV3", declareV3: DeclareTransactionV3.decode(reader, reader.uint32()) };
+          continue;
+        case 12:
+          if (tag !== 98) {
             break;
           }
 
@@ -1089,8 +1160,8 @@ export const Transaction = {
             deployAccountV1: DeployAccountTransactionV1.decode(reader, reader.uint32()),
           };
           continue;
-        case 12:
-          if (tag !== 98) {
+        case 13:
+          if (tag !== 106) {
             break;
           }
 
@@ -1110,6 +1181,9 @@ export const Transaction = {
 
   fromJSON(object: any): Transaction {
     return {
+      filterIds: globalThis.Array.isArray(object?.filterIds)
+        ? object.filterIds.map((e: any) => globalThis.Number(e))
+        : [],
       meta: isSet(object.meta) ? TransactionMeta.fromJSON(object.meta) : undefined,
       transaction: isSet(object.invokeV0)
         ? { $case: "invokeV0", invokeV0: InvokeTransactionV0.fromJSON(object.invokeV0) }
@@ -1139,6 +1213,9 @@ export const Transaction = {
 
   toJSON(message: Transaction): unknown {
     const obj: any = {};
+    if (message.filterIds?.length) {
+      obj.filterIds = message.filterIds.map((e) => Math.round(e));
+    }
     if (message.meta !== undefined) {
       obj.meta = TransactionMeta.toJSON(message.meta);
     }
@@ -1183,6 +1260,7 @@ export const Transaction = {
   },
   fromPartial(object: DeepPartial<Transaction>): Transaction {
     const message = createBaseTransaction() as any;
+    message.filterIds = object.filterIds?.map((e) => e) || [];
     message.meta = (object.meta !== undefined && object.meta !== null)
       ? TransactionMeta.fromPartial(object.meta)
       : undefined;
@@ -1298,7 +1376,7 @@ export const Transaction = {
 };
 
 function createBaseTransactionMeta(): TransactionMeta {
-  return { transactionIndex: 0, transactionHash: undefined, transactionReverted: false };
+  return { transactionIndex: 0, transactionHash: undefined, transactionStatus: 0 };
 }
 
 export const TransactionMeta = {
@@ -1309,8 +1387,8 @@ export const TransactionMeta = {
     if (message.transactionHash !== undefined) {
       FieldElement.encode(message.transactionHash, writer.uint32(18).fork()).ldelim();
     }
-    if (message.transactionReverted !== undefined && message.transactionReverted !== false) {
-      writer.uint32(24).bool(message.transactionReverted);
+    if (message.transactionStatus !== undefined && message.transactionStatus !== 0) {
+      writer.uint32(24).int32(message.transactionStatus);
     }
     return writer;
   },
@@ -1341,7 +1419,7 @@ export const TransactionMeta = {
             break;
           }
 
-          message.transactionReverted = reader.bool();
+          message.transactionStatus = reader.int32() as any;
           continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
@@ -1356,7 +1434,7 @@ export const TransactionMeta = {
     return {
       transactionIndex: isSet(object.transactionIndex) ? globalThis.Number(object.transactionIndex) : 0,
       transactionHash: isSet(object.transactionHash) ? FieldElement.fromJSON(object.transactionHash) : undefined,
-      transactionReverted: isSet(object.transactionReverted) ? globalThis.Boolean(object.transactionReverted) : false,
+      transactionStatus: isSet(object.transactionStatus) ? transactionStatusFromJSON(object.transactionStatus) : 0,
     };
   },
 
@@ -1368,8 +1446,8 @@ export const TransactionMeta = {
     if (message.transactionHash !== undefined) {
       obj.transactionHash = FieldElement.toJSON(message.transactionHash);
     }
-    if (message.transactionReverted !== undefined && message.transactionReverted !== false) {
-      obj.transactionReverted = message.transactionReverted;
+    if (message.transactionStatus !== undefined && message.transactionStatus !== 0) {
+      obj.transactionStatus = transactionStatusToJSON(message.transactionStatus);
     }
     return obj;
   },
@@ -1383,7 +1461,7 @@ export const TransactionMeta = {
     message.transactionHash = (object.transactionHash !== undefined && object.transactionHash !== null)
       ? FieldElement.fromPartial(object.transactionHash)
       : undefined;
-    message.transactionReverted = object.transactionReverted ?? false;
+    message.transactionStatus = object.transactionStatus ?? 0;
     return message;
   },
 };
@@ -3150,29 +3228,36 @@ export const DeployAccountTransactionV3 = {
 };
 
 function createBaseTransactionReceipt(): TransactionReceipt {
-  return { meta: undefined, receipt: undefined };
+  return { filterIds: [], meta: undefined, receipt: undefined };
 }
 
 export const TransactionReceipt = {
   encode(message: TransactionReceipt, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.filterIds !== undefined && message.filterIds.length !== 0) {
+      writer.uint32(10).fork();
+      for (const v of message.filterIds) {
+        writer.uint32(v);
+      }
+      writer.ldelim();
+    }
     if (message.meta !== undefined) {
-      TransactionReceiptMeta.encode(message.meta, writer.uint32(10).fork()).ldelim();
+      TransactionReceiptMeta.encode(message.meta, writer.uint32(18).fork()).ldelim();
     }
     switch (message.receipt?.$case) {
       case "invoke":
-        InvokeTransactionReceipt.encode(message.receipt.invoke, writer.uint32(18).fork()).ldelim();
+        InvokeTransactionReceipt.encode(message.receipt.invoke, writer.uint32(26).fork()).ldelim();
         break;
       case "l1Handler":
-        L1HandlerTransactionReceipt.encode(message.receipt.l1Handler, writer.uint32(26).fork()).ldelim();
+        L1HandlerTransactionReceipt.encode(message.receipt.l1Handler, writer.uint32(34).fork()).ldelim();
         break;
       case "declare":
-        DeclareTransactionReceipt.encode(message.receipt.declare, writer.uint32(34).fork()).ldelim();
+        DeclareTransactionReceipt.encode(message.receipt.declare, writer.uint32(42).fork()).ldelim();
         break;
       case "deploy":
-        DeployTransactionReceipt.encode(message.receipt.deploy, writer.uint32(42).fork()).ldelim();
+        DeployTransactionReceipt.encode(message.receipt.deploy, writer.uint32(50).fork()).ldelim();
         break;
       case "deployAccount":
-        DeployAccountTransactionReceipt.encode(message.receipt.deployAccount, writer.uint32(50).fork()).ldelim();
+        DeployAccountTransactionReceipt.encode(message.receipt.deployAccount, writer.uint32(58).fork()).ldelim();
         break;
     }
     return writer;
@@ -3186,21 +3271,38 @@ export const TransactionReceipt = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          if (tag !== 10) {
-            break;
+          if (tag === 8) {
+            message.filterIds!.push(reader.uint32());
+
+            continue;
           }
 
-          message.meta = TransactionReceiptMeta.decode(reader, reader.uint32());
-          continue;
+          if (tag === 10) {
+            const end2 = reader.uint32() + reader.pos;
+            while (reader.pos < end2) {
+              message.filterIds!.push(reader.uint32());
+            }
+
+            continue;
+          }
+
+          break;
         case 2:
           if (tag !== 18) {
             break;
           }
 
-          message.receipt = { $case: "invoke", invoke: InvokeTransactionReceipt.decode(reader, reader.uint32()) };
+          message.meta = TransactionReceiptMeta.decode(reader, reader.uint32());
           continue;
         case 3:
           if (tag !== 26) {
+            break;
+          }
+
+          message.receipt = { $case: "invoke", invoke: InvokeTransactionReceipt.decode(reader, reader.uint32()) };
+          continue;
+        case 4:
+          if (tag !== 34) {
             break;
           }
 
@@ -3209,22 +3311,22 @@ export const TransactionReceipt = {
             l1Handler: L1HandlerTransactionReceipt.decode(reader, reader.uint32()),
           };
           continue;
-        case 4:
-          if (tag !== 34) {
-            break;
-          }
-
-          message.receipt = { $case: "declare", declare: DeclareTransactionReceipt.decode(reader, reader.uint32()) };
-          continue;
         case 5:
           if (tag !== 42) {
             break;
           }
 
-          message.receipt = { $case: "deploy", deploy: DeployTransactionReceipt.decode(reader, reader.uint32()) };
+          message.receipt = { $case: "declare", declare: DeclareTransactionReceipt.decode(reader, reader.uint32()) };
           continue;
         case 6:
           if (tag !== 50) {
+            break;
+          }
+
+          message.receipt = { $case: "deploy", deploy: DeployTransactionReceipt.decode(reader, reader.uint32()) };
+          continue;
+        case 7:
+          if (tag !== 58) {
             break;
           }
 
@@ -3244,6 +3346,9 @@ export const TransactionReceipt = {
 
   fromJSON(object: any): TransactionReceipt {
     return {
+      filterIds: globalThis.Array.isArray(object?.filterIds)
+        ? object.filterIds.map((e: any) => globalThis.Number(e))
+        : [],
       meta: isSet(object.meta) ? TransactionReceiptMeta.fromJSON(object.meta) : undefined,
       receipt: isSet(object.invoke)
         ? { $case: "invoke", invoke: InvokeTransactionReceipt.fromJSON(object.invoke) }
@@ -3261,6 +3366,9 @@ export const TransactionReceipt = {
 
   toJSON(message: TransactionReceipt): unknown {
     const obj: any = {};
+    if (message.filterIds?.length) {
+      obj.filterIds = message.filterIds.map((e) => Math.round(e));
+    }
     if (message.meta !== undefined) {
       obj.meta = TransactionReceiptMeta.toJSON(message.meta);
     }
@@ -3287,6 +3395,7 @@ export const TransactionReceipt = {
   },
   fromPartial(object: DeepPartial<TransactionReceipt>): TransactionReceipt {
     const message = createBaseTransactionReceipt() as any;
+    message.filterIds = object.filterIds?.map((e) => e) || [];
     message.meta = (object.meta !== undefined && object.meta !== null)
       ? TransactionReceiptMeta.fromPartial(object.meta)
       : undefined;
@@ -3866,42 +3975,50 @@ export const DeployAccountTransactionReceipt = {
 
 function createBaseEvent(): Event {
   return {
+    filterIds: [],
     fromAddress: undefined,
     keys: [],
     data: [],
     eventIndex: 0,
     transactionIndex: 0,
     transactionHash: undefined,
-    transactionReverted: false,
+    transactionStatus: 0,
   };
 }
 
 export const Event = {
   encode(message: Event, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.filterIds !== undefined && message.filterIds.length !== 0) {
+      writer.uint32(10).fork();
+      for (const v of message.filterIds) {
+        writer.uint32(v);
+      }
+      writer.ldelim();
+    }
     if (message.fromAddress !== undefined) {
-      FieldElement.encode(message.fromAddress, writer.uint32(10).fork()).ldelim();
+      FieldElement.encode(message.fromAddress, writer.uint32(18).fork()).ldelim();
     }
     if (message.keys !== undefined && message.keys.length !== 0) {
       for (const v of message.keys) {
-        FieldElement.encode(v!, writer.uint32(18).fork()).ldelim();
+        FieldElement.encode(v!, writer.uint32(26).fork()).ldelim();
       }
     }
     if (message.data !== undefined && message.data.length !== 0) {
       for (const v of message.data) {
-        FieldElement.encode(v!, writer.uint32(26).fork()).ldelim();
+        FieldElement.encode(v!, writer.uint32(34).fork()).ldelim();
       }
     }
     if (message.eventIndex !== undefined && message.eventIndex !== 0) {
-      writer.uint32(32).uint32(message.eventIndex);
+      writer.uint32(40).uint32(message.eventIndex);
     }
     if (message.transactionIndex !== undefined && message.transactionIndex !== 0) {
-      writer.uint32(40).uint32(message.transactionIndex);
+      writer.uint32(48).uint32(message.transactionIndex);
     }
     if (message.transactionHash !== undefined) {
-      FieldElement.encode(message.transactionHash, writer.uint32(50).fork()).ldelim();
+      FieldElement.encode(message.transactionHash, writer.uint32(58).fork()).ldelim();
     }
-    if (message.transactionReverted !== undefined && message.transactionReverted !== false) {
-      writer.uint32(56).bool(message.transactionReverted);
+    if (message.transactionStatus !== undefined && message.transactionStatus !== 0) {
+      writer.uint32(64).int32(message.transactionStatus);
     }
     return writer;
   },
@@ -3914,53 +4031,70 @@ export const Event = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          if (tag !== 10) {
-            break;
+          if (tag === 8) {
+            message.filterIds!.push(reader.uint32());
+
+            continue;
           }
 
-          message.fromAddress = FieldElement.decode(reader, reader.uint32());
-          continue;
+          if (tag === 10) {
+            const end2 = reader.uint32() + reader.pos;
+            while (reader.pos < end2) {
+              message.filterIds!.push(reader.uint32());
+            }
+
+            continue;
+          }
+
+          break;
         case 2:
           if (tag !== 18) {
             break;
           }
 
-          message.keys!.push(FieldElement.decode(reader, reader.uint32()));
+          message.fromAddress = FieldElement.decode(reader, reader.uint32());
           continue;
         case 3:
           if (tag !== 26) {
             break;
           }
 
-          message.data!.push(FieldElement.decode(reader, reader.uint32()));
+          message.keys!.push(FieldElement.decode(reader, reader.uint32()));
           continue;
         case 4:
-          if (tag !== 32) {
+          if (tag !== 34) {
             break;
           }
 
-          message.eventIndex = reader.uint32();
+          message.data!.push(FieldElement.decode(reader, reader.uint32()));
           continue;
         case 5:
           if (tag !== 40) {
             break;
           }
 
-          message.transactionIndex = reader.uint32();
+          message.eventIndex = reader.uint32();
           continue;
         case 6:
-          if (tag !== 50) {
+          if (tag !== 48) {
+            break;
+          }
+
+          message.transactionIndex = reader.uint32();
+          continue;
+        case 7:
+          if (tag !== 58) {
             break;
           }
 
           message.transactionHash = FieldElement.decode(reader, reader.uint32());
           continue;
-        case 7:
-          if (tag !== 56) {
+        case 8:
+          if (tag !== 64) {
             break;
           }
 
-          message.transactionReverted = reader.bool();
+          message.transactionStatus = reader.int32() as any;
           continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
@@ -3973,18 +4107,24 @@ export const Event = {
 
   fromJSON(object: any): Event {
     return {
+      filterIds: globalThis.Array.isArray(object?.filterIds)
+        ? object.filterIds.map((e: any) => globalThis.Number(e))
+        : [],
       fromAddress: isSet(object.fromAddress) ? FieldElement.fromJSON(object.fromAddress) : undefined,
       keys: globalThis.Array.isArray(object?.keys) ? object.keys.map((e: any) => FieldElement.fromJSON(e)) : [],
       data: globalThis.Array.isArray(object?.data) ? object.data.map((e: any) => FieldElement.fromJSON(e)) : [],
       eventIndex: isSet(object.eventIndex) ? globalThis.Number(object.eventIndex) : 0,
       transactionIndex: isSet(object.transactionIndex) ? globalThis.Number(object.transactionIndex) : 0,
       transactionHash: isSet(object.transactionHash) ? FieldElement.fromJSON(object.transactionHash) : undefined,
-      transactionReverted: isSet(object.transactionReverted) ? globalThis.Boolean(object.transactionReverted) : false,
+      transactionStatus: isSet(object.transactionStatus) ? transactionStatusFromJSON(object.transactionStatus) : 0,
     };
   },
 
   toJSON(message: Event): unknown {
     const obj: any = {};
+    if (message.filterIds?.length) {
+      obj.filterIds = message.filterIds.map((e) => Math.round(e));
+    }
     if (message.fromAddress !== undefined) {
       obj.fromAddress = FieldElement.toJSON(message.fromAddress);
     }
@@ -4003,8 +4143,8 @@ export const Event = {
     if (message.transactionHash !== undefined) {
       obj.transactionHash = FieldElement.toJSON(message.transactionHash);
     }
-    if (message.transactionReverted !== undefined && message.transactionReverted !== false) {
-      obj.transactionReverted = message.transactionReverted;
+    if (message.transactionStatus !== undefined && message.transactionStatus !== 0) {
+      obj.transactionStatus = transactionStatusToJSON(message.transactionStatus);
     }
     return obj;
   },
@@ -4014,6 +4154,7 @@ export const Event = {
   },
   fromPartial(object: DeepPartial<Event>): Event {
     const message = createBaseEvent() as any;
+    message.filterIds = object.filterIds?.map((e) => e) || [];
     message.fromAddress = (object.fromAddress !== undefined && object.fromAddress !== null)
       ? FieldElement.fromPartial(object.fromAddress)
       : undefined;
@@ -4024,47 +4165,55 @@ export const Event = {
     message.transactionHash = (object.transactionHash !== undefined && object.transactionHash !== null)
       ? FieldElement.fromPartial(object.transactionHash)
       : undefined;
-    message.transactionReverted = object.transactionReverted ?? false;
+    message.transactionStatus = object.transactionStatus ?? 0;
     return message;
   },
 };
 
 function createBaseMessageToL1(): MessageToL1 {
   return {
+    filterIds: [],
     fromAddress: undefined,
     toAddress: undefined,
     payload: [],
     messageIndex: 0,
     transactionIndex: 0,
     transactionHash: undefined,
-    transactionReverted: false,
+    transactionStatus: 0,
   };
 }
 
 export const MessageToL1 = {
   encode(message: MessageToL1, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.filterIds !== undefined && message.filterIds.length !== 0) {
+      writer.uint32(10).fork();
+      for (const v of message.filterIds) {
+        writer.uint32(v);
+      }
+      writer.ldelim();
+    }
     if (message.fromAddress !== undefined) {
-      FieldElement.encode(message.fromAddress, writer.uint32(10).fork()).ldelim();
+      FieldElement.encode(message.fromAddress, writer.uint32(18).fork()).ldelim();
     }
     if (message.toAddress !== undefined) {
-      FieldElement.encode(message.toAddress, writer.uint32(18).fork()).ldelim();
+      FieldElement.encode(message.toAddress, writer.uint32(26).fork()).ldelim();
     }
     if (message.payload !== undefined && message.payload.length !== 0) {
       for (const v of message.payload) {
-        FieldElement.encode(v!, writer.uint32(26).fork()).ldelim();
+        FieldElement.encode(v!, writer.uint32(34).fork()).ldelim();
       }
     }
     if (message.messageIndex !== undefined && message.messageIndex !== 0) {
-      writer.uint32(32).uint32(message.messageIndex);
+      writer.uint32(40).uint32(message.messageIndex);
     }
     if (message.transactionIndex !== undefined && message.transactionIndex !== 0) {
-      writer.uint32(40).uint32(message.transactionIndex);
+      writer.uint32(48).uint32(message.transactionIndex);
     }
     if (message.transactionHash !== undefined) {
-      FieldElement.encode(message.transactionHash, writer.uint32(50).fork()).ldelim();
+      FieldElement.encode(message.transactionHash, writer.uint32(58).fork()).ldelim();
     }
-    if (message.transactionReverted !== undefined && message.transactionReverted !== false) {
-      writer.uint32(56).bool(message.transactionReverted);
+    if (message.transactionStatus !== undefined && message.transactionStatus !== 0) {
+      writer.uint32(64).int32(message.transactionStatus);
     }
     return writer;
   },
@@ -4077,53 +4226,70 @@ export const MessageToL1 = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          if (tag !== 10) {
-            break;
+          if (tag === 8) {
+            message.filterIds!.push(reader.uint32());
+
+            continue;
           }
 
-          message.fromAddress = FieldElement.decode(reader, reader.uint32());
-          continue;
+          if (tag === 10) {
+            const end2 = reader.uint32() + reader.pos;
+            while (reader.pos < end2) {
+              message.filterIds!.push(reader.uint32());
+            }
+
+            continue;
+          }
+
+          break;
         case 2:
           if (tag !== 18) {
             break;
           }
 
-          message.toAddress = FieldElement.decode(reader, reader.uint32());
+          message.fromAddress = FieldElement.decode(reader, reader.uint32());
           continue;
         case 3:
           if (tag !== 26) {
             break;
           }
 
-          message.payload!.push(FieldElement.decode(reader, reader.uint32()));
+          message.toAddress = FieldElement.decode(reader, reader.uint32());
           continue;
         case 4:
-          if (tag !== 32) {
+          if (tag !== 34) {
             break;
           }
 
-          message.messageIndex = reader.uint32();
+          message.payload!.push(FieldElement.decode(reader, reader.uint32()));
           continue;
         case 5:
           if (tag !== 40) {
             break;
           }
 
-          message.transactionIndex = reader.uint32();
+          message.messageIndex = reader.uint32();
           continue;
         case 6:
-          if (tag !== 50) {
+          if (tag !== 48) {
+            break;
+          }
+
+          message.transactionIndex = reader.uint32();
+          continue;
+        case 7:
+          if (tag !== 58) {
             break;
           }
 
           message.transactionHash = FieldElement.decode(reader, reader.uint32());
           continue;
-        case 7:
-          if (tag !== 56) {
+        case 8:
+          if (tag !== 64) {
             break;
           }
 
-          message.transactionReverted = reader.bool();
+          message.transactionStatus = reader.int32() as any;
           continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
@@ -4136,6 +4302,9 @@ export const MessageToL1 = {
 
   fromJSON(object: any): MessageToL1 {
     return {
+      filterIds: globalThis.Array.isArray(object?.filterIds)
+        ? object.filterIds.map((e: any) => globalThis.Number(e))
+        : [],
       fromAddress: isSet(object.fromAddress) ? FieldElement.fromJSON(object.fromAddress) : undefined,
       toAddress: isSet(object.toAddress) ? FieldElement.fromJSON(object.toAddress) : undefined,
       payload: globalThis.Array.isArray(object?.payload)
@@ -4144,12 +4313,15 @@ export const MessageToL1 = {
       messageIndex: isSet(object.messageIndex) ? globalThis.Number(object.messageIndex) : 0,
       transactionIndex: isSet(object.transactionIndex) ? globalThis.Number(object.transactionIndex) : 0,
       transactionHash: isSet(object.transactionHash) ? FieldElement.fromJSON(object.transactionHash) : undefined,
-      transactionReverted: isSet(object.transactionReverted) ? globalThis.Boolean(object.transactionReverted) : false,
+      transactionStatus: isSet(object.transactionStatus) ? transactionStatusFromJSON(object.transactionStatus) : 0,
     };
   },
 
   toJSON(message: MessageToL1): unknown {
     const obj: any = {};
+    if (message.filterIds?.length) {
+      obj.filterIds = message.filterIds.map((e) => Math.round(e));
+    }
     if (message.fromAddress !== undefined) {
       obj.fromAddress = FieldElement.toJSON(message.fromAddress);
     }
@@ -4168,8 +4340,8 @@ export const MessageToL1 = {
     if (message.transactionHash !== undefined) {
       obj.transactionHash = FieldElement.toJSON(message.transactionHash);
     }
-    if (message.transactionReverted !== undefined && message.transactionReverted !== false) {
-      obj.transactionReverted = message.transactionReverted;
+    if (message.transactionStatus !== undefined && message.transactionStatus !== 0) {
+      obj.transactionStatus = transactionStatusToJSON(message.transactionStatus);
     }
     return obj;
   },
@@ -4179,6 +4351,7 @@ export const MessageToL1 = {
   },
   fromPartial(object: DeepPartial<MessageToL1>): MessageToL1 {
     const message = createBaseMessageToL1() as any;
+    message.filterIds = object.filterIds?.map((e) => e) || [];
     message.fromAddress = (object.fromAddress !== undefined && object.fromAddress !== null)
       ? FieldElement.fromPartial(object.fromAddress)
       : undefined;
@@ -4191,7 +4364,7 @@ export const MessageToL1 = {
     message.transactionHash = (object.transactionHash !== undefined && object.transactionHash !== null)
       ? FieldElement.fromPartial(object.transactionHash)
       : undefined;
-    message.transactionReverted = object.transactionReverted ?? false;
+    message.transactionStatus = object.transactionStatus ?? 0;
     return message;
   },
 };
@@ -4929,22 +5102,22 @@ export const ResourceBounds = {
 };
 
 function createBaseUint128(): Uint128 {
-  return { low: BigInt("0"), high: BigInt("0") };
+  return { x0: BigInt("0"), x1: BigInt("0") };
 }
 
 export const Uint128 = {
   encode(message: Uint128, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.low !== undefined && message.low !== BigInt("0")) {
-      if (BigInt.asUintN(64, message.low) !== message.low) {
-        throw new globalThis.Error("value provided for field message.low of type uint64 too large");
+    if (message.x0 !== undefined && message.x0 !== BigInt("0")) {
+      if (BigInt.asUintN(64, message.x0) !== message.x0) {
+        throw new globalThis.Error("value provided for field message.x0 of type uint64 too large");
       }
-      writer.uint32(8).uint64(message.low.toString());
+      writer.uint32(8).uint64(message.x0.toString());
     }
-    if (message.high !== undefined && message.high !== BigInt("0")) {
-      if (BigInt.asUintN(64, message.high) !== message.high) {
-        throw new globalThis.Error("value provided for field message.high of type uint64 too large");
+    if (message.x1 !== undefined && message.x1 !== BigInt("0")) {
+      if (BigInt.asUintN(64, message.x1) !== message.x1) {
+        throw new globalThis.Error("value provided for field message.x1 of type uint64 too large");
       }
-      writer.uint32(16).uint64(message.high.toString());
+      writer.uint32(16).uint64(message.x1.toString());
     }
     return writer;
   },
@@ -4961,14 +5134,14 @@ export const Uint128 = {
             break;
           }
 
-          message.low = longToBigint(reader.uint64() as Long);
+          message.x0 = longToBigint(reader.uint64() as Long);
           continue;
         case 2:
           if (tag !== 16) {
             break;
           }
 
-          message.high = longToBigint(reader.uint64() as Long);
+          message.x1 = longToBigint(reader.uint64() as Long);
           continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
@@ -4981,18 +5154,18 @@ export const Uint128 = {
 
   fromJSON(object: any): Uint128 {
     return {
-      low: isSet(object.low) ? BigInt(object.low) : BigInt("0"),
-      high: isSet(object.high) ? BigInt(object.high) : BigInt("0"),
+      x0: isSet(object.x0) ? BigInt(object.x0) : BigInt("0"),
+      x1: isSet(object.x1) ? BigInt(object.x1) : BigInt("0"),
     };
   },
 
   toJSON(message: Uint128): unknown {
     const obj: any = {};
-    if (message.low !== undefined && message.low !== BigInt("0")) {
-      obj.low = message.low.toString();
+    if (message.x0 !== undefined && message.x0 !== BigInt("0")) {
+      obj.x0 = message.x0.toString();
     }
-    if (message.high !== undefined && message.high !== BigInt("0")) {
-      obj.high = message.high.toString();
+    if (message.x1 !== undefined && message.x1 !== BigInt("0")) {
+      obj.x1 = message.x1.toString();
     }
     return obj;
   },
@@ -5002,8 +5175,8 @@ export const Uint128 = {
   },
   fromPartial(object: DeepPartial<Uint128>): Uint128 {
     const message = createBaseUint128() as any;
-    message.low = object.low ?? BigInt("0");
-    message.high = object.high ?? BigInt("0");
+    message.x0 = object.x0 ?? BigInt("0");
+    message.x1 = object.x1 ?? BigInt("0");
     return message;
   },
 };
