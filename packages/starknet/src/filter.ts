@@ -36,24 +36,55 @@ export const Key = Schema.transform(
 
 export type Key = typeof Key.Type;
 
+export const TransactionStatusFilter = Schema.transform(
+  Schema.Enums(proto.filter.TransactionStatusFilter),
+  Schema.Literal("succeeded", "reverted", "all", "unknown"),
+  {
+    decode(value) {
+      const enumMap = {
+        [proto.filter.TransactionStatusFilter.SUCCEEDED]: "succeeded",
+        [proto.filter.TransactionStatusFilter.REVERTED]: "reverted",
+        [proto.filter.TransactionStatusFilter.ALL]: "all",
+        [proto.filter.TransactionStatusFilter.UNSPECIFIED]: "unknown",
+        [proto.filter.TransactionStatusFilter.UNRECOGNIZED]: "unknown",
+      } as const;
+      return enumMap[value] ?? "unknown";
+    },
+    encode(value) {
+      switch (value) {
+        case "succeeded":
+          return proto.filter.TransactionStatusFilter.SUCCEEDED;
+        case "reverted":
+          return proto.filter.TransactionStatusFilter.REVERTED;
+        case "all":
+          return proto.filter.TransactionStatusFilter.ALL;
+        default:
+          return proto.filter.TransactionStatusFilter.UNSPECIFIED;
+      }
+    },
+  },
+);
+
+export type TransactionStatusFilter = typeof TransactionStatusFilter.Type;
+
 /** Filter events.
  *
- * @prop fromAddress Filter events by the sender address.
+ * @prop address Filter events by the sender address.
  * @prop keys Filter events by the event keys. Use `null` to match any key.
  * @prop strict If `true`, then the filter will only match events that have exactly the
  * same number of keys as specified in `keys`.
- * @prop includeReverted Include events from reverted transactions. In most
- * cases, this will be the fee payment Transfer event.
+ * @prop transactionStatus Filter based on the transaction status.
  * @prop includeTransaction Include the transaction that emitted the event.
  * @prop includeReceipt Include the transaction receipt.
  * @prop includeMessages Include the messages that were sent to L1 in the same transaction.
  * @prop includeSiblings Include the sibling events of the matched events.
  */
 export const EventFilter = Schema.Struct({
-  fromAddress: Schema.optional(FieldElement),
+  id: Schema.optional(Schema.Number),
+  address: Schema.optional(FieldElement),
   keys: Schema.optional(Schema.Array(Key)),
   strict: Schema.optional(Schema.Boolean),
-  includeReverted: Schema.optional(Schema.Boolean),
+  transactionStatus: Schema.optional(TransactionStatusFilter),
   includeTransaction: Schema.optional(Schema.Boolean),
   includeReceipt: Schema.optional(Schema.Boolean),
   includeMessages: Schema.optional(Schema.Boolean),
@@ -66,15 +97,16 @@ export type EventFilter = typeof EventFilter.Type;
  *
  * @prop fromAddress Filter messages by the sender address (on L2).
  * @prop toAddress Filter messages by the recipient address (on L1).
- * @prop includeReverted Include messages from reverted transactions.
+ * @prop transactionStatus Filter based on the transaction status.
  * @prop includeTransaction Include the transaction that sent the message.
  * @prop includeReceipt Include the transaction receipt.
  * @prop includeEvents Include events from the same transaction.
  */
 export const MessageToL1Filter = Schema.Struct({
+  id: Schema.optional(Schema.Number),
   fromAddress: Schema.optional(FieldElement),
   toAddress: Schema.optional(FieldElement),
-  includeReverted: Schema.optional(Schema.Boolean),
+  transactionStatus: Schema.optional(TransactionStatusFilter),
   includeTransaction: Schema.optional(Schema.Boolean),
   includeReceipt: Schema.optional(Schema.Boolean),
   includeEvents: Schema.optional(Schema.Boolean),
@@ -139,13 +171,14 @@ export const DeployAccountV3TransactionFilter = Schema.Struct({
 
 /** Filter transactions.
  *
- * @prop includeReverted Include messages from reverted transactions.
+ * @prop transactionStatus Filter based on the transaction status.
  * @prop includeReceipt Include the transaction receipt.
  * @prop includeEvents Include events from the same transaction.
  * @prop includeMessages Include messages sent in the transaction.
  */
 export const TransactionFilter = Schema.Struct({
-  includeReverted: Schema.optional(Schema.Boolean),
+  id: Schema.optional(Schema.Number),
+  transactionStatus: Schema.optional(TransactionStatusFilter),
   includeReceipt: Schema.optional(Schema.Boolean),
   includeMessages: Schema.optional(Schema.Boolean),
   includeEvents: Schema.optional(Schema.Boolean),

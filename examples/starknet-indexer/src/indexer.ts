@@ -31,7 +31,7 @@ export function createIndexerConfig(streamUrl: string) {
     filter: {
       events: [
         {
-          fromAddress:
+          address:
             "0x00000005dd3D2F4429AF886cD1a3b08289DBcEa99A294197E9eB43b0e0325b4b",
           includeReceipt: true,
           includeTransaction: true,

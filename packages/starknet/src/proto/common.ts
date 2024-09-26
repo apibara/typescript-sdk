@@ -12,41 +12,41 @@ export const protobufPackage = "starknet.v2";
 
 /** A field element. */
 export interface FieldElement {
-  readonly loLo?: bigint | undefined;
-  readonly loHi?: bigint | undefined;
-  readonly hiLo?: bigint | undefined;
-  readonly hiHi?: bigint | undefined;
+  readonly x0?: bigint | undefined;
+  readonly x1?: bigint | undefined;
+  readonly x2?: bigint | undefined;
+  readonly x3?: bigint | undefined;
 }
 
 function createBaseFieldElement(): FieldElement {
-  return { loLo: BigInt("0"), loHi: BigInt("0"), hiLo: BigInt("0"), hiHi: BigInt("0") };
+  return { x0: BigInt("0"), x1: BigInt("0"), x2: BigInt("0"), x3: BigInt("0") };
 }
 
 export const FieldElement = {
   encode(message: FieldElement, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.loLo !== undefined && message.loLo !== BigInt("0")) {
-      if (BigInt.asUintN(64, message.loLo) !== message.loLo) {
-        throw new globalThis.Error("value provided for field message.loLo of type fixed64 too large");
+    if (message.x0 !== undefined && message.x0 !== BigInt("0")) {
+      if (BigInt.asUintN(64, message.x0) !== message.x0) {
+        throw new globalThis.Error("value provided for field message.x0 of type fixed64 too large");
       }
-      writer.uint32(9).fixed64(message.loLo.toString());
+      writer.uint32(9).fixed64(message.x0.toString());
     }
-    if (message.loHi !== undefined && message.loHi !== BigInt("0")) {
-      if (BigInt.asUintN(64, message.loHi) !== message.loHi) {
-        throw new globalThis.Error("value provided for field message.loHi of type fixed64 too large");
+    if (message.x1 !== undefined && message.x1 !== BigInt("0")) {
+      if (BigInt.asUintN(64, message.x1) !== message.x1) {
+        throw new globalThis.Error("value provided for field message.x1 of type fixed64 too large");
       }
-      writer.uint32(17).fixed64(message.loHi.toString());
+      writer.uint32(17).fixed64(message.x1.toString());
     }
-    if (message.hiLo !== undefined && message.hiLo !== BigInt("0")) {
-      if (BigInt.asUintN(64, message.hiLo) !== message.hiLo) {
-        throw new globalThis.Error("value provided for field message.hiLo of type fixed64 too large");
+    if (message.x2 !== undefined && message.x2 !== BigInt("0")) {
+      if (BigInt.asUintN(64, message.x2) !== message.x2) {
+        throw new globalThis.Error("value provided for field message.x2 of type fixed64 too large");
       }
-      writer.uint32(25).fixed64(message.hiLo.toString());
+      writer.uint32(25).fixed64(message.x2.toString());
     }
-    if (message.hiHi !== undefined && message.hiHi !== BigInt("0")) {
-      if (BigInt.asUintN(64, message.hiHi) !== message.hiHi) {
-        throw new globalThis.Error("value provided for field message.hiHi of type fixed64 too large");
+    if (message.x3 !== undefined && message.x3 !== BigInt("0")) {
+      if (BigInt.asUintN(64, message.x3) !== message.x3) {
+        throw new globalThis.Error("value provided for field message.x3 of type fixed64 too large");
       }
-      writer.uint32(33).fixed64(message.hiHi.toString());
+      writer.uint32(33).fixed64(message.x3.toString());
     }
     return writer;
   },
@@ -63,28 +63,28 @@ export const FieldElement = {
             break;
           }
 
-          message.loLo = longToBigint(reader.fixed64() as Long);
+          message.x0 = longToBigint(reader.fixed64() as Long);
           continue;
         case 2:
           if (tag !== 17) {
             break;
           }
 
-          message.loHi = longToBigint(reader.fixed64() as Long);
+          message.x1 = longToBigint(reader.fixed64() as Long);
           continue;
         case 3:
           if (tag !== 25) {
             break;
           }
 
-          message.hiLo = longToBigint(reader.fixed64() as Long);
+          message.x2 = longToBigint(reader.fixed64() as Long);
           continue;
         case 4:
           if (tag !== 33) {
             break;
           }
 
-          message.hiHi = longToBigint(reader.fixed64() as Long);
+          message.x3 = longToBigint(reader.fixed64() as Long);
           continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
@@ -97,26 +97,26 @@ export const FieldElement = {
 
   fromJSON(object: any): FieldElement {
     return {
-      loLo: isSet(object.loLo) ? BigInt(object.loLo) : BigInt("0"),
-      loHi: isSet(object.loHi) ? BigInt(object.loHi) : BigInt("0"),
-      hiLo: isSet(object.hiLo) ? BigInt(object.hiLo) : BigInt("0"),
-      hiHi: isSet(object.hiHi) ? BigInt(object.hiHi) : BigInt("0"),
+      x0: isSet(object.x0) ? BigInt(object.x0) : BigInt("0"),
+      x1: isSet(object.x1) ? BigInt(object.x1) : BigInt("0"),
+      x2: isSet(object.x2) ? BigInt(object.x2) : BigInt("0"),
+      x3: isSet(object.x3) ? BigInt(object.x3) : BigInt("0"),
     };
   },
 
   toJSON(message: FieldElement): unknown {
     const obj: any = {};
-    if (message.loLo !== undefined && message.loLo !== BigInt("0")) {
-      obj.loLo = message.loLo.toString();
+    if (message.x0 !== undefined && message.x0 !== BigInt("0")) {
+      obj.x0 = message.x0.toString();
     }
-    if (message.loHi !== undefined && message.loHi !== BigInt("0")) {
-      obj.loHi = message.loHi.toString();
+    if (message.x1 !== undefined && message.x1 !== BigInt("0")) {
+      obj.x1 = message.x1.toString();
     }
-    if (message.hiLo !== undefined && message.hiLo !== BigInt("0")) {
-      obj.hiLo = message.hiLo.toString();
+    if (message.x2 !== undefined && message.x2 !== BigInt("0")) {
+      obj.x2 = message.x2.toString();
     }
-    if (message.hiHi !== undefined && message.hiHi !== BigInt("0")) {
-      obj.hiHi = message.hiHi.toString();
+    if (message.x3 !== undefined && message.x3 !== BigInt("0")) {
+      obj.x3 = message.x3.toString();
     }
     return obj;
   },
@@ -126,10 +126,10 @@ export const FieldElement = {
   },
   fromPartial(object: DeepPartial<FieldElement>): FieldElement {
     const message = createBaseFieldElement() as any;
-    message.loLo = object.loLo ?? BigInt("0");
-    message.loHi = object.loHi ?? BigInt("0");
-    message.hiLo = object.hiLo ?? BigInt("0");
-    message.hiHi = object.hiHi ?? BigInt("0");
+    message.x0 = object.x0 ?? BigInt("0");
+    message.x1 = object.x1 ?? BigInt("0");
+    message.x2 = object.x2 ?? BigInt("0");
+    message.x3 = object.x3 ?? BigInt("0");
     return message;
   },
 };

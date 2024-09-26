@@ -10,10 +10,10 @@ describe("FieldElement", () => {
 
     const message = feltToProto(felt);
 
-    expect(message.loLo).toBeDefined();
-    expect(message.loHi).toBeDefined();
-    expect(message.hiLo).toBeDefined();
-    expect(message.hiHi).toBeDefined();
+    expect(message.x0).toBeDefined();
+    expect(message.x1).toBeDefined();
+    expect(message.x2).toBeDefined();
+    expect(message.x3).toBeDefined();
 
     const back = feltFromProto(message);
     expect(back).toEqual(pad(felt, { size: 32 }));
