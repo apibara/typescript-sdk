@@ -169,8 +169,8 @@ describe("mergeFilter", () => {
 
   it("concatenates withdrawals", () => {
     const f = mergeFilter(
-      { withdrawals: [{ validatorIndex: 1n }] },
-      { withdrawals: [{ validatorIndex: 100n }] },
+      { withdrawals: [{ validatorIndex: 1 }] },
+      { withdrawals: [{ validatorIndex: 100 }] },
     );
     expect(f).toMatchInlineSnapshot(`
       {
@@ -179,10 +179,10 @@ describe("mergeFilter", () => {
         "transactions": [],
         "withdrawals": [
           {
-            "validatorIndex": 1n,
+            "validatorIndex": 1,
           },
           {
-            "validatorIndex": 100n,
+            "validatorIndex": 100,
           },
         ],
       }

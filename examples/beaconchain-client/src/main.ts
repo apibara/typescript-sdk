@@ -39,14 +39,16 @@ const command = defineCommand({
 
     const filter = Filter.make({
       // blobs: [{ includeTransaction: true }],
-      transactions: [
-        {
-          // create: true,
-          // to: "0xFf00000000000000000000000000000000102421",
-          // to: "0xAD3C787556B1E9D32D3AE4f2A0B4b1dC6692eDAc",
-          // includeBlob: true,
-        },
-      ],
+      // transactions: [
+      //   {
+      //     // create: true,
+      //     // to: "0xFf00000000000000000000000000000000102421",
+      //     // to: "0xAD3C787556B1E9D32D3AE4f2A0B4b1dC6692eDAc",
+      //     // includeBlob: true,
+      //   },
+      // ],
+      blobs: [{}],
+      // validators: [{}],
     });
 
     const startBlock = 5_931_000;
@@ -59,9 +61,6 @@ const command = defineCommand({
       },
     });
 
-    let total = 0;
-    const cost = (17 / 1e6);
-    const start = performance.now();
     for await (const message of client.streamData(request)) {
       switch (message._tag) {
         case "data": {
@@ -76,26 +75,9 @@ const command = defineCommand({
             const transactions = block.transactions ?? [];
             const validators = block.validators ?? [];
             const blobs = block.blobs ?? [];
-            total += transactions.length;
-            const blocks = blockNumber - startBlock;
-            const elapsed = (performance.now() - start) / 1000;
-            const ts = total / elapsed;
-            const bs = blocks / elapsed;
-            consola.info(`Block ${block.header?.slot}: ${message.data.finality} t=${transactions.length} v=${validators.length} b=${blobs.length}`);
-            consola.info(`Total ${total} ${(total * cost).toFixed(2)}$`);
-            consola.info(`${ts.toFixed(2)} txs/sec ${bs.toFixed(2)} blocks/sec`);
-            for (const tx of transactions) {
-              const blob = blobs.find(
-                (b) => b.transactionIndex === tx.transactionIndex,
-              );
-              // if (blob) {
-              //   consola.info(
-              //     `${tx.transactionHash} - ${blob.blob?.length ?? 0} bytes`,
-              //   );
-              // } else {
-              //   consola.info(`${tx.transactionHash} - no blob`);
-              // }
-            }
+            consola.info(
+              `Block ${block.header?.slot}: ${message.data.finality} t=${transactions.length} v=${validators.length} b=${blobs.length}`,
+            );
           }
 
           break;

@@ -1,6 +1,6 @@
 import { Schema } from "@effect/schema";
 
-import { Address, B256, b256FromProto, b256ToProto } from "./common";
+import { Address, B256, B256Proto } from "./common";
 
 import * as proto from "./proto";
 
@@ -14,38 +14,69 @@ export const HeaderFilter = Schema.Struct({
 export type HeaderFilter = typeof HeaderFilter.Type;
 
 export const WithdrawalFilter = Schema.Struct({
-  validatorIndex: Schema.optional(Schema.BigIntFromSelf),
+  id: Schema.optional(Schema.Number),
+  validatorIndex: Schema.optional(Schema.Number),
   address: Schema.optional(Address),
 });
 
 export type WithdrawalFilter = typeof WithdrawalFilter.Type;
 
-// TODO: using the decoder inside decode/encode feels wrong.
+export const TransactionStatusFilter = Schema.transform(
+  Schema.Enums(proto.filter.TransactionStatusFilter),
+  Schema.Literal("succeeded", "reverted", "all", "unknown"),
+  {
+    decode(value) {
+      const enumMap = {
+        [proto.filter.TransactionStatusFilter.SUCCEEDED]: "succeeded",
+        [proto.filter.TransactionStatusFilter.REVERTED]: "reverted",
+        [proto.filter.TransactionStatusFilter.ALL]: "all",
+        [proto.filter.TransactionStatusFilter.UNSPECIFIED]: "unknown",
+        [proto.filter.TransactionStatusFilter.UNRECOGNIZED]: "unknown",
+      } as const;
+      return enumMap[value] ?? "unknown";
+    },
+    encode(value) {
+      switch (value) {
+        case "succeeded":
+          return proto.filter.TransactionStatusFilter.SUCCEEDED;
+        case "reverted":
+          return proto.filter.TransactionStatusFilter.REVERTED;
+        case "all":
+          return proto.filter.TransactionStatusFilter.ALL;
+        default:
+          return proto.filter.TransactionStatusFilter.UNSPECIFIED;
+      }
+    },
+  },
+);
+
+export type TransactionStatusFilter = typeof TransactionStatusFilter.Type;
+
 export const Topic = Schema.transform(
-  Schema.Struct({ value: Schema.UndefinedOr(B256) }),
+  Schema.Struct({ value: Schema.UndefinedOr(B256Proto) }),
   Schema.NullOr(B256),
   {
-    strict: false,
     decode({ value }) {
       if (value === undefined) {
         return null;
       }
-      return b256ToProto(value);
+      return value;
     },
     encode(value) {
       if (value === null) {
         return { value: undefined };
       }
-      return { value: b256FromProto(value) };
+      return { value };
     },
   },
 );
 
 export const LogFilter = Schema.Struct({
+  id: Schema.optional(Schema.Number),
   address: Schema.optional(Address),
   topics: OptionalArray(Topic),
-
   strict: Schema.optional(Schema.Boolean),
+  transactionStatus: Schema.optional(TransactionStatusFilter),
   includeTransaction: Schema.optional(Schema.Boolean),
   includeReceipt: Schema.optional(Schema.Boolean),
 });
@@ -53,9 +84,11 @@ export const LogFilter = Schema.Struct({
 export type LogFilter = typeof LogFilter.Type;
 
 export const TransactionFilter = Schema.Struct({
+  id: Schema.optional(Schema.Number),
   from: Schema.optional(Address),
   to: Schema.optional(Address),
-
+  create: Schema.optional(Schema.Boolean),
+  transactionStatus: Schema.optional(TransactionStatusFilter),
   includeReceipt: Schema.optional(Schema.Boolean),
   includeLogs: Schema.optional(Schema.Boolean),
 });
@@ -65,8 +98,8 @@ export type TransactionFilter = typeof TransactionFilter.Type;
 export const Filter = Schema.Struct({
   header: Schema.optional(HeaderFilter),
   withdrawals: OptionalArray(WithdrawalFilter),
-  logs: OptionalArray(LogFilter),
   transactions: OptionalArray(TransactionFilter),
+  logs: OptionalArray(LogFilter),
 });
 
 export type Filter = typeof Filter.Type;
