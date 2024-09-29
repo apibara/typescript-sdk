@@ -39,23 +39,16 @@ const command = defineCommand({
       header: {
         always: true,
       },
-      logs: [
-        {
-          strict: true,
-          topics: encodeEventTopics({
-            abi,
-            eventName: "Transfer",
-            args: { from: null, to: null },
-          }) as `0x${string}`[],
-        },
-      ],
+      transactions: [{}],
+      withdrawals: [{}],
+      logs: [{}],
     });
 
     const request = EvmStream.Request.make({
       filter: [filter],
       finality: "accepted",
       startingCursor: {
-        orderKey: 5_000_000n,
+        orderKey: 6_000_000n,
       },
     });
 
@@ -65,23 +58,13 @@ const command = defineCommand({
           consola.info("Block", message.data.endCursor?.orderKey);
           for (const block of message.data.data) {
             assert(block !== null);
-            consola.info("Block", block.header?.number);
-            for (const log of block.logs ?? []) {
-              // const { args } = decodeEventLog({
-              //   abi,
-              //   // @ts-ignore
-              //   topics: log.topics,
-              //   data: log.data,
-              //   eventName: "Transfer",
-              // });
-              // consola.info(
-              //   "Log",
-              //   log.logIndex,
-              //   args.from,
-              //   args.to,
-              //   args.value.toString(),
-              // );
-            }
+            const logs = block.logs ?? [];
+            const transactions = block.transactions ?? [];
+            const withdrawals = block.withdrawals ?? [];
+            const receipts = block.receipts ?? [];
+            consola.info(
+              `Block ${block.header?.blockNumber} logs=${logs.length} transactions=${transactions.length} withdrawals=${withdrawals.length} receipts=${receipts.length}`,
+            );
           }
           break;
         }

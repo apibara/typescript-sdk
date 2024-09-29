@@ -35,7 +35,7 @@ export type Address = typeof Address.Type;
 const _B256 = Schema.TemplateLiteral(Schema.Literal("0x"), Schema.String);
 
 /** Wire representation of `B256`. */
-const B256Proto = Schema.Struct({
+export const B256Proto = Schema.Struct({
   x0: Schema.BigIntFromSelf,
   x1: Schema.BigIntFromSelf,
   x2: Schema.BigIntFromSelf,
