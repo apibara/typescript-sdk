@@ -1,12 +1,16 @@
 {
   "name": "@apibara/evm",
-  "version": "2.0.0-beta.2",
+  "version": "2.0.0-beta.3",
   "type": "module",
   "source": "./src/index.ts",
   "main": "./src/index.ts",
   "exports": "./src/index.ts",
   "publishConfig": {
-    "files": ["dist", "src", "README.md"],
+    "files": [
+      "dist",
+      "src",
+      "README.md"
+    ],
     "main": "./dist/index.mjs",
     "types": "./dist/index.d.ts",
     "exports": {

@@ -1,6 +1,6 @@
 {
   "name": "apibara",
-  "version": "2.0.0-beta.2",
+  "version": "2.0.0-beta.3",
   "type": "module",
   "source": "./src/core/index.ts",
   "main": "./dist/core/index.mjs",
@@ -37,7 +37,11 @@
   "bin": {
     "apibara": "./dist/cli/index.mjs"
   },
-  "files": ["dist", "src", "README.md"],
+  "files": [
+    "dist",
+    "src",
+    "README.md"
+  ],
   "scripts": {
     "build": "unbuild",
     "lint": "biome check .",
