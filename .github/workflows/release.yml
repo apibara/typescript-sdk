@@ -35,6 +35,6 @@ jobs:
         env:
           GIT_TOKEN: ${{ secrets.GIT_TOKEN }}
       - name: Publish package
-        run: pnpm beachball publish --access public --token "${NPM_TOKEN}"
+        run: pnpm beachball publish --access public --token "${NPM_TOKEN}" --tag next
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
