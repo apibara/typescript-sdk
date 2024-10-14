@@ -1,7 +1,0 @@
-{
-  "type": "prerelease",
-  "comment": "Update protobuf definitions",
-  "packageName": "@apibara/starknet",
-  "email": "francesco@ceccon.me",
-  "dependentChangeType": "patch"
-}
