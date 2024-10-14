@@ -40,6 +40,7 @@
       "**/node_modules",
       "**/dist",
       "CHANGELOG.md",
+      "package.json",
       "pnpm-lock.yaml",
       "generated.js",
       "generated.d.ts",
