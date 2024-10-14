@@ -1,1 +1,1 @@
-# @apibara/beaconchain
+# @apibara/beaconchain Changelog
