@@ -4,11 +4,9 @@ on:
   pull_request:
     branches:
       - main
-      - develop
   push:
     branches:
       - main
-      - develop
 
 jobs:
   test:
@@ -25,12 +23,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
       - name: Set Node version
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v4
         with:
-          node-version: 16
+          node-version: 20
       - uses: pnpm/action-setup@v4
         with:
-          version: 8.15.5
+          version: 9.10.0
       - name: Install Protoc
         uses: arduino/setup-protoc@v1
         with:
@@ -47,3 +45,5 @@ jobs:
         run: pnpm typecheck
       - name: Run test
         run: pnpm test:ci
+      - name: Check change files
+        run: pnpm beachball check
