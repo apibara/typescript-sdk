@@ -4,23 +4,6 @@ import { Schema } from "@effect/schema";
 import { Address, B256, U128, U256 } from "./common";
 import * as proto from "./proto";
 
-export const HexData = Schema.transform(
-  Schema.Struct({
-    value: BytesFromUint8Array,
-  }),
-  Bytes,
-  {
-    strict: false,
-    encode(value) {
-      throw new Error("Not implemented");
-    },
-    decode({ value }) {
-      // return value;
-      throw new Error("Not implemented");
-    },
-  },
-);
-
 export const Bloom = Schema.transform(
   Schema.Struct({
     value: BytesFromUint8Array,
@@ -32,47 +15,67 @@ export const Bloom = Schema.transform(
       throw new Error("Not implemented");
     },
     decode({ value }) {
-      throw new Error("Not implemented");
-      // return value;
+      return value;
     },
   },
 );
 
+export const TransactionStatus = Schema.transform(
+  Schema.Enums(proto.data.TransactionStatus),
+  Schema.Literal("unknown", "succeeded", "reverted"),
+  {
+    decode(value) {
+      const enumMap = {
+        [proto.data.TransactionStatus.SUCCEEDED]: "succeeded",
+        [proto.data.TransactionStatus.REVERTED]: "reverted",
+        [proto.data.TransactionStatus.UNSPECIFIED]: "unknown",
+        [proto.data.TransactionStatus.UNRECOGNIZED]: "unknown",
+      } as const;
+
+      return enumMap[value] ?? "unknown";
+    },
+    encode(value) {
+      throw new Error("encode: not implemented");
+    },
+  },
+);
+
+export type TransactionStatus = typeof TransactionStatus.Type;
+
 export const BlockHeader = Schema.Struct({
-  number: Schema.BigIntFromSelf,
-  hash: Schema.optional(B256),
-  parentHash: Schema.optional(B256),
-  uncleHash: Schema.optional(B256),
+  blockNumber: Schema.BigIntFromSelf,
+  blockHash: Schema.optional(B256),
+  parentBlockHash: Schema.optional(B256),
+  unclesHash: Schema.optional(B256),
   miner: Schema.optional(Address),
   stateRoot: Schema.optional(B256),
-  transactionRoot: Schema.optional(B256),
-  receiptRoot: Schema.optional(B256),
+  transactionsRoot: Schema.optional(B256),
+  receiptsRoot: Schema.optional(B256),
   logsBloom: Schema.optional(Bloom),
   difficulty: Schema.optional(U256),
-  gasLimit: Schema.optional(U256),
-  gasUsed: Schema.optional(U256),
+  gasLimit: Schema.optional(U128),
+  gasUsed: Schema.optional(U128),
   timestamp: Schema.optional(Schema.DateFromSelf),
-  // extraData: Schema.optional(HexData),
+  extraData: BytesFromUint8Array,
   mixHash: Schema.optional(B256),
-  nonce: Schema.BigIntFromSelf,
-  baseFeePerGas: Schema.optional(U256),
+  nonce: Schema.optional(Schema.BigIntFromSelf),
+  baseFeePerGas: Schema.optional(U128),
   withdrawalsRoot: Schema.optional(B256),
   totalDifficulty: Schema.optional(U256),
-  uncles: Schema.Array(B256),
-  size: Schema.optional(U256),
-  blobGasUsed: Schema.BigIntFromSelf,
-  excessBlobGas: Schema.BigIntFromSelf,
+  blobGasUsed: Schema.optional(U128),
+  excessBlobGas: Schema.optional(U128),
   parentBeaconBlockRoot: Schema.optional(B256),
 });
 
 export type BlockHeader = typeof BlockHeader.Type;
 
 export const Withdrawal = Schema.Struct({
+  filterIds: Schema.optional(Schema.Array(Schema.Number)),
+  withdrawalIndex: Schema.Number,
   index: Schema.BigIntFromSelf,
-  validatorIndex: Schema.BigIntFromSelf,
-  withdrawalIndex: Schema.BigIntFromSelf,
+  validatorIndex: Schema.Number,
   address: Schema.optional(Address),
-  amount: Schema.optional(U256),
+  amount: Schema.optional(Schema.BigIntFromSelf),
 });
 
 export const AccessListItem = Schema.Struct({
@@ -88,50 +91,53 @@ export const Signature = Schema.Struct({
 });
 
 export const Transaction = Schema.Struct({
-  hash: Schema.optional(B256),
-  nonce: Schema.BigIntFromSelf,
-  transactionIndex: Schema.BigIntFromSelf,
+  filterIds: Schema.optional(Schema.Array(Schema.Number)),
+  transactionIndex: Schema.Number,
+  transactionHash: Schema.optional(B256),
+  nonce: Schema.optional(Schema.BigIntFromSelf),
   from: Schema.optional(Address),
   to: Schema.optional(Address),
   value: Schema.optional(U256),
   gasPrice: Schema.optional(U128),
-  gas: Schema.optional(U256),
+  gas: Schema.optional(U128),
   maxFeePerGas: Schema.optional(U128),
   maxPriorityFeePerGas: Schema.optional(U128),
-  // TODO
-  // input: Schema.optional(HexData),
+  input: BytesFromUint8Array,
   signature: Schema.optional(Signature),
-  chainId: Schema.BigIntFromSelf,
+  chainId: Schema.optional(Schema.BigIntFromSelf),
   accessList: Schema.Array(AccessListItem),
-  transactionType: Schema.BigIntFromSelf,
+  transactionType: Schema.optional(Schema.BigIntFromSelf),
   maxFeePerBlobGas: Schema.optional(U128),
   blobVersionedHashes: Schema.Array(B256),
+  transactionStatus: Schema.optional(TransactionStatus),
 });
 
 export const TransactionReceipt = Schema.Struct({
+  filterIds: Schema.optional(Schema.Array(Schema.Number)),
+  transactionIndex: Schema.optional(Schema.Number),
   transactionHash: Schema.optional(B256),
-  transactionIndex: Schema.BigIntFromSelf,
-  cumulativeGasUsed: Schema.optional(U256),
-  gasUsed: Schema.optional(U256),
+  cumulativeGasUsed: Schema.optional(U128),
+  gasUsed: Schema.optional(U128),
   effectiveGasPrice: Schema.optional(U128),
   from: Schema.optional(Address),
   to: Schema.optional(Address),
   contractAddress: Schema.optional(Address),
   logsBloom: Schema.optional(Bloom),
-  statusCode: Schema.BigIntFromSelf,
-  transactionType: Schema.BigIntFromSelf,
+  transactionType: Schema.optional(Schema.BigIntFromSelf),
   blobGasUsed: Schema.optional(U128),
   blobGasPrice: Schema.optional(U128),
+  transactionStatus: Schema.optional(TransactionStatus),
 });
 
 export const Log = Schema.Struct({
+  filterIds: Schema.optional(Schema.Array(Schema.Number)),
   address: Schema.optional(Address),
   topics: Schema.Array(B256),
-  // TODO
-  // data: Bytes,
-  logIndex: Schema.BigIntFromSelf,
-  transactionIndex: Schema.BigIntFromSelf,
+  data: BytesFromUint8Array,
+  logIndex: Schema.Number,
+  transactionIndex: Schema.Number,
   transactionHash: Schema.optional(B256),
+  transactionStatus: Schema.optional(TransactionStatus),
 });
 
 export type Log = typeof Log.Type;

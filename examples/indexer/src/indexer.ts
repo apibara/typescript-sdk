@@ -47,13 +47,13 @@ export function createIndexerConfig(streamUrl: string) {
 
       await db.insert(users).values([
         {
-          id: Number(header?.number),
-          firstName: `John Doe ${Number(header?.number)}`,
+          id: Number(header?.blockNumber),
+          firstName: `John Doe ${Number(header?.blockNumber)}`,
           phone: "+91 1234567890",
         },
       ]);
 
-      consola.info("Transforming block", header?.number);
+      consola.info("Transforming block", header?.blockNumber);
     },
     hooks: {
       "handler:after": ({ endCursor }) => {

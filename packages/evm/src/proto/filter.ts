@@ -5,13 +5,57 @@
 // source: filter.proto
 
 /* eslint-disable */
-import Long from "long";
 import _m0 from "protobufjs/minimal";
 import { Address, B256 } from "./common";
 
 export const protobufPackage = "evm.v2";
 
 /** EVM DNA definitions (filter). */
+
+export enum TransactionStatusFilter {
+  UNSPECIFIED = 0,
+  SUCCEEDED = 1,
+  REVERTED = 2,
+  ALL = 3,
+  UNRECOGNIZED = -1,
+}
+
+export function transactionStatusFilterFromJSON(object: any): TransactionStatusFilter {
+  switch (object) {
+    case 0:
+    case "TRANSACTION_STATUS_FILTER_UNSPECIFIED":
+      return TransactionStatusFilter.UNSPECIFIED;
+    case 1:
+    case "TRANSACTION_STATUS_FILTER_SUCCEEDED":
+      return TransactionStatusFilter.SUCCEEDED;
+    case 2:
+    case "TRANSACTION_STATUS_FILTER_REVERTED":
+      return TransactionStatusFilter.REVERTED;
+    case 3:
+    case "TRANSACTION_STATUS_FILTER_ALL":
+      return TransactionStatusFilter.ALL;
+    case -1:
+    case "UNRECOGNIZED":
+    default:
+      return TransactionStatusFilter.UNRECOGNIZED;
+  }
+}
+
+export function transactionStatusFilterToJSON(object: TransactionStatusFilter): string {
+  switch (object) {
+    case TransactionStatusFilter.UNSPECIFIED:
+      return "TRANSACTION_STATUS_FILTER_UNSPECIFIED";
+    case TransactionStatusFilter.SUCCEEDED:
+      return "TRANSACTION_STATUS_FILTER_SUCCEEDED";
+    case TransactionStatusFilter.REVERTED:
+      return "TRANSACTION_STATUS_FILTER_REVERTED";
+    case TransactionStatusFilter.ALL:
+      return "TRANSACTION_STATUS_FILTER_ALL";
+    case TransactionStatusFilter.UNRECOGNIZED:
+    default:
+      return "UNRECOGNIZED";
+  }
+}
 
 export interface Filter {
   /** Include header. */
@@ -36,15 +80,21 @@ export interface HeaderFilter {
 }
 
 export interface WithdrawalFilter {
+  readonly id?:
+    | number
+    | undefined;
   /** Filter based on the validator index. */
   readonly validatorIndex?:
-    | bigint
+    | number
     | undefined;
   /** Filter based on the withdrawal's target address. */
   readonly address?: Address | undefined;
 }
 
 export interface TransactionFilter {
+  readonly id?:
+    | number
+    | undefined;
   /** Filter based on the transaction's sender address. */
   readonly from?:
     | Address
@@ -52,6 +102,18 @@ export interface TransactionFilter {
   /** Filter based on the transaction's recipient address. */
   readonly to?:
     | Address
+    | undefined;
+  /** / Only return `create` transactions. Defaults to `false`. */
+  readonly create?:
+    | boolean
+    | undefined;
+  /**
+   * Filter based on the transaction status.
+   *
+   * Defaults to `Succeeded`.
+   */
+  readonly transactionStatus?:
+    | TransactionStatusFilter
     | undefined;
   /** Flag to request the transaction's receipt. Defaults to `false`. */
   readonly includeReceipt?:
@@ -62,6 +124,9 @@ export interface TransactionFilter {
 }
 
 export interface LogFilter {
+  readonly id?:
+    | number
+    | undefined;
   /** Filter based on the log's contract address. */
   readonly address?:
     | Address
@@ -78,12 +143,28 @@ export interface LogFilter {
   readonly strict?:
     | boolean
     | undefined;
+  /**
+   * Filter based on the transaction status.
+   *
+   * Defaults to `Succeeded`.
+   */
+  readonly transactionStatus?:
+    | TransactionStatusFilter
+    | undefined;
   /** Flag to request the log's transaction. Defaults to `false`. */
   readonly includeTransaction?:
     | boolean
     | undefined;
   /** Flag to request the log's receipt. Defaults to `false`. */
-  readonly includeReceipt?: boolean | undefined;
+  readonly includeReceipt?:
+    | boolean
+    | undefined;
+  /**
+   * Include sibling logs, that is logs emitted by the same transaction.
+   *
+   * Defaults to false.
+   */
+  readonly includeSiblings?: boolean | undefined;
 }
 
 /** Topic filter. */
@@ -266,19 +347,19 @@ export const HeaderFilter = {
 };
 
 function createBaseWithdrawalFilter(): WithdrawalFilter {
-  return { validatorIndex: undefined, address: undefined };
+  return { id: 0, validatorIndex: undefined, address: undefined };
 }
 
 export const WithdrawalFilter = {
   encode(message: WithdrawalFilter, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.id !== undefined && message.id !== 0) {
+      writer.uint32(8).uint32(message.id);
+    }
     if (message.validatorIndex !== undefined) {
-      if (BigInt.asUintN(64, message.validatorIndex) !== message.validatorIndex) {
-        throw new globalThis.Error("value provided for field message.validatorIndex of type uint64 too large");
-      }
-      writer.uint32(8).uint64(message.validatorIndex.toString());
+      writer.uint32(16).uint32(message.validatorIndex);
     }
     if (message.address !== undefined) {
-      Address.encode(message.address, writer.uint32(18).fork()).ldelim();
+      Address.encode(message.address, writer.uint32(26).fork()).ldelim();
     }
     return writer;
   },
@@ -295,10 +376,17 @@ export const WithdrawalFilter = {
             break;
           }
 
-          message.validatorIndex = longToBigint(reader.uint64() as Long);
+          message.id = reader.uint32();
           continue;
         case 2:
-          if (tag !== 18) {
+          if (tag !== 16) {
+            break;
+          }
+
+          message.validatorIndex = reader.uint32();
+          continue;
+        case 3:
+          if (tag !== 26) {
             break;
           }
 
@@ -315,15 +403,19 @@ export const WithdrawalFilter = {
 
   fromJSON(object: any): WithdrawalFilter {
     return {
-      validatorIndex: isSet(object.validatorIndex) ? BigInt(object.validatorIndex) : undefined,
+      id: isSet(object.id) ? globalThis.Number(object.id) : 0,
+      validatorIndex: isSet(object.validatorIndex) ? globalThis.Number(object.validatorIndex) : undefined,
       address: isSet(object.address) ? Address.fromJSON(object.address) : undefined,
     };
   },
 
   toJSON(message: WithdrawalFilter): unknown {
     const obj: any = {};
+    if (message.id !== undefined && message.id !== 0) {
+      obj.id = Math.round(message.id);
+    }
     if (message.validatorIndex !== undefined) {
-      obj.validatorIndex = message.validatorIndex.toString();
+      obj.validatorIndex = Math.round(message.validatorIndex);
     }
     if (message.address !== undefined) {
       obj.address = Address.toJSON(message.address);
@@ -336,6 +428,7 @@ export const WithdrawalFilter = {
   },
   fromPartial(object: DeepPartial<WithdrawalFilter>): WithdrawalFilter {
     const message = createBaseWithdrawalFilter() as any;
+    message.id = object.id ?? 0;
     message.validatorIndex = object.validatorIndex ?? undefined;
     message.address = (object.address !== undefined && object.address !== null)
       ? Address.fromPartial(object.address)
@@ -345,22 +438,39 @@ export const WithdrawalFilter = {
 };
 
 function createBaseTransactionFilter(): TransactionFilter {
-  return { from: undefined, to: undefined, includeReceipt: undefined, includeLogs: undefined };
+  return {
+    id: 0,
+    from: undefined,
+    to: undefined,
+    create: undefined,
+    transactionStatus: undefined,
+    includeReceipt: undefined,
+    includeLogs: undefined,
+  };
 }
 
 export const TransactionFilter = {
   encode(message: TransactionFilter, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.id !== undefined && message.id !== 0) {
+      writer.uint32(8).uint32(message.id);
+    }
     if (message.from !== undefined) {
-      Address.encode(message.from, writer.uint32(10).fork()).ldelim();
+      Address.encode(message.from, writer.uint32(18).fork()).ldelim();
     }
     if (message.to !== undefined) {
-      Address.encode(message.to, writer.uint32(18).fork()).ldelim();
+      Address.encode(message.to, writer.uint32(26).fork()).ldelim();
+    }
+    if (message.create !== undefined) {
+      writer.uint32(32).bool(message.create);
+    }
+    if (message.transactionStatus !== undefined) {
+      writer.uint32(40).int32(message.transactionStatus);
     }
     if (message.includeReceipt !== undefined) {
-      writer.uint32(24).bool(message.includeReceipt);
+      writer.uint32(48).bool(message.includeReceipt);
     }
     if (message.includeLogs !== undefined) {
-      writer.uint32(32).bool(message.includeLogs);
+      writer.uint32(56).bool(message.includeLogs);
     }
     return writer;
   },
@@ -373,28 +483,49 @@ export const TransactionFilter = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          if (tag !== 10) {
+          if (tag !== 8) {
             break;
           }
 
-          message.from = Address.decode(reader, reader.uint32());
+          message.id = reader.uint32();
           continue;
         case 2:
           if (tag !== 18) {
             break;
           }
 
-          message.to = Address.decode(reader, reader.uint32());
+          message.from = Address.decode(reader, reader.uint32());
           continue;
         case 3:
-          if (tag !== 24) {
+          if (tag !== 26) {
+            break;
+          }
+
+          message.to = Address.decode(reader, reader.uint32());
+          continue;
+        case 4:
+          if (tag !== 32) {
+            break;
+          }
+
+          message.create = reader.bool();
+          continue;
+        case 5:
+          if (tag !== 40) {
+            break;
+          }
+
+          message.transactionStatus = reader.int32() as any;
+          continue;
+        case 6:
+          if (tag !== 48) {
             break;
           }
 
           message.includeReceipt = reader.bool();
           continue;
-        case 4:
-          if (tag !== 32) {
+        case 7:
+          if (tag !== 56) {
             break;
           }
 
@@ -411,8 +542,13 @@ export const TransactionFilter = {
 
   fromJSON(object: any): TransactionFilter {
     return {
+      id: isSet(object.id) ? globalThis.Number(object.id) : 0,
       from: isSet(object.from) ? Address.fromJSON(object.from) : undefined,
       to: isSet(object.to) ? Address.fromJSON(object.to) : undefined,
+      create: isSet(object.create) ? globalThis.Boolean(object.create) : undefined,
+      transactionStatus: isSet(object.transactionStatus)
+        ? transactionStatusFilterFromJSON(object.transactionStatus)
+        : undefined,
       includeReceipt: isSet(object.includeReceipt) ? globalThis.Boolean(object.includeReceipt) : undefined,
       includeLogs: isSet(object.includeLogs) ? globalThis.Boolean(object.includeLogs) : undefined,
     };
@@ -420,11 +556,20 @@ export const TransactionFilter = {
 
   toJSON(message: TransactionFilter): unknown {
     const obj: any = {};
+    if (message.id !== undefined && message.id !== 0) {
+      obj.id = Math.round(message.id);
+    }
     if (message.from !== undefined) {
       obj.from = Address.toJSON(message.from);
     }
     if (message.to !== undefined) {
       obj.to = Address.toJSON(message.to);
+    }
+    if (message.create !== undefined) {
+      obj.create = message.create;
+    }
+    if (message.transactionStatus !== undefined) {
+      obj.transactionStatus = transactionStatusFilterToJSON(message.transactionStatus);
     }
     if (message.includeReceipt !== undefined) {
       obj.includeReceipt = message.includeReceipt;
@@ -440,8 +585,11 @@ export const TransactionFilter = {
   },
   fromPartial(object: DeepPartial<TransactionFilter>): TransactionFilter {
     const message = createBaseTransactionFilter() as any;
+    message.id = object.id ?? 0;
     message.from = (object.from !== undefined && object.from !== null) ? Address.fromPartial(object.from) : undefined;
     message.to = (object.to !== undefined && object.to !== null) ? Address.fromPartial(object.to) : undefined;
+    message.create = object.create ?? undefined;
+    message.transactionStatus = object.transactionStatus ?? undefined;
     message.includeReceipt = object.includeReceipt ?? undefined;
     message.includeLogs = object.includeLogs ?? undefined;
     return message;
@@ -450,32 +598,44 @@ export const TransactionFilter = {
 
 function createBaseLogFilter(): LogFilter {
   return {
+    id: 0,
     address: undefined,
     topics: [],
     strict: undefined,
+    transactionStatus: undefined,
     includeTransaction: undefined,
     includeReceipt: undefined,
+    includeSiblings: undefined,
   };
 }
 
 export const LogFilter = {
   encode(message: LogFilter, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.id !== undefined && message.id !== 0) {
+      writer.uint32(8).uint32(message.id);
+    }
     if (message.address !== undefined) {
-      Address.encode(message.address, writer.uint32(10).fork()).ldelim();
+      Address.encode(message.address, writer.uint32(18).fork()).ldelim();
     }
     if (message.topics !== undefined && message.topics.length !== 0) {
       for (const v of message.topics) {
-        Topic.encode(v!, writer.uint32(18).fork()).ldelim();
+        Topic.encode(v!, writer.uint32(26).fork()).ldelim();
       }
     }
     if (message.strict !== undefined) {
-      writer.uint32(24).bool(message.strict);
+      writer.uint32(32).bool(message.strict);
+    }
+    if (message.transactionStatus !== undefined) {
+      writer.uint32(40).int32(message.transactionStatus);
     }
     if (message.includeTransaction !== undefined) {
-      writer.uint32(32).bool(message.includeTransaction);
+      writer.uint32(48).bool(message.includeTransaction);
     }
     if (message.includeReceipt !== undefined) {
-      writer.uint32(40).bool(message.includeReceipt);
+      writer.uint32(56).bool(message.includeReceipt);
+    }
+    if (message.includeSiblings !== undefined) {
+      writer.uint32(64).bool(message.includeSiblings);
     }
     return writer;
   },
@@ -488,39 +648,60 @@ export const LogFilter = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          if (tag !== 10) {
+          if (tag !== 8) {
             break;
           }
 
-          message.address = Address.decode(reader, reader.uint32());
+          message.id = reader.uint32();
           continue;
         case 2:
           if (tag !== 18) {
             break;
           }
 
-          message.topics!.push(Topic.decode(reader, reader.uint32()));
+          message.address = Address.decode(reader, reader.uint32());
           continue;
         case 3:
-          if (tag !== 24) {
+          if (tag !== 26) {
             break;
           }
 
-          message.strict = reader.bool();
+          message.topics!.push(Topic.decode(reader, reader.uint32()));
           continue;
         case 4:
           if (tag !== 32) {
             break;
           }
 
-          message.includeTransaction = reader.bool();
+          message.strict = reader.bool();
           continue;
         case 5:
           if (tag !== 40) {
             break;
           }
 
+          message.transactionStatus = reader.int32() as any;
+          continue;
+        case 6:
+          if (tag !== 48) {
+            break;
+          }
+
+          message.includeTransaction = reader.bool();
+          continue;
+        case 7:
+          if (tag !== 56) {
+            break;
+          }
+
           message.includeReceipt = reader.bool();
+          continue;
+        case 8:
+          if (tag !== 64) {
+            break;
+          }
+
+          message.includeSiblings = reader.bool();
           continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
@@ -533,16 +714,24 @@ export const LogFilter = {
 
   fromJSON(object: any): LogFilter {
     return {
+      id: isSet(object.id) ? globalThis.Number(object.id) : 0,
       address: isSet(object.address) ? Address.fromJSON(object.address) : undefined,
       topics: globalThis.Array.isArray(object?.topics) ? object.topics.map((e: any) => Topic.fromJSON(e)) : [],
       strict: isSet(object.strict) ? globalThis.Boolean(object.strict) : undefined,
+      transactionStatus: isSet(object.transactionStatus)
+        ? transactionStatusFilterFromJSON(object.transactionStatus)
+        : undefined,
       includeTransaction: isSet(object.includeTransaction) ? globalThis.Boolean(object.includeTransaction) : undefined,
       includeReceipt: isSet(object.includeReceipt) ? globalThis.Boolean(object.includeReceipt) : undefined,
+      includeSiblings: isSet(object.includeSiblings) ? globalThis.Boolean(object.includeSiblings) : undefined,
     };
   },
 
   toJSON(message: LogFilter): unknown {
     const obj: any = {};
+    if (message.id !== undefined && message.id !== 0) {
+      obj.id = Math.round(message.id);
+    }
     if (message.address !== undefined) {
       obj.address = Address.toJSON(message.address);
     }
@@ -552,11 +741,17 @@ export const LogFilter = {
     if (message.strict !== undefined) {
       obj.strict = message.strict;
     }
+    if (message.transactionStatus !== undefined) {
+      obj.transactionStatus = transactionStatusFilterToJSON(message.transactionStatus);
+    }
     if (message.includeTransaction !== undefined) {
       obj.includeTransaction = message.includeTransaction;
     }
     if (message.includeReceipt !== undefined) {
       obj.includeReceipt = message.includeReceipt;
+    }
+    if (message.includeSiblings !== undefined) {
+      obj.includeSiblings = message.includeSiblings;
     }
     return obj;
   },
@@ -566,13 +761,16 @@ export const LogFilter = {
   },
   fromPartial(object: DeepPartial<LogFilter>): LogFilter {
     const message = createBaseLogFilter() as any;
+    message.id = object.id ?? 0;
     message.address = (object.address !== undefined && object.address !== null)
       ? Address.fromPartial(object.address)
       : undefined;
     message.topics = object.topics?.map((e) => Topic.fromPartial(e)) || [];
     message.strict = object.strict ?? undefined;
+    message.transactionStatus = object.transactionStatus ?? undefined;
     message.includeTransaction = object.includeTransaction ?? undefined;
     message.includeReceipt = object.includeReceipt ?? undefined;
+    message.includeSiblings = object.includeSiblings ?? undefined;
     return message;
   },
 };
@@ -643,15 +841,6 @@ export type DeepPartial<T> = T extends Builtin ? T
     ? { [K in keyof Omit<T, "$case">]?: DeepPartial<T[K]> } & { readonly $case: T["$case"] }
   : T extends {} ? { [K in keyof T]?: DeepPartial<T[K]> }
   : Partial<T>;
-
-function longToBigint(long: Long) {
-  return BigInt(long.toString());
-}
-
-if (_m0.util.Long !== Long) {
-  _m0.util.Long = Long as any;
-  _m0.configure();
-}
 
 function isSet(value: any): boolean {
   return value !== null && value !== undefined;

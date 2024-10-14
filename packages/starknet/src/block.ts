@@ -35,16 +35,38 @@ export const L1DataAvailabilityMode = Schema.transform(
   },
 );
 
+export const TransactionStatus = Schema.transform(
+  Schema.Enums(proto.data.TransactionStatus),
+  Schema.Literal("unknown", "succeeded", "reverted"),
+  {
+    decode(value) {
+      const enumMap = {
+        [proto.data.TransactionStatus.SUCCEEDED]: "succeeded",
+        [proto.data.TransactionStatus.REVERTED]: "reverted",
+        [proto.data.TransactionStatus.UNSPECIFIED]: "unknown",
+        [proto.data.TransactionStatus.UNRECOGNIZED]: "unknown",
+      } as const;
+
+      return enumMap[value] ?? "unknown";
+    },
+    encode(value) {
+      throw new Error("encode: not implemented");
+    },
+  },
+);
+
+export type TransactionStatus = typeof TransactionStatus.Type;
+
 export const U128 = Schema.transform(
   Schema.Struct({
-    low: Schema.BigIntFromSelf,
-    high: Schema.BigIntFromSelf,
+    x0: Schema.BigIntFromSelf,
+    x1: Schema.BigIntFromSelf,
   }),
   Schema.BigIntFromSelf,
   {
     decode(value) {
-      const low = value.low.toString(16).padStart(16, "0");
-      const high = value.high.toString(16).padStart(16, "0");
+      const low = value.x0.toString(16).padStart(16, "0");
+      const high = value.x1.toString(16).padStart(16, "0");
       return BigInt(`0x${low}${high}`);
     },
     encode(value) {
@@ -117,12 +139,12 @@ export type BlockHeader = typeof BlockHeader.Type;
  *
  * @prop transactionIndex The transaction index in the block.
  * @prop transactionHash The transaction hash.
- * @prop transactionReverted Whether the transaction was reverted.
+ * @prop transactionStatus The transaction status.
  */
 export const TransactionMeta = Schema.Struct({
   transactionIndex: Schema.optional(Schema.Number),
   transactionHash: Schema.optional(FieldElement),
-  transactionReverted: Schema.optional(Schema.Boolean),
+  transactionStatus: Schema.optional(TransactionStatus),
 });
 
 export type TransactionMeta = typeof TransactionMeta.Type;
@@ -267,6 +289,7 @@ export const DeployAccountTransactionV3 = Schema.Struct({
  * @prop meta Transaction metadata.
  */
 export const Transaction = Schema.Struct({
+  filterIds: Schema.optional(Schema.Array(Schema.Number)),
   meta: Schema.optional(TransactionMeta),
   transaction: Schema.optional(
     Schema.Union(
@@ -395,6 +418,7 @@ export const DeployAccountTransactionReceipt = Schema.Struct({
  * @prop receipt Transaction-specific receipt.
  */
 export const TransactionReceipt = Schema.Struct({
+  filterIds: Schema.optional(Schema.Array(Schema.Number)),
   meta: Schema.optional(TransactionReceiptMeta),
   receipt: Schema.optional(
     Schema.Union(
@@ -417,16 +441,17 @@ export type TransactionReceipt = typeof TransactionReceipt.Type;
  * @prop eventIndex The event index in the block.
  * @prop transactionIndex The transaction index in the block.
  * @prop transactionHash The transaction hash.
- * @prop transactionReverted Whether the transaction was reverted.
+ * @prop transactionStatus The transaction status.
  */
 export const Event = Schema.Struct({
-  fromAddress: Schema.optional(FieldElement),
+  filterIds: Schema.optional(Schema.Array(Schema.Number)),
+  address: Schema.optional(FieldElement),
   keys: Schema.optional(Schema.Array(FieldElement)),
   data: Schema.optional(Schema.Array(FieldElement)),
   eventIndex: Schema.optional(Schema.Number),
   transactionIndex: Schema.optional(Schema.Number),
   transactionHash: Schema.optional(FieldElement),
-  transactionReverted: Schema.optional(Schema.Boolean),
+  transactionStatus: Schema.optional(TransactionStatus),
 });
 
 export type Event = typeof Event.Type;
@@ -439,16 +464,17 @@ export type Event = typeof Event.Type;
  * @prop messageIndex The message index in the block.
  * @prop transactionIndex The transaction index in the block.
  * @prop transactionHash The transaction hash.
- * @prop transactionReverted Whether the transaction was reverted.
+ * @prop transactionStatus The transaction status.
  */
 export const MessageToL1 = Schema.Struct({
+  filterIds: Schema.optional(Schema.Array(Schema.Number)),
   fromAddress: Schema.optional(FieldElement),
   toAddress: Schema.optional(FieldElement),
   payload: Schema.optional(Schema.Array(FieldElement)),
   messageIndex: Schema.optional(Schema.Number),
   transactionIndex: Schema.optional(Schema.Number),
   transactionHash: Schema.optional(FieldElement),
-  transactionReverted: Schema.optional(Schema.Boolean),
+  transactionStatus: Schema.optional(TransactionStatus),
 });
 
 export type MessageToL1 = typeof MessageToL1.Type;

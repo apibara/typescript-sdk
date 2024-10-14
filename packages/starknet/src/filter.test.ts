@@ -42,10 +42,10 @@ describe("Key", () => {
     expect(proto).toMatchInlineSnapshot(`
       {
         "value": {
-          "hiHi": 4660n,
-          "hiLo": 0n,
-          "loHi": 0n,
-          "loLo": 0n,
+          "x0": 0n,
+          "x1": 0n,
+          "x2": 0n,
+          "x3": 4660n,
         },
       }
     `);
@@ -69,7 +69,7 @@ describe("EventFilter", () => {
 
   it("should encode and decode all values", () => {
     const proto = encode({
-      fromAddress: "0xAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+      address: "0xAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
       keys: [
         "0xBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
         null,
@@ -77,7 +77,7 @@ describe("EventFilter", () => {
         "0xCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC",
       ],
       strict: true,
-      includeReverted: true,
+      transactionStatus: "all",
       includeTransaction: true,
       includeReceipt: true,
       includeMessages: true,
@@ -85,24 +85,23 @@ describe("EventFilter", () => {
     });
     expect(proto).toMatchInlineSnapshot(`
       {
-        "fromAddress": {
-          "hiHi": 12297829382473034410n,
-          "hiLo": 12297829382473034410n,
-          "loHi": 170n,
-          "loLo": 0n,
+        "address": {
+          "x0": 0n,
+          "x1": 170n,
+          "x2": 12297829382473034410n,
+          "x3": 12297829382473034410n,
         },
         "includeMessages": true,
         "includeReceipt": true,
-        "includeReverted": true,
         "includeSiblings": true,
         "includeTransaction": true,
         "keys": [
           {
             "value": {
-              "hiHi": 13527612320720337851n,
-              "hiLo": 13527612320720337851n,
-              "loHi": 187n,
-              "loLo": 0n,
+              "x0": 0n,
+              "x1": 187n,
+              "x2": 13527612320720337851n,
+              "x3": 13527612320720337851n,
             },
           },
           {
@@ -113,23 +112,23 @@ describe("EventFilter", () => {
           },
           {
             "value": {
-              "hiHi": 14757395258967641292n,
-              "hiLo": 14757395258967641292n,
-              "loHi": 0n,
-              "loLo": 0n,
+              "x0": 0n,
+              "x1": 0n,
+              "x2": 14757395258967641292n,
+              "x3": 14757395258967641292n,
             },
           },
         ],
         "strict": true,
+        "transactionStatus": 3,
       }
     `);
     const decoded = decode(proto);
     expect(decoded).toMatchInlineSnapshot(`
       {
-        "fromAddress": "0x000000000000000000000000000000aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "address": "0x000000000000000000000000000000aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
         "includeMessages": true,
         "includeReceipt": true,
-        "includeReverted": true,
         "includeSiblings": true,
         "includeTransaction": true,
         "keys": [
@@ -139,6 +138,7 @@ describe("EventFilter", () => {
           "0x00000000000000000000000000000000cccccccccccccccccccccccccccccccc",
         ],
         "strict": true,
+        "transactionStatus": "all",
       }
     `);
   });
@@ -160,14 +160,14 @@ describe("TransactionFilter", () => {
       includeEvents: true,
       includeMessages: true,
       includeReceipt: true,
-      includeReverted: true,
+      transactionStatus: "reverted",
     });
     expect(proto).toMatchInlineSnapshot(`
       {
         "includeEvents": true,
         "includeMessages": true,
         "includeReceipt": true,
-        "includeReverted": true,
+        "transactionStatus": 2,
       }
     `);
     const decoded = decode(proto);
@@ -176,7 +176,7 @@ describe("TransactionFilter", () => {
         "includeEvents": true,
         "includeMessages": true,
         "includeReceipt": true,
-        "includeReverted": true,
+        "transactionStatus": "reverted",
       }
     `);
   });
@@ -540,17 +540,17 @@ describe("mergeFilter", () => {
 
   it("concatenates events", () => {
     const f = mergeFilter(
-      { events: [{ fromAddress: "0xAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" }] },
-      { events: [{ fromAddress: "0xBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB" }] },
+      { events: [{ address: "0xAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" }] },
+      { events: [{ address: "0xBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB" }] },
     );
     expect(f).toMatchInlineSnapshot(`
       {
         "events": [
           {
-            "fromAddress": "0xAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+            "address": "0xAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
           },
           {
-            "fromAddress": "0xBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
+            "address": "0xBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
           },
         ],
         "header": undefined,

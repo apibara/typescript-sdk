@@ -1,0 +1,7 @@
+{
+  "type": "prerelease",
+  "comment": "Update protobuf definitions",
+  "packageName": "@apibara/evm",
+  "email": "francesco@ceccon.me",
+  "dependentChangeType": "patch"
+}

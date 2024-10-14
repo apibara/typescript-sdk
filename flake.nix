@@ -4,7 +4,7 @@
     flake-utils.url = "github:numtide/flake-utils";
   };
 
-  outputs = { self, nixpkgs, flake-utils, ... }:
+  outputs = { nixpkgs, flake-utils, ... }:
     flake-utils.lib.eachDefaultSystem(system:
       let
         pkgs = import nixpkgs {
@@ -16,7 +16,7 @@
             nativeBuildInputs = with pkgs; [
               protobuf
               nodejs
-              bun
+              biome
               nodePackages.pnpm
               nodePackages.typescript
               nodePackages.typescript-language-server
