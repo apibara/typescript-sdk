@@ -1,0 +1,20 @@
+{
+  "name": "@apibara/starknet",
+  "entries": [
+    {
+      "date": "Mon, 14 Oct 2024 12:56:12 GMT",
+      "version": "2.0.0-beta.4",
+      "tag": "@apibara/starknet_v2.0.0-beta.4",
+      "comments": {
+        "prerelease": [
+          {
+            "author": "francesco@ceccon.me",
+            "package": "@apibara/starknet",
+            "commit": "fc77072ec5bdb5caafc3d2d1174b8105381bed66",
+            "comment": "Update protobuf definitions"
+          }
+        ]
+      }
+    }
+  ]
+}

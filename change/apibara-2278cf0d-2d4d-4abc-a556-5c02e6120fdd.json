@@ -1,7 +1,0 @@
-{
-  "type": "prerelease",
-  "comment": "Bump version to match packages",
-  "packageName": "apibara",
-  "email": "francesco@ceccon.me",
-  "dependentChangeType": "patch"
-}
