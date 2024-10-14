@@ -26,6 +26,20 @@
   },
   "packageManager": "pnpm@9.10.0",
   "beachball": {
+    "prereleasePrefix": "beta",
+    "groups": [
+      {
+        "name": "v2-prerelease",
+        "include": [
+          "packages/beaconchain",
+          "packages/cli",
+          "packages/evm",
+          "packages/indexer",
+          "packages/protocol",
+          "packages/starknet"
+        ]
+      }
+    ],
     "ignorePatterns": [
       "examples/**"
     ]
