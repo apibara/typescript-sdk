@@ -1,0 +1,7 @@
+{
+  "type": "prerelease",
+  "comment": "Fix release",
+  "packageName": "@apibara/beaconchain",
+  "email": "francesco@ceccon.me",
+  "dependentChangeType": "patch"
+}
