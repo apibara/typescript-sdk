@@ -1,7 +1,0 @@
-{
-  "type": "prerelease",
-  "comment": "Fix release",
-  "packageName": "@apibara/evm",
-  "email": "francesco@ceccon.me",
-  "dependentChangeType": "patch"
-}

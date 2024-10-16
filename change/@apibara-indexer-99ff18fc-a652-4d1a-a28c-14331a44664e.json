@@ -1,7 +1,0 @@
-{
-  "type": "prerelease",
-  "comment": "Fix release",
-  "packageName": "@apibara/indexer",
-  "email": "francesco@ceccon.me",
-  "dependentChangeType": "patch"
-}

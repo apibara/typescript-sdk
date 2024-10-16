@@ -2,6 +2,21 @@
   "name": "@apibara/evm",
   "entries": [
     {
+      "date": "Wed, 16 Oct 2024 11:29:42 GMT",
+      "version": "2.0.0-beta.6",
+      "tag": "@apibara/evm_v2.0.0-beta.6",
+      "comments": {
+        "prerelease": [
+          {
+            "author": "francesco@ceccon.me",
+            "package": "@apibara/evm",
+            "commit": "52061e50a07dad274bab166a2be899a81b6f99c6",
+            "comment": "Fix release"
+          }
+        ]
+      }
+    },
+    {
       "date": "Mon, 14 Oct 2024 13:04:10 GMT",
       "version": "2.0.0-beta.5",
       "tag": "@apibara/evm_v2.0.0-beta.5",
