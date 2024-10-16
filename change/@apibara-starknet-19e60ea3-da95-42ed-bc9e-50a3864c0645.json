@@ -1,0 +1,7 @@
+{
+  "type": "prerelease",
+  "comment": "Fix release",
+  "packageName": "@apibara/starknet",
+  "email": "francesco@ceccon.me",
+  "dependentChangeType": "patch"
+}
