@@ -7,8 +7,8 @@
 /* eslint-disable */
 import Long from "long";
 import { type CallContext, type CallOptions } from "nice-grpc-common";
-import _m0 from "protobufjs/minimal";
-import { Duration } from "./google/protobuf/duration";
+import _m0 from "protobufjs/minimal.js";
+import { Duration } from "./google/protobuf/duration.js";
 
 export const protobufPackage = "dna.v2.stream";
 

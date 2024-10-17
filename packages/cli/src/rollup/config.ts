@@ -57,9 +57,11 @@ export const getRollupConfig = (
   const mainContent = `
 import { createClient } from "@apibara/protocol";
 import { createIndexer, run } from "@apibara/indexer";
-import consola from "consola";
-import { defineCommand, runMain } from "citty";
+import { consola as _consola } from "apibara/internal/consola";
+import { defineCommand, runMain } from "apibara/internal/citty";
 import config from './${configPath}';
+
+const consola = _consola.withTag("Apibara | ");
 
 ${indexerImports}
 
@@ -202,7 +204,6 @@ runMain(command);
       "@apibara/evm",
       "@apibara/starknet",
       "@apibara/beaconchain",
-      "@apibara/cli",
     ],
   };
 };

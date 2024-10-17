@@ -2,7 +2,6 @@
   "name": "apibara",
   "version": "2.0.0-beta.6",
   "type": "module",
-  "source": "./src/core/index.ts",
   "main": "./dist/core/index.mjs",
   "exports": {
     ".": {
@@ -32,6 +31,14 @@
     "./hooks": {
       "types": "./dist/hooks/index.d.ts",
       "import": "./dist/hooks/index.mjs"
+    },
+    "./internal/consola": {
+      "import": "./dist/internal/consola/index.mjs",
+      "types": "./dist/internal/consola/index.d.ts"
+    },
+    "./internal/citty": {
+      "import": "./dist/internal/citty/index.mjs",
+      "types": "./dist/internal/citty/index.d.ts"
     }
   },
   "bin": {

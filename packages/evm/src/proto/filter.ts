@@ -5,8 +5,8 @@
 // source: filter.proto
 
 /* eslint-disable */
-import _m0 from "protobufjs/minimal";
-import { Address, B256 } from "./common";
+import _m0 from "protobufjs/minimal.js";
+import { Address, B256 } from "./common.js";
 
 export const protobufPackage = "evm.v2";
 

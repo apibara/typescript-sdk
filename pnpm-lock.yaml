@@ -46,6 +46,31 @@ importers:
         specifier: ^1.21.0
         version: 1.21.0
 
+  examples/cli:
+    dependencies:
+      '@apibara/indexer':
+        specifier: workspace:*
+        version: link:../../packages/indexer
+      '@apibara/protocol':
+        specifier: workspace:*
+        version: link:../../packages/protocol
+      '@apibara/starknet':
+        specifier: workspace:*
+        version: link:../../packages/starknet
+      apibara:
+        specifier: workspace:*
+        version: link:../../packages/cli
+      starknet:
+        specifier: ^6.11.0
+        version: 6.11.0
+    devDependencies:
+      '@types/node':
+        specifier: ^20.5.2
+        version: 20.14.0
+      typescript:
+        specifier: ^5.6.2
+        version: 5.6.2
+
   examples/evm-client:
     dependencies:
       '@apibara/evm':

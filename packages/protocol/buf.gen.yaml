@@ -12,3 +12,4 @@ plugins:
       - esModuleInterop=true
       - removeEnumPrefix=true
       - oneof=unions
+      - importSuffix=.js

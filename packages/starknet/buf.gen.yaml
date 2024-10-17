@@ -13,3 +13,4 @@ plugins:
       - removeEnumPrefix=true
       - oneof=unions
       - useDate=true
+      - importSuffix=.js

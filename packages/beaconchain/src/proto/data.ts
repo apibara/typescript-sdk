@@ -6,7 +6,7 @@
 
 /* eslint-disable */
 import Long from "long";
-import _m0 from "protobufjs/minimal";
+import _m0 from "protobufjs/minimal.js";
 import {
   Address,
   B256,
@@ -16,8 +16,8 @@ import {
   ValidatorStatus,
   validatorStatusFromJSON,
   validatorStatusToJSON,
-} from "./common";
-import { Timestamp } from "./google/protobuf/timestamp";
+} from "./common.js";
+import { Timestamp } from "./google/protobuf/timestamp.js";
 
 export const protobufPackage = "beaconchain.v2";
 
