@@ -5,8 +5,8 @@
 // source: filter.proto
 
 /* eslint-disable */
-import _m0 from "protobufjs/minimal";
-import { FieldElement } from "./common";
+import _m0 from "protobufjs/minimal.js";
+import { FieldElement } from "./common.js";
 
 export const protobufPackage = "starknet.v2";
 

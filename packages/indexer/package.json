@@ -2,55 +2,67 @@
   "name": "@apibara/indexer",
   "version": "2.0.0-beta.6",
   "type": "module",
-  "source": "./src/index.ts",
-  "main": "./src/index.ts",
+  "files": [
+    "dist",
+    "src",
+    "README.md"
+  ],
+  "main": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
   "exports": {
-    ".": "./src/index.ts",
-    "./plugins": "./src/plugins/index.ts",
-    "./sinks/sqlite": "./src/sinks/sqlite.ts",
-    "./sinks/csv": "./src/sinks/csv.ts",
-    "./sinks/drizzle": "./src/sinks/drizzle/index.ts",
-    "./testing": "./src/testing/index.ts"
-  },
-  "publishConfig": {
-    "files": [
-      "dist",
-      "src",
-      "README.md"
-    ],
-    "main": "./dist/index.mjs",
-    "types": "./dist/index.d.ts",
-    "exports": {
-      ".": {
-        "types": "./dist/index.d.ts",
-        "import": "./dist/index.mjs",
-        "require": "./dist/index.cjs",
-        "default": "./dist/index.mjs"
-      },
-      "./sinks/sqlite": {
-        "types": "./dist/sinks/sqlite.d.ts",
-        "import": "./dist/sinks/sqlite.mjs",
-        "require": "./dist/sinks/sqlite.cjs",
-        "default": "./dist/sinks/sqlite.mjs"
-      },
-      "./sinks/csv": {
-        "types": "./dist/sinks/csv.d.ts",
-        "import": "./dist/sinks/csv.mjs",
-        "require": "./dist/sinks/csv.cjs",
-        "default": "./dist/sinks/csv.mjs"
-      },
-      "./sinks/drizzle": {
-        "types": "./dist/sinks/drizzle/index.d.ts",
-        "import": "./dist/sinks/drizzle/index.mjs",
-        "require": "./dist/sinks/drizzle/index.cjs",
-        "default": "./dist/sinks/drizzle/index.mjs"
-      },
-      "./testing": {
-        "types": "./dist/testing/index.d.ts",
-        "import": "./dist/testing/index.mjs",
-        "require": "./dist/testing/index.cjs",
-        "default": "./dist/testing/index.mjs"
-      }
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs",
+      "default": "./dist/index.mjs"
+    },
+    "./sinks/sqlite": {
+      "types": "./dist/sinks/sqlite.d.ts",
+      "import": "./dist/sinks/sqlite.mjs",
+      "require": "./dist/sinks/sqlite.cjs",
+      "default": "./dist/sinks/sqlite.mjs"
+    },
+    "./sinks/csv": {
+      "types": "./dist/sinks/csv.d.ts",
+      "import": "./dist/sinks/csv.mjs",
+      "require": "./dist/sinks/csv.cjs",
+      "default": "./dist/sinks/csv.mjs"
+    },
+    "./sinks/drizzle": {
+      "types": "./dist/sinks/drizzle/index.d.ts",
+      "import": "./dist/sinks/drizzle/index.mjs",
+      "require": "./dist/sinks/drizzle/index.cjs",
+      "default": "./dist/sinks/drizzle/index.mjs"
+    },
+    "./testing": {
+      "types": "./dist/testing/index.d.ts",
+      "import": "./dist/testing/index.mjs",
+      "require": "./dist/testing/index.cjs",
+      "default": "./dist/testing/index.mjs"
+    },
+    "./vcr": {
+      "types": "./dist/vcr/index.d.ts",
+      "import": "./dist/vcr/index.mjs",
+      "require": "./dist/vcr/index.cjs",
+      "default": "./dist/vcr/index.mjs"
+    },
+    "./plugins": {
+      "types": "./dist/plugins/index.d.ts",
+      "import": "./dist/plugins/index.mjs",
+      "require": "./dist/plugins/index.cjs",
+      "default": "./dist/plugins/index.mjs"
+    },
+    "./plugins/kv": {
+      "types": "./dist/plugins/kv.d.ts",
+      "import": "./dist/plugins/kv.mjs",
+      "require": "./dist/plugins/kv.cjs",
+      "default": "./dist/plugins/kv.mjs"
+    },
+    "./plugins/persistence": {
+      "types": "./dist/plugins/persistence.d.ts",
+      "import": "./dist/plugins/persistence.mjs",
+      "require": "./dist/plugins/persistence.cjs",
+      "default": "./dist/plugins/persistence.mjs"
     }
   },
   "scripts": {

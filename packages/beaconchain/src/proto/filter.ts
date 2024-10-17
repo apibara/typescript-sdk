@@ -5,8 +5,8 @@
 // source: filter.proto
 
 /* eslint-disable */
-import _m0 from "protobufjs/minimal";
-import { Address, ValidatorStatus, validatorStatusFromJSON, validatorStatusToJSON } from "./common";
+import _m0 from "protobufjs/minimal.js";
+import { Address, ValidatorStatus, validatorStatusFromJSON, validatorStatusToJSON } from "./common.js";
 
 export const protobufPackage = "beaconchain.v2";
 

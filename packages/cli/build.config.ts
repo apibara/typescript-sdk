@@ -15,6 +15,8 @@ export default defineBuildConfig({
     { input: "./src/rollup/index.ts" },
     { input: "./src/types/index.ts" },
     { input: "./src/hooks/index.ts" },
+    { input: "./src/internal/consola/index.ts" },
+    { input: "./src/internal/citty/index.ts" },
   ],
   clean: true,
   outDir: "./dist",

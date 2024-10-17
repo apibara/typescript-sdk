@@ -6,9 +6,9 @@
 
 /* eslint-disable */
 import Long from "long";
-import _m0 from "protobufjs/minimal";
-import { Address, B256, Bloom, U128, U256 } from "./common";
-import { Timestamp } from "./google/protobuf/timestamp";
+import _m0 from "protobufjs/minimal.js";
+import { Address, B256, Bloom, U128, U256 } from "./common.js";
+import { Timestamp } from "./google/protobuf/timestamp.js";
 
 export const protobufPackage = "evm.v2";
 

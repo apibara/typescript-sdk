@@ -6,9 +6,9 @@
 
 /* eslint-disable */
 import Long from "long";
-import _m0 from "protobufjs/minimal";
-import { FieldElement } from "./common";
-import { Timestamp } from "./google/protobuf/timestamp";
+import _m0 from "protobufjs/minimal.js";
+import { FieldElement } from "./common.js";
+import { Timestamp } from "./google/protobuf/timestamp.js";
 
 export const protobufPackage = "starknet.v2";
 

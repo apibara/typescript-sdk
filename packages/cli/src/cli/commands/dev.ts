@@ -93,7 +93,7 @@ export default defineCommand({
           ...(args.sink ? ["--sink", args.sink] : []),
         ];
 
-        childProcess = spawn("jiti", childArgs, {
+        childProcess = spawn("node", childArgs, {
           stdio: "inherit",
         });
 

@@ -2,24 +2,19 @@
   "name": "@apibara/evm",
   "version": "2.0.0-beta.6",
   "type": "module",
-  "source": "./src/index.ts",
-  "main": "./src/index.ts",
-  "exports": "./src/index.ts",
-  "publishConfig": {
-    "files": [
-      "dist",
-      "src",
-      "README.md"
-    ],
-    "main": "./dist/index.mjs",
-    "types": "./dist/index.d.ts",
-    "exports": {
-      ".": {
-        "types": "./dist/index.d.ts",
-        "import": "./dist/index.mjs",
-        "require": "./dist/index.cjs",
-        "default": "./dist/index.mjs"
-      }
+  "files": [
+    "dist",
+    "src",
+    "README.md"
+  ],
+  "main": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs",
+      "default": "./dist/index.mjs"
     }
   },
   "scripts": {
