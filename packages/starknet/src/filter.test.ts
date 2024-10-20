@@ -2,9 +2,12 @@ import { Schema } from "@effect/schema";
 import { describe, expect, it } from "vitest";
 
 import {
+  ContractChangeFilter,
   EventFilter,
   HeaderFilter,
   Key,
+  NonceUpdateFilter,
+  StorageDiffFilter,
   TransactionFilter,
   mergeFilter,
 } from "./filter";
@@ -468,23 +471,168 @@ describe("TransactionFilter", () => {
   });
 });
 
+describe("StorageDiffFilter", () => {
+  const encode = Schema.encodeSync(StorageDiffFilter);
+  const decode = Schema.decodeSync(StorageDiffFilter);
+
+  it("should encode and decode storage diffs", () => {
+    const proto = encode({
+      contractAddress: "0xAABBCCDD",
+    });
+
+    expect(proto).toMatchInlineSnapshot(`
+      {
+        "contractAddress": {
+          "x0": 0n,
+          "x1": 0n,
+          "x2": 0n,
+          "x3": 2864434397n,
+        },
+      }
+    `);
+    const decoded = decode(proto);
+    expect(decoded).toMatchInlineSnapshot(`
+      {
+        "contractAddress": "0x00000000000000000000000000000000000000000000000000000000aabbccdd",
+      }
+    `);
+  });
+});
+
+describe("ContractChangeFilter", () => {
+  const encode = Schema.encodeSync(ContractChangeFilter);
+  const decode = Schema.decodeSync(ContractChangeFilter);
+
+  it("should encode and decode declared class changes", () => {
+    const proto = encode({
+      change: {
+        _tag: "declaredClass",
+        declaredClass: {},
+      },
+    });
+    expect(proto).toMatchInlineSnapshot(`
+      {
+        "change": {
+          "$case": "declaredClass",
+          "declaredClass": {},
+        },
+      }
+    `);
+    const decoded = decode(proto);
+    expect(decoded).toMatchInlineSnapshot(`
+      {
+        "change": {
+          "_tag": "declaredClass",
+          "declaredClass": {},
+        },
+      }
+    `);
+  });
+
+  it("should encode and decode replaced class changes", () => {
+    const proto = encode({
+      change: {
+        _tag: "replacedClass",
+        replacedClass: {},
+      },
+    });
+    expect(proto).toMatchInlineSnapshot(`
+      {
+        "change": {
+          "$case": "replacedClass",
+          "replacedClass": {},
+        },
+      }
+    `);
+    const decoded = decode(proto);
+    expect(decoded).toMatchInlineSnapshot(`
+      {
+        "change": {
+          "_tag": "replacedClass",
+          "replacedClass": {},
+        },
+      }
+    `);
+  });
+
+  it("should encode and decode deployed contract changes", () => {
+    const proto = encode({
+      change: {
+        _tag: "deployedContract",
+        deployedContract: {},
+      },
+    });
+    expect(proto).toMatchInlineSnapshot(`
+      {
+        "change": {
+          "$case": "deployedContract",
+          "deployedContract": {},
+        },
+      }
+    `);
+    const decoded = decode(proto);
+    expect(decoded).toMatchInlineSnapshot(`
+      {
+        "change": {
+          "_tag": "deployedContract",
+          "deployedContract": {},
+        },
+      }
+    `);
+  });
+});
+
+describe("NonceUpdateFilter", () => {
+  const encode = Schema.encodeSync(NonceUpdateFilter);
+  const decode = Schema.decodeSync(NonceUpdateFilter);
+
+  it("should encode and decode nonce updates", () => {
+    const proto = encode({
+      contractAddress: "0xAABBCCDD",
+    });
+
+    expect(proto).toMatchInlineSnapshot(`
+      {
+        "contractAddress": {
+          "x0": 0n,
+          "x1": 0n,
+          "x2": 0n,
+          "x3": 2864434397n,
+        },
+      }
+    `);
+    const decoded = decode(proto);
+    expect(decoded).toMatchInlineSnapshot(`
+      {
+        "contractAddress": "0x00000000000000000000000000000000000000000000000000000000aabbccdd",
+      }
+        `);
+  });
+});
+
 describe("mergeFilter", () => {
   it("returns header.always if any has it", () => {
     const fa = mergeFilter({}, { header: "always" });
     expect(fa).toMatchInlineSnapshot(`
       {
+        "contractChanges": [],
         "events": [],
         "header": "always",
         "messages": [],
+        "nonceUpdates": [],
+        "storageDiffs": [],
         "transactions": [],
       }
     `);
     const fb = mergeFilter({ header: "always" }, {});
     expect(fb).toMatchInlineSnapshot(`
       {
+        "contractChanges": [],
         "events": [],
         "header": "always",
         "messages": [],
+        "nonceUpdates": [],
+        "storageDiffs": [],
         "transactions": [],
       }
     `);
@@ -494,9 +642,12 @@ describe("mergeFilter", () => {
     const f = mergeFilter({}, {});
     expect(f).toMatchInlineSnapshot(`
       {
+        "contractChanges": [],
         "events": [],
         "header": undefined,
         "messages": [],
+        "nonceUpdates": [],
+        "storageDiffs": [],
         "transactions": [],
       }
     `);
@@ -513,9 +664,12 @@ describe("mergeFilter", () => {
     );
     expect(f).toMatchInlineSnapshot(`
       {
+        "contractChanges": [],
         "events": [],
         "header": undefined,
         "messages": [],
+        "nonceUpdates": [],
+        "storageDiffs": [],
         "transactions": [
           {
             "transactionType": {
@@ -541,6 +695,7 @@ describe("mergeFilter", () => {
     );
     expect(f).toMatchInlineSnapshot(`
       {
+        "contractChanges": [],
         "events": [
           {
             "address": "0xAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
@@ -551,6 +706,8 @@ describe("mergeFilter", () => {
         ],
         "header": undefined,
         "messages": [],
+        "nonceUpdates": [],
+        "storageDiffs": [],
         "transactions": [],
       }
     `);
@@ -563,6 +720,7 @@ describe("mergeFilter", () => {
     );
     expect(f).toMatchInlineSnapshot(`
       {
+        "contractChanges": [],
         "events": [],
         "header": undefined,
         "messages": [
@@ -573,6 +731,100 @@ describe("mergeFilter", () => {
             "fromAddress": "0xBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
           },
         ],
+        "nonceUpdates": [],
+        "storageDiffs": [],
+        "transactions": [],
+      }
+    `);
+  });
+
+  it("concatenates storage diffs", () => {
+    const f = mergeFilter(
+      { storageDiffs: [{ contractAddress: "0xAABBCCDD" }] },
+      { storageDiffs: [{ contractAddress: "0xBBBBCCDD" }] },
+    );
+
+    expect(f).toMatchInlineSnapshot(`
+      {
+        "contractChanges": [],
+        "events": [],
+        "header": undefined,
+        "messages": [],
+        "nonceUpdates": [],
+        "storageDiffs": [
+          {
+            "contractAddress": "0xAABBCCDD",
+          },
+          {
+            "contractAddress": "0xBBBBCCDD",
+          },
+        ],
+        "transactions": [],
+      }
+    `);
+  });
+
+  it("concatenates contract changes", () => {
+    const f = mergeFilter(
+      {
+        contractChanges: [
+          { change: { _tag: "declaredClass", declaredClass: {} } },
+        ],
+      },
+      {
+        contractChanges: [
+          { change: { _tag: "replacedClass", replacedClass: {} } },
+        ],
+      },
+    );
+
+    expect(f).toMatchInlineSnapshot(`
+      {
+        "contractChanges": [
+          {
+            "change": {
+              "_tag": "declaredClass",
+              "declaredClass": {},
+            },
+          },
+          {
+            "change": {
+              "_tag": "replacedClass",
+              "replacedClass": {},
+            },
+          },
+        ],
+        "events": [],
+        "header": undefined,
+        "messages": [],
+        "nonceUpdates": [],
+        "storageDiffs": [],
+        "transactions": [],
+      }
+    `);
+  });
+
+  it("concatenates nonce updates", () => {
+    const f = mergeFilter(
+      { nonceUpdates: [{ contractAddress: "0xAABBCCDD" }] },
+      { nonceUpdates: [{ contractAddress: "0xBBBBCCDD" }] },
+    );
+
+    expect(f).toMatchInlineSnapshot(`
+      {
+        "contractChanges": [],
+        "events": [],
+        "header": undefined,
+        "messages": [],
+        "nonceUpdates": [
+          {
+            "contractAddress": "0xAABBCCDD",
+          },
+          {
+            "contractAddress": "0xBBBBCCDD",
+          },
+        ],
+        "storageDiffs": [],
         "transactions": [],
       }
     `);

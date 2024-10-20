@@ -230,11 +230,68 @@ export const TransactionFilter = Schema.Struct({
 
 export type TransactionFilter = typeof TransactionFilter.Type;
 
+/** Filter storage diffs.
+ *
+ *  @prop contractAddress Filter by contract address.
+ */
+export const StorageDiffFilter = Schema.Struct({
+  id: Schema.optional(Schema.Number),
+  contractAddress: Schema.optional(FieldElement),
+});
+
+export type StorageDiffFilter = typeof StorageDiffFilter.Type;
+
+/** Filter declared classes. */
+export const DeclaredClassFilter = Schema.Struct({
+  _tag: tag("declaredClass"),
+  declaredClass: Schema.Struct({}),
+});
+
+export type DeclaredClassFilter = typeof DeclaredClassFilter.Type;
+
+export const ReplacedClassFilter = Schema.Struct({
+  _tag: tag("replacedClass"),
+  replacedClass: Schema.Struct({}),
+});
+
+export type ReplacedClassFilter = typeof ReplacedClassFilter.Type;
+
+export const DeployedContractFilter = Schema.Struct({
+  _tag: tag("deployedContract"),
+  deployedContract: Schema.Struct({}),
+});
+
+export type DeployedContractFilter = typeof DeployedContractFilter.Type;
+
+/** Filter contract changes. */
+export const ContractChangeFilter = Schema.Struct({
+  id: Schema.optional(Schema.Number),
+  change: Schema.optional(
+    Schema.Union(
+      DeclaredClassFilter,
+      ReplacedClassFilter,
+      DeployedContractFilter,
+    ),
+  ),
+});
+
+/** Filter updates to nonces.
+ *
+ * @prop contractAddress Filter by contract address.
+ */
+export const NonceUpdateFilter = Schema.Struct({
+  id: Schema.optional(Schema.Number),
+  contractAddress: Schema.optional(FieldElement),
+});
+
 export const Filter = Schema.Struct({
   header: Schema.optional(HeaderFilter),
   transactions: Schema.optional(Schema.Array(TransactionFilter)),
   events: Schema.optional(Schema.Array(EventFilter)),
   messages: Schema.optional(Schema.Array(MessageToL1Filter)),
+  storageDiffs: Schema.optional(Schema.Array(StorageDiffFilter)),
+  contractChanges: Schema.optional(Schema.Array(ContractChangeFilter)),
+  nonceUpdates: Schema.optional(Schema.Array(NonceUpdateFilter)),
 });
 
 export type Filter = typeof Filter.Type;
@@ -266,6 +323,12 @@ export function mergeFilter(a: Filter, b: Filter): Filter {
     transactions: [...(a.transactions ?? []), ...(b.transactions ?? [])],
     events: [...(a.events ?? []), ...(b.events ?? [])],
     messages: [...(a.messages ?? []), ...(b.messages ?? [])],
+    storageDiffs: [...(a.storageDiffs ?? []), ...(b.storageDiffs ?? [])],
+    contractChanges: [
+      ...(a.contractChanges ?? []),
+      ...(b.contractChanges ?? []),
+    ],
+    nonceUpdates: [...(a.nonceUpdates ?? []), ...(b.nonceUpdates ?? [])],
   };
 }
 
