@@ -5,7 +5,7 @@
   "description": "Apibara Typescript monorepo",
   "scripts": {
     "build": "turbo run build",
-    "typecheck": "turbo run typecheck --parallel",
+    "typecheck": "turbo run typecheck",
     "test": "turbo run test",
     "test:ci": "turbo run test:ci",
     "test:postgres": "docker run --rm -p 5432:5432 -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres postgres:16",

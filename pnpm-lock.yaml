@@ -141,8 +141,8 @@ importers:
         specifier: ^6.5.0
         version: 6.5.0
       drizzle-orm:
-        specifier: ^0.33.0
-        version: 0.33.0(@opentelemetry/api@1.9.0)(@types/better-sqlite3@7.6.11)(@types/pg@8.11.10)(better-sqlite3@11.1.2)(pg@8.13.0)(postgres@3.4.4)
+        specifier: ^0.35.0
+        version: 0.35.2(@opentelemetry/api@1.9.0)(@types/better-sqlite3@7.6.11)(@types/pg@8.11.10)(better-sqlite3@11.1.2)(pg@8.13.0)(postgres@3.4.4)
       postgres:
         specifier: ^3.4.4
         version: 3.4.4
@@ -224,8 +224,8 @@ importers:
         specifier: ^6.5.0
         version: 6.5.0
       drizzle-orm:
-        specifier: ^0.33.0
-        version: 0.33.0(@opentelemetry/api@1.9.0)(@types/better-sqlite3@7.6.11)(@types/pg@8.11.10)(better-sqlite3@11.1.2)(pg@8.13.0)(postgres@3.4.4)
+        specifier: ^0.35.0
+        version: 0.35.2(@opentelemetry/api@1.9.0)(@types/better-sqlite3@7.6.11)(@types/pg@8.11.10)(better-sqlite3@11.1.2)(pg@8.13.0)(postgres@3.4.4)
       postgres:
         specifier: ^3.4.4
         version: 3.4.4
@@ -460,8 +460,8 @@ importers:
         specifier: ^6.5.0
         version: 6.5.0
       drizzle-orm:
-        specifier: ^0.33.0
-        version: 0.33.0(@opentelemetry/api@1.9.0)(@types/better-sqlite3@7.6.11)(@types/pg@8.11.10)(better-sqlite3@11.1.2)(pg@8.13.0)(postgres@3.4.4)
+        specifier: ^0.35.2
+        version: 0.35.2(@opentelemetry/api@1.9.0)(@types/better-sqlite3@7.6.11)(@types/pg@8.11.10)(better-sqlite3@11.1.2)(pg@8.13.0)(postgres@3.4.4)
       pg:
         specifier: ^8.12.0
         version: 8.13.0
@@ -2034,13 +2034,13 @@ packages:
     resolution: {integrity: sha512-ZmdL2rui+eB2YwhsWzjInR8LldtZHGDoQ1ugH85ppHKwpUHL7j7rN0Ti9NCnGiQbhaZ11FpR+7ao1dNsmduNUg==}
     engines: {node: '>=12'}
 
-  drizzle-orm@0.33.0:
-    resolution: {integrity: sha512-SHy72R2Rdkz0LEq0PSG/IdvnT3nGiWuRk+2tXZQ90GVq/XQhpCzu/EFT3V2rox+w8MlkBQxifF8pCStNYnERfA==}
+  drizzle-orm@0.35.2:
+    resolution: {integrity: sha512-bLQtRchl8QvRo2MyG6kcZC90UDzR7Ubir4YwOHV3cZPdJbF+4jU/Yt0QOczsoXe25wLRt6CtCWLXtSDQKft3yg==}
     peerDependencies:
       '@aws-sdk/client-rds-data': '>=3'
       '@cloudflare/workers-types': '>=3'
       '@electric-sql/pglite': '>=0.1.1'
-      '@libsql/client': '*'
+      '@libsql/client': '>=0.10.0'
       '@neondatabase/serverless': '>=0.1'
       '@op-engineering/op-sqlite': '>=2'
       '@opentelemetry/api': ^1.4.1
@@ -4902,7 +4902,7 @@ snapshots:
 
   dotenv@16.4.5: {}
 
-  drizzle-orm@0.33.0(@opentelemetry/api@1.9.0)(@types/better-sqlite3@7.6.11)(@types/pg@8.11.10)(better-sqlite3@11.1.2)(pg@8.13.0)(postgres@3.4.4):
+  drizzle-orm@0.35.2(@opentelemetry/api@1.9.0)(@types/better-sqlite3@7.6.11)(@types/pg@8.11.10)(better-sqlite3@11.1.2)(pg@8.13.0)(postgres@3.4.4):
     optionalDependencies:
       '@opentelemetry/api': 1.9.0
       '@types/better-sqlite3': 7.6.11
