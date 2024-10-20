@@ -4,12 +4,12 @@ import type {
   TablesRelationalConfig,
 } from "drizzle-orm";
 import type {
-  PgInsertValue,
+  PgInsertValue as DrizzleInsertValue,
   PgQueryResultHKT,
   PgTable,
   PgTransaction,
 } from "drizzle-orm/pg-core";
-import { getDrizzleCursor } from "./utils";
+import { type PgInsertValue, getDrizzleCursor } from "./utils";
 
 export class DrizzleSinkInsert<
   TTable extends PgTable,
@@ -34,6 +34,9 @@ export class DrizzleSinkInsert<
         };
       },
     );
-    return originalInsert.values(cursoredValues as PgInsertValue<TTable>[]);
+
+    return originalInsert.values(
+      cursoredValues as DrizzleInsertValue<TTable>[],
+    );
   }
 }
