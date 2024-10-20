@@ -1,0 +1,7 @@
+{
+  "type": "patch",
+  "comment": "protocol: change `HeaderFilter` to enum",
+  "packageName": "@apibara/beaconchain",
+  "email": "francesco@ceccon.me",
+  "dependentChangeType": "patch"
+}
