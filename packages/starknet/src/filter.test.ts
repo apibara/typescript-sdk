@@ -14,7 +14,7 @@ describe("HeaderFilter", () => {
   const decode = Schema.decodeSync(HeaderFilter);
 
   it("should encode and decode", () => {
-    const always = { always: true };
+    const always = "always";
 
     const proto = encode(always);
     const decoded = decode(proto);
@@ -470,24 +470,20 @@ describe("TransactionFilter", () => {
 
 describe("mergeFilter", () => {
   it("returns header.always if any has it", () => {
-    const fa = mergeFilter({}, { header: { always: true } });
+    const fa = mergeFilter({}, { header: "always" });
     expect(fa).toMatchInlineSnapshot(`
       {
         "events": [],
-        "header": {
-          "always": true,
-        },
+        "header": "always",
         "messages": [],
         "transactions": [],
       }
     `);
-    const fb = mergeFilter({ header: { always: true } }, {});
+    const fb = mergeFilter({ header: "always" }, {});
     expect(fb).toMatchInlineSnapshot(`
       {
         "events": [],
-        "header": {
-          "always": true,
-        },
+        "header": "always",
         "messages": [],
         "transactions": [],
       }

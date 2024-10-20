@@ -12,6 +12,51 @@ export const protobufPackage = "beaconchain.v2";
 
 /** Beacon Chain DNA definitions (filter). */
 
+export enum HeaderFilter {
+  UNSPECIFIED = 0,
+  ALWAYS = 1,
+  ON_DATA = 2,
+  ON_DATA_OR_ON_NEW_BLOCK = 3,
+  UNRECOGNIZED = -1,
+}
+
+export function headerFilterFromJSON(object: any): HeaderFilter {
+  switch (object) {
+    case 0:
+    case "HEADER_FILTER_UNSPECIFIED":
+      return HeaderFilter.UNSPECIFIED;
+    case 1:
+    case "HEADER_FILTER_ALWAYS":
+      return HeaderFilter.ALWAYS;
+    case 2:
+    case "HEADER_FILTER_ON_DATA":
+      return HeaderFilter.ON_DATA;
+    case 3:
+    case "HEADER_FILTER_ON_DATA_OR_ON_NEW_BLOCK":
+      return HeaderFilter.ON_DATA_OR_ON_NEW_BLOCK;
+    case -1:
+    case "UNRECOGNIZED":
+    default:
+      return HeaderFilter.UNRECOGNIZED;
+  }
+}
+
+export function headerFilterToJSON(object: HeaderFilter): string {
+  switch (object) {
+    case HeaderFilter.UNSPECIFIED:
+      return "HEADER_FILTER_UNSPECIFIED";
+    case HeaderFilter.ALWAYS:
+      return "HEADER_FILTER_ALWAYS";
+    case HeaderFilter.ON_DATA:
+      return "HEADER_FILTER_ON_DATA";
+    case HeaderFilter.ON_DATA_OR_ON_NEW_BLOCK:
+      return "HEADER_FILTER_ON_DATA_OR_ON_NEW_BLOCK";
+    case HeaderFilter.UNRECOGNIZED:
+    default:
+      return "UNRECOGNIZED";
+  }
+}
+
 export interface Filter {
   /** Include header. */
   readonly header?:
@@ -27,11 +72,6 @@ export interface Filter {
     | undefined;
   /** Filter blobs. */
   readonly blobs?: readonly BlobFilter[] | undefined;
-}
-
-export interface HeaderFilter {
-  /** Always include header data. Defaults to `false`. */
-  readonly always?: boolean | undefined;
 }
 
 export interface TransactionFilter {
@@ -75,13 +115,13 @@ export interface BlobFilter {
 }
 
 function createBaseFilter(): Filter {
-  return { header: undefined, transactions: [], validators: [], blobs: [] };
+  return { header: 0, transactions: [], validators: [], blobs: [] };
 }
 
 export const Filter = {
   encode(message: Filter, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.header !== undefined) {
-      HeaderFilter.encode(message.header, writer.uint32(10).fork()).ldelim();
+    if (message.header !== undefined && message.header !== 0) {
+      writer.uint32(8).int32(message.header);
     }
     if (message.transactions !== undefined && message.transactions.length !== 0) {
       for (const v of message.transactions) {
@@ -109,11 +149,11 @@ export const Filter = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          if (tag !== 10) {
+          if (tag !== 8) {
             break;
           }
 
-          message.header = HeaderFilter.decode(reader, reader.uint32());
+          message.header = reader.int32() as any;
           continue;
         case 2:
           if (tag !== 18) {
@@ -147,7 +187,7 @@ export const Filter = {
 
   fromJSON(object: any): Filter {
     return {
-      header: isSet(object.header) ? HeaderFilter.fromJSON(object.header) : undefined,
+      header: isSet(object.header) ? headerFilterFromJSON(object.header) : 0,
       transactions: globalThis.Array.isArray(object?.transactions)
         ? object.transactions.map((e: any) => TransactionFilter.fromJSON(e))
         : [],
@@ -160,8 +200,8 @@ export const Filter = {
 
   toJSON(message: Filter): unknown {
     const obj: any = {};
-    if (message.header !== undefined) {
-      obj.header = HeaderFilter.toJSON(message.header);
+    if (message.header !== undefined && message.header !== 0) {
+      obj.header = headerFilterToJSON(message.header);
     }
     if (message.transactions?.length) {
       obj.transactions = message.transactions.map((e) => TransactionFilter.toJSON(e));
@@ -180,69 +220,10 @@ export const Filter = {
   },
   fromPartial(object: DeepPartial<Filter>): Filter {
     const message = createBaseFilter() as any;
-    message.header = (object.header !== undefined && object.header !== null)
-      ? HeaderFilter.fromPartial(object.header)
-      : undefined;
+    message.header = object.header ?? 0;
     message.transactions = object.transactions?.map((e) => TransactionFilter.fromPartial(e)) || [];
     message.validators = object.validators?.map((e) => ValidatorFilter.fromPartial(e)) || [];
     message.blobs = object.blobs?.map((e) => BlobFilter.fromPartial(e)) || [];
-    return message;
-  },
-};
-
-function createBaseHeaderFilter(): HeaderFilter {
-  return { always: undefined };
-}
-
-export const HeaderFilter = {
-  encode(message: HeaderFilter, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.always !== undefined) {
-      writer.uint32(8).bool(message.always);
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): HeaderFilter {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseHeaderFilter() as any;
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 8) {
-            break;
-          }
-
-          message.always = reader.bool();
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): HeaderFilter {
-    return { always: isSet(object.always) ? globalThis.Boolean(object.always) : undefined };
-  },
-
-  toJSON(message: HeaderFilter): unknown {
-    const obj: any = {};
-    if (message.always !== undefined) {
-      obj.always = message.always;
-    }
-    return obj;
-  },
-
-  create(base?: DeepPartial<HeaderFilter>): HeaderFilter {
-    return HeaderFilter.fromPartial(base ?? {});
-  },
-  fromPartial(object: DeepPartial<HeaderFilter>): HeaderFilter {
-    const message = createBaseHeaderFilter() as any;
-    message.always = object.always ?? undefined;
     return message;
   },
 };

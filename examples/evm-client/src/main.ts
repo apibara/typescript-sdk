@@ -36,9 +36,7 @@ const command = defineCommand({
     console.log(response);
 
     const filter = Filter.make({
-      header: {
-        always: true,
-      },
+      header: "on_data",
       transactions: [{}],
       withdrawals: [{}],
       logs: [{}],

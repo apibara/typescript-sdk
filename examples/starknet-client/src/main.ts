@@ -54,6 +54,7 @@ const command = defineCommand({
     console.log(response);
 
     const filter = Filter.make({
+      header: "on_data_or_on_new_block",
       messages: [
         {
           fromAddress:
@@ -77,7 +78,7 @@ const command = defineCommand({
       filter: [filter],
       finality: "accepted",
       startingCursor: {
-        orderKey: 700_000n,
+        orderKey: 800_000n,
       },
     });
 
