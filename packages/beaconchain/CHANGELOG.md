@@ -1,8 +1,20 @@
 # Change Log - @apibara/beaconchain
 
-<!-- This log was last generated on Wed, 16 Oct 2024 11:29:42 GMT and should not be manually modified. -->
+<!-- This log was last generated on Sun, 20 Oct 2024 18:49:49 GMT and should not be manually modified. -->
 
 <!-- Start content -->
+
+## 2.0.1-beta.0
+
+Sun, 20 Oct 2024 18:49:49 GMT
+
+### Patches
+
+- protocol: change `HeaderFilter` to enum (francesco@ceccon.me)
+
+### Changes
+
+- fix build inconsistencies (jadejajaipal5@gmail.com)
 
 ## 2.0.0-beta.6
 

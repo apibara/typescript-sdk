@@ -2,6 +2,27 @@
   "name": "@apibara/starknet",
   "entries": [
     {
+      "date": "Sun, 20 Oct 2024 18:49:49 GMT",
+      "version": "2.0.0-beta.8",
+      "tag": "@apibara/starknet_v2.0.0-beta.8",
+      "comments": {
+        "prerelease": [
+          {
+            "author": "jadejajaipal5@gmail.com",
+            "package": "@apibara/starknet",
+            "commit": "26ccbab32e1c16bbbb73f556878a830d5c6663f3",
+            "comment": "fix build inconsistencies"
+          },
+          {
+            "author": "francesco@ceccon.me",
+            "package": "@apibara/starknet",
+            "commit": "26ccbab32e1c16bbbb73f556878a830d5c6663f3",
+            "comment": "starknet: add state update data"
+          }
+        ]
+      }
+    },
+    {
       "date": "Wed, 16 Oct 2024 11:29:42 GMT",
       "version": "2.0.0-beta.6",
       "tag": "@apibara/starknet_v2.0.0-beta.6",

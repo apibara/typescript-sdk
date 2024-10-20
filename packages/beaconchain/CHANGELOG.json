@@ -2,6 +2,29 @@
   "name": "@apibara/beaconchain",
   "entries": [
     {
+      "date": "Sun, 20 Oct 2024 18:49:49 GMT",
+      "version": "2.0.1-beta.0",
+      "tag": "@apibara/beaconchain_v2.0.1-beta.0",
+      "comments": {
+        "patch": [
+          {
+            "author": "francesco@ceccon.me",
+            "package": "@apibara/beaconchain",
+            "commit": "26ccbab32e1c16bbbb73f556878a830d5c6663f3",
+            "comment": "protocol: change `HeaderFilter` to enum"
+          }
+        ],
+        "prerelease": [
+          {
+            "author": "jadejajaipal5@gmail.com",
+            "package": "@apibara/beaconchain",
+            "commit": "26ccbab32e1c16bbbb73f556878a830d5c6663f3",
+            "comment": "fix build inconsistencies"
+          }
+        ]
+      }
+    },
+    {
       "date": "Wed, 16 Oct 2024 11:29:42 GMT",
       "version": "2.0.0-beta.6",
       "tag": "@apibara/beaconchain_v2.0.0-beta.6",

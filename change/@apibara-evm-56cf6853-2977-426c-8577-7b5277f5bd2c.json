@@ -1,7 +1,0 @@
-{
-  "type": "patch",
-  "comment": "protocol: change `HeaderFilter` to enum",
-  "packageName": "@apibara/evm",
-  "email": "francesco@ceccon.me",
-  "dependentChangeType": "patch"
-}
