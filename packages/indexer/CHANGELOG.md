@@ -1,8 +1,16 @@
 # Change Log - @apibara/indexer
 
-<!-- This log was last generated on Sun, 20 Oct 2024 18:49:49 GMT and should not be manually modified. -->
+<!-- This log was last generated on Sun, 20 Oct 2024 20:29:23 GMT and should not be manually modified. -->
 
 <!-- Start content -->
+
+## 2.0.0-beta.9
+
+Sun, 20 Oct 2024 20:29:23 GMT
+
+### Changes
+
+- indexer: update drizzle and drizzle sink (francesco@ceccon.me)
 
 ## 2.0.0-beta.8
 

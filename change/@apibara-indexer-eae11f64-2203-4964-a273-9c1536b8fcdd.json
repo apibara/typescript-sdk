@@ -1,7 +1,0 @@
-{
-  "type": "prerelease",
-  "comment": "indexer: update drizzle and drizzle sink",
-  "packageName": "@apibara/indexer",
-  "email": "francesco@ceccon.me",
-  "dependentChangeType": "patch"
-}
