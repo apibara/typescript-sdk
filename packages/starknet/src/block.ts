@@ -479,6 +479,103 @@ export const MessageToL1 = Schema.Struct({
 
 export type MessageToL1 = typeof MessageToL1.Type;
 
+/** An entry in the storage diff.
+ *
+ * @prop key The storage location.
+ * @prop value The new value at the storage location.
+ */
+export const StorageEntry = Schema.Struct({
+  key: Schema.optional(FieldElement),
+  value: Schema.optional(FieldElement),
+});
+
+export type StorageEntry = typeof StorageEntry.Type;
+
+/** Storage diff.
+ *
+ * @prop contractAddress The contract address.
+ * @prop storageEntries The entries that changed.
+ */
+export const StorageDiff = Schema.Struct({
+  filterIds: Schema.optional(Schema.Array(Schema.Number)),
+  contractAddress: Schema.optional(FieldElement),
+  storageEntries: Schema.optional(Schema.Array(StorageEntry)),
+});
+
+export type StorageDiff = typeof StorageDiff.Type;
+
+/** A new class declared.
+ *
+ * @prop classHash The class hash.
+ * @prop compiledClassHash The compiled class hash. If undefined, it's the result of a deprecated Cairo 0 declaration.
+ */
+export const DeclaredClass = Schema.Struct({
+  _tag: tag("declaredClass"),
+  declaredClass: Schema.Struct({
+    classHash: Schema.optional(FieldElement),
+    compiledClassHash: Schema.optional(FieldElement),
+  }),
+});
+
+export type DeclaredClass = typeof DeclaredClass.Type;
+
+/** A class replaced.
+ *
+ * @prop contractAddress The contract address.
+ * @prop classHash The class new hash.
+ */
+export const ReplacedClass = Schema.Struct({
+  _tag: tag("replacedClass"),
+  replacedClass: Schema.Struct({
+    contractAddress: Schema.optional(FieldElement),
+    classHash: Schema.optional(FieldElement),
+  }),
+});
+
+export type ReplacedClass = typeof ReplacedClass.Type;
+
+/** A contract deployed.
+ *
+ * @prop contractAddress The contract address.
+ * @prop classHash The class hash.
+ */
+export const DeployedContract = Schema.Struct({
+  _tag: tag("deployedContract"),
+  deployedContract: Schema.Struct({
+    contractAddress: Schema.optional(FieldElement),
+    classHash: Schema.optional(FieldElement),
+  }),
+});
+
+export type DeployedContract = typeof DeployedContract.Type;
+
+/** A contract change.
+ *
+ * @prop contractAddress The contract address.
+ * @prop change The change.
+ */
+export const ContractChange = Schema.Struct({
+  filterIds: Schema.optional(Schema.Array(Schema.Number)),
+  change: Schema.optional(
+    Schema.Union(DeclaredClass, ReplacedClass, DeployedContract),
+  ),
+});
+
+export type ContractChange = typeof ContractChange.Type;
+
+/** A nonce update.
+ *
+ * @prop contractAddress The contract address.
+ * @prop nonce The new nonce.
+ */
+export const NonceUpdate = Schema.Struct({
+  filterIds: Schema.optional(Schema.Array(Schema.Number)),
+  contractAddress: Schema.optional(FieldElement),
+  nonce: Schema.optional(FieldElement),
+});
+
+export type NonceUpdate = typeof NonceUpdate.Type;
+
 /** A block.
  *
  * @prop header The block header.
@@ -486,6 +583,8 @@ export type MessageToL1 = typeof MessageToL1.Type;
  * @prop receipts The receipts of the transactions.
  * @prop events The events emitted by the transactions.
  * @prop messages The messages sent to L1 by the transactions.
+ * @prop storageDiffs The changes to the storage.
+ * @prop contractChanges The changes to contracts and classes.
  */
 export const Block = Schema.Struct({
   header: Schema.optional(BlockHeader),
@@ -493,6 +592,9 @@ export const Block = Schema.Struct({
   receipts: Schema.Array(TransactionReceipt),
   events: Schema.Array(Event),
   messages: Schema.Array(MessageToL1),
+  storageDiffs: Schema.Array(StorageDiff),
+  contractChanges: Schema.Array(ContractChange),
+  nonceUpdates: Schema.Array(NonceUpdate),
 });
 
 export type Block = typeof Block.Type;

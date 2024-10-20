@@ -243,7 +243,19 @@ export interface Block {
     | readonly Event[]
     | undefined;
   /** List of messages. */
-  readonly messages?: readonly MessageToL1[] | undefined;
+  readonly messages?:
+    | readonly MessageToL1[]
+    | undefined;
+  /** List of storage changes by contract. */
+  readonly storageDiffs?:
+    | readonly StorageDiff[]
+    | undefined;
+  /** List of contract/class changes. */
+  readonly contractChanges?:
+    | readonly ContractChange[]
+    | undefined;
+  /** List of nonce updates. */
+  readonly nonceUpdates?: readonly NonceUpdate[] | undefined;
 }
 
 /** Block header. */
@@ -645,8 +657,97 @@ export interface Uint128 {
   readonly x1?: bigint | undefined;
 }
 
+/** Difference in storage values for a contract. */
+export interface StorageDiff {
+  readonly filterIds?:
+    | readonly number[]
+    | undefined;
+  /** The contract address. */
+  readonly contractAddress?:
+    | FieldElement
+    | undefined;
+  /** Entries that changed. */
+  readonly storageEntries?: readonly StorageEntry[] | undefined;
+}
+
+/** Storage entry. */
+export interface StorageEntry {
+  /** Storage location. */
+  readonly key?:
+    | FieldElement
+    | undefined;
+  /** Storage value. */
+  readonly value?: FieldElement | undefined;
+}
+
+/** A class/contract change. */
+export interface ContractChange {
+  readonly filterIds?: readonly number[] | undefined;
+  readonly change?:
+    | { readonly $case: "declaredClass"; readonly declaredClass: DeclaredClass }
+    | { readonly $case: "replacedClass"; readonly replacedClass: ReplacedClass }
+    | { readonly $case: "deployedContract"; readonly deployedContract: DeployedContract }
+    | undefined;
+}
+
+/** Class declared. */
+export interface DeclaredClass {
+  /** Class hash of the newly declared class. */
+  readonly classHash?:
+    | FieldElement
+    | undefined;
+  /**
+   * Hash of the cairo assembly resulting from the sierra compilation.
+   *
+   * If undefined, it's the result of a deprecated Cairo 0 declaration.
+   */
+  readonly compiledClassHash?: FieldElement | undefined;
+}
+
+/** Class replaced. */
+export interface ReplacedClass {
+  /** The address of the contract whose class was replaced. */
+  readonly contractAddress?:
+    | FieldElement
+    | undefined;
+  /** The new class hash. */
+  readonly classHash?: FieldElement | undefined;
+}
+
+/** Contract deployed. */
+export interface DeployedContract {
+  /** Address of the newly deployed contract. */
+  readonly contractAddress?:
+    | FieldElement
+    | undefined;
+  /** Class hash of the deployed contract. */
+  readonly classHash?: FieldElement | undefined;
+}
+
+/** Nonce update. */
+export interface NonceUpdate {
+  readonly filterIds?:
+    | readonly number[]
+    | undefined;
+  /** Contract address. */
+  readonly contractAddress?:
+    | FieldElement
+    | undefined;
+  /** New nonce value. */
+  readonly nonce?: FieldElement | undefined;
+}
+
 function createBaseBlock(): Block {
-  return { header: undefined, transactions: [], receipts: [], events: [], messages: [] };
+  return {
+    header: undefined,
+    transactions: [],
+    receipts: [],
+    events: [],
+    messages: [],
+    storageDiffs: [],
+    contractChanges: [],
+    nonceUpdates: [],
+  };
 }
 
 export const Block = {
@@ -672,6 +773,21 @@ export const Block = {
     if (message.messages !== undefined && message.messages.length !== 0) {
       for (const v of message.messages) {
         MessageToL1.encode(v!, writer.uint32(42).fork()).ldelim();
+      }
+    }
+    if (message.storageDiffs !== undefined && message.storageDiffs.length !== 0) {
+      for (const v of message.storageDiffs) {
+        StorageDiff.encode(v!, writer.uint32(50).fork()).ldelim();
+      }
+    }
+    if (message.contractChanges !== undefined && message.contractChanges.length !== 0) {
+      for (const v of message.contractChanges) {
+        ContractChange.encode(v!, writer.uint32(58).fork()).ldelim();
+      }
+    }
+    if (message.nonceUpdates !== undefined && message.nonceUpdates.length !== 0) {
+      for (const v of message.nonceUpdates) {
+        NonceUpdate.encode(v!, writer.uint32(66).fork()).ldelim();
       }
     }
     return writer;
@@ -719,6 +835,27 @@ export const Block = {
 
           message.messages!.push(MessageToL1.decode(reader, reader.uint32()));
           continue;
+        case 6:
+          if (tag !== 50) {
+            break;
+          }
+
+          message.storageDiffs!.push(StorageDiff.decode(reader, reader.uint32()));
+          continue;
+        case 7:
+          if (tag !== 58) {
+            break;
+          }
+
+          message.contractChanges!.push(ContractChange.decode(reader, reader.uint32()));
+          continue;
+        case 8:
+          if (tag !== 66) {
+            break;
+          }
+
+          message.nonceUpdates!.push(NonceUpdate.decode(reader, reader.uint32()));
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -741,6 +878,15 @@ export const Block = {
       messages: globalThis.Array.isArray(object?.messages)
         ? object.messages.map((e: any) => MessageToL1.fromJSON(e))
         : [],
+      storageDiffs: globalThis.Array.isArray(object?.storageDiffs)
+        ? object.storageDiffs.map((e: any) => StorageDiff.fromJSON(e))
+        : [],
+      contractChanges: globalThis.Array.isArray(object?.contractChanges)
+        ? object.contractChanges.map((e: any) => ContractChange.fromJSON(e))
+        : [],
+      nonceUpdates: globalThis.Array.isArray(object?.nonceUpdates)
+        ? object.nonceUpdates.map((e: any) => NonceUpdate.fromJSON(e))
+        : [],
     };
   },
 
@@ -761,6 +907,15 @@ export const Block = {
     if (message.messages?.length) {
       obj.messages = message.messages.map((e) => MessageToL1.toJSON(e));
     }
+    if (message.storageDiffs?.length) {
+      obj.storageDiffs = message.storageDiffs.map((e) => StorageDiff.toJSON(e));
+    }
+    if (message.contractChanges?.length) {
+      obj.contractChanges = message.contractChanges.map((e) => ContractChange.toJSON(e));
+    }
+    if (message.nonceUpdates?.length) {
+      obj.nonceUpdates = message.nonceUpdates.map((e) => NonceUpdate.toJSON(e));
+    }
     return obj;
   },
 
@@ -776,6 +931,9 @@ export const Block = {
     message.receipts = object.receipts?.map((e) => TransactionReceipt.fromPartial(e)) || [];
     message.events = object.events?.map((e) => Event.fromPartial(e)) || [];
     message.messages = object.messages?.map((e) => MessageToL1.fromPartial(e)) || [];
+    message.storageDiffs = object.storageDiffs?.map((e) => StorageDiff.fromPartial(e)) || [];
+    message.contractChanges = object.contractChanges?.map((e) => ContractChange.fromPartial(e)) || [];
+    message.nonceUpdates = object.nonceUpdates?.map((e) => NonceUpdate.fromPartial(e)) || [];
     return message;
   },
 };
@@ -5177,6 +5335,692 @@ export const Uint128 = {
     const message = createBaseUint128() as any;
     message.x0 = object.x0 ?? BigInt("0");
     message.x1 = object.x1 ?? BigInt("0");
+    return message;
+  },
+};
+
+function createBaseStorageDiff(): StorageDiff {
+  return { filterIds: [], contractAddress: undefined, storageEntries: [] };
+}
+
+export const StorageDiff = {
+  encode(message: StorageDiff, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.filterIds !== undefined && message.filterIds.length !== 0) {
+      writer.uint32(10).fork();
+      for (const v of message.filterIds) {
+        writer.uint32(v);
+      }
+      writer.ldelim();
+    }
+    if (message.contractAddress !== undefined) {
+      FieldElement.encode(message.contractAddress, writer.uint32(18).fork()).ldelim();
+    }
+    if (message.storageEntries !== undefined && message.storageEntries.length !== 0) {
+      for (const v of message.storageEntries) {
+        StorageEntry.encode(v!, writer.uint32(26).fork()).ldelim();
+      }
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): StorageDiff {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseStorageDiff() as any;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag === 8) {
+            message.filterIds!.push(reader.uint32());
+
+            continue;
+          }
+
+          if (tag === 10) {
+            const end2 = reader.uint32() + reader.pos;
+            while (reader.pos < end2) {
+              message.filterIds!.push(reader.uint32());
+            }
+
+            continue;
+          }
+
+          break;
+        case 2:
+          if (tag !== 18) {
+            break;
+          }
+
+          message.contractAddress = FieldElement.decode(reader, reader.uint32());
+          continue;
+        case 3:
+          if (tag !== 26) {
+            break;
+          }
+
+          message.storageEntries!.push(StorageEntry.decode(reader, reader.uint32()));
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): StorageDiff {
+    return {
+      filterIds: globalThis.Array.isArray(object?.filterIds)
+        ? object.filterIds.map((e: any) => globalThis.Number(e))
+        : [],
+      contractAddress: isSet(object.contractAddress) ? FieldElement.fromJSON(object.contractAddress) : undefined,
+      storageEntries: globalThis.Array.isArray(object?.storageEntries)
+        ? object.storageEntries.map((e: any) => StorageEntry.fromJSON(e))
+        : [],
+    };
+  },
+
+  toJSON(message: StorageDiff): unknown {
+    const obj: any = {};
+    if (message.filterIds?.length) {
+      obj.filterIds = message.filterIds.map((e) => Math.round(e));
+    }
+    if (message.contractAddress !== undefined) {
+      obj.contractAddress = FieldElement.toJSON(message.contractAddress);
+    }
+    if (message.storageEntries?.length) {
+      obj.storageEntries = message.storageEntries.map((e) => StorageEntry.toJSON(e));
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<StorageDiff>): StorageDiff {
+    return StorageDiff.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<StorageDiff>): StorageDiff {
+    const message = createBaseStorageDiff() as any;
+    message.filterIds = object.filterIds?.map((e) => e) || [];
+    message.contractAddress = (object.contractAddress !== undefined && object.contractAddress !== null)
+      ? FieldElement.fromPartial(object.contractAddress)
+      : undefined;
+    message.storageEntries = object.storageEntries?.map((e) => StorageEntry.fromPartial(e)) || [];
+    return message;
+  },
+};
+
+function createBaseStorageEntry(): StorageEntry {
+  return { key: undefined, value: undefined };
+}
+
+export const StorageEntry = {
+  encode(message: StorageEntry, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.key !== undefined) {
+      FieldElement.encode(message.key, writer.uint32(10).fork()).ldelim();
+    }
+    if (message.value !== undefined) {
+      FieldElement.encode(message.value, writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): StorageEntry {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseStorageEntry() as any;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.key = FieldElement.decode(reader, reader.uint32());
+          continue;
+        case 2:
+          if (tag !== 18) {
+            break;
+          }
+
+          message.value = FieldElement.decode(reader, reader.uint32());
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): StorageEntry {
+    return {
+      key: isSet(object.key) ? FieldElement.fromJSON(object.key) : undefined,
+      value: isSet(object.value) ? FieldElement.fromJSON(object.value) : undefined,
+    };
+  },
+
+  toJSON(message: StorageEntry): unknown {
+    const obj: any = {};
+    if (message.key !== undefined) {
+      obj.key = FieldElement.toJSON(message.key);
+    }
+    if (message.value !== undefined) {
+      obj.value = FieldElement.toJSON(message.value);
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<StorageEntry>): StorageEntry {
+    return StorageEntry.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<StorageEntry>): StorageEntry {
+    const message = createBaseStorageEntry() as any;
+    message.key = (object.key !== undefined && object.key !== null) ? FieldElement.fromPartial(object.key) : undefined;
+    message.value = (object.value !== undefined && object.value !== null)
+      ? FieldElement.fromPartial(object.value)
+      : undefined;
+    return message;
+  },
+};
+
+function createBaseContractChange(): ContractChange {
+  return { filterIds: [], change: undefined };
+}
+
+export const ContractChange = {
+  encode(message: ContractChange, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.filterIds !== undefined && message.filterIds.length !== 0) {
+      writer.uint32(10).fork();
+      for (const v of message.filterIds) {
+        writer.uint32(v);
+      }
+      writer.ldelim();
+    }
+    switch (message.change?.$case) {
+      case "declaredClass":
+        DeclaredClass.encode(message.change.declaredClass, writer.uint32(18).fork()).ldelim();
+        break;
+      case "replacedClass":
+        ReplacedClass.encode(message.change.replacedClass, writer.uint32(26).fork()).ldelim();
+        break;
+      case "deployedContract":
+        DeployedContract.encode(message.change.deployedContract, writer.uint32(34).fork()).ldelim();
+        break;
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): ContractChange {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseContractChange() as any;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag === 8) {
+            message.filterIds!.push(reader.uint32());
+
+            continue;
+          }
+
+          if (tag === 10) {
+            const end2 = reader.uint32() + reader.pos;
+            while (reader.pos < end2) {
+              message.filterIds!.push(reader.uint32());
+            }
+
+            continue;
+          }
+
+          break;
+        case 2:
+          if (tag !== 18) {
+            break;
+          }
+
+          message.change = { $case: "declaredClass", declaredClass: DeclaredClass.decode(reader, reader.uint32()) };
+          continue;
+        case 3:
+          if (tag !== 26) {
+            break;
+          }
+
+          message.change = { $case: "replacedClass", replacedClass: ReplacedClass.decode(reader, reader.uint32()) };
+          continue;
+        case 4:
+          if (tag !== 34) {
+            break;
+          }
+
+          message.change = {
+            $case: "deployedContract",
+            deployedContract: DeployedContract.decode(reader, reader.uint32()),
+          };
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): ContractChange {
+    return {
+      filterIds: globalThis.Array.isArray(object?.filterIds)
+        ? object.filterIds.map((e: any) => globalThis.Number(e))
+        : [],
+      change: isSet(object.declaredClass)
+        ? { $case: "declaredClass", declaredClass: DeclaredClass.fromJSON(object.declaredClass) }
+        : isSet(object.replacedClass)
+        ? { $case: "replacedClass", replacedClass: ReplacedClass.fromJSON(object.replacedClass) }
+        : isSet(object.deployedContract)
+        ? { $case: "deployedContract", deployedContract: DeployedContract.fromJSON(object.deployedContract) }
+        : undefined,
+    };
+  },
+
+  toJSON(message: ContractChange): unknown {
+    const obj: any = {};
+    if (message.filterIds?.length) {
+      obj.filterIds = message.filterIds.map((e) => Math.round(e));
+    }
+    if (message.change?.$case === "declaredClass") {
+      obj.declaredClass = DeclaredClass.toJSON(message.change.declaredClass);
+    }
+    if (message.change?.$case === "replacedClass") {
+      obj.replacedClass = ReplacedClass.toJSON(message.change.replacedClass);
+    }
+    if (message.change?.$case === "deployedContract") {
+      obj.deployedContract = DeployedContract.toJSON(message.change.deployedContract);
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<ContractChange>): ContractChange {
+    return ContractChange.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<ContractChange>): ContractChange {
+    const message = createBaseContractChange() as any;
+    message.filterIds = object.filterIds?.map((e) => e) || [];
+    if (
+      object.change?.$case === "declaredClass" &&
+      object.change?.declaredClass !== undefined &&
+      object.change?.declaredClass !== null
+    ) {
+      message.change = {
+        $case: "declaredClass",
+        declaredClass: DeclaredClass.fromPartial(object.change.declaredClass),
+      };
+    }
+    if (
+      object.change?.$case === "replacedClass" &&
+      object.change?.replacedClass !== undefined &&
+      object.change?.replacedClass !== null
+    ) {
+      message.change = {
+        $case: "replacedClass",
+        replacedClass: ReplacedClass.fromPartial(object.change.replacedClass),
+      };
+    }
+    if (
+      object.change?.$case === "deployedContract" &&
+      object.change?.deployedContract !== undefined &&
+      object.change?.deployedContract !== null
+    ) {
+      message.change = {
+        $case: "deployedContract",
+        deployedContract: DeployedContract.fromPartial(object.change.deployedContract),
+      };
+    }
+    return message;
+  },
+};
+
+function createBaseDeclaredClass(): DeclaredClass {
+  return { classHash: undefined, compiledClassHash: undefined };
+}
+
+export const DeclaredClass = {
+  encode(message: DeclaredClass, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.classHash !== undefined) {
+      FieldElement.encode(message.classHash, writer.uint32(10).fork()).ldelim();
+    }
+    if (message.compiledClassHash !== undefined) {
+      FieldElement.encode(message.compiledClassHash, writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): DeclaredClass {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseDeclaredClass() as any;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.classHash = FieldElement.decode(reader, reader.uint32());
+          continue;
+        case 2:
+          if (tag !== 18) {
+            break;
+          }
+
+          message.compiledClassHash = FieldElement.decode(reader, reader.uint32());
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): DeclaredClass {
+    return {
+      classHash: isSet(object.classHash) ? FieldElement.fromJSON(object.classHash) : undefined,
+      compiledClassHash: isSet(object.compiledClassHash) ? FieldElement.fromJSON(object.compiledClassHash) : undefined,
+    };
+  },
+
+  toJSON(message: DeclaredClass): unknown {
+    const obj: any = {};
+    if (message.classHash !== undefined) {
+      obj.classHash = FieldElement.toJSON(message.classHash);
+    }
+    if (message.compiledClassHash !== undefined) {
+      obj.compiledClassHash = FieldElement.toJSON(message.compiledClassHash);
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<DeclaredClass>): DeclaredClass {
+    return DeclaredClass.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<DeclaredClass>): DeclaredClass {
+    const message = createBaseDeclaredClass() as any;
+    message.classHash = (object.classHash !== undefined && object.classHash !== null)
+      ? FieldElement.fromPartial(object.classHash)
+      : undefined;
+    message.compiledClassHash = (object.compiledClassHash !== undefined && object.compiledClassHash !== null)
+      ? FieldElement.fromPartial(object.compiledClassHash)
+      : undefined;
+    return message;
+  },
+};
+
+function createBaseReplacedClass(): ReplacedClass {
+  return { contractAddress: undefined, classHash: undefined };
+}
+
+export const ReplacedClass = {
+  encode(message: ReplacedClass, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.contractAddress !== undefined) {
+      FieldElement.encode(message.contractAddress, writer.uint32(10).fork()).ldelim();
+    }
+    if (message.classHash !== undefined) {
+      FieldElement.encode(message.classHash, writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): ReplacedClass {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseReplacedClass() as any;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.contractAddress = FieldElement.decode(reader, reader.uint32());
+          continue;
+        case 2:
+          if (tag !== 18) {
+            break;
+          }
+
+          message.classHash = FieldElement.decode(reader, reader.uint32());
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): ReplacedClass {
+    return {
+      contractAddress: isSet(object.contractAddress) ? FieldElement.fromJSON(object.contractAddress) : undefined,
+      classHash: isSet(object.classHash) ? FieldElement.fromJSON(object.classHash) : undefined,
+    };
+  },
+
+  toJSON(message: ReplacedClass): unknown {
+    const obj: any = {};
+    if (message.contractAddress !== undefined) {
+      obj.contractAddress = FieldElement.toJSON(message.contractAddress);
+    }
+    if (message.classHash !== undefined) {
+      obj.classHash = FieldElement.toJSON(message.classHash);
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<ReplacedClass>): ReplacedClass {
+    return ReplacedClass.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<ReplacedClass>): ReplacedClass {
+    const message = createBaseReplacedClass() as any;
+    message.contractAddress = (object.contractAddress !== undefined && object.contractAddress !== null)
+      ? FieldElement.fromPartial(object.contractAddress)
+      : undefined;
+    message.classHash = (object.classHash !== undefined && object.classHash !== null)
+      ? FieldElement.fromPartial(object.classHash)
+      : undefined;
+    return message;
+  },
+};
+
+function createBaseDeployedContract(): DeployedContract {
+  return { contractAddress: undefined, classHash: undefined };
+}
+
+export const DeployedContract = {
+  encode(message: DeployedContract, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.contractAddress !== undefined) {
+      FieldElement.encode(message.contractAddress, writer.uint32(10).fork()).ldelim();
+    }
+    if (message.classHash !== undefined) {
+      FieldElement.encode(message.classHash, writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): DeployedContract {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseDeployedContract() as any;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.contractAddress = FieldElement.decode(reader, reader.uint32());
+          continue;
+        case 2:
+          if (tag !== 18) {
+            break;
+          }
+
+          message.classHash = FieldElement.decode(reader, reader.uint32());
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): DeployedContract {
+    return {
+      contractAddress: isSet(object.contractAddress) ? FieldElement.fromJSON(object.contractAddress) : undefined,
+      classHash: isSet(object.classHash) ? FieldElement.fromJSON(object.classHash) : undefined,
+    };
+  },
+
+  toJSON(message: DeployedContract): unknown {
+    const obj: any = {};
+    if (message.contractAddress !== undefined) {
+      obj.contractAddress = FieldElement.toJSON(message.contractAddress);
+    }
+    if (message.classHash !== undefined) {
+      obj.classHash = FieldElement.toJSON(message.classHash);
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<DeployedContract>): DeployedContract {
+    return DeployedContract.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<DeployedContract>): DeployedContract {
+    const message = createBaseDeployedContract() as any;
+    message.contractAddress = (object.contractAddress !== undefined && object.contractAddress !== null)
+      ? FieldElement.fromPartial(object.contractAddress)
+      : undefined;
+    message.classHash = (object.classHash !== undefined && object.classHash !== null)
+      ? FieldElement.fromPartial(object.classHash)
+      : undefined;
+    return message;
+  },
+};
+
+function createBaseNonceUpdate(): NonceUpdate {
+  return { filterIds: [], contractAddress: undefined, nonce: undefined };
+}
+
+export const NonceUpdate = {
+  encode(message: NonceUpdate, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.filterIds !== undefined && message.filterIds.length !== 0) {
+      writer.uint32(10).fork();
+      for (const v of message.filterIds) {
+        writer.uint32(v);
+      }
+      writer.ldelim();
+    }
+    if (message.contractAddress !== undefined) {
+      FieldElement.encode(message.contractAddress, writer.uint32(18).fork()).ldelim();
+    }
+    if (message.nonce !== undefined) {
+      FieldElement.encode(message.nonce, writer.uint32(26).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): NonceUpdate {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseNonceUpdate() as any;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag === 8) {
+            message.filterIds!.push(reader.uint32());
+
+            continue;
+          }
+
+          if (tag === 10) {
+            const end2 = reader.uint32() + reader.pos;
+            while (reader.pos < end2) {
+              message.filterIds!.push(reader.uint32());
+            }
+
+            continue;
+          }
+
+          break;
+        case 2:
+          if (tag !== 18) {
+            break;
+          }
+
+          message.contractAddress = FieldElement.decode(reader, reader.uint32());
+          continue;
+        case 3:
+          if (tag !== 26) {
+            break;
+          }
+
+          message.nonce = FieldElement.decode(reader, reader.uint32());
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): NonceUpdate {
+    return {
+      filterIds: globalThis.Array.isArray(object?.filterIds)
+        ? object.filterIds.map((e: any) => globalThis.Number(e))
+        : [],
+      contractAddress: isSet(object.contractAddress) ? FieldElement.fromJSON(object.contractAddress) : undefined,
+      nonce: isSet(object.nonce) ? FieldElement.fromJSON(object.nonce) : undefined,
+    };
+  },
+
+  toJSON(message: NonceUpdate): unknown {
+    const obj: any = {};
+    if (message.filterIds?.length) {
+      obj.filterIds = message.filterIds.map((e) => Math.round(e));
+    }
+    if (message.contractAddress !== undefined) {
+      obj.contractAddress = FieldElement.toJSON(message.contractAddress);
+    }
+    if (message.nonce !== undefined) {
+      obj.nonce = FieldElement.toJSON(message.nonce);
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<NonceUpdate>): NonceUpdate {
+    return NonceUpdate.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<NonceUpdate>): NonceUpdate {
+    const message = createBaseNonceUpdate() as any;
+    message.filterIds = object.filterIds?.map((e) => e) || [];
+    message.contractAddress = (object.contractAddress !== undefined && object.contractAddress !== null)
+      ? FieldElement.fromPartial(object.contractAddress)
+      : undefined;
+    message.nonce = (object.nonce !== undefined && object.nonce !== null)
+      ? FieldElement.fromPartial(object.nonce)
+      : undefined;
     return message;
   },
 };

@@ -7,9 +7,41 @@ import * as proto from "./proto";
 const OptionalArray = <TSchema extends Schema.Schema.Any>(schema: TSchema) =>
   Schema.optional(Schema.Array(schema));
 
-export const HeaderFilter = Schema.Struct({
-  always: Schema.optional(Schema.Boolean),
-});
+/** Header options.
+ *
+ * - `always`: receive all block headers.
+ * - `on_data`: receive headers only if any other filter matches.
+ * - `on_data_or_on_new_block`: receive headers only if any other filter matches and for "live" blocks.
+ */
+export const HeaderFilter = Schema.transform(
+  Schema.Enums(proto.filter.HeaderFilter),
+  Schema.Literal("always", "on_data", "on_data_or_on_new_block", "unknown"),
+  {
+    decode(value) {
+      const enumMap = {
+        [proto.filter.HeaderFilter.ALWAYS]: "always",
+        [proto.filter.HeaderFilter.ON_DATA]: "on_data",
+        [proto.filter.HeaderFilter.ON_DATA_OR_ON_NEW_BLOCK]:
+          "on_data_or_on_new_block",
+        [proto.filter.HeaderFilter.UNSPECIFIED]: "unknown",
+        [proto.filter.HeaderFilter.UNRECOGNIZED]: "unknown",
+      } as const;
+      return enumMap[value] ?? "unknown";
+    },
+    encode(value) {
+      switch (value) {
+        case "always":
+          return proto.filter.HeaderFilter.ALWAYS;
+        case "on_data":
+          return proto.filter.HeaderFilter.ON_DATA;
+        case "on_data_or_on_new_block":
+          return proto.filter.HeaderFilter.ON_DATA_OR_ON_NEW_BLOCK;
+        default:
+          return proto.filter.HeaderFilter.UNSPECIFIED;
+      }
+    },
+  },
+);
 
 export type HeaderFilter = typeof HeaderFilter.Type;
 
@@ -144,7 +176,14 @@ function mergeHeaderFilter(
   if (b === undefined) {
     return a;
   }
-  return {
-    always: a.always || b.always,
-  };
+
+  if (a === "always" || b === "always") {
+    return "always";
+  }
+
+  if (a === "on_data_or_on_new_block" || b === "on_data_or_on_new_block") {
+    return "on_data_or_on_new_block";
+  }
+
+  return "on_data";
 }

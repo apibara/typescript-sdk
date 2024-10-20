@@ -54,30 +54,34 @@ const command = defineCommand({
     console.log(response);
 
     const filter = Filter.make({
-      messages: [
-        {
-          fromAddress:
-            "0x074761a8d48ce002963002becc6d9c3dd8a2a05b1075d55e5967f42296f16bd0",
-        },
-      ],
-      transactions: [
-        {
-          transactionStatus: "all",
-        },
-      ],
-      events: [
-        {
-          address:
-            "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
-        },
-      ],
+      storageDiffs: [{}],
+      contractChanges: [{}],
+      nonceUpdates: [{}],
+      // header: "on_data_or_on_new_block",
+      // messages: [
+      //   {
+      //     fromAddress:
+      //       "0x074761a8d48ce002963002becc6d9c3dd8a2a05b1075d55e5967f42296f16bd0",
+      //   },
+      // ],
+      // transactions: [
+      //   {
+      //     transactionStatus: "all",
+      //   },
+      // ],
+      // events: [
+      //   {
+      //     address:
+      //       "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+      //   },
+      // ],
     });
 
     const request = StarknetStream.Request.make({
       filter: [filter],
       finality: "accepted",
       startingCursor: {
-        orderKey: 700_000n,
+        orderKey: 800_000n,
       },
     });
 
@@ -97,6 +101,11 @@ const command = defineCommand({
             consola.info(`   Messages: ${block.messages.length}`);
             consola.info(`   Transactions: ${block.transactions.length}`);
             consola.info(`   Receipts: ${block.receipts.length}`);
+            consola.info(`   Storage Diffs: ${block.storageDiffs.length}`);
+            consola.info(
+              `   Contract Changes: ${block.contractChanges.length}`,
+            );
+            consola.info(`   Nonce Updates: ${block.nonceUpdates.length}`);
 
             if (args.headers) {
               consola.log(block.header);

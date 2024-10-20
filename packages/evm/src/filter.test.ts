@@ -87,23 +87,19 @@ describe("LogFilter", () => {
 
 describe("mergeFilter", () => {
   it("returns header.always if any has it", () => {
-    const fa = mergeFilter({}, { header: { always: true } });
+    const fa = mergeFilter({}, { header: "always" });
     expect(fa).toMatchInlineSnapshot(`
       {
-        "header": {
-          "always": true,
-        },
+        "header": "always",
         "logs": [],
         "transactions": [],
         "withdrawals": [],
       }
     `);
-    const fb = mergeFilter({ header: { always: true } }, {});
+    const fb = mergeFilter({ header: "always" }, {});
     expect(fb).toMatchInlineSnapshot(`
       {
-        "header": {
-          "always": true,
-        },
+        "header": "always",
         "logs": [],
         "transactions": [],
         "withdrawals": [],

@@ -6,11 +6,39 @@ import * as proto from "./proto";
 
 /** Header options.
  *
- * Change `always` to `true` to receive headers even if no other data matches.
+ * - `always`: receive all block headers.
+ * - `on_data`: receive headers only if any other filter matches.
+ * - `on_data_or_on_new_block`: receive headers only if any other filter matches and for "live" blocks.
  */
-export const HeaderFilter = Schema.Struct({
-  always: Schema.optional(Schema.Boolean),
-});
+export const HeaderFilter = Schema.transform(
+  Schema.Enums(proto.filter.HeaderFilter),
+  Schema.Literal("always", "on_data", "on_data_or_on_new_block", "unknown"),
+  {
+    decode(value) {
+      const enumMap = {
+        [proto.filter.HeaderFilter.ALWAYS]: "always",
+        [proto.filter.HeaderFilter.ON_DATA]: "on_data",
+        [proto.filter.HeaderFilter.ON_DATA_OR_ON_NEW_BLOCK]:
+          "on_data_or_on_new_block",
+        [proto.filter.HeaderFilter.UNSPECIFIED]: "unknown",
+        [proto.filter.HeaderFilter.UNRECOGNIZED]: "unknown",
+      } as const;
+      return enumMap[value] ?? "unknown";
+    },
+    encode(value) {
+      switch (value) {
+        case "always":
+          return proto.filter.HeaderFilter.ALWAYS;
+        case "on_data":
+          return proto.filter.HeaderFilter.ON_DATA;
+        case "on_data_or_on_new_block":
+          return proto.filter.HeaderFilter.ON_DATA_OR_ON_NEW_BLOCK;
+        default:
+          return proto.filter.HeaderFilter.UNSPECIFIED;
+      }
+    },
+  },
+);
 
 export type HeaderFilter = typeof HeaderFilter.Type;
 
@@ -202,11 +230,68 @@ export const TransactionFilter = Schema.Struct({
 
 export type TransactionFilter = typeof TransactionFilter.Type;
 
+/** Filter storage diffs.
+ *
+ *  @prop contractAddress Filter by contract address.
+ */
+export const StorageDiffFilter = Schema.Struct({
+  id: Schema.optional(Schema.Number),
+  contractAddress: Schema.optional(FieldElement),
+});
+
+export type StorageDiffFilter = typeof StorageDiffFilter.Type;
+
+/** Filter declared classes. */
+export const DeclaredClassFilter = Schema.Struct({
+  _tag: tag("declaredClass"),
+  declaredClass: Schema.Struct({}),
+});
+
+export type DeclaredClassFilter = typeof DeclaredClassFilter.Type;
+
+export const ReplacedClassFilter = Schema.Struct({
+  _tag: tag("replacedClass"),
+  replacedClass: Schema.Struct({}),
+});
+
+export type ReplacedClassFilter = typeof ReplacedClassFilter.Type;
+
+export const DeployedContractFilter = Schema.Struct({
+  _tag: tag("deployedContract"),
+  deployedContract: Schema.Struct({}),
+});
+
+export type DeployedContractFilter = typeof DeployedContractFilter.Type;
+
+/** Filter contract changes. */
+export const ContractChangeFilter = Schema.Struct({
+  id: Schema.optional(Schema.Number),
+  change: Schema.optional(
+    Schema.Union(
+      DeclaredClassFilter,
+      ReplacedClassFilter,
+      DeployedContractFilter,
+    ),
+  ),
+});
+
+/** Filter updates to nonces.
+ *
+ * @prop contractAddress Filter by contract address.
+ */
+export const NonceUpdateFilter = Schema.Struct({
+  id: Schema.optional(Schema.Number),
+  contractAddress: Schema.optional(FieldElement),
+});
+
 export const Filter = Schema.Struct({
   header: Schema.optional(HeaderFilter),
   transactions: Schema.optional(Schema.Array(TransactionFilter)),
   events: Schema.optional(Schema.Array(EventFilter)),
   messages: Schema.optional(Schema.Array(MessageToL1Filter)),
+  storageDiffs: Schema.optional(Schema.Array(StorageDiffFilter)),
+  contractChanges: Schema.optional(Schema.Array(ContractChangeFilter)),
+  nonceUpdates: Schema.optional(Schema.Array(NonceUpdateFilter)),
 });
 
 export type Filter = typeof Filter.Type;
@@ -238,6 +323,12 @@ export function mergeFilter(a: Filter, b: Filter): Filter {
     transactions: [...(a.transactions ?? []), ...(b.transactions ?? [])],
     events: [...(a.events ?? []), ...(b.events ?? [])],
     messages: [...(a.messages ?? []), ...(b.messages ?? [])],
+    storageDiffs: [...(a.storageDiffs ?? []), ...(b.storageDiffs ?? [])],
+    contractChanges: [
+      ...(a.contractChanges ?? []),
+      ...(b.contractChanges ?? []),
+    ],
+    nonceUpdates: [...(a.nonceUpdates ?? []), ...(b.nonceUpdates ?? [])],
   };
 }
 
@@ -251,7 +342,14 @@ function mergeHeaderFilter(
   if (b === undefined) {
     return a;
   }
-  return {
-    always: a.always || b.always,
-  };
+
+  if (a === "always" || b === "always") {
+    return "always";
+  }
+
+  if (a === "on_data_or_on_new_block" || b === "on_data_or_on_new_block") {
+    return "on_data_or_on_new_block";
+  }
+
+  return "on_data";
 }
