@@ -2,6 +2,21 @@
   "name": "@apibara/protocol",
   "entries": [
     {
+      "date": "Mon, 21 Oct 2024 15:53:51 GMT",
+      "version": "2.0.0-beta.10",
+      "tag": "@apibara/protocol_v2.0.0-beta.10",
+      "comments": {
+        "prerelease": [
+          {
+            "author": "francesco@ceccon.me",
+            "package": "@apibara/protocol",
+            "commit": "76de56966594318b0afa28c40b8c61112cdd8df5",
+            "comment": "protocol: make client options configurable"
+          }
+        ]
+      }
+    },
+    {
       "date": "Sun, 20 Oct 2024 18:49:49 GMT",
       "version": "2.0.0-beta.8",
       "tag": "@apibara/protocol_v2.0.0-beta.8",

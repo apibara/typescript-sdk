@@ -1,8 +1,16 @@
 # Change Log - @apibara/protocol
 
-<!-- This log was last generated on Sun, 20 Oct 2024 18:49:49 GMT and should not be manually modified. -->
+<!-- This log was last generated on Mon, 21 Oct 2024 15:53:51 GMT and should not be manually modified. -->
 
 <!-- Start content -->
+
+## 2.0.0-beta.10
+
+Mon, 21 Oct 2024 15:53:51 GMT
+
+### Changes
+
+- protocol: make client options configurable (francesco@ceccon.me)
 
 ## 2.0.0-beta.8
 
