@@ -1,5 +1,7 @@
 import { Schema } from "@effect/schema";
 import {
+  type ChannelCredentials,
+  type ChannelOptions,
   type DefaultCallOptions,
   type NormalizedServiceDefinition,
   createChannel,
@@ -44,20 +46,32 @@ export interface Client<TFilter, TBlock> {
   ): AsyncIterable<StreamDataResponse<TBlock>>;
 }
 
+export type CreateClientOptions = {
+  defaultCallOptions?: DefaultCallOptions<
+    NormalizedServiceDefinition<proto.stream.DnaStreamDefinition>
+  >;
+  credentials?: ChannelCredentials;
+  channelOptions?: ChannelOptions;
+};
+
 /** Create a client connecting to the DNA grpc service. */
 export function createClient<TFilter, TBlock>(
   config: StreamConfig<TFilter, TBlock>,
   streamUrl: string,
-  defaultCallOptions?: DefaultCallOptions<
-    NormalizedServiceDefinition<proto.stream.DnaStreamDefinition>
-  >,
+  options: CreateClientOptions = {},
 ) {
-  const channel = createChannel(streamUrl);
+  const channel = createChannel(
+    streamUrl,
+    options?.credentials,
+    options?.channelOptions,
+  );
+
   const client: proto.stream.DnaStreamClient = grpcCreateClient(
     proto.stream.DnaStreamDefinition,
     channel,
-    defaultCallOptions,
+    options?.defaultCallOptions,
   );
+
   return new GrpcClient(config, client);
 }
 

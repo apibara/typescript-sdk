@@ -1,0 +1,7 @@
+{
+  "type": "prerelease",
+  "comment": "protocol: make client options configurable",
+  "packageName": "@apibara/protocol",
+  "email": "francesco@ceccon.me",
+  "dependentChangeType": "patch"
+}
