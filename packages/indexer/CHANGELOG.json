@@ -2,6 +2,21 @@
   "name": "@apibara/indexer",
   "entries": [
     {
+      "date": "Tue, 22 Oct 2024 11:17:30 GMT",
+      "version": "2.0.0-beta.11",
+      "tag": "@apibara/indexer_v2.0.0-beta.11",
+      "comments": {
+        "prerelease": [
+          {
+            "author": "jadejajaipal5@gmail.com",
+            "package": "@apibara/indexer",
+            "commit": "8fe1292ba47c6b8139c95aee483d1df0954833fa",
+            "comment": "indexer: fix conditions in getDrizzleCursor"
+          }
+        ]
+      }
+    },
+    {
       "date": "Sun, 20 Oct 2024 20:29:23 GMT",
       "version": "2.0.0-beta.9",
       "tag": "@apibara/indexer_v2.0.0-beta.9",

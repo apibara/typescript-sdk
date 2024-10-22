@@ -1,8 +1,16 @@
 # Change Log - @apibara/indexer
 
-<!-- This log was last generated on Sun, 20 Oct 2024 20:29:23 GMT and should not be manually modified. -->
+<!-- This log was last generated on Tue, 22 Oct 2024 11:17:30 GMT and should not be manually modified. -->
 
 <!-- Start content -->
+
+## 2.0.0-beta.11
+
+Tue, 22 Oct 2024 11:17:30 GMT
+
+### Changes
+
+- indexer: fix conditions in getDrizzleCursor (jadejajaipal5@gmail.com)
 
 ## 2.0.0-beta.9
 
