@@ -9,16 +9,13 @@ import { drizzle } from "drizzle-orm/node-postgres";
 import { serial, text } from "drizzle-orm/pg-core";
 import { Client } from "pg";
 import { beforeAll, beforeEach, describe, expect, it } from "vitest";
-import {
-  type Int8Range,
-  drizzle as drizzleSink,
-  getDrizzleCursor,
-  pgTable,
-} from ".";
 import { useSink } from "../../hooks";
 import { run } from "../../indexer";
 import { generateMockMessages } from "../../testing";
 import { getMockIndexer } from "../../testing/indexer";
+import type { Int8Range } from "./Int8Range";
+import { drizzle as drizzleSink } from "./drizzle";
+import { getDrizzleCursor, pgTable } from "./utils";
 
 const testTable = pgTable("test_table", {
   id: serial("id").primaryKey(),
