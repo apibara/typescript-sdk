@@ -83,10 +83,10 @@ export const getDrizzleCursor = (
   const isArray = Array.isArray(cursor_range);
   const [lower, upper] = isArray ? cursor_range : [cursor_range, undefined];
   let isNoUpperBound = false;
-  if (!lower) {
+  if (lower === undefined) {
     throw new Error("Lower bound cursor is required");
   }
-  if (!upper) {
+  if (upper === undefined) {
     isNoUpperBound = true;
   }
   return new Int8Range(
