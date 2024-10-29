@@ -29,7 +29,7 @@ export type CursorColumnBuilder = NotNull<
 >;
 
 // Redefining the type of `pgTable` to include the `_cursor` column.
-export type PgTableWithCursorFn<
+export type PgIndexerTableWithCursorFn<
   TSchema extends string | undefined = undefined,
 > = <
   TTableName extends string,
@@ -66,7 +66,11 @@ export type PgInsertValue<TTable extends PgTable> = Omit<
   "_cursor"
 >;
 
-export const pgTable: PgTableWithCursorFn = (name, columns, extraConfig?) => {
+export const pgIndexerTable: PgIndexerTableWithCursorFn = (
+  name,
+  columns,
+  extraConfig?,
+) => {
   return drizzlePgTable(
     name,
     {

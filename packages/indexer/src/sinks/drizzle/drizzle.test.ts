@@ -15,9 +15,9 @@ import { generateMockMessages } from "../../testing";
 import { getMockIndexer } from "../../testing/indexer";
 import type { Int8Range } from "./Int8Range";
 import { drizzle as drizzleSink } from "./drizzle";
-import { getDrizzleCursor, pgTable } from "./utils";
+import { getDrizzleCursor, pgIndexerTable } from "./utils";
 
-const testTable = pgTable("test_table", {
+const testTable = pgIndexerTable("test_table", {
   id: serial("id").primaryKey(),
   data: text("data"),
 });
