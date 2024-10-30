@@ -1,7 +1,7 @@
 import { defineIndexer, useSink } from "@apibara/indexer";
 import {
   drizzle as drizzleSink,
-  pgTable,
+  pgIndexerTable,
 } from "@apibara/indexer/sinks/drizzle";
 import { StarknetStream } from "@apibara/starknet";
 import consola from "consola";
@@ -9,7 +9,7 @@ import { bigint } from "drizzle-orm/pg-core";
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
 
-const headers = pgTable("headers", {
+const headers = pgIndexerTable("headers", {
   number: bigint("number", { mode: "bigint" }),
 });
 
