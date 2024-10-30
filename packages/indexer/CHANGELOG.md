@@ -1,8 +1,16 @@
 # Change Log - @apibara/indexer
 
-<!-- This log was last generated on Tue, 22 Oct 2024 11:17:30 GMT and should not be manually modified. -->
+<!-- This log was last generated on Wed, 30 Oct 2024 08:19:34 GMT and should not be manually modified. -->
 
 <!-- Start content -->
+
+## 2.0.0-beta.12
+
+Wed, 30 Oct 2024 08:19:34 GMT
+
+### Changes
+
+- indexer: rename pgTable to pgIndexerTable (francesco@ceccon.me)
 
 ## 2.0.0-beta.11
 

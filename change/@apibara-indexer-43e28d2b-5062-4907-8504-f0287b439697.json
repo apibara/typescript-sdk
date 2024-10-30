@@ -1,7 +1,0 @@
-{
-  "type": "prerelease",
-  "comment": "indexer: rename pgTable to pgIndexerTable",
-  "packageName": "@apibara/indexer",
-  "email": "francesco@ceccon.me",
-  "dependentChangeType": "patch"
-}
