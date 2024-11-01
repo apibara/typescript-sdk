@@ -27,10 +27,5 @@ export default function indexer(runtimeConfig: ApibaraRuntimeConfig) {
         `Got block ${header?.blockNumber} with ${events.length} events`,
       );
     },
-    hooks: {
-      "handler:after": ({ endCursor }) => {
-        consola.info("Handler After ", endCursor?.orderKey);
-      },
-    },
   });
 }

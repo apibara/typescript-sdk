@@ -3,6 +3,8 @@ import { createIndexer as _createIndexer } from "@apibara/indexer";
 import { config } from "#apibara-internal-virtual/config";
 import { indexers } from "#apibara-internal-virtual/indexers";
 
+export const availableIndexers = indexers.map((i) => i.name);
+
 export function createIndexer(indexerName: string, preset?: string) {
   let runtimeConfig: Record<string, unknown> = { ...config.runtimeConfig };
 

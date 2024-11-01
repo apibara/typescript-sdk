@@ -1,16 +1,14 @@
 import { type ChildProcess, spawn } from "node:child_process";
 import { build, createApibara, prepare, writeTypes } from "apibara/core";
+import { runtimeDir } from "apibara/runtime/meta";
 import type { Apibara } from "apibara/types";
 import { defineCommand } from "citty";
-import consola from "consola";
-import { resolve } from "pathe";
+import { join, resolve } from "pathe";
 import { commonArgs } from "../common";
 
 // Hot module reloading key regex
 // for only runtimeConfig.* keys
 const hmrKeyRe = /^runtimeConfig\./;
-
-let childProcess: ChildProcess | undefined;
 
 export default defineCommand({
   meta: {
@@ -33,18 +31,21 @@ export default defineCommand({
     },
   },
   async run({ args }) {
-    consola.start("Starting dev server");
     const rootDir = resolve((args.dir || args._dir || ".") as string);
+
     let apibara: Apibara;
+    let childProcess: ChildProcess | undefined;
 
     const reload = async () => {
       if (apibara) {
-        consola.info("Restarting dev server");
+        apibara.logger.info("Restarting dev server");
         if ("unwatch" in apibara.options._c12) {
           await apibara.options._c12.unwatch();
         }
+
         await apibara.close();
       }
+
       apibara = await createApibara(
         {
           rootDir,
@@ -59,10 +60,11 @@ export default defineCommand({
                 return; // No changes
               }
 
-              consola.info(
-                `Nitro config updated:
+              apibara.logger.info(
+                `Config updated:
                   ${diff.map((entry) => `  ${entry.toString()}`).join("\n")}`,
               );
+
               await (diff.every((e) => hmrKeyRe.test(e.key))
                 ? apibara.updateConfig(newConfig.config || {}) // Hot reload
                 : reload()); // Full reload
@@ -71,7 +73,10 @@ export default defineCommand({
         },
         true,
       );
+
       apibara.hooks.hookOnce("restart", reload);
+
+      apibara.options.entry = join(runtimeDir, "dev.mjs");
 
       await prepare(apibara);
       await writeTypes(apibara);
@@ -79,15 +84,16 @@ export default defineCommand({
 
       apibara.hooks.hook("dev:reload", () => {
         if (childProcess) {
-          consola.start("Restarting indexers");
+          apibara.logger.start("Restarting indexers");
           childProcess.kill();
         } else {
-          consola.success("Dev server started");
-          consola.success("Starting indexers");
+          apibara.logger.success("Dev server started");
+          apibara.logger.success("Starting indexers");
         }
 
         const childArgs = [
-          resolve(apibara.options.outputDir || "./.apibara/build", "main.mjs"),
+          resolve(apibara.options.outputDir || "./.apibara/build", "dev.mjs"),
+          "start",
           ...(args.indexers ? ["--indexers", args.indexers] : []),
           ...(args.preset ? ["--preset", args.preset] : []),
           ...(args.sink ? ["--sink", args.sink] : []),
@@ -99,7 +105,7 @@ export default defineCommand({
 
         childProcess.on("close", (code) => {
           if (code !== null) {
-            consola.log(`Indexers process exited with code ${code}`);
+            apibara.logger.log(`Indexers process exited with code ${code}`);
           }
         });
       });
