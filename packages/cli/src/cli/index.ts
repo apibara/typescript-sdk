@@ -9,6 +9,7 @@ export const mainCli = defineCommand({
   subCommands: {
     dev: () => import("./commands/dev").then((r) => r.default),
     build: () => import("./commands/build").then((r) => r.default),
+    start: () => import("./commands/start").then((r) => r.default),
     prepare: () => import("./commands/prepare").then((r) => r.default),
   },
 });
