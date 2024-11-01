@@ -1,12 +1,12 @@
 import fsp from "node:fs/promises";
 import type { Apibara } from "apibara/types";
-import consola from "consola";
 import defu from "defu";
 import { dirname, isAbsolute, join, relative, resolve } from "pathe";
 import type { TSConfig } from "pkg-types";
 import { type JSValue, generateTypes, resolveSchema } from "untyped";
 
 export async function writeTypes(apibara: Apibara) {
+  apibara.logger.start("Preparing Types");
   const typesDir = resolve(apibara.options.buildDir, "types");
 
   const config = [
@@ -131,7 +131,7 @@ declare module "apibara/types" {`,
     }),
   );
 
-  consola.success("Types generated");
+  apibara.logger.success("Types generated");
 }
 
 const RELATIVE_RE = /^\.{1,2}\//;

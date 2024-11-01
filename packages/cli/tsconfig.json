@@ -13,8 +13,8 @@
       "apibara/rollup": ["./src/rollup"],
       "apibara/types": ["./src/types"],
       "apibara/hooks": ["./src/hooks"],
-      "apibara/internal/consola": ["./src/internal/consola"],
-      "apibara/internal/citty": ["./src/internal/citty"]
+      "apibara/runtime/meta": ["./runtime-meta"],
+      "#apibara-internal-virtual/*": ["./src/types/virtual/*"]
     }
   },
   "include": ["src/"]

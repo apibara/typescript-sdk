@@ -1,7 +1,7 @@
 import { build, createApibara, prepare, writeTypes } from "apibara/core";
+import { runtimeDir } from "apibara/runtime/meta";
 import { defineCommand } from "citty";
-import consola from "consola";
-import { resolve } from "pathe";
+import { join, resolve } from "pathe";
 import { commonArgs } from "../common";
 
 export default defineCommand({
@@ -13,11 +13,14 @@ export default defineCommand({
     ...commonArgs,
   },
   async run({ args }) {
-    consola.start("Building");
     const rootDir = resolve((args.dir || args._dir || ".") as string);
     const apibara = await createApibara({
       rootDir,
     });
+    apibara.logger.start("Building");
+
+    apibara.options.entry = join(runtimeDir, "start.mjs");
+
     await prepare(apibara);
     await writeTypes(apibara);
     await build(apibara);

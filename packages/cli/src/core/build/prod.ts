@@ -1,16 +1,14 @@
 import type { Apibara, RollupConfig } from "apibara/types";
-import consola from "consola";
 import { type OutputOptions, rollup } from "rollup";
 
 export async function buildProduction(
   apibara: Apibara,
   rollupConfig: RollupConfig,
 ) {
+  apibara.logger.start("Building indexers");
   try {
-    // Create a bundle
     const bundle = await rollup(rollupConfig);
 
-    // Generate output
     if (Array.isArray(rollupConfig.output)) {
       for (const outputOptions of rollupConfig.output) {
         await bundle.write(outputOptions);
@@ -21,12 +19,11 @@ export async function buildProduction(
       throw new Error("No output options specified in Rollup config");
     }
 
-    // Close the bundle
     await bundle.close();
 
-    consola.success("Build completed successfully!");
+    apibara.logger.success("Build succeeded!");
   } catch (error) {
-    console.error("Build failed:", error);
+    apibara.logger.error("Build failed", error);
     throw error;
   }
 }
