@@ -4,6 +4,7 @@ import type { RollupConfig } from "./rollup";
 export interface ApibaraHooks {
   "rollup:before": (apibara: Apibara, rollupConfig: RollupConfig) => void;
   compiled: (apibara: Apibara) => void;
+  "dev:restart": () => void;
   "dev:reload": () => void;
   "rollup:reload": () => void;
   restart: () => void;

@@ -53,6 +53,7 @@ function startRollupWatcher(apibara: Apibara, rollupConfig: RollupConfig) {
     switch (event.code) {
       // The watcher is (re)starting
       case "START": {
+        apibara.hooks.callHook("dev:restart");
         return;
       }
 

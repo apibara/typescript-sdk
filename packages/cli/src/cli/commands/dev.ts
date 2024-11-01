@@ -82,13 +82,19 @@ export default defineCommand({
       await writeTypes(apibara);
       await build(apibara);
 
+      apibara.hooks.hook("dev:restart", () => {
+        if (childProcess) {
+          apibara.logger.info("Change detected, stopping indexers to restart");
+          childProcess.kill();
+          childProcess = undefined;
+        }
+      });
+
       apibara.hooks.hook("dev:reload", () => {
         if (childProcess) {
-          apibara.logger.start("Restarting indexers");
           childProcess.kill();
         } else {
-          apibara.logger.success("Dev server started");
-          apibara.logger.success("Starting indexers");
+          apibara.logger.success("Restarting indexers");
         }
 
         const childArgs = [
