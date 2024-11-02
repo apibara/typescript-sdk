@@ -1,5 +1,5 @@
 import type { Apibara } from "apibara/types";
-import { existsSync, readdirSync } from "fs-extra";
+import fse from "fs-extra";
 import { basename, join } from "pathe";
 
 const INDEXER_EXTENSIONS = [".indexer.ts", ".indexer.js"];
@@ -12,13 +12,13 @@ export async function scanIndexers(apibara: Apibara) {
     apibara.options.indexersDir,
   );
 
-  if (!existsSync(indexersDir)) {
+  if (!fse.existsSync(indexersDir)) {
     throw new Error(`Indexers directory not found: ${indexersDir}`);
   }
 
   apibara.indexers = [];
 
-  for (const file of readdirSync(indexersDir)) {
+  for (const file of fse.readdirSync(indexersDir)) {
     const indexerName = indexerNameFromFile(file);
     if (indexerName) {
       apibara.indexers.push({
