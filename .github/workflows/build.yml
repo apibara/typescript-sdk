@@ -38,10 +38,11 @@ jobs:
       - name: Run lint
         run: pnpm lint
       - name: Run build
-        run: pnpm build
+        # Exclude examples/cli since it requires the cli to be built.
+        run: pnpm build --filter=!./examples/cli
       - name: Run typecheck
         run: pnpm typecheck
       - name: Run test
-        run: pnpm test:ci
+        run: pnpm test:ci --filter=!./examples/cli
       - name: Check change files
         run: pnpm beachball check
