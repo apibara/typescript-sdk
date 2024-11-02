@@ -1,8 +1,8 @@
 import { spawn } from "node:child_process";
-import { build, createApibara, prepare, writeTypes } from "apibara/core";
-import { runtimeDir } from "apibara/runtime/meta";
+import { createApibara } from "apibara/core";
 import { defineCommand } from "citty";
-import { join, resolve } from "pathe";
+import fse from "fs-extra";
+import { resolve } from "pathe";
 import { commonArgs } from "../common";
 
 export default defineCommand({
@@ -23,24 +23,31 @@ export default defineCommand({
     },
   },
   async run({ args }) {
+    const { indexer, preset } = args;
     const rootDir = resolve((args.dir || args._dir || ".") as string);
+
     const apibara = await createApibara({
       rootDir,
     });
 
-    apibara.logger.start("Building");
+    apibara.logger.start(
+      `Starting indexer ${indexer}${preset ? ` with preset ${preset}` : ""}`,
+    );
 
-    apibara.options.entry = join(runtimeDir, "start.mjs");
+    const outputDir = apibara.options.outputDir || "./.apibara/build";
+    const entry = resolve(outputDir, "start.mjs");
 
-    await prepare(apibara);
-    await writeTypes(apibara);
-    await build(apibara);
+    if (!fse.existsSync(entry)) {
+      apibara.logger.error(
+        `Output directory ${outputDir} does not exist. Try building the indexer with "apibara build" first.`,
+      );
+      return process.exit(1);
+    }
+
     await apibara.close();
 
-    const { indexer, preset } = args;
-
     const childArgs = [
-      resolve(apibara.options.outputDir || "./.apibara/build", "start.mjs"),
+      entry,
       "start",
       "--indexer",
       indexer,

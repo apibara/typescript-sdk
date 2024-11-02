@@ -67,7 +67,7 @@
     "playground:prepare": "pnpm playground prepare --dir playground",
     "playground:dev": "pnpm playground dev --dir playground",
     "playground:build": "pnpm playground build --dir playground",
-    "playground:start": "JITI_ESM_RESOLVE=1 NODE_OPTIONS=\"--enable-source-maps\" jiti ./playground/.apibara/build/main.mjs"
+    "playground:start": "pnpm playground start --dir playground --indexer starknet"
   },
   "devDependencies": {
     "@apibara/starknet": "workspace:*",
