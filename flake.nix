@@ -13,6 +13,7 @@
       in
         {
           devShells.default = pkgs.mkShell {
+            MADNESS_ALLOW_LDD = "1";
             nativeBuildInputs = with pkgs; [
               protobuf
               nodejs
