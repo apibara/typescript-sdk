@@ -17,7 +17,6 @@ export default defineCommand({
     const apibara = await createApibara({
       rootDir,
     });
-    apibara.logger.start("Building");
 
     apibara.options.entry = join(runtimeDir, "start.mjs");
 

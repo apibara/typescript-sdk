@@ -9,7 +9,7 @@ export default function (runtimeConfig: ApibaraRuntimeConfig) {
     streamUrl: "https://starknet.preview.apibara.org",
     finality: "accepted",
     startingCursor: {
-      orderKey: 80_000n,
+      orderKey: 800_000n,
     },
     filter: {
       events: [
@@ -23,11 +23,6 @@ export default function (runtimeConfig: ApibaraRuntimeConfig) {
     },
     async transform({ block: { header } }) {
       console.log("Transforming block ", header?.blockNumber);
-    },
-    hooks: {
-      "handler:after": ({ endCursor }) => {
-        console.log("Handler After ", endCursor?.orderKey);
-      },
     },
   });
 }

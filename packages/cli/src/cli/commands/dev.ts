@@ -3,6 +3,7 @@ import { build, createApibara, prepare, writeTypes } from "apibara/core";
 import { runtimeDir } from "apibara/runtime/meta";
 import type { Apibara } from "apibara/types";
 import { defineCommand } from "citty";
+import { colors } from "consola/utils";
 import { join, resolve } from "pathe";
 import { commonArgs } from "../common";
 
@@ -111,7 +112,9 @@ export default defineCommand({
 
         childProcess.on("close", (code) => {
           if (code !== null) {
-            apibara.logger.log(`Indexers process exited with code ${code}`);
+            apibara.logger.log(
+              `Indexers process exited with code ${colors.red(code)}`,
+            );
           }
         });
       });

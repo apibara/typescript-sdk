@@ -4,9 +4,9 @@ import defu from "defu";
 import { dirname, isAbsolute, join, relative, resolve } from "pathe";
 import type { TSConfig } from "pkg-types";
 import { type JSValue, generateTypes, resolveSchema } from "untyped";
+import { prettyPath } from "../path";
 
 export async function writeTypes(apibara: Apibara) {
-  apibara.logger.start("Preparing Types");
   const typesDir = resolve(apibara.options.buildDir, "types");
 
   const config = [
@@ -131,7 +131,7 @@ declare module "apibara/types" {`,
     }),
   );
 
-  apibara.logger.success("Types generated");
+  apibara.logger.success(`Types written to ${prettyPath(typesDir)}`);
 }
 
 const RELATIVE_RE = /^\.{1,2}\//;
