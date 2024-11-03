@@ -1,3 +1,4 @@
+import type { RollupCommonJSOptions } from "@rollup/plugin-commonjs";
 import type {
   C12InputConfig,
   ConfigWatcher,
@@ -73,6 +74,7 @@ export interface ApibaraOptions<
   rollupConfig?: RollupConfig;
   sourceMap?: boolean;
   entry: string;
+  commonJS?: RollupCommonJSOptions;
 
   // Advanced
   typescript: {
