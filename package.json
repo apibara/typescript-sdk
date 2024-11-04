@@ -9,9 +9,8 @@
     "test": "turbo run test",
     "test:ci": "turbo run test:ci",
     "test:postgres": "docker run --rm -p 5432:5432 -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres postgres:16",
-    "lint": "turbo run lint --parallel",
-    "lint:fix": "turbo run lint:fix --parallel",
-    "format": "turbo run format --parallel",
+    "lint": "pnpm run -r lint",
+    "lint:fix": "pnpm run -r lint:fix",
     "release": "pnpm build"
   },
   "repository": {

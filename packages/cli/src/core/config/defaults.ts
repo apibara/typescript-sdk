@@ -1,8 +1,8 @@
-// import { defaultSink } from "@apibara/indexer";
 import type { ApibaraConfig } from "apibara/types";
 
 export const ApibaraDefaults: ApibaraConfig = {
   rootDir: ".",
+  indexersDir: "indexers",
 
   runtimeConfig: {},
   hooks: {},

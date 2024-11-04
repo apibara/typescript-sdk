@@ -19,7 +19,7 @@
     "@opentelemetry/sdk-node": "^0.52.0",
     "@opentelemetry/sdk-trace-base": "^1.25.0",
     "@opentelemetry/semantic-conventions": "^1.25.0",
-    "better-sqlite3": "^11.1.2",
+    "better-sqlite3": "^11.5.0",
     "citty": "^0.1.6",
     "consola": "^3.2.3",
     "csv-stringify": "^6.5.0",

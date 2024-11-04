@@ -53,6 +53,7 @@ async function _loadUserConfig(
 
   options._config = configOverrides;
   options._c12 = loadedConfig;
+
   if (dev) {
     options.dev = dev;
   }

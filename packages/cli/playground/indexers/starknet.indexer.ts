@@ -7,10 +7,10 @@ import { hash } from "starknet";
 export default function indexer(runtimeConfig: ApibaraRuntimeConfig) {
   consola.log("--> Starknet Indexer Runtime Config: ", runtimeConfig);
   return defineIndexer(StarknetStream)({
-    streamUrl: "http://mainnet-v2.starknet.a5a.ch:7007",
+    streamUrl: "https://starknet.preview.apibara.org",
     finality: "accepted",
     startingCursor: {
-      orderKey: 80_000n,
+      orderKey: 800_000n,
     },
     filter: {
       events: [
@@ -23,12 +23,9 @@ export default function indexer(runtimeConfig: ApibaraRuntimeConfig) {
       ],
     },
     async transform({ block: { header, events } }) {
-      consola.info("Transforming block ", header?.blockNumber);
-    },
-    hooks: {
-      "handler:after": ({ endCursor }) => {
-        consola.info("Handler After ", endCursor?.orderKey);
-      },
+      consola.info(
+        `Got block ${header?.blockNumber} with ${events.length} events`,
+      );
     },
   });
 }

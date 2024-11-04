@@ -1,16 +1,21 @@
 import { defineIndexer } from "@apibara/indexer";
+import { sqlitePersistence } from "@apibara/indexer/plugins/persistence";
 import { StarknetStream } from "@apibara/starknet";
 import type { ApibaraRuntimeConfig } from "apibara/types";
+import Database from "better-sqlite3";
 import { hash } from "starknet";
 
 export default function (runtimeConfig: ApibaraRuntimeConfig) {
   console.log("--> Starknet Indexer Runtime Config: ", runtimeConfig);
+  const database = new Database(":memory:");
+
   return defineIndexer(StarknetStream)({
     streamUrl: "https://starknet.preview.apibara.org",
     finality: "accepted",
     startingCursor: {
-      orderKey: 80_000n,
+      orderKey: 800_000n,
     },
+    plugins: [sqlitePersistence({ database })],
     filter: {
       events: [
         {
@@ -23,11 +28,6 @@ export default function (runtimeConfig: ApibaraRuntimeConfig) {
     },
     async transform({ block: { header } }) {
       console.log("Transforming block ", header?.blockNumber);
-    },
-    hooks: {
-      "handler:after": ({ endCursor }) => {
-        console.log("Handler After ", endCursor?.orderKey);
-      },
     },
   });
 }

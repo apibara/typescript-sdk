@@ -1,10 +1,15 @@
-import { defaultSink } from "@apibara/indexer";
 import { defineConfig } from "apibara/config";
 
 export default defineConfig({
   runtimeConfig: {
     test: 123,
     check: "something",
+    nested: {
+      test: 456,
+    },
+    fromEnv: {
+      nodeEnv: process.env.NODE_ENV,
+    },
   },
   presets: {
     dev: {
@@ -12,8 +17,5 @@ export default defineConfig({
         test: 999,
       },
     },
-  },
-  sink: {
-    default: () => defaultSink(),
   },
 });

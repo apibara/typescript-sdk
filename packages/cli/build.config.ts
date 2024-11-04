@@ -2,9 +2,17 @@ import { fileURLToPath } from "node:url";
 import { resolve } from "pathe";
 import { defineBuildConfig } from "unbuild";
 
-const modules = ["cli", "config", "core", "rollup", "types", "hooks "];
+const modules = [
+  "cli",
+  "config",
+  "core",
+  "rollup",
+  "types",
+  "hooks",
+  "runtime",
+];
 
-// @ts-ignore The 'import.meta' meta-property is only allowed when the '--module' option is 'es2020', 'es2022', 'esnext', 'system', 'node16', or 'nodenext'.
+// @ts-ignore
 const srcDir = fileURLToPath(new URL("src", import.meta.url));
 
 export default defineBuildConfig({
@@ -15,13 +23,13 @@ export default defineBuildConfig({
     { input: "./src/rollup/index.ts" },
     { input: "./src/types/index.ts" },
     { input: "./src/hooks/index.ts" },
-    { input: "./src/internal/consola/index.ts" },
-    { input: "./src/internal/citty/index.ts" },
+    { input: "./src/runtime/", outDir: "./dist/runtime", format: "esm" },
   ],
   clean: true,
   outDir: "./dist",
   declaration: true,
   alias: {
+    "apibara/runtime/meta": resolve(srcDir, "../runtime-meta.mjs"),
     ...Object.fromEntries(
       modules.map((module) => [
         `apibara/${module}`,
@@ -29,5 +37,8 @@ export default defineBuildConfig({
       ]),
     ),
   },
-  externals: [...modules.map((module) => `apibara/${module}`)],
+  externals: [
+    "apibara/runtime/meta",
+    ...modules.map((module) => `apibara/${module}`),
+  ],
 });

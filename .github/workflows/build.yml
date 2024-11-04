@@ -37,13 +37,12 @@ jobs:
         run: pnpm install --strict-peer-dependencies=false
       - name: Run lint
         run: pnpm lint
-      - name: Run format
-        run: pnpm format
       - name: Run build
-        run: pnpm build
+        # Exclude examples/cli since it requires the cli to be built.
+        run: pnpm build --filter=!./examples/cli --filter=!./examples/cli-js
       - name: Run typecheck
         run: pnpm typecheck
       - name: Run test
-        run: pnpm test:ci
+        run: pnpm test:ci --filter=!./examples/cli --filter=!./examples/cli-js
       - name: Check change files
         run: pnpm beachball check

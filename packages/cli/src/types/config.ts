@@ -1,4 +1,4 @@
-import type { Sink } from "@apibara/indexer";
+import type { RollupCommonJSOptions } from "@rollup/plugin-commonjs";
 import type {
   C12InputConfig,
   ConfigWatcher,
@@ -16,16 +16,13 @@ import type { RollupConfig } from "./rollup";
  * Apibara Config type (apibara.config)
  */
 export interface ApibaraConfig<
-  // biome-ignore lint/complexity/noBannedTypes: <explanation>
-  T extends Record<string, DeepPartial<ApibaraConfig<T, R>>> = {},
-  // biome-ignore lint/complexity/noBannedTypes: <explanation>
-  R extends Record<string, unknown> = {},
+  T extends Record<string, DeepPartial<ApibaraConfig<T, R>>> = Record<
+    string,
+    never
+  >,
+  R extends Record<string, unknown> = Record<string, never>,
 > extends DeepPartial<Omit<ApibaraOptions<T, R>, "preset" | "presets" | "dev">>,
     C12InputConfig<ApibaraConfig<T, R>> {
-  sink?: {
-    default: () => Sink;
-    [key: string]: () => Sink;
-  };
   runtimeConfig?: R;
   presets?: T;
   preset?: keyof T;
@@ -42,22 +39,17 @@ export interface LoadConfigOptions {
 }
 
 export interface ApibaraOptions<
-  // biome-ignore lint/complexity/noBannedTypes: <explanation>
-  T extends Record<string, DeepPartial<ApibaraConfig<T, R>>> = {},
-  // biome-ignore lint/complexity/noBannedTypes: <explanation>
-  R extends Record<string, unknown> = {},
+  T extends Record<string, DeepPartial<ApibaraConfig<T, R>>> = Record<
+    string,
+    never
+  >,
+  R extends Record<string, unknown> = Record<string, never>,
 > {
   // Internal
   _config: ApibaraConfig<T, R>;
   _c12:
     | ResolvedConfig<ApibaraConfig<T, R>>
     | ConfigWatcher<ApibaraConfig<T, R>>;
-
-  // Sink
-  sink: {
-    default: () => Sink;
-    [key: string]: () => Sink;
-  };
 
   // Presets
   presets?: T;
@@ -69,16 +61,20 @@ export interface ApibaraOptions<
   rootDir: string;
   buildDir: string;
   outputDir: string;
+  indexersDir: string;
+
   // Dev
   dev: boolean;
   watchOptions: WatchOptions;
 
   // Hooks
   hooks: NestedHooks<ApibaraHooks>;
+
   // Rollup
   rollupConfig?: RollupConfig;
+  sourceMap?: boolean;
   entry: string;
-  minify: boolean;
+  commonJS?: RollupCommonJSOptions;
 
   // Advanced
   typescript: {

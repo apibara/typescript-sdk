@@ -8,6 +8,7 @@ import consola from "consola";
 import { createHooks } from "hookable";
 import { loadOptions } from "./config/loader";
 import { updateApibaraConfig } from "./config/update";
+import { scanIndexers } from "./scan";
 
 export async function createApibara(
   config: ApibaraConfig = {},
@@ -20,6 +21,7 @@ export async function createApibara(
   // create apibara context
   const apibara: Apibara = {
     options,
+    indexers: [],
     hooks: createHooks(),
     close: () => apibara.hooks.callHook("close"),
     logger: consola.withTag("apibara"),
@@ -29,6 +31,8 @@ export async function createApibara(
   };
 
   apibara.hooks.addHooks(apibara.options.hooks);
+
+  await scanIndexers(apibara);
 
   return apibara;
 }
