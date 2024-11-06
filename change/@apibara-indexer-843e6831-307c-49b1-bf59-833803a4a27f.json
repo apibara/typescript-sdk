@@ -1,7 +1,0 @@
-{
-  "type": "none",
-  "comment": "Remove unused scripts",
-  "packageName": "@apibara/indexer",
-  "email": "francesco@ceccon.me",
-  "dependentChangeType": "none"
-}

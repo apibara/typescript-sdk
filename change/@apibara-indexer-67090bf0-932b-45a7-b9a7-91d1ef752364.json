@@ -1,7 +1,0 @@
-{
-  "type": "prerelease",
-  "comment": "indexer: add hooks for each message type",
-  "packageName": "@apibara/indexer",
-  "email": "francesco@ceccon.me",
-  "dependentChangeType": "patch"
-}

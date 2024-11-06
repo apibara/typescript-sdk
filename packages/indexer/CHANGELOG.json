@@ -2,6 +2,29 @@
   "name": "@apibara/indexer",
   "entries": [
     {
+      "date": "Wed, 06 Nov 2024 19:16:31 GMT",
+      "version": "2.0.0-beta.13",
+      "tag": "@apibara/indexer_v2.0.0-beta.13",
+      "comments": {
+        "prerelease": [
+          {
+            "author": "francesco@ceccon.me",
+            "package": "@apibara/indexer",
+            "commit": "1d78fece2924de1afa6b37c90add240bfb9b02ff",
+            "comment": "indexer: add hooks for each message type"
+          }
+        ],
+        "none": [
+          {
+            "author": "francesco@ceccon.me",
+            "package": "@apibara/indexer",
+            "commit": "1d78fece2924de1afa6b37c90add240bfb9b02ff",
+            "comment": "Remove unused scripts"
+          }
+        ]
+      }
+    },
+    {
       "date": "Wed, 30 Oct 2024 08:19:34 GMT",
       "version": "2.0.0-beta.12",
       "tag": "@apibara/indexer_v2.0.0-beta.12",

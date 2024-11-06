@@ -1,8 +1,16 @@
 # Change Log - @apibara/indexer
 
-<!-- This log was last generated on Wed, 30 Oct 2024 08:19:34 GMT and should not be manually modified. -->
+<!-- This log was last generated on Wed, 06 Nov 2024 19:16:31 GMT and should not be manually modified. -->
 
 <!-- Start content -->
+
+## 2.0.0-beta.13
+
+Wed, 06 Nov 2024 19:16:31 GMT
+
+### Changes
+
+- indexer: add hooks for each message type (francesco@ceccon.me)
 
 ## 2.0.0-beta.12
 

@@ -1,8 +1,16 @@
 # Change Log - apibara
 
-<!-- This log was last generated on Sun, 20 Oct 2024 18:49:49 GMT and should not be manually modified. -->
+<!-- This log was last generated on Wed, 06 Nov 2024 19:16:31 GMT and should not be manually modified. -->
 
 <!-- Start content -->
+
+## 2.0.0-beta.13
+
+Wed, 06 Nov 2024 19:16:31 GMT
+
+### Changes
+
+- Refactor dev, build, and start commands (francesco@ceccon.me)
 
 ## 2.0.0-beta.8
 

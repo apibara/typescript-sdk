@@ -2,6 +2,21 @@
   "name": "apibara",
   "entries": [
     {
+      "date": "Wed, 06 Nov 2024 19:16:31 GMT",
+      "version": "2.0.0-beta.13",
+      "tag": "apibara_v2.0.0-beta.13",
+      "comments": {
+        "prerelease": [
+          {
+            "author": "francesco@ceccon.me",
+            "package": "apibara",
+            "commit": "1d78fece2924de1afa6b37c90add240bfb9b02ff",
+            "comment": "Refactor dev, build, and start commands"
+          }
+        ]
+      }
+    },
+    {
       "date": "Sun, 20 Oct 2024 18:49:49 GMT",
       "version": "2.0.0-beta.8",
       "tag": "apibara_v2.0.0-beta.8",

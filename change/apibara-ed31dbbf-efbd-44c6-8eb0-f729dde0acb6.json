@@ -1,7 +1,0 @@
-{
-  "type": "prerelease",
-  "comment": "Refactor dev, build, and start commands",
-  "packageName": "apibara",
-  "email": "francesco@ceccon.me",
-  "dependentChangeType": "patch"
-}
