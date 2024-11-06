@@ -19,6 +19,7 @@
     "typescript": "^5.6.2"
   },
   "dependencies": {
+    "@apibara/evm": "workspace:*",
     "@apibara/indexer": "workspace:*",
     "@apibara/protocol": "workspace:*",
     "@apibara/starknet": "workspace:*",

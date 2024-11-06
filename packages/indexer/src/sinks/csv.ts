@@ -104,6 +104,11 @@ export class CsvSink extends Sink {
     throw new Error("Not implemented");
   }
 
+  async finalize(cursor?: Cursor) {
+    // TODO: Implement
+    throw new Error("Not implemented");
+  }
+
   private async insertToCSV(data: SinkData[]) {
     if (data.length === 0) return;
 

@@ -2,10 +2,14 @@ import type {
   Client,
   Cursor,
   DataFinality,
+  Finalize,
+  Heartbeat,
+  Invalidate,
   StreamConfig,
   StreamDataOptions,
   StreamDataRequest,
   StreamDataResponse,
+  SystemMessage,
 } from "@apibara/protocol";
 import consola from "consola";
 import {
@@ -70,6 +74,10 @@ export interface IndexerHooks<TFilter, TBlock> {
   }) => void;
   "handler:exception": ({ error }: { error: Error }) => void;
   message: ({ message }: { message: StreamDataResponse<TBlock> }) => void;
+  "message:invalidate": ({ message }: { message: Invalidate }) => void;
+  "message:finalize": ({ message }: { message: Finalize }) => void;
+  "message:heartbeat": ({ message }: { message: Heartbeat }) => void;
+  "message:systemMessage": ({ message }: { message: SystemMessage }) => void;
 }
 
 export interface IndexerConfig<TFilter, TBlock, TTxnParams> {
@@ -307,7 +315,49 @@ export async function run<TFilter, TBlock, TTxnParams>(
         case "invalidate": {
           await tracer.startActiveSpan("message invalidate", async (span) => {
             await sink.invalidate(message.invalidate.cursor);
+            await indexer.hooks.callHook("message:invalidate", { message });
+            span.end();
           });
+          break;
+        }
+        case "finalize": {
+          await tracer.startActiveSpan("message finalize", async (span) => {
+            await sink.finalize(message.finalize.cursor);
+            await indexer.hooks.callHook("message:finalize", { message });
+            span.end();
+          });
+          break;
+        }
+        case "heartbeat": {
+          await tracer.startActiveSpan("message heartbeat", async (span) => {
+            await indexer.hooks.callHook("message:heartbeat", { message });
+            span.end();
+          });
+          break;
+        }
+        case "systemMessage": {
+          await tracer.startActiveSpan(
+            "message systemMessage",
+            async (span) => {
+              switch (message.systemMessage.output?._tag) {
+                case "stderr": {
+                  consola.warn(message.systemMessage.output.stderr);
+                  break;
+                }
+                case "stdout": {
+                  consola.info(message.systemMessage.output.stdout);
+                  break;
+                }
+                default: {
+                }
+              }
+
+              await indexer.hooks.callHook("message:systemMessage", {
+                message,
+              });
+              span.end();
+            },
+          );
           break;
         }
         default: {

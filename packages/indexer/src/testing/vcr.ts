@@ -47,6 +47,11 @@ export class VcrSink extends Sink {
     // TODO: Implement
     throw new Error("Not implemented");
   }
+
+  async finalize(cursor?: Cursor) {
+    // TODO: Implement
+    throw new Error("Not implemented");
+  }
 }
 
 export function vcr() {
