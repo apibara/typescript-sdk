@@ -21,6 +21,8 @@ import {
 } from "./status";
 import { type StreamDataRequest, StreamDataResponse } from "./stream";
 
+export type { ClientError, Status } from "nice-grpc";
+
 /** Client call options. */
 export interface ClientCallOptions {
   signal?: AbortSignal;
