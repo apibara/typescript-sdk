@@ -1,8 +1,16 @@
 # Change Log - @apibara/protocol
 
-<!-- This log was last generated on Mon, 21 Oct 2024 15:53:51 GMT and should not be manually modified. -->
+<!-- This log was last generated on Wed, 06 Nov 2024 20:31:32 GMT and should not be manually modified. -->
 
 <!-- Start content -->
+
+## 2.0.0-beta.14
+
+Wed, 06 Nov 2024 20:31:32 GMT
+
+### Changes
+
+- protocol: export ClientError and Status (francesco@ceccon.me)
 
 ## 2.0.0-beta.10
 

@@ -2,6 +2,21 @@
   "name": "@apibara/protocol",
   "entries": [
     {
+      "date": "Wed, 06 Nov 2024 20:31:32 GMT",
+      "version": "2.0.0-beta.14",
+      "tag": "@apibara/protocol_v2.0.0-beta.14",
+      "comments": {
+        "prerelease": [
+          {
+            "author": "francesco@ceccon.me",
+            "package": "@apibara/protocol",
+            "commit": "eba73ebb12de02ab4ce6770ad81ae15ca9e28aa5",
+            "comment": "protocol: export ClientError and Status"
+          }
+        ]
+      }
+    },
+    {
       "date": "Mon, 21 Oct 2024 15:53:51 GMT",
       "version": "2.0.0-beta.10",
       "tag": "@apibara/protocol_v2.0.0-beta.10",

@@ -1,7 +1,0 @@
-{
-  "type": "prerelease",
-  "comment": "protocol: export ClientError and Status",
-  "packageName": "@apibara/protocol",
-  "email": "francesco@ceccon.me",
-  "dependentChangeType": "patch"
-}
