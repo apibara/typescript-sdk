@@ -48,6 +48,9 @@ importers:
 
   examples/cli:
     dependencies:
+      '@apibara/evm':
+        specifier: workspace:*
+        version: link:../../packages/evm
       '@apibara/indexer':
         specifier: workspace:*
         version: link:../../packages/indexer

@@ -16,6 +16,7 @@ export abstract class Sink<TTxnParams = unknown> {
   ): Promise<void>;
 
   abstract invalidate(cursor?: Cursor): Promise<void>;
+  abstract finalize(cursor?: Cursor): Promise<void>;
 }
 
 export class DefaultSink extends Sink<unknown> {
@@ -28,6 +29,10 @@ export class DefaultSink extends Sink<unknown> {
 
   async invalidate(cursor?: Cursor) {
     consola.info(`Invalidating cursor ${cursor?.orderKey}`);
+  }
+
+  async finalize(cursor?: Cursor) {
+    consola.info(`Finalizing cursor ${cursor?.orderKey}`);
   }
 }
 

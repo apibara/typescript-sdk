@@ -101,6 +101,11 @@ export class DrizzleSink<
       }
     });
   }
+
+  async finalize(cursor?: Cursor) {
+    // TODO: Implement
+    throw new Error("Not implemented");
+  }
 }
 
 export const drizzle = <
