@@ -1,11 +1,9 @@
 import assert from "node:assert";
 import fs from "node:fs";
 import path from "node:path";
-import type { Client, Cursor } from "@apibara/protocol";
+import type { Client } from "@apibara/protocol";
 import { MockClient } from "@apibara/protocol/testing";
 import { type Indexer, run } from "../indexer";
-import type { SinkData } from "../sink";
-import { vcr } from "../testing/vcr";
 import { type CassetteDataType, deserialize } from "../vcr";
 import type { VcrConfig } from "./config";
 
@@ -13,21 +11,10 @@ export async function replay<TFilter, TBlock, TTxnParams>(
   vcrConfig: VcrConfig,
   indexer: Indexer<TFilter, TBlock, TTxnParams>,
   cassetteName: string,
-): Promise<VcrReplayResult> {
+) {
   const client = loadCassette<TFilter, TBlock>(vcrConfig, cassetteName);
-
-  const sink = vcr();
-
   await run(client, indexer);
-
-  return {
-    outputs: sink.result,
-  };
 }
-
-export type VcrReplayResult = {
-  outputs: Array<{ endCursor?: Cursor; data: SinkData[] }>;
-};
 
 export function loadCassette<TFilter, TBlock>(
   vcrConfig: VcrConfig,
@@ -41,11 +28,14 @@ export function loadCassette<TFilter, TBlock>(
   const { filter, messages } = cassetteData;
 
   return new MockClient<TFilter, TBlock>((request, options) => {
+    // Notice that the request filter is an array of filters,
+    // so we need to wrap the indexer filter in an array.
     assert.deepStrictEqual(
       request.filter,
-      filter,
-      "Request and Cassette filter mismatch",
+      [filter],
+      "Indexer and cassette filter mismatch. Hint: delete the cassette and run again.",
     );
+
     return messages;
   });
 }

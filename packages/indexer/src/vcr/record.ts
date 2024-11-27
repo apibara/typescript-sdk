@@ -33,10 +33,14 @@ export async function record<TFilter, TBlock, TTxnParams>(
         filter: indexer.options.filter,
         messages: messages,
       };
+
+      await fs.mkdir(vcrConfig.cassetteDir, { recursive: true });
+
       const filePath = path.join(
         vcrConfig.cassetteDir,
         `${cassetteOptions.name}.json`,
       );
+
       await fs.writeFile(filePath, serialize(output), { flag: "w" });
     },
   });

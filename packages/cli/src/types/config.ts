@@ -7,7 +7,6 @@ import type {
 } from "c12";
 import type { WatchOptions } from "chokidar";
 import type { NestedHooks } from "hookable";
-import type { TSConfig } from "pkg-types";
 import type { DeepPartial } from "./_utils";
 import type { ApibaraHooks } from "./hooks";
 import type { RollupConfig } from "./rollup";
@@ -81,9 +80,5 @@ export interface ApibaraOptions<
     strict?: boolean;
     internalPaths?: boolean;
     generateRuntimeConfigTypes?: boolean;
-    generateTsConfig?: boolean;
-    /** the path of the generated `tsconfig.json`, relative to buildDir */
-    tsconfigPath: string;
-    tsConfig?: Partial<TSConfig>;
   };
 }

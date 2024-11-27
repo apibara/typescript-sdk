@@ -8,8 +8,7 @@ import Database from "better-sqlite3";
 import { klona } from "klona/full";
 import { describe, expect, it } from "vitest";
 import { run } from "../indexer";
-import { generateMockMessages } from "../testing";
-import { getMockIndexer } from "../testing/indexer";
+import { generateMockMessages, getMockIndexer } from "../internal/testing";
 import { SqlitePersistence, sqlitePersistence } from "./persistence";
 
 describe("Persistence", () => {

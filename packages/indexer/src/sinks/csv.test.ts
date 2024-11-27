@@ -5,11 +5,9 @@ import {
   type MockFilter,
 } from "@apibara/protocol/testing";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { useSink } from "../hooks";
 import { run } from "../indexer";
-import {} from "../plugins/persistence";
-import { generateMockMessages } from "../testing";
-import { getMockIndexer } from "../testing/indexer";
+import { generateMockMessages, getMockIndexer } from "../internal/testing";
+import { useSink } from "../sink";
 import { csv } from "./csv";
 
 describe("Run Test", () => {

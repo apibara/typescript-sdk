@@ -1,5 +1,5 @@
-import { defineIndexer } from "@apibara/indexer";
-import { sqlitePersistence } from "@apibara/indexer/plugins/persistence";
+import { defineIndexer, useSink } from "@apibara/indexer";
+import { sqlite } from "@apibara/indexer/sinks/sqlite";
 import { StarknetStream } from "@apibara/starknet";
 import type { ApibaraRuntimeConfig } from "apibara/types";
 import Database from "better-sqlite3";
@@ -7,7 +7,12 @@ import { hash } from "starknet";
 
 export default function (runtimeConfig: ApibaraRuntimeConfig) {
   console.log("--> Starknet Indexer Runtime Config: ", runtimeConfig);
-  const database = new Database(":memory:");
+  const database = new Database(runtimeConfig.databasePath);
+
+  database.exec("DROP TABLE IF EXISTS test");
+  database.exec(
+    "CREATE TABLE IF NOT EXISTS test (number TEXT, hash TEXT, _cursor BIGINT)",
+  );
 
   return defineIndexer(StarknetStream)({
     streamUrl: "https://starknet.preview.apibara.org",
@@ -15,7 +20,7 @@ export default function (runtimeConfig: ApibaraRuntimeConfig) {
     startingCursor: {
       orderKey: 800_000n,
     },
-    plugins: [sqlitePersistence({ database })],
+    sink: sqlite({ database, tableName: "test" }),
     filter: {
       events: [
         {
@@ -26,8 +31,13 @@ export default function (runtimeConfig: ApibaraRuntimeConfig) {
         },
       ],
     },
-    async transform({ block: { header } }) {
-      console.log("Transforming block ", header?.blockNumber);
+    async transform({ block: { header }, context }) {
+      const { writer } = useSink({ context });
+
+      // writer.insert([{
+      //   number: header?.blockNumber.toString(),
+      //   hash: header?.blockHash,
+      // }])
     },
   });
 }

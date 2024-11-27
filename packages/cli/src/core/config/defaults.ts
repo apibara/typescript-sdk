@@ -11,10 +11,7 @@ export const ApibaraDefaults: ApibaraConfig = {
 
   typescript: {
     strict: false,
-    generateTsConfig: true,
     generateRuntimeConfigTypes: true,
-    tsconfigPath: "types/tsconfig.json",
     internalPaths: false,
-    tsConfig: {},
   },
 };

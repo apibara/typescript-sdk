@@ -1,8 +1,6 @@
 import fsp from "node:fs/promises";
 import type { Apibara } from "apibara/types";
-import defu from "defu";
-import { dirname, isAbsolute, join, relative, resolve } from "pathe";
-import type { TSConfig } from "pkg-types";
+import { dirname, join, resolve } from "pathe";
 import { type JSValue, generateTypes, resolveSchema } from "untyped";
 import { prettyPath } from "../path";
 
@@ -30,13 +28,6 @@ declare module "apibara/types" {`,
         )
       : "",
     "}",
-    // Makes this a module for augmentation purposes
-    "export type {}",
-  ];
-
-  const declarations = [
-    // local apibara augmentations
-    '/// <reference path="./apibara-config.d.ts" />',
   ];
 
   const buildFiles: { path: string; contents: string }[] = [];
@@ -45,83 +36,6 @@ declare module "apibara/types" {`,
     path: join(typesDir, "apibara-config.d.ts"),
     contents: config.join("\n"),
   });
-
-  buildFiles.push({
-    path: join(typesDir, "apibara.d.ts"),
-    contents: declarations.join("\n"),
-  });
-
-  if (apibara.options.typescript.generateTsConfig) {
-    const tsConfigPath = resolve(
-      apibara.options.buildDir,
-      apibara.options.typescript.tsconfigPath,
-    );
-    const tsconfigDir = dirname(tsConfigPath);
-    const tsConfig: TSConfig = defu(apibara.options.typescript.tsConfig, {
-      compilerOptions: {
-        forceConsistentCasingInFileNames: true,
-        strict: apibara.options.typescript.strict,
-        noEmit: true,
-        target: "ESNext",
-        module: "ESNext",
-        moduleResolution: "Bundler",
-        allowJs: true,
-        resolveJsonModule: true,
-        jsx: "preserve",
-        allowSyntheticDefaultImports: true,
-        jsxFactory: "h",
-        jsxFragmentFactory: "Fragment",
-      },
-      include: [
-        relativeWithDot(tsconfigDir, join(typesDir, "apibara.d.ts")).replace(
-          /^(?=[^.])/,
-          "./",
-        ),
-      ],
-    });
-
-    for (const alias in tsConfig.compilerOptions!.paths) {
-      const paths = tsConfig.compilerOptions!.paths[alias];
-      tsConfig.compilerOptions!.paths[alias] = await Promise.all(
-        paths.map(async (path: string) => {
-          if (!isAbsolute(path)) {
-            return path;
-          }
-          const stats = await fsp
-            .stat(path)
-            .catch(() => null /* file does not exist */);
-          return relativeWithDot(
-            tsconfigDir,
-            stats?.isFile()
-              ? path.replace(/(?<=\w)\.\w+$/g, "") /* remove extension */
-              : path,
-          );
-        }),
-      );
-    }
-
-    tsConfig.include = [
-      ...new Set(
-        tsConfig.include!.map((p) =>
-          isAbsolute(p) ? relativeWithDot(tsconfigDir, p) : p,
-        ),
-      ),
-    ];
-    if (tsConfig.exclude) {
-      tsConfig.exclude = [
-        ...new Set(
-          tsConfig.exclude!.map((p) =>
-            isAbsolute(p) ? relativeWithDot(tsconfigDir, p) : p,
-          ),
-        ),
-      ];
-    }
-
-    buildFiles.push({
-      path: tsConfigPath,
-      contents: JSON.stringify(tsConfig, null, 2),
-    });
-  }
 
   await Promise.all(
     buildFiles.map(async (file) => {
@@ -132,11 +46,4 @@ declare module "apibara/types" {`,
   );
 
   apibara.logger.success(`Types written to ${prettyPath(typesDir)}`);
-}
-
-const RELATIVE_RE = /^\.{1,2}\//;
-
-export function relativeWithDot(from: string, to: string) {
-  const rel = relative(from, to);
-  return RELATIVE_RE.test(rel) ? rel : `./${rel}`;
 }

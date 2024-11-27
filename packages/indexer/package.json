@@ -88,6 +88,7 @@
   "dependencies": {
     "@apibara/protocol": "workspace:*",
     "@opentelemetry/api": "^1.9.0",
+    "ci-info": "^4.1.0",
     "consola": "^3.2.3",
     "hookable": "^5.5.3",
     "klona": "^2.0.6",
