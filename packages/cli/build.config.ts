@@ -41,4 +41,10 @@ export default defineBuildConfig({
     "apibara/runtime/meta",
     ...modules.map((module) => `apibara/${module}`),
   ],
+  rollup: {
+    output: {
+      banner: ({ fileName }) =>
+        fileName === "cli/index.mjs" ? "#!/usr/bin/env node" : undefined,
+    },
+  },
 });

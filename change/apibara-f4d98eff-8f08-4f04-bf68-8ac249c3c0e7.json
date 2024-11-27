@@ -1,0 +1,7 @@
+{
+  "type": "prerelease",
+  "comment": "cli: add shebang banner to cli module",
+  "packageName": "apibara",
+  "email": "francesco@ceccon.me",
+  "dependentChangeType": "patch"
+}
