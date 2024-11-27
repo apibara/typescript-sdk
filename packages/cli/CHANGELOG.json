@@ -2,6 +2,21 @@
   "name": "apibara",
   "entries": [
     {
+      "date": "Wed, 27 Nov 2024 08:54:56 GMT",
+      "version": "2.0.0-beta.15",
+      "tag": "apibara_v2.0.0-beta.15",
+      "comments": {
+        "prerelease": [
+          {
+            "author": "francesco@ceccon.me",
+            "package": "apibara",
+            "commit": "66c907d8cac119e8f0d1c47146372fc506bb4d87",
+            "comment": "cli: include runtime-meta in package"
+          }
+        ]
+      }
+    },
+    {
       "date": "Wed, 06 Nov 2024 19:16:31 GMT",
       "version": "2.0.0-beta.13",
       "tag": "apibara_v2.0.0-beta.13",
