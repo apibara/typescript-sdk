@@ -1,0 +1,7 @@
+{
+  "type": "prerelease",
+  "comment": "cli: include runtime-meta in package",
+  "packageName": "apibara",
+  "email": "francesco@ceccon.me",
+  "dependentChangeType": "patch"
+}
