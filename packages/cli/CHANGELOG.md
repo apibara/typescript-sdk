@@ -1,8 +1,16 @@
 # Change Log - apibara
 
-<!-- This log was last generated on Wed, 27 Nov 2024 08:54:56 GMT and should not be manually modified. -->
+<!-- This log was last generated on Wed, 27 Nov 2024 10:20:55 GMT and should not be manually modified. -->
 
 <!-- Start content -->
+
+## 2.0.0-beta.16
+
+Wed, 27 Nov 2024 10:20:55 GMT
+
+### Changes
+
+- cli: add shebang banner to cli module (francesco@ceccon.me)
 
 ## 2.0.0-beta.15
 

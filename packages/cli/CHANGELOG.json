@@ -2,6 +2,21 @@
   "name": "apibara",
   "entries": [
     {
+      "date": "Wed, 27 Nov 2024 10:20:55 GMT",
+      "version": "2.0.0-beta.16",
+      "tag": "apibara_v2.0.0-beta.16",
+      "comments": {
+        "prerelease": [
+          {
+            "author": "francesco@ceccon.me",
+            "package": "apibara",
+            "commit": "15a81d272833891d8ceda48bb71bca525904f38d",
+            "comment": "cli: add shebang banner to cli module"
+          }
+        ]
+      }
+    },
+    {
       "date": "Wed, 27 Nov 2024 08:54:56 GMT",
       "version": "2.0.0-beta.15",
       "tag": "apibara_v2.0.0-beta.15",
