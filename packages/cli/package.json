@@ -55,6 +55,8 @@
   "files": [
     "dist",
     "src",
+    "runtime-meta.d.ts",
+    "runtime-meta.mjs",
     "README.md"
   ],
   "scripts": {
