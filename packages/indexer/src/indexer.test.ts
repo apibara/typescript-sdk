@@ -5,11 +5,14 @@ import {
 } from "@apibara/protocol/testing";
 import Database from "better-sqlite3";
 import { describe, expect, it } from "vitest";
-import { useSink } from "./hooks";
 import { run } from "./indexer";
+import {
+  generateMockMessages,
+  getMockIndexer,
+  mockSink,
+} from "./internal/testing";
 import { SqlitePersistence, sqlitePersistence } from "./plugins/persistence";
-import { generateMockMessages, vcr } from "./testing";
-import { getMockIndexer } from "./testing/indexer";
+import { useSink } from "./sink";
 
 describe("Run Test", () => {
   it("should stream messages", async () => {
@@ -17,12 +20,12 @@ describe("Run Test", () => {
       return generateMockMessages();
     });
 
-    const sink = vcr();
+    const sink = mockSink();
 
     const indexer = getMockIndexer({
       sink,
       override: {
-        transform: async ({ context, endCursor, block: { data } }) => {
+        transform: async ({ context, block: { data } }) => {
           const { writer } = useSink({ context });
           writer.insert([{ data }]);
         },
@@ -257,7 +260,7 @@ describe("Run Test", () => {
 
     const db = Database(":memory:");
 
-    const sink = vcr();
+    const sink = mockSink();
 
     // create mock indexer with persistence plugin
     const indexer = getMockIndexer({
@@ -443,7 +446,7 @@ describe("Run Test", () => {
 
     const db = Database(":memory:");
 
-    const sink = vcr();
+    const sink = mockSink();
 
     // create mock indexer with persistence plugin
     const indexer = getMockIndexer({

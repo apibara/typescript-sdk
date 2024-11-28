@@ -1,0 +1,7 @@
+{
+  "type": "prerelease",
+  "comment": "indexer: refactor testing module",
+  "packageName": "@apibara/indexer",
+  "email": "francesco@ceccon.me",
+  "dependentChangeType": "patch"
+}

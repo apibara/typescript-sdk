@@ -1,5 +1,6 @@
 import type { Cursor, DataFinality } from "@apibara/protocol";
 import consola from "consola";
+import type { IndexerContext } from "./context";
 
 export type SinkData = Record<string, unknown>;
 
@@ -36,6 +37,20 @@ export class DefaultSink extends Sink<unknown> {
   }
 }
 
+/** A default sink that does nothing. */
 export function defaultSink() {
   return new DefaultSink();
+}
+
+/** Returns the sink for the current indexer. */
+export function useSink<TTxnParams>({
+  context,
+}: {
+  context: IndexerContext<TTxnParams>;
+}) {
+  if (!context.sinkTransaction) {
+    throw new Error("Transaction context doesn't exist!");
+  }
+
+  return context.sinkTransaction;
 }

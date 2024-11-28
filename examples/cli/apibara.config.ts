@@ -2,13 +2,12 @@ import { defineConfig } from "apibara/config";
 
 export default defineConfig({
   runtimeConfig: {
-    test: 123,
-    check: "something",
+    databasePath: ":memory:",
   },
   presets: {
     dev: {
       runtimeConfig: {
-        test: 999,
+        databasePath: "/tmp/my-db.sqlite",
       },
     },
   },

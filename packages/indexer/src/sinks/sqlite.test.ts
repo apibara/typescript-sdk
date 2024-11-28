@@ -5,11 +5,9 @@ import {
 } from "@apibara/protocol/testing";
 import Database from "better-sqlite3";
 import { describe, expect, it } from "vitest";
-import { useSink } from "../hooks";
 import { run } from "../indexer";
-import {} from "../plugins/persistence";
-import { generateMockMessages } from "../testing";
-import { getMockIndexer } from "../testing/indexer";
+import { generateMockMessages, getMockIndexer } from "../internal/testing";
+import { useSink } from "../sink";
 import { sqlite } from "./sqlite";
 
 describe("Run Test", () => {
