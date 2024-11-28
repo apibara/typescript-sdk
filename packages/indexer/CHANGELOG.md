@@ -1,8 +1,16 @@
 # Change Log - @apibara/indexer
 
-<!-- This log was last generated on Wed, 06 Nov 2024 19:16:31 GMT and should not be manually modified. -->
+<!-- This log was last generated on Thu, 28 Nov 2024 11:36:10 GMT and should not be manually modified. -->
 
 <!-- Start content -->
+
+## 2.0.0-beta.17
+
+Thu, 28 Nov 2024 11:36:10 GMT
+
+### Changes
+
+- indexer: refactor testing module (francesco@ceccon.me)
 
 ## 2.0.0-beta.13
 

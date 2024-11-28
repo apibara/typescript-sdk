@@ -2,6 +2,21 @@
   "name": "apibara",
   "entries": [
     {
+      "date": "Thu, 28 Nov 2024 11:36:10 GMT",
+      "version": "2.0.0-beta.17",
+      "tag": "apibara_v2.0.0-beta.17",
+      "comments": {
+        "prerelease": [
+          {
+            "author": "francesco@ceccon.me",
+            "package": "apibara",
+            "commit": "96cc294cafd41ae0e1dc33e39b7259d36d61ae72",
+            "comment": "Refactor testing module"
+          }
+        ]
+      }
+    },
+    {
       "date": "Wed, 27 Nov 2024 10:20:55 GMT",
       "version": "2.0.0-beta.16",
       "tag": "apibara_v2.0.0-beta.16",

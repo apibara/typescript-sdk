@@ -2,6 +2,21 @@
   "name": "@apibara/indexer",
   "entries": [
     {
+      "date": "Thu, 28 Nov 2024 11:36:10 GMT",
+      "version": "2.0.0-beta.17",
+      "tag": "@apibara/indexer_v2.0.0-beta.17",
+      "comments": {
+        "prerelease": [
+          {
+            "author": "francesco@ceccon.me",
+            "package": "@apibara/indexer",
+            "commit": "96cc294cafd41ae0e1dc33e39b7259d36d61ae72",
+            "comment": "indexer: refactor testing module"
+          }
+        ]
+      }
+    },
+    {
       "date": "Wed, 06 Nov 2024 19:16:31 GMT",
       "version": "2.0.0-beta.13",
       "tag": "@apibara/indexer_v2.0.0-beta.13",

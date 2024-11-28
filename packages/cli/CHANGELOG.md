@@ -1,8 +1,16 @@
 # Change Log - apibara
 
-<!-- This log was last generated on Wed, 27 Nov 2024 10:20:55 GMT and should not be manually modified. -->
+<!-- This log was last generated on Thu, 28 Nov 2024 11:36:10 GMT and should not be manually modified. -->
 
 <!-- Start content -->
+
+## 2.0.0-beta.17
+
+Thu, 28 Nov 2024 11:36:10 GMT
+
+### Changes
+
+- Refactor testing module (francesco@ceccon.me)
 
 ## 2.0.0-beta.16
 
