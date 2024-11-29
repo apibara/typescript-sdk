@@ -88,6 +88,8 @@ export class DrizzleSink<
   }
 
   async invalidate(cursor?: Cursor) {
+    if (cursor?.orderKey === undefined) return;
+
     await this._db.transaction(async (db) => {
       for (const table of this._tables) {
         // delete all rows whose lowerbound of "_cursor" (int8range) column is greater than the invalidate cursor
@@ -106,6 +108,8 @@ export class DrizzleSink<
   }
 
   async finalize(cursor?: Cursor) {
+    if (cursor?.orderKey === undefined) return;
+
     await this._db.transaction(async (db) => {
       for (const table of this._tables) {
         // delete all rows where the upper bound of "_cursor" is less than the finalize cursor

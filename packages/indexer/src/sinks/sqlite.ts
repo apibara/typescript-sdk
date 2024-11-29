@@ -104,7 +104,9 @@ export class SqliteSink extends Sink {
   }
 
   async invalidate(cursor?: Cursor) {
-    const cursorValue = Number(cursor?.orderKey);
+    if (cursor?.orderKey === undefined) return;
+
+    const cursorValue = Number(cursor.orderKey);
 
     const sql = `DELETE FROM ${this._config.tableName} WHERE ${this._config.cursorColumn ?? "_cursor"} > ?`;
     this._db.prepare(sql).run(cursorValue);

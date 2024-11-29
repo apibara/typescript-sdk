@@ -92,8 +92,7 @@ export class MockSink extends Sink {
   }
 
   async invalidateOnRestart(cursor?: Cursor) {
-    // TODO: Implement
-    throw new Error("Not implemented");
+    // No Implementation required
   }
 
   async invalidate(cursor?: Cursor) {
@@ -102,8 +101,7 @@ export class MockSink extends Sink {
   }
 
   async finalize(cursor?: Cursor) {
-    // TODO: Implement
-    throw new Error("Not implemented");
+    // No Implementation required
   }
 }
 
