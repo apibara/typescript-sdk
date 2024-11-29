@@ -244,7 +244,7 @@ message DeployAccountTransactionReceipt { FieldElement contract_address = 1; }
 message Event {
   repeated uint32 filter_ids = 1;
   // The contract that emitted the event.
-  FieldElement from_address = 2;
+  FieldElement address = 2;
   // The event keys.
   repeated FieldElement keys = 3;
   // The event data.
