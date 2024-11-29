@@ -1,8 +1,16 @@
 # Change Log - apibara
 
-<!-- This log was last generated on Fri, 29 Nov 2024 13:19:26 GMT and should not be manually modified. -->
+<!-- This log was last generated on Fri, 29 Nov 2024 15:14:44 GMT and should not be manually modified. -->
 
 <!-- Start content -->
+
+## 2.0.0-beta.20
+
+Fri, 29 Nov 2024 15:14:44 GMT
+
+### Changes
+
+- Add logger plugin (francesco@ceccon.me)
 
 ## 2.0.0-beta.18
 
