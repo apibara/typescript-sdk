@@ -1,4 +1,5 @@
 import { createIndexer as _createIndexer } from "@apibara/indexer";
+import { logger } from "@apibara/indexer/plugins/logger";
 
 import { config } from "#apibara-internal-virtual/config";
 import { indexers } from "#apibara-internal-virtual/indexers";
@@ -33,7 +34,12 @@ export function createIndexer(indexerName: string, preset?: string) {
     );
   }
 
-  return typeof indexerDefinition.indexer === "function"
-    ? _createIndexer(indexerDefinition.indexer(runtimeConfig))
-    : _createIndexer(indexerDefinition.indexer);
+  const definition =
+    typeof indexerDefinition.indexer === "function"
+      ? indexerDefinition.indexer(runtimeConfig)
+      : indexerDefinition.indexer;
+
+  definition.plugins = [...(definition.plugins ?? []), logger()];
+
+  return _createIndexer(definition);
 }

@@ -2,17 +2,16 @@ import { EvmStream } from "@apibara/evm";
 import { defineIndexer } from "@apibara/indexer";
 
 export default defineIndexer(EvmStream)({
-  streamUrl: "http://localhost:7007",
+  streamUrl: "https://ethereum.preview.apibara.org",
   finality: "accepted",
+  startingCursor: {
+    orderKey: 10_000_000n,
+  },
   filter: {
     header: "always",
+    transactions: [{}],
   },
-  async transform({ cursor, endCursor }) {
-    console.log({ cursor, endCursor });
-  },
-  hooks: {
-    "message:invalidate"({ message }) {
-      console.warn(message);
-    },
+  async transform({ endCursor }) {
+    console.log({ endCursor });
   },
 });
