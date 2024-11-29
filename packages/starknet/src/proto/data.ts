@@ -494,7 +494,7 @@ export interface Event {
     | readonly number[]
     | undefined;
   /** The contract that emitted the event. */
-  readonly fromAddress?:
+  readonly address?:
     | FieldElement
     | undefined;
   /** The event keys. */
@@ -4134,7 +4134,7 @@ export const DeployAccountTransactionReceipt = {
 function createBaseEvent(): Event {
   return {
     filterIds: [],
-    fromAddress: undefined,
+    address: undefined,
     keys: [],
     data: [],
     eventIndex: 0,
@@ -4153,8 +4153,8 @@ export const Event = {
       }
       writer.ldelim();
     }
-    if (message.fromAddress !== undefined) {
-      FieldElement.encode(message.fromAddress, writer.uint32(18).fork()).ldelim();
+    if (message.address !== undefined) {
+      FieldElement.encode(message.address, writer.uint32(18).fork()).ldelim();
     }
     if (message.keys !== undefined && message.keys.length !== 0) {
       for (const v of message.keys) {
@@ -4210,7 +4210,7 @@ export const Event = {
             break;
           }
 
-          message.fromAddress = FieldElement.decode(reader, reader.uint32());
+          message.address = FieldElement.decode(reader, reader.uint32());
           continue;
         case 3:
           if (tag !== 26) {
@@ -4268,7 +4268,7 @@ export const Event = {
       filterIds: globalThis.Array.isArray(object?.filterIds)
         ? object.filterIds.map((e: any) => globalThis.Number(e))
         : [],
-      fromAddress: isSet(object.fromAddress) ? FieldElement.fromJSON(object.fromAddress) : undefined,
+      address: isSet(object.address) ? FieldElement.fromJSON(object.address) : undefined,
       keys: globalThis.Array.isArray(object?.keys) ? object.keys.map((e: any) => FieldElement.fromJSON(e)) : [],
       data: globalThis.Array.isArray(object?.data) ? object.data.map((e: any) => FieldElement.fromJSON(e)) : [],
       eventIndex: isSet(object.eventIndex) ? globalThis.Number(object.eventIndex) : 0,
@@ -4283,8 +4283,8 @@ export const Event = {
     if (message.filterIds?.length) {
       obj.filterIds = message.filterIds.map((e) => Math.round(e));
     }
-    if (message.fromAddress !== undefined) {
-      obj.fromAddress = FieldElement.toJSON(message.fromAddress);
+    if (message.address !== undefined) {
+      obj.address = FieldElement.toJSON(message.address);
     }
     if (message.keys?.length) {
       obj.keys = message.keys.map((e) => FieldElement.toJSON(e));
@@ -4313,8 +4313,8 @@ export const Event = {
   fromPartial(object: DeepPartial<Event>): Event {
     const message = createBaseEvent() as any;
     message.filterIds = object.filterIds?.map((e) => e) || [];
-    message.fromAddress = (object.fromAddress !== undefined && object.fromAddress !== null)
-      ? FieldElement.fromPartial(object.fromAddress)
+    message.address = (object.address !== undefined && object.address !== null)
+      ? FieldElement.fromPartial(object.address)
       : undefined;
     message.keys = object.keys?.map((e) => FieldElement.fromPartial(e)) || [];
     message.data = object.data?.map((e) => FieldElement.fromPartial(e)) || [];
