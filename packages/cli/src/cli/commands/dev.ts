@@ -26,10 +26,6 @@ export default defineCommand({
       type: "string",
       description: "Preset to use",
     },
-    sink: {
-      type: "string",
-      description: "Sink to use",
-    },
   },
   async run({ args }) {
     const rootDir = resolve((args.dir || args._dir || ".") as string);
@@ -103,7 +99,6 @@ export default defineCommand({
           "start",
           ...(args.indexers ? ["--indexers", args.indexers] : []),
           ...(args.preset ? ["--preset", args.preset] : []),
-          ...(args.sink ? ["--sink", args.sink] : []),
         ];
 
         childProcess = spawn("node", childArgs, {
