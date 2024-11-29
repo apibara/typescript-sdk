@@ -1,0 +1,7 @@
+{
+  "type": "prerelease",
+  "comment": "cli: use default logger that includes indexer name",
+  "packageName": "apibara",
+  "email": "francesco@ceccon.me",
+  "dependentChangeType": "patch"
+}

@@ -1,8 +1,10 @@
 import { createIndexer as _createIndexer } from "@apibara/indexer";
-import { logger } from "@apibara/indexer/plugins/logger";
+import { type ConsolaReporter, logger } from "@apibara/indexer/plugins/logger";
 
 import { config } from "#apibara-internal-virtual/config";
 import { indexers } from "#apibara-internal-virtual/indexers";
+
+import { createLogger } from "./logger";
 
 export const availableIndexers = indexers.map((i) => i.name);
 
@@ -39,7 +41,24 @@ export function createIndexer(indexerName: string, preset?: string) {
       ? indexerDefinition.indexer(runtimeConfig)
       : indexerDefinition.indexer;
 
-  definition.plugins = [...(definition.plugins ?? []), logger()];
+  let reporter: ConsolaReporter = createLogger({
+    indexer: indexerName,
+    preset,
+    indexers: availableIndexers,
+  });
+
+  if (config.logger) {
+    reporter = config.logger({
+      indexer: indexerName,
+      preset,
+      indexers: availableIndexers,
+    });
+  }
+
+  definition.plugins = [
+    ...(definition.plugins ?? []),
+    logger({ logger: reporter }),
+  ];
 
   return _createIndexer(definition);
 }
