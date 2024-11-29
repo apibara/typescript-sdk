@@ -99,6 +99,11 @@ export class CsvSink extends Sink {
     await this.write({ data: context.buffer, endCursor });
   }
 
+  async invalidateOnRestart(cursor?: Cursor) {
+    // TODO: Implement
+    throw new Error("Not implemented");
+  }
+
   async invalidate(cursor?: Cursor) {
     // TODO: Implement
     throw new Error("Not implemented");

@@ -83,6 +83,10 @@ export class DrizzleSink<
     });
   }
 
+  async invalidateOnRestart(cursor?: Cursor) {
+    await this.invalidate(cursor);
+  }
+
   async invalidate(cursor?: Cursor) {
     await this._db.transaction(async (db) => {
       for (const table of this._tables) {

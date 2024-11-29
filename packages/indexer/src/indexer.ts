@@ -178,6 +178,9 @@ export async function run<TFilter, TBlock, TTxnParams>(
 
     await indexer.hooks.callHook("connect:before", { request, options });
 
+    // avoid having duplicate data if it was inserted before the persistence commited the state
+    await sink.invalidateOnRestart(request.startingCursor);
+
     // store main filter, so later it can be merged
     let mainFilter: TFilter;
     if (isFactoryMode) {

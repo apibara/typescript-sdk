@@ -16,6 +16,7 @@ export abstract class Sink<TTxnParams = unknown> {
     cb: (params: TTxnParams) => Promise<void>,
   ): Promise<void>;
 
+  abstract invalidateOnRestart(cursor?: Cursor): Promise<void>;
   abstract invalidate(cursor?: Cursor): Promise<void>;
   abstract finalize(cursor?: Cursor): Promise<void>;
 }
@@ -26,6 +27,12 @@ export class DefaultSink extends Sink<unknown> {
     cb: (params: unknown) => Promise<void>,
   ): Promise<void> {
     await cb({});
+  }
+
+  async invalidateOnRestart(cursor?: Cursor) {
+    consola.info(
+      `Invalidating all rows with cursor > ${cursor?.orderKey} on restart`,
+    );
   }
 
   async invalidate(cursor?: Cursor) {
