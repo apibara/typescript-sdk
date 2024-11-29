@@ -100,13 +100,14 @@ export class SqliteSink extends Sink {
   }
 
   async invalidateOnRestart(cursor?: Cursor) {
-    // TODO: Implement
-    throw new Error("Not implemented");
+    await this.invalidate(cursor);
   }
 
   async invalidate(cursor?: Cursor) {
-    // TODO: Implement
-    throw new Error("Not implemented");
+    const cursorValue = Number(cursor?.orderKey);
+
+    const sql = `DELETE FROM ${this._config.tableName} WHERE ${this._config.cursorColumn ?? "_cursor"} > ?`;
+    this._db.prepare(sql).run(cursorValue);
   }
 
   async finalize(cursor?: Cursor) {
