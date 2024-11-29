@@ -99,14 +99,21 @@ export class SqliteSink extends Sink {
     await this.write({ data: context.buffer, endCursor });
   }
 
+  async invalidateOnRestart(cursor?: Cursor) {
+    await this.invalidate(cursor);
+  }
+
   async invalidate(cursor?: Cursor) {
-    // TODO: Implement
-    throw new Error("Not implemented");
+    if (cursor?.orderKey === undefined) return;
+
+    const cursorValue = Number(cursor.orderKey);
+
+    const sql = `DELETE FROM ${this._config.tableName} WHERE ${this._config.cursorColumn ?? "_cursor"} > ?`;
+    this._db.prepare(sql).run(cursorValue);
   }
 
   async finalize(cursor?: Cursor) {
-    // TODO: Implement
-    throw new Error("Not implemented");
+    // No Implementation required
   }
 
   private async insertJsonArray(data: SinkData[]) {

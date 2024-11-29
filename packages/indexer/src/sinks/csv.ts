@@ -99,14 +99,16 @@ export class CsvSink extends Sink {
     await this.write({ data: context.buffer, endCursor });
   }
 
+  async invalidateOnRestart(cursor?: Cursor) {
+    // No Implementation required
+  }
+
   async invalidate(cursor?: Cursor) {
-    // TODO: Implement
-    throw new Error("Not implemented");
+    throw new Error("Reorg for CSV Sink is not implemented");
   }
 
   async finalize(cursor?: Cursor) {
-    // TODO: Implement
-    throw new Error("Not implemented");
+    // No Implementation required
   }
 
   private async insertToCSV(data: SinkData[]) {

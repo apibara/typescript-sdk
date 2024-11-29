@@ -91,14 +91,17 @@ export class MockSink extends Sink {
     this.write({ data: context.buffer, endCursor });
   }
 
+  async invalidateOnRestart(cursor?: Cursor) {
+    // No Implementation required
+  }
+
   async invalidate(cursor?: Cursor) {
     // TODO: Implement
     throw new Error("Not implemented");
   }
 
   async finalize(cursor?: Cursor) {
-    // TODO: Implement
-    throw new Error("Not implemented");
+    // No Implementation required
   }
 }
 

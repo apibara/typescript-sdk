@@ -1,0 +1,7 @@
+{
+  "type": "prerelease",
+  "comment": "add reorg aware implementations in sinks",
+  "packageName": "@apibara/indexer",
+  "email": "jadejajaipal5@gmail.com",
+  "dependentChangeType": "patch"
+}
