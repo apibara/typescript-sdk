@@ -111,8 +111,7 @@ export class SqliteSink extends Sink {
   }
 
   async finalize(cursor?: Cursor) {
-    // TODO: Implement
-    throw new Error("Not implemented");
+    // No Implementation required
   }
 
   private async insertJsonArray(data: SinkData[]) {

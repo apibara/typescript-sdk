@@ -93,8 +93,7 @@ export class DrizzleSink<
         // delete all rows whose lowerbound of "_cursor" (int8range) column is greater than the invalidate cursor
         await db
           .delete(table)
-          .where(gt(sql`lower(_cursor)`, sql`${Number(cursor?.orderKey)}`))
-          .returning();
+          .where(gt(sql`lower(_cursor)`, sql`${Number(cursor?.orderKey)}`));
         // and for rows whose upperbound of "_cursor" (int8range) column is greater than the invalidate cursor, set the upperbound to infinity
         await db
           .update(table)
@@ -107,8 +106,14 @@ export class DrizzleSink<
   }
 
   async finalize(cursor?: Cursor) {
-    // TODO: Implement
-    throw new Error("Not implemented");
+    await this._db.transaction(async (db) => {
+      for (const table of this._tables) {
+        // delete all rows where the upper bound of "_cursor" is less than the finalize cursor
+        await db
+          .delete(table)
+          .where(sql`upper(_cursor) < ${Number(cursor?.orderKey)}`);
+      }
+    });
   }
 }
 
