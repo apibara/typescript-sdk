@@ -1,8 +1,16 @@
 # Change Log - @apibara/indexer
 
-<!-- This log was last generated on Thu, 28 Nov 2024 11:36:10 GMT and should not be manually modified. -->
+<!-- This log was last generated on Fri, 29 Nov 2024 14:21:22 GMT and should not be manually modified. -->
 
 <!-- Start content -->
+
+## 2.0.0-beta.19
+
+Fri, 29 Nov 2024 14:21:22 GMT
+
+### Changes
+
+- add reorg aware implementations in sinks (jadejajaipal5@gmail.com)
 
 ## 2.0.0-beta.17
 
