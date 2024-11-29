@@ -10,6 +10,7 @@ export default defineBuildConfig({
     "./src/vcr/index.ts",
     "./src/plugins/index.ts",
     "./src/plugins/kv.ts",
+    "./src/plugins/logger.ts",
     "./src/plugins/persistence.ts",
   ],
   clean: true,

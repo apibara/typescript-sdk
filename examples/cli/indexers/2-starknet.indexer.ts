@@ -1,4 +1,5 @@
 import { defineIndexer, useSink } from "@apibara/indexer";
+import { useLogger } from "@apibara/indexer/plugins/logger";
 import { sqlite } from "@apibara/indexer/sinks/sqlite";
 import { StarknetStream } from "@apibara/starknet";
 import type { ApibaraRuntimeConfig } from "apibara/types";
@@ -31,7 +32,9 @@ export default function (runtimeConfig: ApibaraRuntimeConfig) {
         },
       ],
     },
-    async transform({ block: { header }, context }) {
+    async transform({ endCursor, block: { header }, context }) {
+      const logger = useLogger();
+      logger.info("Transforming block ", endCursor);
       const { writer } = useSink({ context });
 
       // writer.insert([{

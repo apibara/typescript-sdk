@@ -52,6 +52,12 @@
       "require": "./dist/plugins/index.cjs",
       "default": "./dist/plugins/index.mjs"
     },
+    "./plugins/logger": {
+      "types": "./dist/plugins/logger.d.ts",
+      "import": "./dist/plugins/logger.mjs",
+      "require": "./dist/plugins/logger.cjs",
+      "default": "./dist/plugins/logger.mjs"
+    },
     "./plugins/kv": {
       "types": "./dist/plugins/kv.d.ts",
       "import": "./dist/plugins/kv.mjs",
