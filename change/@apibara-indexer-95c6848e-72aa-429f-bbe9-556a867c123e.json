@@ -1,0 +1,7 @@
+{
+  "type": "prerelease",
+  "comment": "Add logger plugin",
+  "packageName": "@apibara/indexer",
+  "email": "francesco@ceccon.me",
+  "dependentChangeType": "patch"
+}
