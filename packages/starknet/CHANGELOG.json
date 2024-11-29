@@ -2,6 +2,21 @@
   "name": "@apibara/starknet",
   "entries": [
     {
+      "date": "Fri, 29 Nov 2024 13:19:26 GMT",
+      "version": "2.0.0-beta.18",
+      "tag": "@apibara/starknet_v2.0.0-beta.18",
+      "comments": {
+        "prerelease": [
+          {
+            "author": "francesco@ceccon.me",
+            "package": "@apibara/starknet",
+            "commit": "0d87c0c3498983e75e5b00a37f33a8f3b172bf66",
+            "comment": "starknet: fix Event.address name"
+          }
+        ]
+      }
+    },
+    {
       "date": "Sun, 20 Oct 2024 18:49:49 GMT",
       "version": "2.0.0-beta.8",
       "tag": "@apibara/starknet_v2.0.0-beta.8",

@@ -1,7 +1,0 @@
-{
-  "type": "prerelease",
-  "comment": "starknet: fix Event.address name",
-  "packageName": "@apibara/starknet",
-  "email": "francesco@ceccon.me",
-  "dependentChangeType": "patch"
-}

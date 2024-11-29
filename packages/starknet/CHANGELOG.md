@@ -1,8 +1,16 @@
 # Change Log - @apibara/starknet
 
-<!-- This log was last generated on Sun, 20 Oct 2024 18:49:49 GMT and should not be manually modified. -->
+<!-- This log was last generated on Fri, 29 Nov 2024 13:19:26 GMT and should not be manually modified. -->
 
 <!-- Start content -->
+
+## 2.0.0-beta.18
+
+Fri, 29 Nov 2024 13:19:26 GMT
+
+### Changes
+
+- starknet: fix Event.address name (francesco@ceccon.me)
 
 ## 2.0.0-beta.8
 

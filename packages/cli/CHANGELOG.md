@@ -1,8 +1,16 @@
 # Change Log - apibara
 
-<!-- This log was last generated on Thu, 28 Nov 2024 11:36:10 GMT and should not be manually modified. -->
+<!-- This log was last generated on Fri, 29 Nov 2024 13:19:26 GMT and should not be manually modified. -->
 
 <!-- Start content -->
+
+## 2.0.0-beta.18
+
+Fri, 29 Nov 2024 13:19:26 GMT
+
+### Changes
+
+- cli: remove unused dev argument (francesco@ceccon.me)
 
 ## 2.0.0-beta.17
 
