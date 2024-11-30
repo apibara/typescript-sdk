@@ -2,6 +2,21 @@
   "name": "@apibara/indexer",
   "entries": [
     {
+      "date": "Sat, 30 Nov 2024 17:11:28 GMT",
+      "version": "2.0.0-beta.23",
+      "tag": "@apibara/indexer_v2.0.0-beta.23",
+      "comments": {
+        "prerelease": [
+          {
+            "author": "jadejajaipal5@gmail.com",
+            "package": "@apibara/indexer",
+            "commit": "639ccdc633cb7d7556a741542111bed7120cd343",
+            "comment": "indexer: add drizzle persistence plugin"
+          }
+        ]
+      }
+    },
+    {
       "date": "Sat, 30 Nov 2024 16:55:34 GMT",
       "version": "2.0.0-beta.22",
       "tag": "@apibara/indexer_v2.0.0-beta.22",

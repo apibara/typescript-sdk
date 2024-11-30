@@ -1,8 +1,16 @@
 # Change Log - @apibara/indexer
 
-<!-- This log was last generated on Sat, 30 Nov 2024 16:55:34 GMT and should not be manually modified. -->
+<!-- This log was last generated on Sat, 30 Nov 2024 17:11:28 GMT and should not be manually modified. -->
 
 <!-- Start content -->
+
+## 2.0.0-beta.23
+
+Sat, 30 Nov 2024 17:11:28 GMT
+
+### Changes
+
+- indexer: add drizzle persistence plugin (jadejajaipal5@gmail.com)
 
 ## 2.0.0-beta.22
 
