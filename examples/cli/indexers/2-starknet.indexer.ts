@@ -34,7 +34,7 @@ export default function (runtimeConfig: ApibaraRuntimeConfig) {
     },
     async transform({ endCursor, block: { header }, context }) {
       const logger = useLogger();
-      logger.info("Transforming block ", endCursor);
+      logger.info("Transforming block ", endCursor?.orderKey);
       const { writer } = useSink({ context });
 
       // writer.insert([{

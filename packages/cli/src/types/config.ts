@@ -1,3 +1,4 @@
+import type { ConsolaReporter } from "@apibara/indexer/plugins/logger";
 import type { RollupCommonJSOptions } from "@rollup/plugin-commonjs";
 import type {
   C12InputConfig,
@@ -10,6 +11,11 @@ import type { NestedHooks } from "hookable";
 import type { DeepPartial } from "./_utils";
 import type { ApibaraHooks } from "./hooks";
 import type { RollupConfig } from "./rollup";
+
+export type LoggerFactory = ({
+  indexer,
+  preset,
+}: { indexer: string; indexers: string[]; preset?: string }) => ConsolaReporter;
 
 /**
  * Apibara Config type (apibara.config)
@@ -25,6 +31,7 @@ export interface ApibaraConfig<
   runtimeConfig?: R;
   presets?: T;
   preset?: keyof T;
+  logger?: LoggerFactory;
 }
 
 export type ApibaraDynamicConfig = Pick<ApibaraConfig, "runtimeConfig">;
@@ -68,6 +75,9 @@ export interface ApibaraOptions<
 
   // Hooks
   hooks: NestedHooks<ApibaraHooks>;
+
+  // Logging
+  logger?: LoggerFactory;
 
   // Rollup
   rollupConfig?: RollupConfig;

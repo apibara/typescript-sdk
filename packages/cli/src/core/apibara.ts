@@ -15,10 +15,8 @@ export async function createApibara(
   opts: LoadConfigOptions = {},
   dev = false,
 ): Promise<Apibara> {
-  // load options
   const options = await loadOptions(config, opts, dev);
 
-  // create apibara context
   const apibara: Apibara = {
     options,
     indexers: [],
