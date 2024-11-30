@@ -1,4 +1,4 @@
-import { run } from "@apibara/indexer";
+import { runWithReconnect } from "@apibara/indexer";
 import { createClient } from "@apibara/protocol";
 import { defineCommand, runMain } from "citty";
 import { createIndexer } from "./internal/app";
@@ -29,7 +29,7 @@ const startCommand = defineCommand({
       indexerInstance.options.streamUrl,
     );
 
-    await run(client, indexerInstance);
+    await runWithReconnect(client, indexerInstance);
   },
 });
 

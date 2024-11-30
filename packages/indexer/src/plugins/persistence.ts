@@ -3,6 +3,36 @@ import type { Database as SqliteDatabase, Statement } from "better-sqlite3";
 import { deserialize, serialize } from "../vcr";
 import { defineIndexerPlugin } from "./config";
 
+export function inMemoryPersistence<TFilter, TBlock, TTxnParams>() {
+  return defineIndexerPlugin<TFilter, TBlock, TTxnParams>((indexer) => {
+    let lastCursor: Cursor | undefined;
+    let lastFilter: TFilter | undefined;
+
+    indexer.hooks.hook("connect:before", ({ request }) => {
+      if (lastCursor) {
+        request.startingCursor = lastCursor;
+      }
+
+      if (lastFilter) {
+        request.filter[1] = lastFilter;
+      }
+    });
+
+    indexer.hooks.hook("transaction:commit", ({ endCursor }) => {
+      if (endCursor) {
+        lastCursor = endCursor;
+      }
+    });
+
+    indexer.hooks.hook("connect:factory", ({ request, endCursor }) => {
+      if (request.filter[1]) {
+        lastCursor = endCursor;
+        lastFilter = request.filter[1];
+      }
+    });
+  });
+}
+
 export function sqlitePersistence<TFilter, TBlock, TTxnParams>({
   database,
 }: { database: SqliteDatabase }) {

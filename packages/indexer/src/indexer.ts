@@ -1,15 +1,17 @@
-import type {
-  Client,
-  Cursor,
-  DataFinality,
-  Finalize,
-  Heartbeat,
-  Invalidate,
-  StreamConfig,
-  StreamDataOptions,
-  StreamDataRequest,
-  StreamDataResponse,
-  SystemMessage,
+import {
+  type Client,
+  ClientError,
+  type Cursor,
+  type DataFinality,
+  type Finalize,
+  type Heartbeat,
+  type Invalidate,
+  Status,
+  type StreamConfig,
+  type StreamDataOptions,
+  type StreamDataRequest,
+  type StreamDataResponse,
+  type SystemMessage,
 } from "@apibara/protocol";
 import consola from "consola";
 import {
@@ -149,9 +151,71 @@ export function createIndexer<TFilter, TBlock, TTxnParams>({
   return indexer;
 }
 
+export interface ReconnectOptions {
+  maxRetries?: number;
+  retryDelay?: number;
+  maxWait?: number;
+}
+
+export async function runWithReconnect<TFilter, TBlock, TTxnParams>(
+  client: Client<TFilter, TBlock>,
+  indexer: Indexer<TFilter, TBlock, TTxnParams>,
+  options: ReconnectOptions = {},
+) {
+  let retryCount = 0;
+
+  const maxRetries = options.maxRetries ?? 10;
+  const retryDelay = options.retryDelay ?? 1_000;
+  const maxWait = options.maxWait ?? 30_000;
+
+  const runOptions: RunOptions = {
+    onConnect() {
+      retryCount = 0;
+    },
+  };
+
+  while (true) {
+    try {
+      await run(client, indexer, runOptions);
+      return;
+    } catch (error) {
+      // Only reconnect on internal/server errors.
+      // All other errors should be rethrown.
+
+      retryCount++;
+
+      if (error instanceof ClientError) {
+        if (error.code === Status.INTERNAL) {
+          if (retryCount < maxRetries) {
+            consola.error(
+              "Internal server error, reconnecting...",
+              error.message,
+            );
+
+            // Add jitter to the retry delay to avoid all clients retrying at the same time.
+            const delay = Math.random() * (retryDelay * 0.2) + retryDelay;
+            await new Promise((resolve) =>
+              setTimeout(resolve, Math.min(retryCount * delay, maxWait)),
+            );
+
+            continue;
+          }
+        }
+      }
+
+      throw error;
+    }
+  }
+}
+
+export interface RunOptions {
+  onConnect?: () => void | Promise<void>;
+}
+
 export async function run<TFilter, TBlock, TTxnParams>(
   client: Client<TFilter, TBlock>,
   indexer: Indexer<TFilter, TBlock, TTxnParams>,
+  runOptions: RunOptions = {},
 ) {
   await indexerAsyncContext.callAsync({}, async () => {
     const context = useIndexerContext<TTxnParams>();
@@ -195,11 +259,20 @@ export async function run<TFilter, TBlock, TTxnParams>(
 
     await indexer.hooks.callHook("connect:after");
 
+    let onConnectCalled = false;
+
     while (true) {
       const { value: message, done } = await stream.next();
 
       if (done) {
         break;
+      }
+
+      if (!onConnectCalled) {
+        onConnectCalled = true;
+        if (runOptions.onConnect) {
+          await runOptions.onConnect();
+        }
       }
 
       await indexer.hooks.callHook("message", { message });
