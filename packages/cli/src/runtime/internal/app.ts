@@ -1,5 +1,6 @@
 import { createIndexer as _createIndexer } from "@apibara/indexer";
 import { type ConsolaReporter, logger } from "@apibara/indexer/plugins/logger";
+import { inMemoryPersistence } from "@apibara/indexer/plugins/persistence";
 
 import { config } from "#apibara-internal-virtual/config";
 import { indexers } from "#apibara-internal-virtual/indexers";
@@ -55,7 +56,11 @@ export function createIndexer(indexerName: string, preset?: string) {
     });
   }
 
+  // Put the in-memory persistence plugin first so that it can be overridden by any user-defined
+  // persistence plugin.
+  // Put the logger last since we want to override any user-defined logger.
   definition.plugins = [
+    inMemoryPersistence(),
     ...(definition.plugins ?? []),
     logger({ logger: reporter }),
   ];
