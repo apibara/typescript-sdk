@@ -70,11 +70,11 @@
       "require": "./dist/plugins/persistence.cjs",
       "default": "./dist/plugins/persistence.mjs"
     },
-    "./plugins/dirzzle-persistence": {
-      "types": "./dist/plugins/dirzzle-persistence.d.ts",
-      "import": "./dist/plugins/dirzzle-persistence.mjs",
-      "require": "./dist/plugins/dirzzle-persistence.cjs",
-      "default": "./dist/plugins/dirzzle-persistence.mjs"
+    "./plugins/drizzle-persistence": {
+      "types": "./dist/plugins/drizzle-persistence.d.ts",
+      "import": "./dist/plugins/drizzle-persistence.mjs",
+      "require": "./dist/plugins/drizzle-persistence.cjs",
+      "default": "./dist/plugins/drizzle-persistence.mjs"
     }
   },
   "scripts": {

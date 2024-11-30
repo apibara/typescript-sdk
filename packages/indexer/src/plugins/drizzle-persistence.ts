@@ -117,11 +117,6 @@ export class DrizzlePersistence<
     }
   }
 
-  public async del() {
-    await this._delCheckpoint();
-    await this._delFilter();
-  }
-
   // --- CHECKPOINTS TABLE METHODS ---
 
   private async _getCheckpoint(): Promise<Cursor | undefined> {
@@ -154,12 +149,6 @@ export class DrizzlePersistence<
           uniqueKey: cursor.uniqueKey,
         },
       });
-  }
-
-  private async _delCheckpoint() {
-    await this._db
-      .delete(checkpoints)
-      .where(eq(checkpoints.id, this._indexerName));
   }
 
   // --- FILTERS TABLE METHODS ---
@@ -199,9 +188,5 @@ export class DrizzlePersistence<
           fromBlock: Number(endCursor.orderKey),
         },
       });
-  }
-
-  private async _delFilter() {
-    await this._db.delete(filters).where(eq(filters.id, this._indexerName));
   }
 }
