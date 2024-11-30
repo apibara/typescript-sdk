@@ -2,6 +2,21 @@
   "name": "@apibara/protocol",
   "entries": [
     {
+      "date": "Sat, 30 Nov 2024 16:55:34 GMT",
+      "version": "2.0.0-beta.22",
+      "tag": "@apibara/protocol_v2.0.0-beta.22",
+      "comments": {
+        "prerelease": [
+          {
+            "author": "francesco@ceccon.me",
+            "package": "@apibara/protocol",
+            "commit": "19ac26a702f877655df52653029f859b213d7d18",
+            "comment": "indexer: reconnect indexer on internal stream errors"
+          }
+        ]
+      }
+    },
+    {
       "date": "Wed, 06 Nov 2024 20:31:32 GMT",
       "version": "2.0.0-beta.14",
       "tag": "@apibara/protocol_v2.0.0-beta.14",

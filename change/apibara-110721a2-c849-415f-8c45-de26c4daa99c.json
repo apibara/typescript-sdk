@@ -1,7 +1,0 @@
-{
-  "type": "prerelease",
-  "comment": "indexer: reconnect indexer on internal stream errors",
-  "packageName": "apibara",
-  "email": "francesco@ceccon.me",
-  "dependentChangeType": "patch"
-}

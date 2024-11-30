@@ -1,8 +1,16 @@
 # Change Log - @apibara/protocol
 
-<!-- This log was last generated on Wed, 06 Nov 2024 20:31:32 GMT and should not be manually modified. -->
+<!-- This log was last generated on Sat, 30 Nov 2024 16:55:34 GMT and should not be manually modified. -->
 
 <!-- Start content -->
+
+## 2.0.0-beta.22
+
+Sat, 30 Nov 2024 16:55:34 GMT
+
+### Changes
+
+- indexer: reconnect indexer on internal stream errors (francesco@ceccon.me)
 
 ## 2.0.0-beta.14
 
