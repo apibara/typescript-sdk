@@ -60,12 +60,21 @@ importers:
       '@apibara/starknet':
         specifier: workspace:*
         version: link:../../packages/starknet
+      '@electric-sql/pglite':
+        specifier: ^0.2.14
+        version: 0.2.14
       apibara:
         specifier: workspace:*
         version: link:../../packages/cli
       better-sqlite3:
         specifier: ^11.5.0
         version: 11.5.0
+      drizzle-orm:
+        specifier: ^0.35.2
+        version: 0.35.2(@electric-sql/pglite@0.2.14)(@opentelemetry/api@1.9.0)(@types/better-sqlite3@7.6.11)(@types/pg@8.11.10)(better-sqlite3@11.5.0)(pg@8.13.0)(postgres@3.4.4)
+      pg:
+        specifier: ^8.12.0
+        version: 8.13.0
       starknet:
         specifier: ^6.11.0
         version: 6.11.0
@@ -76,6 +85,9 @@ importers:
       '@types/node':
         specifier: ^20.5.2
         version: 20.14.0
+      '@types/pg':
+        specifier: ^8.11.10
+        version: 8.11.10
       typescript:
         specifier: ^5.6.2
         version: 5.6.2
@@ -179,7 +191,7 @@ importers:
         version: 6.5.0
       drizzle-orm:
         specifier: ^0.35.0
-        version: 0.35.2(@opentelemetry/api@1.9.0)(@types/better-sqlite3@7.6.11)(@types/pg@8.11.10)(better-sqlite3@11.5.0)(pg@8.13.0)(postgres@3.4.4)
+        version: 0.35.2(@electric-sql/pglite@0.2.14)(@opentelemetry/api@1.9.0)(@types/better-sqlite3@7.6.11)(@types/pg@8.11.10)(better-sqlite3@11.5.0)(pg@8.13.0)(postgres@3.4.4)
       postgres:
         specifier: ^3.4.4
         version: 3.4.4
@@ -262,7 +274,7 @@ importers:
         version: 6.5.0
       drizzle-orm:
         specifier: ^0.35.0
-        version: 0.35.2(@opentelemetry/api@1.9.0)(@types/better-sqlite3@7.6.11)(@types/pg@8.11.10)(better-sqlite3@11.5.0)(pg@8.13.0)(postgres@3.4.4)
+        version: 0.35.2(@electric-sql/pglite@0.2.14)(@opentelemetry/api@1.9.0)(@types/better-sqlite3@7.6.11)(@types/pg@8.11.10)(better-sqlite3@11.5.0)(pg@8.13.0)(postgres@3.4.4)
       postgres:
         specifier: ^3.4.4
         version: 3.4.4
@@ -493,6 +505,9 @@ importers:
         specifier: ^2.3.1
         version: 2.3.1
     devDependencies:
+      '@electric-sql/pglite':
+        specifier: ^0.2.14
+        version: 0.2.14
       '@types/better-sqlite3':
         specifier: ^7.6.11
         version: 7.6.11
@@ -510,7 +525,7 @@ importers:
         version: 6.5.0
       drizzle-orm:
         specifier: ^0.35.2
-        version: 0.35.2(@opentelemetry/api@1.9.0)(@types/better-sqlite3@7.6.11)(@types/pg@8.11.10)(better-sqlite3@11.5.0)(pg@8.13.0)(postgres@3.4.4)
+        version: 0.35.2(@electric-sql/pglite@0.2.14)(@opentelemetry/api@1.9.0)(@types/better-sqlite3@7.6.11)(@types/pg@8.11.10)(better-sqlite3@11.5.0)(pg@8.13.0)(postgres@3.4.4)
       pg:
         specifier: ^8.12.0
         version: 8.13.0
@@ -855,6 +870,9 @@ packages:
     resolution: {integrity: sha512-+AO29qX0GIDARbQE1TcnWz3cUBCOm3x8KP6SXpWUot1cfG4ccoWrrfzVBaaCl1FDT5egvAtwfQ26GPVMJEobEg==}
     peerDependencies:
       effect: ^3.2.6
+
+  '@electric-sql/pglite@0.2.14':
+    resolution: {integrity: sha512-ZMYZL/yFu5sCewYecdX4OjyOPcrI2OmQ6598e/tyke4Rpgeekd4+pINf9jjzJNJk1Kq5dtuB6buqZsBQf0sx8A==}
 
   '@esbuild/aix-ppc64@0.19.11':
     resolution: {integrity: sha512-FnzU0LyE3ySQk7UntJO4+qIiQgI7KoODnZg5xzXIrFJlKd2P2gwHsHY4927xj9y5PJmJSzULiUCWmv7iWnNa7g==}
@@ -3907,6 +3925,8 @@ snapshots:
       effect: 3.2.6
       fast-check: 3.19.0
 
+  '@electric-sql/pglite@0.2.14': {}
+
   '@esbuild/aix-ppc64@0.19.11':
     optional: true
 
@@ -4994,8 +5014,9 @@ snapshots:
 
   dotenv@16.4.5: {}
 
-  drizzle-orm@0.35.2(@opentelemetry/api@1.9.0)(@types/better-sqlite3@7.6.11)(@types/pg@8.11.10)(better-sqlite3@11.5.0)(pg@8.13.0)(postgres@3.4.4):
+  drizzle-orm@0.35.2(@electric-sql/pglite@0.2.14)(@opentelemetry/api@1.9.0)(@types/better-sqlite3@7.6.11)(@types/pg@8.11.10)(better-sqlite3@11.5.0)(pg@8.13.0)(postgres@3.4.4):
     optionalDependencies:
+      '@electric-sql/pglite': 0.2.14
       '@opentelemetry/api': 1.9.0
       '@types/better-sqlite3': 7.6.11
       '@types/pg': 8.11.10
