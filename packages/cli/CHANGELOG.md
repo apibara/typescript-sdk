@@ -1,8 +1,16 @@
 # Change Log - apibara
 
-<!-- This log was last generated on Fri, 29 Nov 2024 15:14:44 GMT and should not be manually modified. -->
+<!-- This log was last generated on Sat, 30 Nov 2024 11:36:48 GMT and should not be manually modified. -->
 
 <!-- Start content -->
+
+## 2.0.0-beta.21
+
+Sat, 30 Nov 2024 11:36:48 GMT
+
+### Changes
+
+- cli: use default logger that includes indexer name (francesco@ceccon.me)
 
 ## 2.0.0-beta.20
 

@@ -2,6 +2,21 @@
   "name": "apibara",
   "entries": [
     {
+      "date": "Sat, 30 Nov 2024 11:36:48 GMT",
+      "version": "2.0.0-beta.21",
+      "tag": "apibara_v2.0.0-beta.21",
+      "comments": {
+        "prerelease": [
+          {
+            "author": "francesco@ceccon.me",
+            "package": "apibara",
+            "commit": "80b95432a58db6d8c443afe3d47439e16ecfaf38",
+            "comment": "cli: use default logger that includes indexer name"
+          }
+        ]
+      }
+    },
+    {
       "date": "Fri, 29 Nov 2024 15:14:44 GMT",
       "version": "2.0.0-beta.20",
       "tag": "apibara_v2.0.0-beta.20",
