@@ -12,6 +12,7 @@ export default defineBuildConfig({
     "./src/plugins/kv.ts",
     "./src/plugins/logger.ts",
     "./src/plugins/persistence.ts",
+    "./src/plugins/dirzzle-persistence.ts",
   ],
   clean: true,
   outDir: "./dist",

@@ -69,6 +69,12 @@
       "import": "./dist/plugins/persistence.mjs",
       "require": "./dist/plugins/persistence.cjs",
       "default": "./dist/plugins/persistence.mjs"
+    },
+    "./plugins/dirzzle-persistence": {
+      "types": "./dist/plugins/dirzzle-persistence.d.ts",
+      "import": "./dist/plugins/dirzzle-persistence.mjs",
+      "require": "./dist/plugins/dirzzle-persistence.cjs",
+      "default": "./dist/plugins/dirzzle-persistence.mjs"
     }
   },
   "scripts": {
@@ -80,6 +86,7 @@
     "test:ci": "vitest run"
   },
   "devDependencies": {
+    "@electric-sql/pglite": "^0.2.14",
     "@types/better-sqlite3": "^7.6.11",
     "@types/node": "^20.14.0",
     "@types/pg": "^8.11.10",
@@ -102,6 +109,7 @@
     "unctx": "^2.3.1"
   },
   "peerDependencies": {
+    "@electric-sql/pglite": "^0.2.14",
     "better-sqlite3": "^11.5.0",
     "csv-stringify": "^6.5.0",
     "drizzle-orm": "^0.35.2",
