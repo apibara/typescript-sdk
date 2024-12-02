@@ -12,7 +12,7 @@ import { appConfig } from "./plugins/config";
 import { esmShim } from "./plugins/esm-shim";
 import { indexers } from "./plugins/indexers";
 
-const runtimeDependencies = ["better-sqlite3"];
+const runtimeDependencies = ["better-sqlite3", "@electric-sql/pglite"];
 
 export function getRollupConfig(apibara: Apibara): RollupConfig {
   const extensions: string[] = [
