@@ -1,4 +1,4 @@
-import { defineIndexer, useSink } from "@apibara/indexer";
+import { defineIndexer } from "@apibara/indexer";
 import { drizzlePersistence } from "@apibara/indexer/plugins/drizzle-persistence";
 import { useLogger } from "@apibara/indexer/plugins/logger";
 import { sqlite } from "@apibara/indexer/sinks/sqlite";
@@ -6,13 +6,10 @@ import { StarknetStream } from "@apibara/starknet";
 import type { ApibaraRuntimeConfig } from "apibara/types";
 import Database from "better-sqlite3";
 import { sql } from "drizzle-orm";
-import { drizzle } from "drizzle-orm/node-postgres";
-import { Client } from "pg";
+import { drizzle } from "drizzle-orm/pglite";
 import { hash } from "starknet";
 
 export default function (runtimeConfig: ApibaraRuntimeConfig) {
-  console.log("--> Starknet Indexer Runtime Config: ", runtimeConfig);
-
   // Sink Database
   const database = new Database(runtimeConfig.databasePath);
   database.exec("DROP TABLE IF EXISTS test");
@@ -21,10 +18,9 @@ export default function (runtimeConfig: ApibaraRuntimeConfig) {
   );
 
   // Persistence Database
-  const client = new Client({
-    connectionString: "postgres://postgres:postgres@localhost:5432/postgres",
+  const persistDatabase = drizzle("./.persistence", {
+    logger: true,
   });
-  const persistDatabase = drizzle(client);
 
   return defineIndexer(StarknetStream)({
     streamUrl: "https://starknet.preview.apibara.org",
@@ -52,7 +48,7 @@ export default function (runtimeConfig: ApibaraRuntimeConfig) {
     async transform({ endCursor, block: { header }, context }) {
       const logger = useLogger();
       logger.info("Transforming block ", endCursor?.orderKey);
-      const { writer } = useSink({ context });
+      // const { writer } = useSink({ context });
 
       // writer.insert([{
       //   number: header?.blockNumber.toString(),
@@ -61,8 +57,6 @@ export default function (runtimeConfig: ApibaraRuntimeConfig) {
     },
     hooks: {
       async "run:before"() {
-        await client.connect();
-
         // Normally user will do migrations of both tables, which are defined in
         // ```
         // import { checkpoints, filters } from "@apibara/indexer/plugins/drizzle-persistence"
@@ -75,7 +69,9 @@ export default function (runtimeConfig: ApibaraRuntimeConfig) {
             order_key INTEGER NOT NULL,
             unique_key TEXT
           );
-      
+        `);
+
+        await persistDatabase.execute(sql`
           CREATE TABLE IF NOT EXISTS filters (
             id TEXT NOT NULL,
             filter TEXT NOT NULL,
