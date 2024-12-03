@@ -6,6 +6,8 @@ import { hash } from "starknet";
 
 const PAIR_CREATED = hash.getSelectorFromName("PairCreated") as `0x${string}`;
 const SWAP = hash.getSelectorFromName("Swap") as `0x${string}`;
+const shortAddress = (addr?: string) =>
+  addr ? `${addr.slice(0, 6)}...${addr.slice(-4)}` : "";
 
 export default function (runtimeConfig: ApibaraRuntimeConfig) {
   return defineIndexer(StarknetStream)({
@@ -30,23 +32,34 @@ export default function (runtimeConfig: ApibaraRuntimeConfig) {
       const poolEvents = (events ?? []).flatMap((event) => {
         const pairAddress = event.data?.[2];
 
-        logger.log(`Factory: PairAddress - ${pairAddress}`);
+        logger.log(
+          "Factory: PairAddress    : ",
+          `\x1b[35m${pairAddress}\x1b[0m`,
+        );
         return {
           address: pairAddress,
           keys: [SWAP],
-          includeReceipt: false,
         };
       });
       return {
         filter: {
-          header: "always",
           events: poolEvents,
         },
       };
     },
     async transform({ block, endCursor }) {
       const logger = useLogger();
-      logger.log("Transforming ", endCursor?.orderKey);
+      const { events } = block;
+
+      logger.log("Transforming...         : ", endCursor?.orderKey);
+      for (const event of events) {
+        logger.log(
+          "Event Address           : ",
+          shortAddress(event.address),
+          "| Txn hash :",
+          shortAddress(event.transactionHash),
+        );
+      }
     },
   });
 }
