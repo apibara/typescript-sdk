@@ -1,7 +1,0 @@
-{
-  "type": "prerelease",
-  "comment": "cli: add @electric-sql/pglite as external dependency",
-  "packageName": "apibara",
-  "email": "jadejajaipal5@gmail.com",
-  "dependentChangeType": "patch"
-}

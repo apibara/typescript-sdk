@@ -1,8 +1,16 @@
 # Change Log - apibara
 
-<!-- This log was last generated on Sat, 30 Nov 2024 16:55:34 GMT and should not be manually modified. -->
+<!-- This log was last generated on Tue, 03 Dec 2024 12:54:33 GMT and should not be manually modified. -->
 
 <!-- Start content -->
+
+## 2.0.0-beta.24
+
+Tue, 03 Dec 2024 12:54:33 GMT
+
+### Changes
+
+- cli: add @electric-sql/pglite as external dependency (jadejajaipal5@gmail.com)
 
 ## 2.0.0-beta.22
 

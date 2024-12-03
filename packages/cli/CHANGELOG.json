@@ -2,6 +2,21 @@
   "name": "apibara",
   "entries": [
     {
+      "date": "Tue, 03 Dec 2024 12:54:33 GMT",
+      "version": "2.0.0-beta.24",
+      "tag": "apibara_v2.0.0-beta.24",
+      "comments": {
+        "prerelease": [
+          {
+            "author": "jadejajaipal5@gmail.com",
+            "package": "apibara",
+            "commit": "975b8004e02cb732aad4357d28176118c8d9637c",
+            "comment": "cli: add @electric-sql/pglite as external dependency"
+          }
+        ]
+      }
+    },
+    {
       "date": "Sat, 30 Nov 2024 16:55:34 GMT",
       "version": "2.0.0-beta.22",
       "tag": "apibara_v2.0.0-beta.22",
