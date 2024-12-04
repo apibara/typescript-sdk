@@ -1,6 +1,7 @@
 import { createClient } from "@apibara/protocol";
 import ci from "ci-info";
 import { type IndexerWithStreamConfig, createIndexer } from "../indexer";
+import { logger } from "../plugins/logger";
 import type { CassetteOptions, VcrConfig } from "../vcr/config";
 import { isCassetteAvailable } from "../vcr/helper";
 import { record } from "../vcr/record";
@@ -26,6 +27,8 @@ export function createVcr() {
           orderKey: range.toBlock,
         },
       };
+
+      indexerConfig.plugins = [logger(), ...(indexerConfig.plugins ?? [])];
 
       const indexer = createIndexer(indexerConfig);
 
