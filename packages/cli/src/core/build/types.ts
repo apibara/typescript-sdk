@@ -28,6 +28,8 @@ declare module "apibara/types" {`,
         )
       : "",
     "}",
+    // Makes this a module for augmentation purposes
+    "export type {};",
   ];
 
   const buildFiles: { path: string; contents: string }[] = [];

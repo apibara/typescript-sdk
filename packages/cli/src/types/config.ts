@@ -21,12 +21,12 @@ export type LoggerFactory = ({
  * Apibara Config type (apibara.config)
  */
 export interface ApibaraConfig<
-  T extends Record<string, DeepPartial<ApibaraConfig<T, R>>> = Record<
+  T extends Record<
     string,
-    never
-  >,
+    DeepPartial<Pick<ApibaraConfig<T, R>, "runtimeConfig">>
+  > = Record<string, never>,
   R extends Record<string, unknown> = Record<string, never>,
-> extends DeepPartial<Omit<ApibaraOptions<T, R>, "preset" | "presets" | "dev">>,
+> extends Partial<Omit<ApibaraOptions<T, R>, "preset" | "presets" | "dev">>,
     C12InputConfig<ApibaraConfig<T, R>> {
   runtimeConfig?: R;
   presets?: T;
@@ -45,10 +45,10 @@ export interface LoadConfigOptions {
 }
 
 export interface ApibaraOptions<
-  T extends Record<string, DeepPartial<ApibaraConfig<T, R>>> = Record<
+  T extends Record<
     string,
-    never
-  >,
+    DeepPartial<Pick<ApibaraConfig<T, R>, "runtimeConfig">>
+  > = Record<string, never>,
   R extends Record<string, unknown> = Record<string, never>,
 > {
   // Internal
@@ -80,7 +80,7 @@ export interface ApibaraOptions<
   logger?: LoggerFactory;
 
   // Rollup
-  rollupConfig?: RollupConfig;
+  rollupConfig?: Partial<RollupConfig>;
   sourceMap?: boolean;
   entry: string;
   commonJS?: RollupCommonJSOptions;
