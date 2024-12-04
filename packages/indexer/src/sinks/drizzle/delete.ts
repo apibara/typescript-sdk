@@ -1,8 +1,9 @@
 import type { Cursor } from "@apibara/protocol";
-import type {
-  ExtractTablesWithRelations,
-  SQL,
-  TablesRelationalConfig,
+import {
+  type ExtractTablesWithRelations,
+  type SQL,
+  type TablesRelationalConfig,
+  sql,
 } from "drizzle-orm";
 import type {
   PgQueryResultHKT,
