@@ -9,7 +9,7 @@ import type {
   PgColumnBuilderBase,
   PgCustomColumnBuilder,
   PgTable,
-  PgTableExtraConfig,
+  PgTableExtraConfigValue,
   PgTableWithColumns,
 } from "drizzle-orm/pg-core";
 import { pgTable as drizzlePgTable } from "drizzle-orm/pg-core";
@@ -43,7 +43,7 @@ export type PgIndexerTableWithCursorFn<
       TColumnsMap & { _cursor: CursorColumnBuilder },
       "pg"
     >,
-  ) => PgTableExtraConfig,
+  ) => PgTableExtraConfigValue[],
 ) => PgTableWithColumns<{
   name: TTableName;
   schema: TSchema;
