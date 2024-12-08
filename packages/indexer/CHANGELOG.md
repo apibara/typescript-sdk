@@ -1,8 +1,16 @@
 # Change Log - @apibara/indexer
 
-<!-- This log was last generated on Sat, 30 Nov 2024 17:11:28 GMT and should not be manually modified. -->
+<!-- This log was last generated on Sun, 08 Dec 2024 14:48:11 GMT and should not be manually modified. -->
 
 <!-- Start content -->
+
+## 2.0.0-beta.25
+
+Sun, 08 Dec 2024 14:48:11 GMT
+
+### Changes
+
+- indexer: upgrade drizzle & fix vcr (jadejajaipal5@gmail.com)
 
 ## 2.0.0-beta.23
 

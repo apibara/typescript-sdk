@@ -2,6 +2,21 @@
   "name": "apibara",
   "entries": [
     {
+      "date": "Sun, 08 Dec 2024 14:48:11 GMT",
+      "version": "2.0.0-beta.25",
+      "tag": "apibara_v2.0.0-beta.25",
+      "comments": {
+        "prerelease": [
+          {
+            "author": "jadejajaipal5@gmail.com",
+            "package": "apibara",
+            "commit": "37f00c0656f140466d3500b2c5ad1c8d8f5356e4",
+            "comment": "cli: fix infinite type instantiation errors in apibara config"
+          }
+        ]
+      }
+    },
+    {
       "date": "Tue, 03 Dec 2024 12:54:33 GMT",
       "version": "2.0.0-beta.24",
       "tag": "apibara_v2.0.0-beta.24",

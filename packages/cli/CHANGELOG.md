@@ -1,8 +1,16 @@
 # Change Log - apibara
 
-<!-- This log was last generated on Tue, 03 Dec 2024 12:54:33 GMT and should not be manually modified. -->
+<!-- This log was last generated on Sun, 08 Dec 2024 14:48:11 GMT and should not be manually modified. -->
 
 <!-- Start content -->
+
+## 2.0.0-beta.25
+
+Sun, 08 Dec 2024 14:48:11 GMT
+
+### Changes
+
+- cli: fix infinite type instantiation errors in apibara config (jadejajaipal5@gmail.com)
 
 ## 2.0.0-beta.24
 
