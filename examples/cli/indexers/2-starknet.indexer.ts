@@ -1,27 +1,33 @@
-import { defineIndexer } from "@apibara/indexer";
+import { defineIndexer, useSink } from "@apibara/indexer";
 import { drizzlePersistence } from "@apibara/indexer/plugins/drizzle-persistence";
 import { useLogger } from "@apibara/indexer/plugins/logger";
-import { sqlite } from "@apibara/indexer/sinks/sqlite";
+import { drizzle as drizzleSink } from "@apibara/indexer/sinks/drizzle";
 import { StarknetStream } from "@apibara/starknet";
 import type { ApibaraRuntimeConfig } from "apibara/types";
-import Database from "better-sqlite3";
-import { sql } from "drizzle-orm";
-import { drizzle } from "drizzle-orm/pglite";
+import type {
+  ExtractTablesWithRelations,
+  TablesRelationalConfig,
+} from "drizzle-orm";
+import type { PgDatabase, PgQueryResultHKT } from "drizzle-orm/pg-core";
 import { hash } from "starknet";
+import { db } from "../lib/db";
+import { starknetUsdcTransfers } from "../lib/schema";
 
+// USDC Transfers on Starknet
 export default function (runtimeConfig: ApibaraRuntimeConfig) {
-  // Sink Database
-  const database = new Database(runtimeConfig.databasePath);
-  database.exec("DROP TABLE IF EXISTS test");
-  database.exec(
-    "CREATE TABLE IF NOT EXISTS test (number TEXT, hash TEXT, _cursor BIGINT)",
-  );
+  return createIndexer({ database: db });
+}
 
-  // Persistence Database
-  const persistDatabase = drizzle("./.persistence", {
-    logger: true,
-  });
-
+export function createIndexer<
+  TQueryResult extends PgQueryResultHKT,
+  TFullSchema extends Record<string, unknown> = Record<string, never>,
+  TSchema extends
+    TablesRelationalConfig = ExtractTablesWithRelations<TFullSchema>,
+>({
+  database,
+}: {
+  database: PgDatabase<TQueryResult, TFullSchema, TSchema>;
+}) {
   return defineIndexer(StarknetStream)({
     streamUrl: "https://starknet.preview.apibara.org",
     finality: "accepted",
@@ -29,58 +35,39 @@ export default function (runtimeConfig: ApibaraRuntimeConfig) {
       orderKey: 800_000n,
     },
     plugins: [
-      drizzlePersistence({
-        database: persistDatabase,
-        indexerName: "2-starknet",
-      }),
+      drizzlePersistence({ database, indexerName: "starknet-usdc-transfers" }),
     ],
-    sink: sqlite({ database, tableName: "test" }),
+    sink: drizzleSink({ database, tables: [starknetUsdcTransfers] }),
     filter: {
       events: [
         {
           address:
-            "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7" as `0x${string}`,
+            "0x053c91253bc9682c04929ca02ed00b3e423f6710d2ee7e0d5ebb06f3ecf368a8" as `0x${string}`,
           keys: [hash.getSelectorFromName("Transfer") as `0x${string}`],
-          includeReceipt: true,
         },
       ],
     },
-    async transform({ endCursor, block: { header }, context }) {
+    async transform({ endCursor, block, context }) {
       const logger = useLogger();
+      const { db } = useSink({ context });
+      const { events } = block;
+
       logger.info("Transforming block ", endCursor?.orderKey);
-      // const { writer } = useSink({ context });
 
-      // writer.insert([{
-      //   number: header?.blockNumber.toString(),
-      //   hash: header?.blockHash,
-      // }])
-    },
-    hooks: {
-      async "run:before"() {
-        // Normally user will do migrations of both tables, which are defined in
-        // ```
-        // import { checkpoints, filters } from "@apibara/indexer/plugins/drizzle-persistence"
-        // ```,
-        // but just for quick testing and example we create them here directly
+      const transactionHashes = new Set<string>();
 
-        await persistDatabase.execute(sql`
-          CREATE TABLE IF NOT EXISTS checkpoints (
-            id TEXT NOT NULL PRIMARY KEY,
-            order_key INTEGER NOT NULL,
-            unique_key TEXT
-          );
-        `);
+      for (const event of events) {
+        if (event.transactionHash) {
+          transactionHashes.add(event.transactionHash);
+        }
+      }
 
-        await persistDatabase.execute(sql`
-          CREATE TABLE IF NOT EXISTS filters (
-            id TEXT NOT NULL,
-            filter TEXT NOT NULL,
-            from_block INTEGER NOT NULL,
-            to_block INTEGER,
-            PRIMARY KEY (id, from_block)
-          );
-        `);
-      },
+      await db.insert(starknetUsdcTransfers).values(
+        Array.from(transactionHashes).map((transactionHash) => ({
+          number: Number(endCursor?.orderKey),
+          hash: transactionHash,
+        })),
+      );
     },
   });
 }

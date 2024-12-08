@@ -2,13 +2,16 @@ import { defineConfig } from "apibara/config";
 
 export default defineConfig({
   runtimeConfig: {
-    databasePath: ":memory:",
+    pgLiteDBPath: "memory://persistence",
   },
   presets: {
     dev: {
       runtimeConfig: {
-        databasePath: "/tmp/my-db.sqlite",
+        pgLiteDBPath: "./.persistence",
       },
     },
   },
+  // rollupConfig: {
+  //   plugins: [tsConfigPaths()],
+  // },
 });

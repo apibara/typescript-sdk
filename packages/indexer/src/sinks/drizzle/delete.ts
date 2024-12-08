@@ -10,6 +10,7 @@ import type {
   PgTable,
   PgTransaction,
   PgUpdateBase,
+  PgUpdateWithout,
 } from "drizzle-orm/pg-core";
 
 export class DrizzleSinkDelete<
@@ -25,18 +26,19 @@ export class DrizzleSinkDelete<
     private endCursor?: Cursor,
   ) {}
 
-  //@ts-ignore
-  where(where: SQL): Omit<
-    // for type safety used PgUpdateBase instead of PgDeleteBase
-    PgUpdateBase<TTable, TQueryResult, undefined, false, "where">,
-    "where"
-  > {
+  where(
+    where: SQL,
+  ): PgUpdateWithout<PgUpdateBase<TTable, TQueryResult>, false, "where"> {
     return this.db
       .update(this.table)
       .set({
         // @ts-ignore
         _cursor: sql`int8range(lower(_cursor), ${Number(this.endCursor?.orderKey!)}, '[)')`,
       })
-      .where(where);
+      .where(where) as PgUpdateWithout<
+      PgUpdateBase<TTable, TQueryResult>,
+      false,
+      "where"
+    >;
   }
 }

@@ -1,7 +1,6 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import type { Client, StreamDataResponse } from "@apibara/protocol";
-import { klona } from "klona/full";
 import { type Indexer, run } from "../indexer";
 import type { CassetteOptions, VcrConfig } from "./config";
 import { serialize } from "./helper";
@@ -14,10 +13,9 @@ export type CassetteDataType<TFilter, TBlock> = {
 export async function record<TFilter, TBlock, TTxnParams>(
   vcrConfig: VcrConfig,
   client: Client<TFilter, TBlock>,
-  indexerArg: Indexer<TFilter, TBlock, TTxnParams>,
+  indexer: Indexer<TFilter, TBlock, TTxnParams>,
   cassetteOptions: CassetteOptions,
 ) {
-  const indexer = klona(indexerArg);
   const messages: StreamDataResponse<TBlock>[] = [];
 
   indexer.hooks.addHooks({
