@@ -3,6 +3,7 @@ import { defineIndexer, useSink } from "@apibara/indexer";
 import { drizzlePersistence } from "@apibara/indexer/plugins/drizzle-persistence";
 import { useLogger } from "@apibara/indexer/plugins/logger";
 import { drizzle as drizzleSink } from "@apibara/indexer/sinks/drizzle";
+
 import type { ApibaraRuntimeConfig } from "apibara/types";
 import type {
   ExtractTablesWithRelations,
@@ -10,8 +11,9 @@ import type {
 } from "drizzle-orm";
 import type { PgDatabase, PgQueryResultHKT } from "drizzle-orm/pg-core";
 import { encodeEventTopics, parseAbi } from "viem";
-import { db } from "../lib/db";
-import { ethereumUsdcTransfers } from "../lib/schema";
+
+import { db } from "@/lib/db";
+import { ethereumUsdcTransfers } from "@/lib/schema";
 
 const abi = parseAbi([
   "event Transfer(address indexed from, address indexed to, uint256 value)",

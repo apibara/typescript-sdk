@@ -1,6 +1,7 @@
 import { defineIndexer } from "@apibara/indexer";
 import { useLogger } from "@apibara/indexer/plugins/logger";
 import { StarknetStream } from "@apibara/starknet";
+
 import type { ApibaraRuntimeConfig } from "apibara/types";
 import { hash } from "starknet";
 

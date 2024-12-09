@@ -1,9 +1,12 @@
 import { createVcr } from "@apibara/indexer/testing";
+
 import { drizzle } from "drizzle-orm/pglite";
 import { beforeAll, describe, expect, it } from "vitest";
-import { createIndexer } from "../indexers/2-starknet.indexer";
-import { starknetUsdcTransfers } from "../lib/schema";
-import * as schema from "../lib/schema";
+
+import { createIndexer } from "@/indexers/2-starknet.indexer";
+import { starknetUsdcTransfers } from "@/lib/schema";
+import * as schema from "@/lib/schema";
+
 import { migratePglite } from "./helper";
 
 const vcr = createVcr();

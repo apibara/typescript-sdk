@@ -3,6 +3,7 @@ import { drizzlePersistence } from "@apibara/indexer/plugins/drizzle-persistence
 import { useLogger } from "@apibara/indexer/plugins/logger";
 import { drizzle as drizzleSink } from "@apibara/indexer/sinks/drizzle";
 import { StarknetStream } from "@apibara/starknet";
+
 import type { ApibaraRuntimeConfig } from "apibara/types";
 import type {
   ExtractTablesWithRelations,
@@ -10,8 +11,9 @@ import type {
 } from "drizzle-orm";
 import type { PgDatabase, PgQueryResultHKT } from "drizzle-orm/pg-core";
 import { hash } from "starknet";
-import { db } from "../lib/db";
-import { starknetUsdcTransfers } from "../lib/schema";
+
+import { db } from "@/lib/db";
+import { starknetUsdcTransfers } from "@/lib/schema";
 
 // USDC Transfers on Starknet
 export default function (runtimeConfig: ApibaraRuntimeConfig) {
