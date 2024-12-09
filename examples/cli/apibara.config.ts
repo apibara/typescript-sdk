@@ -1,3 +1,4 @@
+import typescript from "@rollup/plugin-typescript";
 import { defineConfig } from "apibara/config";
 
 export default defineConfig({
@@ -11,7 +12,7 @@ export default defineConfig({
       },
     },
   },
-  // rollupConfig: {
-  //   plugins: [tsConfigPaths()],
-  // },
+  rollupConfig: {
+    plugins: [typescript()],
+  },
 });

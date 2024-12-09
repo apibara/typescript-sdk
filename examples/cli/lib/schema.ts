@@ -1,4 +1,5 @@
 import { pgIndexerTable } from "@apibara/indexer/sinks/drizzle";
+
 import { bigint, text } from "drizzle-orm/pg-core";
 
 export const starknetUsdcTransfers = pgIndexerTable("starknet_usdc_transfers", {
