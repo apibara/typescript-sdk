@@ -1,8 +1,16 @@
 # Change Log - @apibara/indexer
 
-<!-- This log was last generated on Sun, 08 Dec 2024 14:48:11 GMT and should not be manually modified. -->
+<!-- This log was last generated on Mon, 09 Dec 2024 13:03:01 GMT and should not be manually modified. -->
 
 <!-- Start content -->
+
+## 2.0.0-beta.26
+
+Mon, 09 Dec 2024 13:03:01 GMT
+
+### Changes
+
+- indexer: remove logs from default sink (jadejajaipal5@gmail.com)
 
 ## 2.0.0-beta.25
 

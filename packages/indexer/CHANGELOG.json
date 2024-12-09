@@ -2,6 +2,21 @@
   "name": "@apibara/indexer",
   "entries": [
     {
+      "date": "Mon, 09 Dec 2024 13:03:01 GMT",
+      "version": "2.0.0-beta.26",
+      "tag": "@apibara/indexer_v2.0.0-beta.26",
+      "comments": {
+        "prerelease": [
+          {
+            "author": "jadejajaipal5@gmail.com",
+            "package": "@apibara/indexer",
+            "commit": "3bef18699440beae3a3edc604154bcd2d1dc9296",
+            "comment": "indexer: remove logs from default sink"
+          }
+        ]
+      }
+    },
+    {
       "date": "Sun, 08 Dec 2024 14:48:11 GMT",
       "version": "2.0.0-beta.25",
       "tag": "@apibara/indexer_v2.0.0-beta.25",
