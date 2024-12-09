@@ -1,5 +1,4 @@
 import type { Cursor, DataFinality } from "@apibara/protocol";
-import consola from "consola";
 import type { IndexerContext } from "./context";
 
 export type SinkData = Record<string, unknown>;
@@ -29,19 +28,11 @@ export class DefaultSink extends Sink<unknown> {
     await cb({});
   }
 
-  async invalidateOnRestart(cursor?: Cursor) {
-    consola.info(
-      `Invalidating all rows with cursor > ${cursor?.orderKey} on restart`,
-    );
-  }
+  async invalidateOnRestart(cursor?: Cursor) {}
 
-  async invalidate(cursor?: Cursor) {
-    consola.info(`Invalidating cursor ${cursor?.orderKey}`);
-  }
+  async invalidate(cursor?: Cursor) {}
 
-  async finalize(cursor?: Cursor) {
-    consola.info(`Finalizing cursor ${cursor?.orderKey}`);
-  }
+  async finalize(cursor?: Cursor) {}
 }
 
 /** A default sink that does nothing. */
