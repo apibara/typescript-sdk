@@ -96,7 +96,7 @@ export class MongoSink extends Sink {
   }
 }
 
-export const mongo = (args: MongoSinkOptions) => {
+export const mongoSink = (args: MongoSinkOptions) => {
   const { client, ...rest } = args;
   return new MongoSink(client, rest);
 };

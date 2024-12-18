@@ -8,6 +8,7 @@ import type {
   Document,
   Filter,
   FindCursor,
+  FindOneAndUpdateOptions,
   FindOptions,
   InsertManyResult,
   InsertOneOptions,
@@ -73,7 +74,8 @@ export class MongoSinkCollection<TSchema extends Document> {
     update: UpdateFilter<TSchema>,
     options?: UpdateOptions,
   ): Promise<UpdateResult<TSchema>> {
-    return await this.collection.updateOne(
+    // 1. Find and update the document, getting the old version
+    const oldDoc = await this.collection.findOneAndUpdate(
       {
         ...filter,
         _cursor: {
@@ -84,11 +86,39 @@ export class MongoSinkCollection<TSchema extends Document> {
         ...update,
         $set: {
           ...update.$set,
-          "_cursor.to": Number(this.endCursor?.orderKey),
+          "_cursor.from": Number(this.endCursor?.orderKey),
         } as unknown as MatchKeysAndValues<TSchema>,
       },
-      { ...options, session: this.session },
+      {
+        ...options,
+        session: this.session,
+        returnDocument: "before",
+      } as FindOneAndUpdateOptions,
     );
+
+    // 2. If we found and updated a document, insert its old version
+    if (oldDoc) {
+      const { _id, ...doc } = oldDoc;
+      await this.collection.insertOne(
+        {
+          ...doc,
+          _cursor: {
+            ...oldDoc._cursor,
+            to: Number(this.endCursor?.orderKey),
+          },
+        } as unknown as OptionalUnlessRequiredId<TSchema>,
+        { session: this.session },
+      );
+    }
+
+    // 3. Return an UpdateResult-compatible object
+    return {
+      acknowledged: true,
+      modifiedCount: oldDoc ? 1 : 0,
+      upsertedId: null,
+      upsertedCount: 0,
+      matchedCount: oldDoc ? 1 : 0,
+    };
   }
 
   async updateMany(
@@ -96,7 +126,20 @@ export class MongoSinkCollection<TSchema extends Document> {
     update: UpdateFilter<TSchema>,
     options?: UpdateOptions,
   ): Promise<UpdateResult<TSchema>> {
-    return await this.collection.updateMany(
+    // 1. Find all documents matching the filter that are latest (to: null)
+    const oldDocs = await this.collection
+      .find(
+        {
+          ...filter,
+          _cursor: { to: null },
+        },
+        { session: this.session },
+      )
+      .toArray();
+
+    // 2. Update to the new values with updateMany
+    // (setting _cursor.from to endCursor, leaving _cursor.to unchanged)
+    const updateResult = await this.collection.updateMany(
       {
         ...filter,
         _cursor: { to: null },
@@ -105,20 +148,39 @@ export class MongoSinkCollection<TSchema extends Document> {
         ...update,
         $set: {
           ...update.$set,
-          "_cursor.to": Number(this.endCursor?.orderKey),
+          "_cursor.from": Number(this.endCursor?.orderKey),
         } as unknown as MatchKeysAndValues<TSchema>,
       },
       { ...options, session: this.session },
     );
+
+    // 3. Adjust the cursor.to of the old values
+    const oldDocsWithUpdatedCursor = oldDocs.map(({ _id, ...doc }) => ({
+      ...doc,
+      _cursor: {
+        ...doc._cursor,
+        to: Number(this.endCursor?.orderKey),
+      },
+    }));
+
+    // 4. Insert the old values back into the db
+    if (oldDocsWithUpdatedCursor.length > 0) {
+      await this.collection.insertMany(
+        oldDocsWithUpdatedCursor as unknown as OptionalUnlessRequiredId<TSchema>[],
+        { session: this.session },
+      );
+    }
+
+    return updateResult;
   }
 
   async deleteOne(
-    filter?: Filter<TSchema>,
+    filter: Filter<TSchema>,
     options?: DeleteOptions,
   ): Promise<UpdateResult<TSchema>> {
     return await this.collection.updateOne(
       {
-        ...((filter ?? {}) as Filter<TSchema>),
+        ...filter,
         _cursor: {
           to: null,
         } as Condition<MongoCursor | null>,
