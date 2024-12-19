@@ -3,7 +3,6 @@ import type {
   BulkWriteOptions,
   ClientSession,
   Collection,
-  Condition,
   DeleteOptions,
   Document,
   Filter,
@@ -78,9 +77,7 @@ export class MongoSinkCollection<TSchema extends Document> {
     const oldDoc = await this.collection.findOneAndUpdate(
       {
         ...filter,
-        _cursor: {
-          to: null,
-        } as Condition<MongoCursor | null>,
+        "_cursor.to": null,
       },
       {
         ...update,
@@ -131,7 +128,7 @@ export class MongoSinkCollection<TSchema extends Document> {
       .find(
         {
           ...filter,
-          _cursor: { to: null },
+          "_cursor.to": null,
         },
         { session: this.session },
       )
@@ -142,7 +139,7 @@ export class MongoSinkCollection<TSchema extends Document> {
     const updateResult = await this.collection.updateMany(
       {
         ...filter,
-        _cursor: { to: null },
+        "_cursor.to": null,
       },
       {
         ...update,
@@ -181,9 +178,7 @@ export class MongoSinkCollection<TSchema extends Document> {
     return await this.collection.updateOne(
       {
         ...filter,
-        _cursor: {
-          to: null,
-        } as Condition<MongoCursor | null>,
+        "_cursor.to": null,
       },
       {
         $set: {
@@ -201,9 +196,7 @@ export class MongoSinkCollection<TSchema extends Document> {
     return await this.collection.updateMany(
       {
         ...((filter ?? {}) as Filter<TSchema>),
-        _cursor: {
-          to: null,
-        } as Condition<MongoCursor | null>,
+        "_cursor.to": null,
       },
       {
         $set: {
@@ -216,14 +209,12 @@ export class MongoSinkCollection<TSchema extends Document> {
 
   async findOne(
     filter: Filter<TSchema>,
-    options: Omit<FindOptions, "timeoutMode">,
+    options?: Omit<FindOptions, "timeoutMode">,
   ): Promise<WithId<TSchema> | null> {
     return await this.collection.findOne(
       {
         ...filter,
-        _cursor: {
-          to: null,
-        } as Condition<MongoCursor | null>,
+        "_cursor.to": null,
       },
       { ...options, session: this.session },
     );
@@ -236,9 +227,7 @@ export class MongoSinkCollection<TSchema extends Document> {
     return this.collection.find(
       {
         ...filter,
-        _cursor: {
-          to: null,
-        } as Condition<MongoCursor | null>,
+        "_cursor.to": null,
       },
       { ...options, session: this.session },
     );

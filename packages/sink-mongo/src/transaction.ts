@@ -1,5 +1,5 @@
 import type { Cursor } from "@apibara/protocol";
-import type { ClientSession, CollectionOptions, Db } from "mongodb";
+import type { ClientSession, CollectionOptions, Db, Document } from "mongodb";
 import { MongoSinkCollection } from "./collection";
 
 export class MongoSinkTransactionDb {

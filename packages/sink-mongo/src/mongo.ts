@@ -54,6 +54,8 @@ export class MongoSink extends Sink {
             { session },
           );
         }
+
+        return "Transaction committed.";
       }),
     );
   }
@@ -61,15 +63,16 @@ export class MongoSink extends Sink {
   async invalidate(cursor?: Cursor) {
     if (cursor?.orderKey === undefined) return;
 
-    this.client.withSession(async (session) =>
+    await this.client.withSession(async (session) =>
       session.withTransaction(async (session) => {
         const db = this.client.db(this.config.dbName, this.config.dbOptions);
         const orderKeyValue = Number(cursor.orderKey);
+
         for (const collection of this.config.collections) {
           // Delete documents where the lower bound of _cursor is greater than the invalidate cursor
           await db.collection(collection).deleteMany(
             {
-              "cursor.from": {
+              "_cursor.from": {
                 $gt: orderKeyValue,
               },
             },
@@ -87,6 +90,8 @@ export class MongoSink extends Sink {
             { session },
           );
         }
+
+        return "Transaction committed.";
       }),
     );
   }
