@@ -1,7 +1,7 @@
 import { defineIndexer, useSink } from "@apibara/indexer";
 import { drizzlePersistence } from "@apibara/indexer/plugins/drizzle-persistence";
 import { useLogger } from "@apibara/indexer/plugins/logger";
-import { drizzle as drizzleSink } from "@apibara/indexer/sinks/drizzle";
+import { drizzleSink } from "@apibara/indexer/sinks/drizzle";
 import { StarknetStream } from "@apibara/starknet";
 
 import type { ApibaraRuntimeConfig } from "apibara/types";

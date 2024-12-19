@@ -1,0 +1,7 @@
+{
+  "type": "prerelease",
+  "comment": "sink-mongo: add mongodb sink",
+  "packageName": "@apibara/sink-mongo",
+  "email": "jadejajaipal5@gmail.com",
+  "dependentChangeType": "patch"
+}

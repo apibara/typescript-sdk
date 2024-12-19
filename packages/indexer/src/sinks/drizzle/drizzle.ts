@@ -121,7 +121,7 @@ export class DrizzleSink<
   }
 }
 
-export const drizzle = <
+export const drizzleSink = <
   TQueryResult extends PgQueryResultHKT,
   TFullSchema extends Record<string, unknown> = Record<string, never>,
   TSchema extends

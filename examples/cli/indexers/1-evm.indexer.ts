@@ -2,7 +2,7 @@ import { EvmStream } from "@apibara/evm";
 import { defineIndexer, useSink } from "@apibara/indexer";
 import { drizzlePersistence } from "@apibara/indexer/plugins/drizzle-persistence";
 import { useLogger } from "@apibara/indexer/plugins/logger";
-import { drizzle as drizzleSink } from "@apibara/indexer/sinks/drizzle";
+import { drizzleSink } from "@apibara/indexer/sinks/drizzle";
 
 import type { ApibaraRuntimeConfig } from "apibara/types";
 import type {

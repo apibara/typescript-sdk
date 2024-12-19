@@ -13,7 +13,7 @@ import { run } from "../../indexer";
 import { generateMockMessages, getMockIndexer } from "../../internal/testing";
 import { useSink } from "../../sink";
 import type { Int8Range } from "./Int8Range";
-import { drizzle as drizzleSink } from "./drizzle";
+import { drizzleSink } from "./drizzle";
 import { getDrizzleCursor, pgIndexerTable } from "./utils";
 
 const testTable = pgIndexerTable("test_table", {
@@ -35,7 +35,7 @@ describe("Drizzle Test", () => {
     await db.execute(sql`DROP TABLE IF EXISTS test_table`);
     // create test_table with db
     await db.execute(
-      sql`CREATE TABLE test_table (id SERIAL PRIMARY KEY, data TEXT, _cursor INT8RANGE)`,
+      sql`CREATE TABLE test_table (id SERIAL, data TEXT, _cursor INT8RANGE)`,
     );
   });
 
@@ -108,11 +108,14 @@ describe("Drizzle Test", () => {
 
     const result = await db.select().from(testTable).orderBy(asc(testTable.id));
 
-    expect(result).toHaveLength(5);
-    expect(result[2].data).toBe("0000000");
+    expect(result).toHaveLength(6);
+    expect(
+      result.find((r) => r.id === 5000002 && r._cursor?.range.upper === null)
+        ?.data,
+    ).toBe("0000000");
   });
 
-  it("should delete data", async () => {
+  it("should soft delete data", async () => {
     const client = new MockClient<MockFilter, MockBlock>((request, options) => {
       return generateMockMessages(5);
     });

@@ -1,6 +1,6 @@
 import { EvmStream } from "@apibara/evm";
 import { defineIndexer, useSink } from "@apibara/indexer";
-import { drizzle as drizzleSink } from "@apibara/indexer/sinks/drizzle";
+import { drizzleSink } from "@apibara/indexer/sinks/drizzle";
 import consola from "consola";
 import { pgTable, serial, text, varchar } from "drizzle-orm/pg-core";
 import { drizzle } from "drizzle-orm/postgres-js";

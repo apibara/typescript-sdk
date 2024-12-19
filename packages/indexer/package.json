@@ -75,6 +75,12 @@
       "import": "./dist/plugins/drizzle-persistence.mjs",
       "require": "./dist/plugins/drizzle-persistence.cjs",
       "default": "./dist/plugins/drizzle-persistence.mjs"
+    },
+    "./internal": {
+      "types": "./dist/internal/testing.d.ts",
+      "import": "./dist/internal/testing.mjs",
+      "require": "./dist/internal/testing.cjs",
+      "default": "./dist/internal/testing.mjs"
     }
   },
   "scripts": {

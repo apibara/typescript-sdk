@@ -1,8 +1,5 @@
 import { defineIndexer, useSink } from "@apibara/indexer";
-import {
-  drizzle as drizzleSink,
-  pgIndexerTable,
-} from "@apibara/indexer/sinks/drizzle";
+import { drizzleSink, pgIndexerTable } from "@apibara/indexer/sinks/drizzle";
 import { StarknetStream } from "@apibara/starknet";
 import consola from "consola";
 import { bigint } from "drizzle-orm/pg-core";
