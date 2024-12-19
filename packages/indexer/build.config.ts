@@ -13,6 +13,7 @@ export default defineBuildConfig({
     "./src/plugins/logger.ts",
     "./src/plugins/persistence.ts",
     "./src/plugins/drizzle-persistence.ts",
+    "./src/internal/testing.ts",
   ],
   clean: true,
   outDir: "./dist",
