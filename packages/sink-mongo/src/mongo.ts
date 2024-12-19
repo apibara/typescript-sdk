@@ -32,7 +32,6 @@ export class MongoSink extends Sink {
           db: new MongoSinkTransactionDb(db, session, endCursor),
           session,
         });
-        return "Transaction committed.";
       }),
     );
   }
@@ -54,8 +53,6 @@ export class MongoSink extends Sink {
             { session },
           );
         }
-
-        return "Transaction committed.";
       }),
     );
   }
@@ -90,8 +87,6 @@ export class MongoSink extends Sink {
             { session },
           );
         }
-
-        return "Transaction committed.";
       }),
     );
   }
