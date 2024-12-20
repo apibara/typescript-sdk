@@ -1,8 +1,16 @@
 # Change Log - @apibara/indexer
 
-<!-- This log was last generated on Mon, 09 Dec 2024 13:03:01 GMT and should not be manually modified. -->
+<!-- This log was last generated on Fri, 20 Dec 2024 09:18:36 GMT and should not be manually modified. -->
 
 <!-- Start content -->
+
+## 2.0.0-beta.27
+
+Fri, 20 Dec 2024 09:18:36 GMT
+
+### Changes
+
+- indexer: rename drizzle sink factory and fix update method (jadejajaipal5@gmail.com)
 
 ## 2.0.0-beta.26
 

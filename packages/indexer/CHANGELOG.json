@@ -2,6 +2,21 @@
   "name": "@apibara/indexer",
   "entries": [
     {
+      "date": "Fri, 20 Dec 2024 09:18:36 GMT",
+      "version": "2.0.0-beta.27",
+      "tag": "@apibara/indexer_v2.0.0-beta.27",
+      "comments": {
+        "prerelease": [
+          {
+            "author": "jadejajaipal5@gmail.com",
+            "package": "@apibara/indexer",
+            "commit": "5d3b8d072bd3b2d727daac7bae1decde89e21342",
+            "comment": "indexer: rename drizzle sink factory and fix update method"
+          }
+        ]
+      }
+    },
+    {
       "date": "Mon, 09 Dec 2024 13:03:01 GMT",
       "version": "2.0.0-beta.26",
       "tag": "@apibara/indexer_v2.0.0-beta.26",

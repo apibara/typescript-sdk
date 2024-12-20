@@ -1,0 +1,20 @@
+{
+  "name": "@apibara/sink-mongo",
+  "entries": [
+    {
+      "date": "Fri, 20 Dec 2024 09:18:36 GMT",
+      "version": "2.0.0-beta.27",
+      "tag": "@apibara/sink-mongo_v2.0.0-beta.27",
+      "comments": {
+        "prerelease": [
+          {
+            "author": "jadejajaipal5@gmail.com",
+            "package": "@apibara/sink-mongo",
+            "commit": "5d3b8d072bd3b2d727daac7bae1decde89e21342",
+            "comment": "sink-mongo: add mongodb sink"
+          }
+        ]
+      }
+    }
+  ]
+}

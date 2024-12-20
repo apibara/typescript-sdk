@@ -1,7 +1,0 @@
-{
-  "type": "prerelease",
-  "comment": "indexer: rename drizzle sink factory and fix update method",
-  "packageName": "@apibara/indexer",
-  "email": "jadejajaipal5@gmail.com",
-  "dependentChangeType": "patch"
-}
