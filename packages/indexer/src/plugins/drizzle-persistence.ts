@@ -1,3 +1,4 @@
+/*
 import type { Cursor } from "@apibara/protocol";
 import {
   type ExtractTablesWithRelations,
@@ -190,3 +191,4 @@ export class DrizzlePersistence<
       });
   }
 }
+*/

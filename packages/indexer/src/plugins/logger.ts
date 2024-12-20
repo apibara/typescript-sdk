@@ -7,7 +7,7 @@ export type { ConsolaReporter, ConsolaInstance } from "consola";
 export function logger<TFilter, TBlock, TTxnParams>({
   logger,
 }: { logger?: ConsolaReporter } = {}) {
-  return defineIndexerPlugin<TFilter, TBlock, TTxnParams>((indexer) => {
+  return defineIndexerPlugin<TFilter, TBlock>((indexer) => {
     indexer.hooks.hook("run:before", () => {
       const ctx = useIndexerContext();
 

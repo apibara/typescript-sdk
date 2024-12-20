@@ -1,18 +1,37 @@
+import type { Cursor, DataFinality } from "@apibara/protocol";
 import {
   type MockBlock,
   MockClient,
   type MockFilter,
 } from "@apibara/protocol/testing";
-import Database from "better-sqlite3";
 import { describe, expect, it } from "vitest";
+import { type IndexerContext, useMessageMetadataContext } from "./context";
 import { run } from "./indexer";
 import {
   generateMockMessages,
   getMockIndexer,
   mockSink,
+  useMockSink,
 } from "./internal/testing";
-import { SqlitePersistence, sqlitePersistence } from "./plugins/persistence";
-import { useSink } from "./sink";
+
+async function transform<TData>({
+  block: { data },
+}: {
+  block: { data?: TData };
+  cursor?: Cursor;
+  endCursor?: Cursor;
+  finality?: DataFinality;
+  context: IndexerContext;
+}) {
+  const { cursor, endCursor, finality } = useMessageMetadataContext();
+  const { output } = useMockSink();
+  output.push({
+    data,
+    cursor: cursor?.orderKey,
+    endCursor: endCursor?.orderKey,
+    finality,
+  });
+}
 
 describe("Run Test", () => {
   it("should stream messages", async () => {
@@ -20,121 +39,78 @@ describe("Run Test", () => {
       return generateMockMessages();
     });
 
-    const sink = mockSink();
+    const output: unknown[] = [];
 
     const indexer = getMockIndexer({
-      sink,
       override: {
-        transform: async ({ context, block: { data } }) => {
-          const { writer } = useSink({ context });
-          writer.insert([{ data }]);
-        },
+        plugins: [mockSink({ output })],
+        transform,
       },
     });
 
     await run(client, indexer);
 
-    expect(sink.result).toMatchInlineSnapshot(`
+    expect(output).toMatchInlineSnapshot(`
       [
         {
-          "data": [
-            {
-              "data": "5000000",
-            },
-          ],
-          "endCursor": {
-            "orderKey": 5000000n,
-          },
+          "cursor": 4999999n,
+          "data": "5000000",
+          "endCursor": 5000000n,
+          "finality": "accepted",
         },
         {
-          "data": [
-            {
-              "data": "5000001",
-            },
-          ],
-          "endCursor": {
-            "orderKey": 5000001n,
-          },
+          "cursor": 5000000n,
+          "data": "5000001",
+          "endCursor": 5000001n,
+          "finality": "accepted",
         },
         {
-          "data": [
-            {
-              "data": "5000002",
-            },
-          ],
-          "endCursor": {
-            "orderKey": 5000002n,
-          },
+          "cursor": 5000001n,
+          "data": "5000002",
+          "endCursor": 5000002n,
+          "finality": "accepted",
         },
         {
-          "data": [
-            {
-              "data": "5000003",
-            },
-          ],
-          "endCursor": {
-            "orderKey": 5000003n,
-          },
+          "cursor": 5000002n,
+          "data": "5000003",
+          "endCursor": 5000003n,
+          "finality": "accepted",
         },
         {
-          "data": [
-            {
-              "data": "5000004",
-            },
-          ],
-          "endCursor": {
-            "orderKey": 5000004n,
-          },
+          "cursor": 5000003n,
+          "data": "5000004",
+          "endCursor": 5000004n,
+          "finality": "accepted",
         },
         {
-          "data": [
-            {
-              "data": "5000005",
-            },
-          ],
-          "endCursor": {
-            "orderKey": 5000005n,
-          },
+          "cursor": 5000004n,
+          "data": "5000005",
+          "endCursor": 5000005n,
+          "finality": "accepted",
         },
         {
-          "data": [
-            {
-              "data": "5000006",
-            },
-          ],
-          "endCursor": {
-            "orderKey": 5000006n,
-          },
+          "cursor": 5000005n,
+          "data": "5000006",
+          "endCursor": 5000006n,
+          "finality": "accepted",
         },
         {
-          "data": [
-            {
-              "data": "5000007",
-            },
-          ],
-          "endCursor": {
-            "orderKey": 5000007n,
-          },
+          "cursor": 5000006n,
+          "data": "5000007",
+          "endCursor": 5000007n,
+          "finality": "accepted",
         },
         {
-          "data": [
-            {
-              "data": "5000008",
-            },
-          ],
-          "endCursor": {
-            "orderKey": 5000008n,
-          },
+          "cursor": 5000007n,
+          "data": "5000008",
+          "endCursor": 5000008n,
+          "finality": "accepted",
         },
         {
-          "data": [
-            {
-              "data": "5000009",
-            },
-          ],
-          "endCursor": {
-            "orderKey": 5000009n,
-          },
+          "cursor": 5000008n,
+          "data": "5000009",
+          "endCursor": 5000009n,
+          "finality": "accepted",
         },
       ]
     `);
@@ -258,18 +234,11 @@ describe("Run Test", () => {
       return [];
     });
 
-    const db = Database(":memory:");
+    const output: unknown[] = [];
+    const metadata: Record<string, unknown> = {};
 
-    const sink = mockSink();
-
-    // create mock indexer with persistence plugin
     const indexer = getMockIndexer({
-      plugins: [
-        sqlitePersistence({
-          database: db,
-        }),
-      ],
-      sink,
+      plugins: [mockSink({ output, metadata })],
       override: {
         startingCursor: { orderKey: 100n },
         factory: async ({ block }) => {
@@ -283,88 +252,55 @@ describe("Run Test", () => {
 
           return {};
         },
-        transform: async ({ context, endCursor, block: { data } }) => {
-          const { writer } = useSink({ context });
-          writer.insert([{ data }]);
-        },
+        transform,
       },
     });
 
     await run(client, indexer);
 
-    const store = new SqlitePersistence<MockFilter>(db);
+    expect((metadata.lastCursor as Cursor).orderKey).toEqual(108n);
+    expect((metadata.lastFilter as { filter: unknown }).filter).toEqual("BC");
 
-    const latest = store.get();
-
-    expect(latest.cursor?.orderKey).toEqual(108n);
-    expect(latest.filter?.filter).toEqual("BC");
-
-    expect(sink.result).toMatchInlineSnapshot(`
+    expect(output).toMatchInlineSnapshot(`
       [
         {
-          "data": [
-            {
-              "data": "103B",
-            },
-          ],
-          "endCursor": {
-            "orderKey": 103n,
-          },
+          "cursor": 102n,
+          "data": "103B",
+          "endCursor": 103n,
+          "finality": "accepted",
         },
         {
-          "data": [
-            {
-              "data": "104B",
-            },
-          ],
-          "endCursor": {
-            "orderKey": 104n,
-          },
+          "cursor": 103n,
+          "data": "104B",
+          "endCursor": 104n,
+          "finality": "accepted",
         },
         {
-          "data": [
-            {
-              "data": "105B",
-            },
-          ],
-          "endCursor": {
-            "orderKey": 105n,
-          },
+          "cursor": 104n,
+          "data": "105B",
+          "endCursor": 105n,
+          "finality": "accepted",
         },
         {
-          "data": [
-            {
-              "data": "106BC",
-            },
-          ],
-          "endCursor": {
-            "orderKey": 106n,
-          },
+          "cursor": 105n,
+          "data": "106BC",
+          "endCursor": 106n,
+          "finality": "accepted",
         },
         {
-          "data": [
-            {
-              "data": "107BC",
-            },
-          ],
-          "endCursor": {
-            "orderKey": 107n,
-          },
+          "cursor": 106n,
+          "data": "107BC",
+          "endCursor": 107n,
+          "finality": "accepted",
         },
         {
-          "data": [
-            {
-              "data": "108BC",
-            },
-          ],
-          "endCursor": {
-            "orderKey": 108n,
-          },
+          "cursor": 107n,
+          "data": "108BC",
+          "endCursor": 108n,
+          "finality": "accepted",
         },
       ]
     `);
-
-    db.close();
   });
 
   it("factory mode: last cursor should persist when error is thrown in indexer", async () => {
@@ -444,18 +380,11 @@ describe("Run Test", () => {
       return [];
     });
 
-    const db = Database(":memory:");
+    const output: unknown[] = [];
+    const metadata: Record<string, unknown> = {};
 
-    const sink = mockSink();
-
-    // create mock indexer with persistence plugin
     const indexer = getMockIndexer({
-      plugins: [
-        sqlitePersistence({
-          database: db,
-        }),
-      ],
-      sink,
+      plugins: [mockSink({ output, metadata })],
       override: {
         startingCursor: { orderKey: 100n },
         factory: async ({ block }) => {
@@ -469,10 +398,7 @@ describe("Run Test", () => {
 
           return {};
         },
-        transform: async ({ context, endCursor, block: { data } }) => {
-          const { writer } = useSink({ context });
-          writer.insert([{ data }]);
-        },
+        transform,
       },
     });
 
@@ -480,15 +406,9 @@ describe("Run Test", () => {
       "this error should occurr!",
     );
 
-    const store = new SqlitePersistence<MockFilter>(db);
+    expect((metadata.lastCursor as Cursor).orderKey).toEqual(103n);
+    expect((metadata.lastFilter as { filter: unknown }).filter).toEqual("B");
 
-    const latest = store.get();
-
-    expect(latest.cursor?.orderKey).toEqual(103n);
-    expect(latest.filter?.filter).toEqual("B");
-
-    expect(sink.result).toMatchInlineSnapshot("[]");
-
-    db.close();
+    expect(output).toMatchInlineSnapshot("[]");
   });
 });

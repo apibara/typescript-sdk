@@ -13,7 +13,7 @@ export type CassetteDataType<TFilter, TBlock> = {
 export async function record<TFilter, TBlock, TTxnParams>(
   vcrConfig: VcrConfig,
   client: Client<TFilter, TBlock>,
-  indexer: Indexer<TFilter, TBlock, TTxnParams>,
+  indexer: Indexer<TFilter, TBlock>,
   cassetteOptions: CassetteOptions,
 ) {
   const messages: StreamDataResponse<TBlock>[] = [];

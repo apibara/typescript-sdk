@@ -1,48 +1,45 @@
-import assert from "node:assert";
-import type { Cursor, DataFinality } from "@apibara/protocol";
+/*
+import { isCursor, type Cursor, type DataFinality } from "@apibara/protocol";
+import { defineIndexerPlugin } from "@apibara/indexer/plugins";
 import type { Database as SqliteDatabase, Statement } from "better-sqlite3";
-import { useIndexerContext } from "../context";
-import { deserialize, serialize } from "../vcr";
-import { defineIndexerPlugin } from "./config";
 
-export function kv<TFilter, TBlock, TTxnParams>({
+export function kv<TFilter, TBlock>({
   database,
 }: { database: SqliteDatabase }) {
-  return defineIndexerPlugin<TFilter, TBlock, TTxnParams>((indexer) => {
+  return defineIndexerPlugin<TFilter, TBlock>((indexer) => {
     indexer.hooks.hook("run:before", () => {
       KVStore.initialize(database);
     });
 
-    indexer.hooks.hook("handler:before", ({ finality, endCursor }) => {
-      const ctx = useIndexerContext();
+    indexer.hooks.hook("handler:middleware", ({ use }) => {
+      use(async (ctx, next) => {
+        if (!ctx.finality) {
+          throw new Error("finality is undefined");
+        }
 
-      assert(endCursor, new Error("endCursor cannot be undefined"));
+        if (!ctx.endCursor || !isCursor(ctx.endCursor)) {
+          throw new Error("endCursor is undefined or not a cursor");
+        }
 
-      ctx.kv = new KVStore(database, finality, endCursor);
+        ctx.kv = new KVStore(database, ctx.finality, ctx.endCursor);
+        ctx.kv.beginTransaction();
 
-      ctx.kv.beginTransaction();
-    });
+        try {
+          await next();
+        } catch (error) {
+          ctx.kv.rollbackTransaction();
+          ctx.kv = null;
+          throw error;
+        }
 
-    indexer.hooks.hook("handler:after", () => {
-      const ctx = useIndexerContext();
-
-      ctx.kv.commitTransaction();
-
-      ctx.kv = null;
-    });
-
-    indexer.hooks.hook("handler:exception", () => {
-      const ctx = useIndexerContext();
-
-      ctx.kv.rollbackTransaction();
-
-      ctx.kv = null;
+        ctx.kv.commitTransaction();
+        ctx.kv = null;
+      });
     });
   });
 }
 
 export class KVStore {
-  /** Sqlite Queries Prepare Statements */
   private _beginTxnQuery: Statement;
   private _commitTxnQuery: Statement;
   private _rollbackTxnQuery: Statement;
@@ -140,3 +137,5 @@ const statements = {
     SET to_block = ?
     WHERE k = ? AND to_block IS NULL`,
 };
+
+*/

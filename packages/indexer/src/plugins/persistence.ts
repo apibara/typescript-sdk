@@ -1,10 +1,12 @@
-import type { Cursor } from "@apibara/protocol";
-import type { Database as SqliteDatabase, Statement } from "better-sqlite3";
-import { deserialize, serialize } from "../vcr";
+import { type Cursor, isCursor } from "@apibara/protocol";
+
 import { defineIndexerPlugin } from "./config";
 
-export function inMemoryPersistence<TFilter, TBlock, TTxnParams>() {
-  return defineIndexerPlugin<TFilter, TBlock, TTxnParams>((indexer) => {
+/**
+ * A plugin that persists the last cursor and filter to memory.
+ */
+export function inMemoryPersistence<TFilter, TBlock>() {
+  return defineIndexerPlugin<TFilter, TBlock>((indexer) => {
     let lastCursor: Cursor | undefined;
     let lastFilter: TFilter | undefined;
 
@@ -18,21 +20,25 @@ export function inMemoryPersistence<TFilter, TBlock, TTxnParams>() {
       }
     });
 
-    indexer.hooks.hook("transaction:commit", ({ endCursor }) => {
-      if (endCursor) {
-        lastCursor = endCursor;
-      }
-    });
-
     indexer.hooks.hook("connect:factory", ({ request, endCursor }) => {
       if (request.filter[1]) {
         lastCursor = endCursor;
         lastFilter = request.filter[1];
       }
     });
+
+    indexer.hooks.hook("handler:middleware", ({ use }) => {
+      use(async (context, next) => {
+        await next();
+        if (context.endCursor && isCursor(context.endCursor)) {
+          lastCursor = context.endCursor;
+        }
+      });
+    });
   });
 }
 
+/*
 export function sqlitePersistence<TFilter, TBlock, TTxnParams>({
   database,
 }: { database: SqliteDatabase }) {
@@ -72,7 +78,6 @@ export function sqlitePersistence<TFilter, TBlock, TTxnParams>({
 }
 
 export class SqlitePersistence<TFilter> {
-  /** Sqlite Queries Prepare Statements */
   private _getCheckpointQuery: Statement<string, CheckpointRow>;
   private _putCheckpointQuery: Statement<
     [string, number, `0x${string}` | undefined]
@@ -230,3 +235,5 @@ export type FilterRow = {
   from_block: number;
   to_block?: number;
 };
+
+*/
