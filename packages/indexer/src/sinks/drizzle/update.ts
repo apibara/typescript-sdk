@@ -12,6 +12,8 @@ import type {
   PgUpdateBase,
   PgUpdateSetSource,
 } from "drizzle-orm/pg-core";
+import type { Int8Range } from "./Int8Range";
+import { getDrizzleCursor } from "./utils";
 
 export class DrizzleSinkUpdate<
   TTable extends PgTable,
@@ -32,15 +34,36 @@ export class DrizzleSinkUpdate<
     return {
       ...originalSet,
       where: async (where: SQL | undefined) => {
-        await this.db
-          .update(this.table)
-          .set({
-            _cursor: sql`int8range(lower(_cursor), ${Number(this.endCursor?.orderKey!)}, '[)')`,
-          } as PgUpdateSetSource<TTable>)
+        // 1. Find and store old versions of matching records
+        const oldRecords = await this.db
+          .select()
+          .from(this.table)
           .where(sql`${where ? sql`${where} AND ` : sql``}upper_inf(_cursor)`)
           .execute();
 
-        return originalSet.where(where);
+        // 2. Insert old versions with updated upperbound cursor
+        if (oldRecords.length > 0) {
+          const oldRecordsWithNewCursor = oldRecords.map((record) => ({
+            ...record,
+            _cursor: getDrizzleCursor([
+              BigInt((record._cursor as Int8Range).range.lower!),
+              this.endCursor?.orderKey,
+            ]),
+          }));
+
+          await this.db
+            .insert(this.table)
+            .values(oldRecordsWithNewCursor)
+            .execute();
+        }
+
+        // 3. Update matching records with new values and new 'lowerbound' cursor
+        return originalUpdate
+          .set({
+            ...values,
+            _cursor: sql`int8range(${Number(this.endCursor?.orderKey!)}, NULL, '[)')`,
+          } as PgUpdateSetSource<TTable>)
+          .where(sql`${where ? sql`${where} AND ` : sql``}upper_inf(_cursor)`);
       },
     } as PgUpdateBase<TTable, TQueryResult>;
   }
