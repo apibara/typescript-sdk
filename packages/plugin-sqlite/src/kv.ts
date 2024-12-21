@@ -1,118 +1,63 @@
-/*
-import { isCursor, type Cursor, type DataFinality } from "@apibara/protocol";
-import { defineIndexerPlugin } from "@apibara/indexer/plugins";
-import type { Database as SqliteDatabase, Statement } from "better-sqlite3";
+import type { Cursor, DataFinality } from "@apibara/protocol";
+import type { Database } from "better-sqlite3";
 
-export function kv<TFilter, TBlock>({
-  database,
-}: { database: SqliteDatabase }) {
-  return defineIndexerPlugin<TFilter, TBlock>((indexer) => {
-    indexer.hooks.hook("run:before", () => {
-      KVStore.initialize(database);
-    });
+import {
+  type DeserializeFn,
+  type SerializeFn,
+  assertInTransaction,
+} from "./utils";
 
-    indexer.hooks.hook("handler:middleware", ({ use }) => {
-      use(async (ctx, next) => {
-        if (!ctx.finality) {
-          throw new Error("finality is undefined");
-        }
-
-        if (!ctx.endCursor || !isCursor(ctx.endCursor)) {
-          throw new Error("endCursor is undefined or not a cursor");
-        }
-
-        ctx.kv = new KVStore(database, ctx.finality, ctx.endCursor);
-        ctx.kv.beginTransaction();
-
-        try {
-          await next();
-        } catch (error) {
-          ctx.kv.rollbackTransaction();
-          ctx.kv = null;
-          throw error;
-        }
-
-        ctx.kv.commitTransaction();
-        ctx.kv = null;
-      });
-    });
-  });
+export function initializeKeyValueStore(db: Database) {
+  assertInTransaction(db);
+  db.exec(statements.createTable);
 }
 
-export class KVStore {
-  private _beginTxnQuery: Statement;
-  private _commitTxnQuery: Statement;
-  private _rollbackTxnQuery: Statement;
-  private _getQuery: Statement<string, { v: string }>;
-  private _updateToBlockQuery: Statement<[number, string]>;
-  private _insertIntoKvsQuery: Statement<[number, string, string]>;
-  private _delQuery: Statement<[number, string]>;
-
+export class KeyValueStore {
   constructor(
-    private _db: SqliteDatabase,
-    private _finality: DataFinality,
-    private _endCursor: Cursor,
+    private readonly db: Database,
+    private readonly endCursor: Cursor,
+    private readonly finality: DataFinality,
+    private readonly serialize: SerializeFn,
+    private readonly deserialize: DeserializeFn,
   ) {
-    this._beginTxnQuery = this._db.prepare(statements.beginTxn);
-    this._commitTxnQuery = this._db.prepare(statements.commitTxn);
-    this._rollbackTxnQuery = this._db.prepare(statements.rollbackTxn);
-    this._getQuery = this._db.prepare(statements.get);
-    this._updateToBlockQuery = this._db.prepare(statements.updateToBlock);
-    this._insertIntoKvsQuery = this._db.prepare(statements.insertIntoKvs);
-    this._delQuery = this._db.prepare(statements.del);
+    assertInTransaction(db);
   }
 
-  static initialize(db: SqliteDatabase) {
-    db.prepare(statements.createTable).run();
-  }
+  get<T>(key: string): T | undefined {
+    const row = this.db.prepare<string, KeyValueRow>(statements.get).get(key);
 
-  beginTransaction() {
-    this._beginTxnQuery.run();
-  }
-
-  commitTransaction() {
-    this._commitTxnQuery.run();
-  }
-
-  rollbackTransaction() {
-    this._rollbackTxnQuery.run();
-  }
-
-  get<T>(key: string): T {
-    const row = this._getQuery.get(key);
-
-    return row ? deserialize(row.v) : undefined;
+    return row ? this.deserialize(row.v) : undefined;
   }
 
   put<T>(key: string, value: T) {
-    this._updateToBlockQuery.run(Number(this._endCursor.orderKey), key);
+    this.db
+      .prepare<[number, string], KeyValueRow>(statements.updateToBlock)
+      .run(Number(this.endCursor.orderKey), key);
 
-    this._insertIntoKvsQuery.run(
-      Number(this._endCursor.orderKey),
-      key,
-      serialize(value as Record<string, unknown>),
-    );
+    this.db
+      .prepare<[number, string, string], KeyValueRow>(statements.insertIntoKvs)
+      .run(
+        Number(this.endCursor.orderKey),
+        key,
+        this.serialize(value as Record<string, unknown>),
+      );
   }
 
   del(key: string) {
-    this._delQuery.run(Number(this._endCursor.orderKey), key);
+    this.db
+      .prepare<[number, string], KeyValueRow>(statements.del)
+      .run(Number(this.endCursor.orderKey), key);
   }
 }
 
-export type UseKVStoreResult = InstanceType<typeof KVStore>;
-
-export function useKVStore(): UseKVStoreResult {
-  const ctx = useIndexerContext();
-
-  if (!ctx?.kv) throw new Error("KV Plugin is not available in context!");
-
-  return ctx.kv;
-}
+type KeyValueRow = {
+  from_block: number;
+  to_block: number;
+  k: string;
+  v: string;
+};
 
 const statements = {
-  beginTxn: "BEGIN TRANSACTION",
-  commitTxn: "COMMIT TRANSACTION",
-  rollbackTxn: "ROLLBACK TRANSACTION",
   createTable: `
     CREATE TABLE IF NOT EXISTS kvs (
       from_block INTEGER NOT NULL,
@@ -137,5 +82,3 @@ const statements = {
     SET to_block = ?
     WHERE k = ? AND to_block IS NULL`,
 };
-
-*/
