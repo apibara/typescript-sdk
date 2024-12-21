@@ -63,3 +63,7 @@ export const CursorFromBytes = Schema.transform(
 
 export const cursorToBytes = Schema.encodeSync(CursorFromBytes);
 export const cursorFromBytes = Schema.decodeSync(CursorFromBytes);
+
+export function isCursor(value: unknown): value is Cursor {
+  return Schema.is(Cursor)(value);
+}

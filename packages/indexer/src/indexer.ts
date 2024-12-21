@@ -22,6 +22,7 @@ import {
 } from "hookable";
 
 import assert from "node:assert";
+import { type MiddlewareFunction, type NextFunction, compose } from "./compose";
 import {
   type IndexerContext,
   indexerAsyncContext,
@@ -29,7 +30,10 @@ import {
 } from "./context";
 import { tracer } from "./otel";
 import type { IndexerPlugin } from "./plugins";
-import { type Sink, defaultSink } from "./sink";
+
+export type UseMiddlewareFunction = (
+  fn: MiddlewareFunction<IndexerContext>,
+) => void;
 
 export interface IndexerHooks<TFilter, TBlock> {
   "run:before": () => void;
@@ -41,7 +45,9 @@ export interface IndexerHooks<TFilter, TBlock> {
     request: StreamDataRequest<TFilter>;
     options: StreamDataOptions;
   }) => void;
-  "connect:after": () => void;
+  "connect:after": ({
+    request,
+  }: { request: StreamDataRequest<TFilter> }) => void;
   "connect:factory": ({
     request,
     endCursor,
@@ -49,32 +55,7 @@ export interface IndexerHooks<TFilter, TBlock> {
     request: StreamDataRequest<TFilter>;
     endCursor?: Cursor;
   }) => void;
-  "handler:before": ({
-    block,
-    finality,
-    endCursor,
-  }: {
-    block: TBlock;
-    finality: DataFinality;
-    endCursor?: Cursor;
-  }) => void;
-  "handler:after": ({
-    block,
-    finality,
-    endCursor,
-  }: {
-    block: TBlock;
-    finality: DataFinality;
-    endCursor?: Cursor;
-  }) => void;
-  "transaction:commit": ({
-    finality,
-    endCursor,
-  }: {
-    finality: DataFinality;
-    endCursor?: Cursor;
-  }) => void;
-  "handler:exception": ({ error }: { error: Error }) => void;
+  "handler:middleware": ({ use }: { use: UseMiddlewareFunction }) => void;
   message: ({ message }: { message: StreamDataResponse<TBlock> }) => void;
   "message:invalidate": ({ message }: { message: Invalidate }) => void;
   "message:finalize": ({ message }: { message: Finalize }) => void;
@@ -82,16 +63,15 @@ export interface IndexerHooks<TFilter, TBlock> {
   "message:systemMessage": ({ message }: { message: SystemMessage }) => void;
 }
 
-export interface IndexerConfig<TFilter, TBlock, TTxnParams> {
+export interface IndexerConfig<TFilter, TBlock> {
   streamUrl: string;
   filter: TFilter;
   finality?: DataFinality;
   startingCursor?: Cursor;
-  sink?: Sink<TTxnParams>;
   factory?: ({
     block,
     context,
-  }: { block: TBlock; context: IndexerContext<TTxnParams> }) => Promise<{
+  }: { block: TBlock; context: IndexerContext }) => Promise<{
     filter?: TFilter;
   }>;
   transform: (args: {
@@ -99,40 +79,40 @@ export interface IndexerConfig<TFilter, TBlock, TTxnParams> {
     cursor?: Cursor | undefined;
     endCursor?: Cursor | undefined;
     finality: DataFinality;
-    context: IndexerContext<TTxnParams>;
+    context: IndexerContext;
   }) => Promise<void>;
   hooks?: NestedHooks<IndexerHooks<TFilter, TBlock>>;
-  plugins?: ReadonlyArray<IndexerPlugin<TFilter, TBlock, TTxnParams>>;
+  plugins?: ReadonlyArray<IndexerPlugin<TFilter, TBlock>>;
   debug?: boolean;
 }
 
-export interface IndexerWithStreamConfig<TFilter, TBlock, TTxnParams>
-  extends IndexerConfig<TFilter, TBlock, TTxnParams> {
+export interface IndexerWithStreamConfig<TFilter, TBlock>
+  extends IndexerConfig<TFilter, TBlock> {
   streamConfig: StreamConfig<TFilter, TBlock>;
 }
 
 export function defineIndexer<TFilter, TBlock>(
   streamConfig: StreamConfig<TFilter, TBlock>,
 ) {
-  return <TTxnParams>(
-    config: IndexerConfig<TFilter, TBlock, TTxnParams>,
-  ): IndexerWithStreamConfig<TFilter, TBlock, TTxnParams> => ({
+  return (
+    config: IndexerConfig<TFilter, TBlock>,
+  ): IndexerWithStreamConfig<TFilter, TBlock> => ({
     streamConfig,
     ...config,
   });
 }
 
-export interface Indexer<TFilter, TBlock, TTxnParams> {
+export interface Indexer<TFilter, TBlock> {
   streamConfig: StreamConfig<TFilter, TBlock>;
-  options: IndexerConfig<TFilter, TBlock, TTxnParams>;
+  options: IndexerConfig<TFilter, TBlock>;
   hooks: Hookable<IndexerHooks<TFilter, TBlock>>;
 }
 
-export function createIndexer<TFilter, TBlock, TTxnParams>({
+export function createIndexer<TFilter, TBlock>({
   streamConfig,
   ...options
-}: IndexerWithStreamConfig<TFilter, TBlock, TTxnParams>) {
-  const indexer: Indexer<TFilter, TBlock, TTxnParams> = {
+}: IndexerWithStreamConfig<TFilter, TBlock>) {
+  const indexer: Indexer<TFilter, TBlock> = {
     options,
     streamConfig,
     hooks: createHooks<IndexerHooks<TFilter, TBlock>>(),
@@ -157,9 +137,9 @@ export interface ReconnectOptions {
   maxWait?: number;
 }
 
-export async function runWithReconnect<TFilter, TBlock, TTxnParams>(
+export async function runWithReconnect<TFilter, TBlock>(
   client: Client<TFilter, TBlock>,
-  indexer: Indexer<TFilter, TBlock, TTxnParams>,
+  indexer: Indexer<TFilter, TBlock>,
   options: ReconnectOptions = {},
 ) {
   let retryCount = 0;
@@ -212,17 +192,14 @@ export interface RunOptions {
   onConnect?: () => void | Promise<void>;
 }
 
-export async function run<TFilter, TBlock, TTxnParams>(
+export async function run<TFilter, TBlock>(
   client: Client<TFilter, TBlock>,
-  indexer: Indexer<TFilter, TBlock, TTxnParams>,
+  indexer: Indexer<TFilter, TBlock>,
   runOptions: RunOptions = {},
 ) {
   await indexerAsyncContext.callAsync({}, async () => {
-    const context = useIndexerContext<TTxnParams>();
-
-    const sink = indexer.options.sink ?? defaultSink();
-
-    context.sink = sink as Sink<TTxnParams>;
+    const context = useIndexerContext();
+    const middleware = await registerMiddleware(indexer);
 
     await indexer.hooks.callHook("run:before");
 
@@ -242,9 +219,6 @@ export async function run<TFilter, TBlock, TTxnParams>(
 
     await indexer.hooks.callHook("connect:before", { request, options });
 
-    // avoid having duplicate data if it was inserted before the persistence commited the state
-    await sink.invalidateOnRestart(request.startingCursor);
-
     // store main filter, so later it can be merged
     let mainFilter: TFilter;
     if (isFactoryMode) {
@@ -257,7 +231,7 @@ export async function run<TFilter, TBlock, TTxnParams>(
       StreamDataResponse<TBlock>
     > = client.streamData(request, options)[Symbol.asyncIterator]();
 
-    await indexer.hooks.callHook("connect:after");
+    await indexer.hooks.callHook("connect:after", { request });
 
     let onConnectCalled = false;
 
@@ -283,114 +257,94 @@ export async function run<TFilter, TBlock, TTxnParams>(
             const blocks = message.data.data;
             const { cursor, endCursor, finality } = message.data;
 
-            await sink.transaction(
-              { cursor, endCursor, finality },
-              async (txn) => {
-                // attach transaction to context
-                context.sinkTransaction = txn as TTxnParams;
+            context.cursor = cursor;
+            context.endCursor = endCursor;
+            context.finality = finality;
 
-                let block: TBlock | null;
+            await middleware(context, async () => {
+              let block: TBlock | null;
 
-                // when factory mode
-                if (isFactoryMode) {
-                  assert(indexer.options.factory !== undefined);
+              // when factory mode
+              if (isFactoryMode) {
+                assert(indexer.options.factory !== undefined);
 
-                  const [factoryBlock, mainBlock] = blocks;
+                const [factoryBlock, mainBlock] = blocks;
 
-                  block = mainBlock;
+                block = mainBlock;
 
-                  if (factoryBlock !== null) {
-                    const { filter } = await indexer.options.factory({
-                      block: factoryBlock,
-                      context,
-                    });
-
-                    // write returned data from factory function if filter is not defined
-                    if (filter) {
-                      // when filter is defined
-                      // merge old and new filters
-                      mainFilter = indexer.streamConfig.mergeFilter(
-                        mainFilter,
-                        filter,
-                      );
-
-                      // create request with new filters
-                      const request = indexer.streamConfig.Request.make({
-                        filter: [indexer.options.filter, mainFilter],
-                        finality: indexer.options.finality,
-                        startingCursor: cursor,
-                      });
-
-                      await indexer.hooks.callHook("connect:factory", {
-                        request,
-                        endCursor,
-                      });
-
-                      // create new stream with new request
-                      stream = client
-                        .streamData(request, options)
-                        [Symbol.asyncIterator]();
-
-                      const { value: message } = await stream.next();
-
-                      assert(message._tag === "data");
-
-                      const [_factoryBlock, _block] = message.data.data;
-
-                      block = _block;
-                    }
-                  }
-                } else {
-                  // when not in factory mode
-                  block = blocks[0];
-                }
-
-                // if block is not null
-                if (block) {
-                  await tracer.startActiveSpan("handler", async (span) => {
-                    await indexer.hooks.callHook("handler:before", {
-                      block,
-                      endCursor,
-                      finality,
-                    });
-
-                    try {
-                      await indexer.options.transform({
-                        block,
-                        cursor,
-                        endCursor,
-                        finality,
-                        context,
-                      });
-                      await indexer.hooks.callHook("handler:after", {
-                        block,
-                        finality,
-                        endCursor,
-                      });
-                    } catch (error) {
-                      assert(error instanceof Error);
-                      await indexer.hooks.callHook("handler:exception", {
-                        error,
-                      });
-                      throw error;
-                    }
-
-                    span.end();
+                if (factoryBlock !== null) {
+                  const { filter } = await indexer.options.factory({
+                    block: factoryBlock,
+                    context,
                   });
+
+                  // write returned data from factory function if filter is not defined
+                  if (filter) {
+                    // when filter is defined
+                    // merge old and new filters
+                    mainFilter = indexer.streamConfig.mergeFilter(
+                      mainFilter,
+                      filter,
+                    );
+
+                    // create request with new filters
+                    const request = indexer.streamConfig.Request.make({
+                      filter: [indexer.options.filter, mainFilter],
+                      finality: indexer.options.finality,
+                      startingCursor: cursor,
+                    });
+
+                    await indexer.hooks.callHook("connect:factory", {
+                      request,
+                      endCursor,
+                    });
+
+                    // create new stream with new request
+                    stream = client
+                      .streamData(request, options)
+                      [Symbol.asyncIterator]();
+
+                    const { value: message } = await stream.next();
+
+                    assert(message._tag === "data");
+
+                    const [_factoryBlock, _block] = message.data.data;
+
+                    block = _block;
+                  }
                 }
-              },
-            );
-            await indexer.hooks.callHook("transaction:commit", {
-              finality,
-              endCursor,
+              } else {
+                // when not in factory mode
+                block = blocks[0];
+              }
+
+              // if block is not null
+              if (block) {
+                await tracer.startActiveSpan("handler", async (span) => {
+                  await indexer.options.transform({
+                    block,
+                    cursor,
+                    endCursor,
+                    finality,
+                    context,
+                  });
+
+                  span.end();
+                });
+              }
             });
+
             span.end();
           });
+
+          context.cursor = undefined;
+          context.endCursor = undefined;
+          context.finality = undefined;
+
           break;
         }
         case "invalidate": {
           await tracer.startActiveSpan("message invalidate", async (span) => {
-            await sink.invalidate(message.invalidate.cursor);
             await indexer.hooks.callHook("message:invalidate", { message });
             span.end();
           });
@@ -398,7 +352,6 @@ export async function run<TFilter, TBlock, TTxnParams>(
         }
         case "finalize": {
           await tracer.startActiveSpan("message finalize", async (span) => {
-            await sink.finalize(message.finalize.cursor);
             await indexer.hooks.callHook("message:finalize", { message });
             span.end();
           });
@@ -445,4 +398,25 @@ export async function run<TFilter, TBlock, TTxnParams>(
       await indexer.hooks.callHook("run:after");
     }
   });
+}
+
+async function registerMiddleware<TFilter, TBlock>(
+  indexer: Indexer<TFilter, TBlock>,
+): Promise<MiddlewareFunction<IndexerContext>> {
+  const middleware: MiddlewareFunction<IndexerContext>[] = [];
+  const use = (fn: MiddlewareFunction<IndexerContext>) => {
+    middleware.push(fn);
+  };
+
+  await indexer.hooks.callHook("handler:middleware", { use });
+
+  const composed = compose(middleware);
+
+  // Return a named function to help debugging
+  return async function _composedIndexerMiddleware(
+    context: IndexerContext,
+    next?: NextFunction,
+  ) {
+    await composed(context, next);
+  };
 }

@@ -9,9 +9,9 @@ import { replay } from "../vcr/replay";
 
 export function createVcr() {
   return {
-    async run<TFilter, TBlock, TTxnParams>(
+    async run<TFilter, TBlock>(
       cassetteName: string,
-      indexerConfig: IndexerWithStreamConfig<TFilter, TBlock, TTxnParams>,
+      indexerConfig: IndexerWithStreamConfig<TFilter, TBlock>,
       range: { fromBlock: bigint; toBlock: bigint },
     ) {
       const vcrConfig: VcrConfig = {

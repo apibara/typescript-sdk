@@ -1,0 +1,41 @@
+{
+  "name": "@apibara/plugin-drizzle",
+  "version": "2.0.0-beta.26",
+  "type": "module",
+  "files": [
+    "dist",
+    "src",
+    "README.md"
+  ],
+  "main": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs",
+      "default": "./dist/index.mjs"
+    }
+  },
+  "scripts": {
+    "build": "unbuild",
+    "typecheck": "tsc --noEmit",
+    "lint": "biome check .",
+    "lint:fix": "pnpm lint --write",
+    "test": "vitest",
+    "test:ci": "vitest run"
+  },
+  "devDependencies": {
+    "@electric-sql/pglite": "^0.2.14",
+    "@types/node": "^20.14.0",
+    "unbuild": "^2.0.0",
+    "vitest": "^1.6.0"
+  },
+  "dependencies": {
+    "@apibara/indexer": "workspace:*",
+    "@apibara/protocol": "workspace:*",
+    "drizzle-orm": "^0.37.0",
+    "pg": "^8.13.1",
+    "postgres-range": "^1.1.4"
+  }
+}

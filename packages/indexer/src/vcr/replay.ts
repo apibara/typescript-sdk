@@ -9,7 +9,7 @@ import type { VcrConfig } from "./config";
 
 export async function replay<TFilter, TBlock, TTxnParams>(
   vcrConfig: VcrConfig,
-  indexer: Indexer<TFilter, TBlock, TTxnParams>,
+  indexer: Indexer<TFilter, TBlock>,
   cassetteName: string,
 ) {
   const client = loadCassette<TFilter, TBlock>(vcrConfig, cassetteName);

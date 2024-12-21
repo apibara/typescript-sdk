@@ -1,6 +1,9 @@
 import { createIndexer as _createIndexer } from "@apibara/indexer";
-import { type ConsolaReporter, logger } from "@apibara/indexer/plugins/logger";
-import { inMemoryPersistence } from "@apibara/indexer/plugins/persistence";
+import {
+  type ConsolaReporter,
+  inMemoryPersistence,
+  logger,
+} from "@apibara/indexer/plugins";
 
 import { config } from "#apibara-internal-virtual/config";
 import { indexers } from "#apibara-internal-virtual/indexers";

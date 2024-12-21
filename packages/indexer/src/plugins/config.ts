@@ -1,11 +1,11 @@
 import type { Indexer } from "../indexer";
 
-export type IndexerPlugin<TFilter, TBlock, TTxnParams> = (
-  indexer: Indexer<TFilter, TBlock, TTxnParams>,
+export type IndexerPlugin<TFilter, TBlock> = (
+  indexer: Indexer<TFilter, TBlock>,
 ) => void;
 
-export function defineIndexerPlugin<TFilter, TBlock, TTxnParams>(
-  def: IndexerPlugin<TFilter, TBlock, TTxnParams>,
+export function defineIndexerPlugin<TFilter, TBlock>(
+  def: IndexerPlugin<TFilter, TBlock>,
 ) {
   return def;
 }
