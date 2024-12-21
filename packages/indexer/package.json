@@ -54,11 +54,6 @@
     "@types/better-sqlite3": "^7.6.11",
     "@types/node": "^20.14.0",
     "@types/pg": "^8.11.10",
-    "better-sqlite3": "^11.5.0",
-    "csv-stringify": "^6.5.0",
-    "drizzle-orm": "^0.37.0",
-    "pg": "^8.13.1",
-    "postgres-range": "^1.1.4",
     "unbuild": "^2.0.0",
     "vitest": "^1.6.0"
   },
@@ -73,11 +68,6 @@
     "unctx": "^2.3.1"
   },
   "peerDependencies": {
-    "@electric-sql/pglite": "^0.2.14",
-    "better-sqlite3": "^11.5.0",
-    "csv-stringify": "^6.5.0",
-    "drizzle-orm": "^0.37.0",
-    "postgres-range": "^1.1.4",
     "vitest": "^1.6.0"
   }
 }

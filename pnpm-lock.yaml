@@ -523,12 +523,21 @@ importers:
       '@types/pg':
         specifier: ^8.11.10
         version: 8.11.10
-      better-sqlite3:
-        specifier: ^11.5.0
-        version: 11.5.0
-      csv-stringify:
-        specifier: ^6.5.0
-        version: 6.5.0
+      unbuild:
+        specifier: ^2.0.0
+        version: 2.0.0(typescript@5.6.2)
+      vitest:
+        specifier: ^1.6.0
+        version: 1.6.0(@types/node@20.14.0)
+
+  packages/plugin-drizzle:
+    dependencies:
+      '@apibara/indexer':
+        specifier: workspace:*
+        version: link:../indexer
+      '@apibara/protocol':
+        specifier: workspace:*
+        version: link:../protocol
       drizzle-orm:
         specifier: ^0.37.0
         version: 0.37.0(@electric-sql/pglite@0.2.14)(@opentelemetry/api@1.9.0)(@types/better-sqlite3@7.6.11)(@types/pg@8.11.10)(better-sqlite3@11.5.0)(pg@8.13.1)(postgres@3.4.4)
@@ -538,6 +547,35 @@ importers:
       postgres-range:
         specifier: ^1.1.4
         version: 1.1.4
+    devDependencies:
+      '@electric-sql/pglite':
+        specifier: ^0.2.14
+        version: 0.2.14
+      '@types/node':
+        specifier: ^20.14.0
+        version: 20.14.0
+      unbuild:
+        specifier: ^2.0.0
+        version: 2.0.0(typescript@5.6.2)
+      vitest:
+        specifier: ^1.6.0
+        version: 1.6.0(@types/node@20.14.0)
+
+  packages/plugin-mongo:
+    dependencies:
+      '@apibara/indexer':
+        specifier: workspace:*
+        version: link:../indexer
+      '@apibara/protocol':
+        specifier: workspace:*
+        version: link:../protocol
+    devDependencies:
+      '@types/node':
+        specifier: ^20.14.0
+        version: 20.14.0
+      mongodb:
+        specifier: ^6.12.0
+        version: 6.12.0
       unbuild:
         specifier: ^2.0.0
         version: 2.0.0(typescript@5.6.2)
@@ -555,7 +593,7 @@ importers:
         version: link:../protocol
       better-sqlite3:
         specifier: ^9.0.0
-        version: 11.5.0
+        version: 9.6.0
     devDependencies:
       '@types/better-sqlite3':
         specifier: ^7.6.11
@@ -609,28 +647,6 @@ importers:
       vitest:
         specifier: ^1.6.0
         version: 1.6.0(@types/node@20.12.13)
-
-  packages/sink-mongo:
-    dependencies:
-      '@apibara/indexer':
-        specifier: workspace:*
-        version: link:../indexer
-      '@apibara/protocol':
-        specifier: workspace:*
-        version: link:../protocol
-    devDependencies:
-      '@types/node':
-        specifier: ^20.14.0
-        version: 20.14.0
-      mongodb:
-        specifier: ^6.12.0
-        version: 6.12.0
-      unbuild:
-        specifier: ^2.0.0
-        version: 2.0.0(typescript@5.6.2)
-      vitest:
-        specifier: ^1.6.0
-        version: 1.6.0(@types/node@20.14.0)
 
   packages/starknet:
     dependencies:
@@ -2091,6 +2107,9 @@ packages:
 
   better-sqlite3@11.5.0:
     resolution: {integrity: sha512-e/6eggfOutzoK0JWiU36jsisdWoHOfN9iWiW/SieKvb7SAa6aGNmBM/UKyp+/wWSXpLlWNN8tCPwoDNPhzUvuQ==}
+
+  better-sqlite3@9.6.0:
+    resolution: {integrity: sha512-yR5HATnqeYNVnkaUTf4bOP2dJSnyhP4puJN/QPRyx4YkBEEUxib422n2XzPqDEHjQQqazoYoADdAm5vE15+dAQ==}
 
   binary-extensions@2.3.0:
     resolution: {integrity: sha512-Ceh+7ox5qe7LJuLHoY0feh3pHuUDHAcRUeyL2VYghZwfpkNIy/+8Ocg0a3UuSoYzavmylwuLWQOf3hl0jjMMIw==}
@@ -5212,6 +5231,11 @@ snapshots:
       - typescript
 
   better-sqlite3@11.5.0:
+    dependencies:
+      bindings: 1.5.0
+      prebuild-install: 7.1.2
+
+  better-sqlite3@9.6.0:
     dependencies:
       bindings: 1.5.0
       prebuild-install: 7.1.2
