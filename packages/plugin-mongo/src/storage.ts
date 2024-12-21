@@ -3,6 +3,8 @@ import type {
   BulkWriteOptions,
   ClientSession,
   Collection,
+  CollectionOptions,
+  Db,
   DeleteOptions,
   Document,
   Filter,
@@ -20,6 +22,27 @@ import type {
   WithId,
 } from "mongodb";
 
+export class MongoStorage {
+  constructor(
+    private db: Db,
+    private session: ClientSession,
+    private endCursor?: Cursor,
+  ) {}
+
+  collection<TSchema extends Document = Document>(
+    name: string,
+    options?: CollectionOptions,
+  ) {
+    const collection = this.db.collection<TSchema>(name, options);
+
+    return new MongoCollection<TSchema>(
+      this.session,
+      collection,
+      this.endCursor,
+    );
+  }
+}
+
 export type MongoCursor = {
   from: number | null;
   to: number | null;
@@ -29,7 +52,7 @@ export type CursoredSchema<TSchema extends Document> = TSchema & {
   _cursor: MongoCursor;
 };
 
-export class MongoSinkCollection<TSchema extends Document> {
+export class MongoCollection<TSchema extends Document> {
   constructor(
     private session: ClientSession,
     private collection: Collection<TSchema>,

@@ -45,9 +45,7 @@ export interface IndexerHooks<TFilter, TBlock> {
     request: StreamDataRequest<TFilter>;
     options: StreamDataOptions;
   }) => void;
-  "connect:after": ({
-    request,
-  }: { request: StreamDataRequest<TFilter> }) => void;
+  "connect:after": ({ request }: { request: StreamDataRequest<TFilter> }) => void;
   "connect:factory": ({
     request,
     endCursor,
