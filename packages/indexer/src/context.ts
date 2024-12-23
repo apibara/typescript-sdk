@@ -1,19 +1,25 @@
 import { AsyncLocalStorage } from "node:async_hooks";
+import type { Cursor, DataFinality } from "@apibara/protocol";
 import { getContext } from "unctx";
-import type { Sink } from "./sink";
 
 // biome-ignore lint/suspicious/noExplicitAny: context type
-export interface IndexerContext<TTxnParams = any> extends Record<string, any> {
-  sink?: Sink<TTxnParams>;
-  sinkTransaction?: TTxnParams;
-}
+export interface IndexerContext extends Record<string, any> {}
 
 export const indexerAsyncContext = getContext<IndexerContext>("indexer", {
   asyncContext: true,
   AsyncLocalStorage,
 });
 
-// biome-ignore lint/suspicious/noExplicitAny: <explanation>
-export function useIndexerContext<TTxnParams = any>() {
-  return indexerAsyncContext.use() as IndexerContext<TTxnParams>;
+export function useIndexerContext() {
+  return indexerAsyncContext.use() as IndexerContext;
+}
+
+export interface MessageMetadataContext extends IndexerContext {
+  cursor?: Cursor;
+  endCursor?: Cursor;
+  finality?: DataFinality;
+}
+
+export function useMessageMetadataContext(): MessageMetadataContext {
+  return useIndexerContext() as MessageMetadataContext;
 }

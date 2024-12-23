@@ -1,4 +1,4 @@
-import type { ConsolaReporter } from "@apibara/indexer/plugins/logger";
+import type { ConsolaReporter } from "@apibara/indexer/plugins";
 import type { RollupCommonJSOptions } from "@rollup/plugin-commonjs";
 import type {
   C12InputConfig,

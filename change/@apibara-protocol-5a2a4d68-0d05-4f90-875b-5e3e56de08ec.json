@@ -1,0 +1,7 @@
+{
+  "type": "prerelease",
+  "comment": "indexer: replace sink with middleware",
+  "packageName": "@apibara/protocol",
+  "email": "francesco@ceccon.me",
+  "dependentChangeType": "patch"
+}
