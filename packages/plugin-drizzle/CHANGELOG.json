@@ -1,0 +1,20 @@
+{
+  "name": "@apibara/plugin-drizzle",
+  "entries": [
+    {
+      "date": "Mon, 23 Dec 2024 11:34:53 GMT",
+      "version": "2.0.0-beta.27",
+      "tag": "@apibara/plugin-drizzle_v2.0.0-beta.27",
+      "comments": {
+        "prerelease": [
+          {
+            "author": "francesco@ceccon.me",
+            "package": "@apibara/plugin-drizzle",
+            "commit": "61a19d0455c8fd78d2b7b9dbdce9cf6ecefc469e",
+            "comment": "indexer: replace sink with middleware"
+          }
+        ]
+      }
+    }
+  ]
+}

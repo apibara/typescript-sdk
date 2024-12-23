@@ -2,6 +2,21 @@
   "name": "@apibara/indexer",
   "entries": [
     {
+      "date": "Mon, 23 Dec 2024 11:34:53 GMT",
+      "version": "2.0.0-beta.28",
+      "tag": "@apibara/indexer_v2.0.0-beta.28",
+      "comments": {
+        "prerelease": [
+          {
+            "author": "francesco@ceccon.me",
+            "package": "@apibara/indexer",
+            "commit": "61a19d0455c8fd78d2b7b9dbdce9cf6ecefc469e",
+            "comment": "indexer: replace sink with middleware"
+          }
+        ]
+      }
+    },
+    {
       "date": "Fri, 20 Dec 2024 09:18:36 GMT",
       "version": "2.0.0-beta.27",
       "tag": "@apibara/indexer_v2.0.0-beta.27",
