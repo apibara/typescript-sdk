@@ -103,6 +103,6 @@ describe("SQLite key-value store", () => {
       },
     });
 
-    expect(() => run(client, indexer)).rejects.toThrow();
+    await expect(run(client, indexer)).rejects.toThrow();
   });
 });

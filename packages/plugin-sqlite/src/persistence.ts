@@ -65,6 +65,13 @@ export function getState<TFilter>(db: Database) {
   return { cursor, filter };
 }
 
+export function finalizeState(db: Database, cursor: Cursor) {
+  db.prepare<[string, number]>(statements.finalizeFilter).run(
+    DEFAULT_INDEXER_ID,
+    Number(cursor.orderKey),
+  );
+}
+
 const statements = {
   createCheckpointsTable: `
     CREATE TABLE IF NOT EXISTS checkpoints (
@@ -110,4 +117,7 @@ const statements = {
   delFilter: `
     DELETE FROM filters
     WHERE id = ?`,
+  finalizeFilter: `
+    DELETE FROM filters
+    WHERE id = ? AND to_block < ?`,
 };

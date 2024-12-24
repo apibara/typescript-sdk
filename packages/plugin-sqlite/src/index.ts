@@ -5,6 +5,7 @@ import type { Database as SqliteDatabase } from "better-sqlite3";
 
 import { KeyValueStore, initializeKeyValueStore } from "./kv";
 import {
+  finalizeState,
   getState,
   initializePersistentState,
   persistState,
@@ -124,6 +125,18 @@ export function sqliteStorage<TFilter, TBlock>({
             delete ctx[KV_PROPERTY];
           }
         });
+      });
+    });
+
+    indexer.hooks.hook("message:finalize", async ({ message }) => {
+      const { cursor } = message.finalize;
+
+      if (!cursor) {
+        throw new SqliteStorageError("finalized cursor is undefined");
+      }
+
+      await withTransaction(database, async (db) => {
+        finalizeState(db, cursor);
       });
     });
 

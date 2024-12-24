@@ -60,11 +60,7 @@ describe("SQLite persistence", () => {
       },
     });
 
-    try {
-      await run(client, indexer);
-    } catch (error) {
-      expect(error).toBeInstanceOf(Error);
-    }
+    await expect(run(client, indexer)).rejects.toThrow("test");
 
     const rows = db.prepare("SELECT * FROM checkpoints").all();
 
