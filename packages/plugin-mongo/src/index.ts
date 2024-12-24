@@ -3,6 +3,11 @@ import { defineIndexerPlugin } from "@apibara/indexer/plugins";
 import type { DbOptions, MongoClient } from "mongodb";
 
 import { finalize, invalidate } from "./mongo";
+import {
+  getState,
+  initializePersistentState,
+  persistState,
+} from "./persistence";
 import { MongoStorage } from "./storage";
 import { MongoStorageError, withTransaction } from "./utils";
 
@@ -28,6 +33,7 @@ export interface MongoStorageOptions {
   dbOptions?: DbOptions;
   collections: string[];
   persistState?: boolean;
+  indexerName?: string;
 }
 
 export function mongoStorage<TFilter, TBlock>({
@@ -36,8 +42,41 @@ export function mongoStorage<TFilter, TBlock>({
   dbOptions,
   collections,
   persistState: enablePersistence = true,
+  indexerName,
 }: MongoStorageOptions) {
   return defineIndexerPlugin<TFilter, TBlock>((indexer) => {
+    indexer.hooks.hook("run:before", async () => {
+      await withTransaction(client, async (session) => {
+        const db = client.db(dbName, dbOptions);
+        if (enablePersistence) {
+          await initializePersistentState(db, session);
+        }
+      });
+    });
+
+    indexer.hooks.hook("connect:before", async ({ request }) => {
+      if (!enablePersistence) {
+        return;
+      }
+
+      await withTransaction(client, async (session) => {
+        const db = client.db(dbName, dbOptions);
+        const { cursor, filter } = await getState<TFilter>({
+          db,
+          session,
+          indexerName,
+        });
+
+        if (cursor) {
+          request.startingCursor = cursor;
+        }
+
+        if (filter) {
+          request.filter[1] = filter;
+        }
+      });
+    });
+
     indexer.hooks.hook("message:finalize", async ({ message }) => {
       const { cursor } = message.finalize;
 
@@ -91,13 +130,30 @@ export function mongoStorage<TFilter, TBlock>({
           context[MONGO_PROPERTY] = new MongoStorage(db, session, endCursor);
 
           await next();
-
           delete context[MONGO_PROPERTY];
 
           if (enablePersistence) {
-            // TODO: persist state
+            await persistState({ db, endCursor, session, indexerName });
           }
         });
+      });
+    });
+
+    indexer.hooks.hook("connect:factory", async ({ request, endCursor }) => {
+      if (!enablePersistence) {
+        return;
+      }
+      await withTransaction(client, async (session) => {
+        const db = client.db(dbName, dbOptions);
+        if (endCursor && request.filter[1]) {
+          await persistState({
+            db,
+            endCursor,
+            session,
+            filter: request.filter[1],
+            indexerName,
+          });
+        }
       });
     });
   });
