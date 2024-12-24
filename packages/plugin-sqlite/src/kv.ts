@@ -50,6 +50,28 @@ export class KeyValueStore {
   }
 }
 
+export function finalizeKV(db: Database, cursor: Cursor) {
+  assertInTransaction(db);
+
+  db.prepare<[number], KeyValueRow>(statements.finalize).run(
+    Number(cursor.orderKey),
+  );
+}
+
+export function invalidateKV(db: Database, cursor: Cursor) {
+  assertInTransaction(db);
+
+  // Delete entries that started after the invalidation cursor
+  db.prepare<[number], KeyValueRow>(statements.invalidateDelete).run(
+    Number(cursor.orderKey),
+  );
+
+  // Update entries that were supposed to end after the invalidation cursor
+  db.prepare<[number], KeyValueRow>(statements.invalidateUpdate).run(
+    Number(cursor.orderKey),
+  );
+}
+
 type KeyValueRow = {
   from_block: number;
   to_block: number;
@@ -81,4 +103,14 @@ const statements = {
     UPDATE kvs
     SET to_block = ?
     WHERE k = ? AND to_block IS NULL`,
+  finalize: `
+    DELETE FROM kvs
+    WHERE to_block < ?`,
+  invalidateDelete: `
+    DELETE FROM kvs
+    WHERE from_block > ?`,
+  invalidateUpdate: `
+    UPDATE kvs
+    SET to_block = NULL
+    WHERE to_block > ?`,
 };
