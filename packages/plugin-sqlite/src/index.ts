@@ -3,11 +3,17 @@ import { defineIndexerPlugin } from "@apibara/indexer/plugins";
 import { isCursor } from "@apibara/protocol";
 import type { Database as SqliteDatabase } from "better-sqlite3";
 
-import { KeyValueStore, initializeKeyValueStore } from "./kv";
+import {
+  KeyValueStore,
+  finalizeKV,
+  initializeKeyValueStore,
+  invalidateKV,
+} from "./kv";
 import {
   finalizeState,
   getState,
   initializePersistentState,
+  invalidateState,
   persistState,
 } from "./persistence";
 import {
@@ -39,6 +45,7 @@ export type SqliteStorageOptions = {
   database: SqliteDatabase;
   keyValueStore?: boolean;
   persistState?: boolean;
+  indexerName?: string;
 
   serialize?: SerializeFn;
   deserialize?: DeserializeFn;
@@ -53,6 +60,7 @@ export type SqliteStorageOptions = {
  * @param options.keyValueStore - Whether to enable the Key-Value store. Defaults to true.
  * @param options.serialize - A function to serialize the value to the KV.
  * @param options.deserialize - A function to deserialize the value from the KV.
+ * @param options.indexerName - The name of the indexer. Defaults value is 'default'.
  */
 export function sqliteStorage<TFilter, TBlock>({
   database,
@@ -60,6 +68,7 @@ export function sqliteStorage<TFilter, TBlock>({
   keyValueStore: enableKeyValueStore = true,
   serialize: serializeFn = serialize,
   deserialize: deserializeFn = deserialize,
+  indexerName,
 }: SqliteStorageOptions) {
   return defineIndexerPlugin<TFilter, TBlock>((indexer) => {
     indexer.hooks.hook("run:before", async () => {
@@ -80,7 +89,7 @@ export function sqliteStorage<TFilter, TBlock>({
       }
 
       return await withTransaction(database, async (db) => {
-        const { cursor, filter } = getState<TFilter>(db);
+        const { cursor, filter } = getState<TFilter>({ db, indexerName });
 
         if (cursor) {
           request.startingCursor = cursor;
@@ -118,7 +127,7 @@ export function sqliteStorage<TFilter, TBlock>({
           await next();
 
           if (enablePersistState) {
-            persistState(db, ctx.endCursor);
+            persistState({ db, endCursor: ctx.endCursor, indexerName });
           }
 
           if (enableKeyValueStore) {
@@ -136,7 +145,31 @@ export function sqliteStorage<TFilter, TBlock>({
       }
 
       await withTransaction(database, async (db) => {
-        finalizeState(db, cursor);
+        if (enablePersistState) {
+          finalizeState({ db, cursor, indexerName });
+        }
+
+        if (enableKeyValueStore) {
+          finalizeKV(db, cursor);
+        }
+      });
+    });
+
+    indexer.hooks.hook("message:invalidate", async ({ message }) => {
+      const { cursor } = message.invalidate;
+
+      if (!cursor) {
+        throw new SqliteStorageError("invalidate cursor is undefined");
+      }
+
+      await withTransaction(database, async (db) => {
+        if (enablePersistState) {
+          invalidateState({ db, cursor, indexerName });
+        }
+
+        if (enableKeyValueStore) {
+          invalidateKV(db, cursor);
+        }
       });
     });
 
@@ -150,7 +183,12 @@ export function sqliteStorage<TFilter, TBlock>({
       assertInTransaction(database);
 
       if (endCursor && request.filter[1]) {
-        persistState(database, endCursor, request.filter[1]);
+        persistState({
+          db: database,
+          endCursor,
+          indexerName,
+          filter: request.filter[1],
+        });
       }
     });
   });

@@ -11,15 +11,18 @@ export function initializePersistentState(db: Database) {
   db.exec(statements.createFiltersTable);
 }
 
-export function persistState<TFilter>(
-  db: Database,
-  endCursor: Cursor,
-  filter?: TFilter,
-) {
+export function persistState<TFilter>(props: {
+  db: Database;
+  endCursor: Cursor;
+  filter?: TFilter;
+  indexerName?: string;
+}) {
+  const { db, endCursor, filter, indexerName = DEFAULT_INDEXER_ID } = props;
+
   assertInTransaction(db);
 
   db.prepare(statements.putCheckpoint).run(
-    DEFAULT_INDEXER_ID,
+    indexerName,
     Number(endCursor.orderKey),
     endCursor.uniqueKey,
   );
@@ -27,26 +30,30 @@ export function persistState<TFilter>(
   if (filter) {
     db.prepare(statements.updateFilterToBlock).run(
       Number(endCursor.orderKey),
-      DEFAULT_INDEXER_ID,
+      indexerName,
     );
     db.prepare(statements.insertFilter).run(
-      DEFAULT_INDEXER_ID,
+      indexerName,
       serialize(filter as Record<string, unknown>),
       Number(endCursor.orderKey),
     );
   }
 }
 
-export function getState<TFilter>(db: Database) {
+export function getState<TFilter>(props: {
+  db: Database;
+  indexerName?: string;
+}) {
+  const { db, indexerName = DEFAULT_INDEXER_ID } = props;
   assertInTransaction(db);
   const storedCursor = db
     .prepare<string, { order_key?: number; unique_key?: string }>(
       statements.getCheckpoint,
     )
-    .get(DEFAULT_INDEXER_ID);
+    .get(indexerName);
   const storedFilter = db
     .prepare<string, { filter: string }>(statements.getFilter)
-    .get(DEFAULT_INDEXER_ID);
+    .get(indexerName);
 
   let cursor: Cursor | undefined;
   let filter: TFilter | undefined;
@@ -65,9 +72,32 @@ export function getState<TFilter>(db: Database) {
   return { cursor, filter };
 }
 
-export function finalizeState(db: Database, cursor: Cursor) {
+export function finalizeState(props: {
+  db: Database;
+  cursor: Cursor;
+  indexerName?: string;
+}) {
+  const { cursor, db, indexerName = DEFAULT_INDEXER_ID } = props;
+  assertInTransaction(db);
   db.prepare<[string, number]>(statements.finalizeFilter).run(
-    DEFAULT_INDEXER_ID,
+    indexerName,
+    Number(cursor.orderKey),
+  );
+}
+
+export function invalidateState(props: {
+  db: Database;
+  cursor: Cursor;
+  indexerName?: string;
+}) {
+  const { cursor, db, indexerName = DEFAULT_INDEXER_ID } = props;
+  assertInTransaction(db);
+  db.prepare<[string, number]>(statements.invalidateFilterDelete).run(
+    indexerName,
+    Number(cursor.orderKey),
+  );
+  db.prepare<[string, number]>(statements.invalidateFilterUpdate).run(
+    indexerName,
     Number(cursor.orderKey),
   );
 }
@@ -120,4 +150,11 @@ const statements = {
   finalizeFilter: `
     DELETE FROM filters
     WHERE id = ? AND to_block < ?`,
+  invalidateFilterDelete: `
+    DELETE FROM filters
+    WHERE id = ? AND from_block > ?`,
+  invalidateFilterUpdate: `
+    UPDATE filters
+    SET to_block = NULL
+    WHERE id = ? AND to_block > ?`,
 };
