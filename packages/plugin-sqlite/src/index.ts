@@ -101,40 +101,42 @@ export function sqliteStorage<TFilter, TBlock>({
       });
     });
 
-    indexer.hooks.hook("handler:middleware", ({ use }) => {
-      use(async (ctx, next) => {
-        if (!ctx.finality) {
-          throw new SqliteStorageError("finality is undefined");
+    indexer.hooks.hook("connect:after", async ({ request }) => {
+      // On restart, we need to invalidate data for blocks that were processed but not persisted.
+      const cursor = request.startingCursor;
+
+      if (!cursor) {
+        return;
+      }
+
+      await withTransaction(database, async (db) => {
+        if (enablePersistState) {
+          invalidateState({ db, cursor, indexerName });
         }
 
-        if (!ctx.endCursor || !isCursor(ctx.endCursor)) {
-          throw new SqliteStorageError(
-            "endCursor is undefined or not a cursor",
-          );
+        if (enableKeyValueStore) {
+          invalidateKV(db, cursor);
         }
-
-        await withTransaction(database, async (db) => {
-          if (enableKeyValueStore) {
-            ctx[KV_PROPERTY] = new KeyValueStore(
-              db,
-              ctx.endCursor,
-              ctx.finality,
-              serializeFn,
-              deserializeFn,
-            );
-          }
-
-          await next();
-
-          if (enablePersistState) {
-            persistState({ db, endCursor: ctx.endCursor, indexerName });
-          }
-
-          if (enableKeyValueStore) {
-            delete ctx[KV_PROPERTY];
-          }
-        });
       });
+    });
+
+    indexer.hooks.hook("connect:factory", ({ request, endCursor }) => {
+      if (!enablePersistState) {
+        return;
+      }
+
+      // The connect factory hook is called while indexing a block, so the database should be in a transaction
+      // created by the middleware.
+      assertInTransaction(database);
+
+      if (endCursor && request.filter[1]) {
+        persistState({
+          db: database,
+          endCursor,
+          indexerName,
+          filter: request.filter[1],
+        });
+      }
     });
 
     indexer.hooks.hook("message:finalize", async ({ message }) => {
@@ -173,23 +175,40 @@ export function sqliteStorage<TFilter, TBlock>({
       });
     });
 
-    indexer.hooks.hook("connect:factory", ({ request, endCursor }) => {
-      if (!enablePersistState) {
-        return;
-      }
+    indexer.hooks.hook("handler:middleware", ({ use }) => {
+      use(async (ctx, next) => {
+        if (!ctx.finality) {
+          throw new SqliteStorageError("finality is undefined");
+        }
 
-      // The connect factory hook is called while indexing a block, so the database should be in a transaction
-      // created by the middleware.
-      assertInTransaction(database);
+        if (!ctx.endCursor || !isCursor(ctx.endCursor)) {
+          throw new SqliteStorageError(
+            "endCursor is undefined or not a cursor",
+          );
+        }
 
-      if (endCursor && request.filter[1]) {
-        persistState({
-          db: database,
-          endCursor,
-          indexerName,
-          filter: request.filter[1],
+        await withTransaction(database, async (db) => {
+          if (enableKeyValueStore) {
+            ctx[KV_PROPERTY] = new KeyValueStore(
+              db,
+              ctx.endCursor,
+              ctx.finality,
+              serializeFn,
+              deserializeFn,
+            );
+          }
+
+          await next();
+
+          if (enablePersistState) {
+            persistState({ db, endCursor: ctx.endCursor, indexerName });
+          }
+
+          if (enableKeyValueStore) {
+            delete ctx[KV_PROPERTY];
+          }
         });
-      }
+      });
     });
   });
 }

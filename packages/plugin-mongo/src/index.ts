@@ -4,8 +4,10 @@ import type { DbOptions, MongoClient } from "mongodb";
 
 import { finalize, invalidate } from "./mongo";
 import {
+  finalizeState,
   getState,
   initializePersistentState,
+  invalidateState,
   persistState,
 } from "./persistence";
 import { MongoStorage } from "./storage";
@@ -35,7 +37,17 @@ export interface MongoStorageOptions {
   persistState?: boolean;
   indexerName?: string;
 }
-
+/**
+ * Creates a plugin that uses MongoDB as the storage layer.
+ *
+ * Supports storing the indexer's state and provides a simple Key-Value store.
+ * @param options.client - The MongoDB client instance.
+ * @param options.dbName - The name of the database.
+ * @param options.dbOptions - The database options.
+ * @param options.collections - The collections to use.
+ * @param options.persistState - Whether to persist the indexer's state. Defaults to true.
+ * @param options.indexerName - The name of the indexer. Defaults value is 'default'.
+ */
 export function mongoStorage<TFilter, TBlock>({
   client,
   dbName,
@@ -77,6 +89,42 @@ export function mongoStorage<TFilter, TBlock>({
       });
     });
 
+    indexer.hooks.hook("connect:after", async ({ request }) => {
+      // On restart, we need to invalidate data for blocks that were processed but not persisted.
+      const cursor = request.startingCursor;
+
+      if (!cursor) {
+        return;
+      }
+
+      await withTransaction(client, async (session) => {
+        const db = client.db(dbName, dbOptions);
+        await invalidate(db, session, cursor, collections);
+
+        if (enablePersistence) {
+          await invalidateState({ db, session, cursor, indexerName });
+        }
+      });
+    });
+
+    indexer.hooks.hook("connect:factory", async ({ request, endCursor }) => {
+      if (!enablePersistence) {
+        return;
+      }
+      await withTransaction(client, async (session) => {
+        const db = client.db(dbName, dbOptions);
+        if (endCursor && request.filter[1]) {
+          await persistState({
+            db,
+            endCursor,
+            session,
+            filter: request.filter[1],
+            indexerName,
+          });
+        }
+      });
+    });
+
     indexer.hooks.hook("message:finalize", async ({ message }) => {
       const { cursor } = message.finalize;
 
@@ -87,6 +135,10 @@ export function mongoStorage<TFilter, TBlock>({
       await withTransaction(client, async (session) => {
         const db = client.db(dbName, dbOptions);
         await finalize(db, session, cursor, collections);
+
+        if (enablePersistence) {
+          await finalizeState({ db, session, cursor, indexerName });
+        }
       });
     });
 
@@ -100,20 +152,10 @@ export function mongoStorage<TFilter, TBlock>({
       await withTransaction(client, async (session) => {
         const db = client.db(dbName, dbOptions);
         await invalidate(db, session, cursor, collections);
-      });
-    });
 
-    indexer.hooks.hook("connect:after", async ({ request }) => {
-      // On restart, we need to invalidate data for blocks that were processed but not persisted.
-      const cursor = request.startingCursor;
-
-      if (!cursor) {
-        return;
-      }
-
-      await withTransaction(client, async (session) => {
-        const db = client.db(dbName, dbOptions);
-        await invalidate(db, session, cursor, collections);
+        if (enablePersistence) {
+          await invalidateState({ db, session, cursor, indexerName });
+        }
       });
     });
 
@@ -136,24 +178,6 @@ export function mongoStorage<TFilter, TBlock>({
             await persistState({ db, endCursor, session, indexerName });
           }
         });
-      });
-    });
-
-    indexer.hooks.hook("connect:factory", async ({ request, endCursor }) => {
-      if (!enablePersistence) {
-        return;
-      }
-      await withTransaction(client, async (session) => {
-        const db = client.db(dbName, dbOptions);
-        if (endCursor && request.filter[1]) {
-          await persistState({
-            db,
-            endCursor,
-            session,
-            filter: request.filter[1],
-            indexerName,
-          });
-        }
       });
     });
   });

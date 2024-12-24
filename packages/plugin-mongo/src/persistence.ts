@@ -65,6 +65,40 @@ export async function getState<TFilter>(props: {
   return await mongoPersistence.get();
 }
 
+export async function invalidateState<TFilter>(props: {
+  db: Db;
+  session: ClientSession;
+  cursor: Cursor;
+  indexerName?: string;
+}) {
+  const { db, session, cursor, indexerName = "default" } = props;
+
+  const mongoPersistence = new MongoPersistence<TFilter>(
+    db,
+    session,
+    indexerName,
+  );
+
+  await mongoPersistence.invalidate(cursor);
+}
+
+export async function finalizeState<TFilter>(props: {
+  db: Db;
+  session: ClientSession;
+  cursor: Cursor;
+  indexerName?: string;
+}) {
+  const { db, session, cursor, indexerName = "default" } = props;
+
+  const mongoPersistence = new MongoPersistence<TFilter>(
+    db,
+    session,
+    indexerName,
+  );
+
+  await mongoPersistence.finalize(cursor);
+}
+
 export class MongoPersistence<TFilter> {
   constructor(
     private db: Db,
@@ -91,6 +125,10 @@ export class MongoPersistence<TFilter> {
 
   public async finalize(cursor: Cursor) {
     await this._finalizeFilter(cursor);
+  }
+
+  public async invalidate(cursor: Cursor) {
+    await this._invalidateFilter(cursor);
   }
 
   // --- CHECKPOINTS METHODS ---
@@ -166,6 +204,23 @@ export class MongoPersistence<TFilter> {
       },
       { upsert: true, session: this.session },
     );
+  }
+
+  private async _invalidateFilter(cursor: Cursor) {
+    await this.db
+      .collection<FilterSchema>(filterCollectionName)
+      .deleteMany(
+        { id: this.indexerName, fromBlock: { $gt: Number(cursor.orderKey) } },
+        { session: this.session },
+      );
+
+    await this.db
+      .collection<FilterSchema>(filterCollectionName)
+      .updateMany(
+        { id: this.indexerName, toBlock: { $gt: Number(cursor.orderKey) } },
+        { $set: { toBlock: null } },
+        { session: this.session },
+      );
   }
 
   private async _finalizeFilter(cursor: Cursor) {
