@@ -10,9 +10,14 @@ import {
 } from "@apibara/protocol/testing";
 import { describe, expect, it } from "vitest";
 
+import type { Finalize, Invalidate } from "@apibara/protocol";
 import { MongoClient } from "mongodb";
 import { mongoStorage, useMongoStorage } from "../src";
-import { getState } from "../src/persistence";
+import {
+  checkpointCollectionName,
+  filterCollectionName,
+  getState,
+} from "../src/persistence";
 import { withTransaction } from "../src/utils";
 
 type TestSchema = {
@@ -26,7 +31,7 @@ type TestSchema = {
   };
 };
 
-describe("MongoDB persistence", () => {
+describe("MongoDB Test", () => {
   it("should store data with a cursor", async () => {
     const { db, client, dbName } = getRandomDatabase();
 
@@ -427,6 +432,567 @@ describe("MongoDB persistence", () => {
         }
       `);
     });
+  });
+
+  it("should persist the filters and latest block number (factory mode)", async () => {
+    const { db, client, dbName } = getRandomDatabase();
+    const indexerName = "persist-test";
+
+    const mockClient = new MockClient<MockFilter, MockBlock>(
+      (request, options) => {
+        const [_factoryFilter, mainFilter] = request.filter;
+
+        if (Object.keys(mainFilter).length === 0) {
+          expect(request.startingCursor?.orderKey).toEqual(100n);
+
+          return [
+            {
+              _tag: "data",
+              data: {
+                finality: "accepted",
+                cursor: { orderKey: 100n },
+                endCursor: { orderKey: 101n },
+                data: [null, null],
+              },
+            },
+            {
+              _tag: "data",
+              data: {
+                finality: "accepted",
+                cursor: { orderKey: 101n },
+                endCursor: { orderKey: 102n },
+                data: [null, null],
+              },
+            },
+            {
+              _tag: "data",
+              data: {
+                finality: "accepted",
+                cursor: { orderKey: 102n },
+                endCursor: { orderKey: 103n },
+                data: [{ data: "B" }, null],
+              },
+            },
+          ];
+        }
+
+        if (mainFilter.filter === "B") {
+          expect(request.startingCursor?.orderKey).toEqual(102n);
+
+          return [
+            {
+              _tag: "data",
+              data: {
+                finality: "accepted",
+                cursor: { orderKey: 102n },
+                endCursor: { orderKey: 103n },
+                data: [{ data: "B" }, { data: "103B" }],
+              },
+            },
+            {
+              _tag: "data",
+              data: {
+                finality: "accepted",
+                cursor: { orderKey: 103n },
+                endCursor: { orderKey: 104n },
+                data: [null, { data: "104B" }],
+              },
+            },
+            {
+              _tag: "data",
+              data: {
+                finality: "accepted",
+                cursor: { orderKey: 104n },
+                endCursor: { orderKey: 105n },
+                data: [null, { data: "105B" }],
+              },
+            },
+            {
+              _tag: "data",
+              data: {
+                finality: "accepted",
+                cursor: { orderKey: 105n },
+                endCursor: { orderKey: 106n },
+                data: [{ data: "C" }, { data: "106B" }],
+              },
+            },
+          ];
+        }
+
+        if (mainFilter.filter === "BC") {
+          expect(request.startingCursor?.orderKey).toEqual(105n);
+
+          return [
+            {
+              _tag: "data",
+              data: {
+                finality: "accepted",
+                cursor: { orderKey: 105n },
+                endCursor: { orderKey: 106n },
+                data: [{ data: "C" }, { data: "106BC" }],
+              },
+            },
+            {
+              _tag: "data",
+              data: {
+                finality: "accepted",
+                cursor: { orderKey: 106n },
+                endCursor: { orderKey: 107n },
+                data: [null, { data: "107BC" }],
+              },
+            },
+            {
+              _tag: "data",
+              data: {
+                finality: "accepted",
+                cursor: { orderKey: 107n },
+                endCursor: { orderKey: 108n },
+                data: [null, { data: "108BC" }],
+              },
+            },
+          ];
+        }
+
+        return [];
+      },
+    );
+
+    const indexer = getMockIndexer({
+      plugins: [
+        mongoStorage({
+          client,
+          dbName,
+          collections: ["test"],
+          persistState: true,
+          indexerName,
+        }),
+      ],
+      override: {
+        startingCursor: { orderKey: 100n },
+        factory: async ({ block }) => {
+          if (block.data === "B") {
+            return { filter: { filter: "B" } };
+          }
+
+          if (block.data === "C") {
+            return { filter: { filter: "C" } };
+          }
+
+          return {};
+        },
+      },
+    });
+
+    await run(mockClient, indexer);
+
+    const checkpointsRows = await db
+      .collection(checkpointCollectionName)
+      .find()
+      .toArray();
+    const filtersRows = await db
+      .collection(filterCollectionName)
+      .find()
+      .toArray();
+
+    expect(
+      checkpointsRows.map(({ _id, ...rest }) => rest),
+    ).toMatchInlineSnapshot(`
+      [
+        {
+          "id": "persist-test",
+          "orderKey": 108,
+          "uniqueKey": null,
+        },
+      ]
+    `);
+    expect(filtersRows.map(({ _id, ...rest }) => rest)).toMatchInlineSnapshot(`
+      [
+        {
+          "filter": {
+            "filter": "B",
+          },
+          "fromBlock": 103,
+          "id": "persist-test",
+          "toBlock": 106,
+        },
+        {
+          "filter": {
+            "filter": "BC",
+          },
+          "fromBlock": 106,
+          "id": "persist-test",
+          "toBlock": null,
+        },
+      ]
+    `);
+  });
+
+  it("should invalidate state (factory mode)", async () => {
+    const { db, client, dbName } = getRandomDatabase();
+    const indexerName = "persist-test";
+
+    const mockClient = new MockClient<MockFilter, MockBlock>(
+      (request, options) => {
+        const [_factoryFilter, mainFilter] = request.filter;
+
+        if (Object.keys(mainFilter).length === 0) {
+          expect(request.startingCursor?.orderKey).toEqual(100n);
+
+          return [
+            {
+              _tag: "data",
+              data: {
+                finality: "accepted",
+                cursor: { orderKey: 100n },
+                endCursor: { orderKey: 101n },
+                data: [null, null],
+              },
+            },
+            {
+              _tag: "data",
+              data: {
+                finality: "accepted",
+                cursor: { orderKey: 101n },
+                endCursor: { orderKey: 102n },
+                data: [null, null],
+              },
+            },
+            {
+              _tag: "data",
+              data: {
+                finality: "accepted",
+                cursor: { orderKey: 102n },
+                endCursor: { orderKey: 103n },
+                data: [{ data: "B" }, null],
+              },
+            },
+          ];
+        }
+
+        if (mainFilter.filter === "B") {
+          expect(request.startingCursor?.orderKey).toEqual(102n);
+
+          return [
+            {
+              _tag: "data",
+              data: {
+                finality: "accepted",
+                cursor: { orderKey: 102n },
+                endCursor: { orderKey: 103n },
+                data: [{ data: "B" }, { data: "103B" }],
+              },
+            },
+            {
+              _tag: "data",
+              data: {
+                finality: "accepted",
+                cursor: { orderKey: 103n },
+                endCursor: { orderKey: 104n },
+                data: [null, { data: "104B" }],
+              },
+            },
+            {
+              _tag: "data",
+              data: {
+                finality: "accepted",
+                cursor: { orderKey: 104n },
+                endCursor: { orderKey: 105n },
+                data: [null, { data: "105B" }],
+              },
+            },
+            {
+              _tag: "data",
+              data: {
+                finality: "accepted",
+                cursor: { orderKey: 105n },
+                endCursor: { orderKey: 106n },
+                data: [{ data: "C" }, { data: "106B" }],
+              },
+            },
+          ];
+        }
+
+        if (mainFilter.filter === "BC") {
+          expect(request.startingCursor?.orderKey).toEqual(105n);
+
+          return [
+            {
+              _tag: "data",
+              data: {
+                finality: "accepted",
+                cursor: { orderKey: 105n },
+                endCursor: { orderKey: 106n },
+                data: [{ data: "C" }, { data: "106BC" }],
+              },
+            },
+            {
+              _tag: "data",
+              data: {
+                finality: "accepted",
+                cursor: { orderKey: 106n },
+                endCursor: { orderKey: 107n },
+                data: [null, { data: "107BC" }],
+              },
+            },
+            {
+              _tag: "invalidate",
+              invalidate: {
+                cursor: {
+                  orderKey: 105n,
+                },
+              },
+            } as Invalidate,
+          ];
+        }
+
+        return [];
+      },
+    );
+
+    const indexer = getMockIndexer({
+      plugins: [
+        mongoStorage({
+          client,
+          dbName,
+          collections: ["test"],
+          persistState: true,
+          indexerName,
+        }),
+      ],
+      override: {
+        startingCursor: { orderKey: 100n },
+        factory: async ({ block }) => {
+          if (block.data === "B") {
+            return { filter: { filter: "B" } };
+          }
+
+          if (block.data === "C") {
+            return { filter: { filter: "C" } };
+          }
+
+          return {};
+        },
+      },
+    });
+
+    await run(mockClient, indexer);
+
+    const checkpointsRows = await db
+      .collection(checkpointCollectionName)
+      .find()
+      .toArray();
+    const filtersRows = await db
+      .collection(filterCollectionName)
+      .find()
+      .toArray();
+
+    expect(
+      checkpointsRows.map(({ _id, ...rest }) => rest),
+    ).toMatchInlineSnapshot(`
+      [
+        {
+          "id": "persist-test",
+          "orderKey": 107,
+          "uniqueKey": null,
+        },
+      ]
+    `);
+    expect(filtersRows.map(({ _id, ...rest }) => rest)).toMatchInlineSnapshot(`
+      [
+        {
+          "filter": {
+            "filter": "B",
+          },
+          "fromBlock": 103,
+          "id": "persist-test",
+          "toBlock": null,
+        },
+      ]
+    `);
+  });
+
+  it("should finalize state (factory mode)", async () => {
+    const { db, client, dbName } = getRandomDatabase();
+    const indexerName = "persist-test";
+
+    const mockClient = new MockClient<MockFilter, MockBlock>(
+      (request, options) => {
+        const [_factoryFilter, mainFilter] = request.filter;
+
+        if (Object.keys(mainFilter).length === 0) {
+          expect(request.startingCursor?.orderKey).toEqual(100n);
+
+          return [
+            {
+              _tag: "data",
+              data: {
+                finality: "accepted",
+                cursor: { orderKey: 100n },
+                endCursor: { orderKey: 101n },
+                data: [null, null],
+              },
+            },
+            {
+              _tag: "data",
+              data: {
+                finality: "accepted",
+                cursor: { orderKey: 101n },
+                endCursor: { orderKey: 102n },
+                data: [null, null],
+              },
+            },
+            {
+              _tag: "data",
+              data: {
+                finality: "accepted",
+                cursor: { orderKey: 102n },
+                endCursor: { orderKey: 103n },
+                data: [{ data: "B" }, null],
+              },
+            },
+          ];
+        }
+
+        if (mainFilter.filter === "B") {
+          expect(request.startingCursor?.orderKey).toEqual(102n);
+
+          return [
+            {
+              _tag: "data",
+              data: {
+                finality: "accepted",
+                cursor: { orderKey: 102n },
+                endCursor: { orderKey: 103n },
+                data: [{ data: "B" }, { data: "103B" }],
+              },
+            },
+            {
+              _tag: "data",
+              data: {
+                finality: "accepted",
+                cursor: { orderKey: 103n },
+                endCursor: { orderKey: 104n },
+                data: [null, { data: "104B" }],
+              },
+            },
+            {
+              _tag: "data",
+              data: {
+                finality: "accepted",
+                cursor: { orderKey: 104n },
+                endCursor: { orderKey: 105n },
+                data: [null, { data: "105B" }],
+              },
+            },
+            {
+              _tag: "data",
+              data: {
+                finality: "accepted",
+                cursor: { orderKey: 105n },
+                endCursor: { orderKey: 106n },
+                data: [{ data: "C" }, { data: "106B" }],
+              },
+            },
+          ];
+        }
+
+        if (mainFilter.filter === "BC") {
+          expect(request.startingCursor?.orderKey).toEqual(105n);
+
+          return [
+            {
+              _tag: "data",
+              data: {
+                finality: "accepted",
+                cursor: { orderKey: 105n },
+                endCursor: { orderKey: 106n },
+                data: [{ data: "C" }, { data: "106BC" }],
+              },
+            },
+            {
+              _tag: "data",
+              data: {
+                finality: "accepted",
+                cursor: { orderKey: 106n },
+                endCursor: { orderKey: 107n },
+                data: [null, { data: "107BC" }],
+              },
+            },
+            {
+              _tag: "finalize",
+              finalize: {
+                cursor: {
+                  orderKey: 107n,
+                },
+              },
+            } as Finalize,
+          ];
+        }
+
+        return [];
+      },
+    );
+
+    const indexer = getMockIndexer({
+      plugins: [
+        mongoStorage({
+          client,
+          dbName,
+          collections: ["test"],
+          persistState: true,
+          indexerName,
+        }),
+      ],
+      override: {
+        startingCursor: { orderKey: 100n },
+        factory: async ({ block }) => {
+          if (block.data === "B") {
+            return { filter: { filter: "B" } };
+          }
+
+          if (block.data === "C") {
+            return { filter: { filter: "C" } };
+          }
+
+          return {};
+        },
+      },
+    });
+
+    await run(mockClient, indexer);
+
+    const checkpointsRows = await db
+      .collection(checkpointCollectionName)
+      .find()
+      .toArray();
+    const filtersRows = await db
+      .collection(filterCollectionName)
+      .find()
+      .toArray();
+
+    expect(
+      checkpointsRows.map(({ _id, ...rest }) => rest),
+    ).toMatchInlineSnapshot(`
+      [
+        {
+          "id": "persist-test",
+          "orderKey": 107,
+          "uniqueKey": null,
+        },
+      ]
+    `);
+    expect(filtersRows.map(({ _id, ...rest }) => rest)).toMatchInlineSnapshot(`
+      [
+        {
+          "filter": {
+            "filter": "BC",
+          },
+          "fromBlock": 106,
+          "id": "persist-test",
+          "toBlock": null,
+        },
+      ]
+    `);
   });
 });
 
