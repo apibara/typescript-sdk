@@ -2,6 +2,21 @@
   "name": "@apibara/indexer",
   "entries": [
     {
+      "date": "Mon, 30 Dec 2024 09:36:43 GMT",
+      "version": "2.0.0-beta.29",
+      "tag": "@apibara/indexer_v2.0.0-beta.29",
+      "comments": {
+        "prerelease": [
+          {
+            "author": "jadejajaipal5@gmail.com",
+            "package": "@apibara/indexer",
+            "commit": "3b77ab7205132a333aa635122376db9e56ca124f",
+            "comment": "option to get invalidate messages from mock generator"
+          }
+        ]
+      }
+    },
+    {
       "date": "Mon, 23 Dec 2024 11:34:53 GMT",
       "version": "2.0.0-beta.28",
       "tag": "@apibara/indexer_v2.0.0-beta.28",

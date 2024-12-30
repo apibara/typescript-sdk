@@ -2,6 +2,21 @@
   "name": "@apibara/plugin-mongo",
   "entries": [
     {
+      "date": "Mon, 30 Dec 2024 09:36:43 GMT",
+      "version": "2.0.0-beta.29",
+      "tag": "@apibara/plugin-mongo_v2.0.0-beta.29",
+      "comments": {
+        "prerelease": [
+          {
+            "author": "jadejajaipal5@gmail.com",
+            "package": "@apibara/plugin-mongo",
+            "commit": "3b77ab7205132a333aa635122376db9e56ca124f",
+            "comment": "finalize and invalidation with tests"
+          }
+        ]
+      }
+    },
+    {
       "date": "Mon, 23 Dec 2024 11:34:53 GMT",
       "version": "2.0.0-beta.28",
       "tag": "@apibara/plugin-mongo_v2.0.0-beta.28",

@@ -1,8 +1,16 @@
 # Change Log - @apibara/indexer
 
-<!-- This log was last generated on Mon, 23 Dec 2024 11:34:53 GMT and should not be manually modified. -->
+<!-- This log was last generated on Mon, 30 Dec 2024 09:36:43 GMT and should not be manually modified. -->
 
 <!-- Start content -->
+
+## 2.0.0-beta.29
+
+Mon, 30 Dec 2024 09:36:43 GMT
+
+### Changes
+
+- option to get invalidate messages from mock generator (jadejajaipal5@gmail.com)
 
 ## 2.0.0-beta.28
 
