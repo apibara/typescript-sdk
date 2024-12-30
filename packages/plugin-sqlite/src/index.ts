@@ -3,10 +3,17 @@ import { defineIndexerPlugin } from "@apibara/indexer/plugins";
 import { isCursor } from "@apibara/protocol";
 import type { Database as SqliteDatabase } from "better-sqlite3";
 
-import { KeyValueStore, initializeKeyValueStore } from "./kv";
 import {
+  KeyValueStore,
+  finalizeKV,
+  initializeKeyValueStore,
+  invalidateKV,
+} from "./kv";
+import {
+  finalizeState,
   getState,
   initializePersistentState,
+  invalidateState,
   persistState,
 } from "./persistence";
 import {
@@ -38,6 +45,7 @@ export type SqliteStorageOptions = {
   database: SqliteDatabase;
   keyValueStore?: boolean;
   persistState?: boolean;
+  indexerName?: string;
 
   serialize?: SerializeFn;
   deserialize?: DeserializeFn;
@@ -52,6 +60,7 @@ export type SqliteStorageOptions = {
  * @param options.keyValueStore - Whether to enable the Key-Value store. Defaults to true.
  * @param options.serialize - A function to serialize the value to the KV.
  * @param options.deserialize - A function to deserialize the value from the KV.
+ * @param options.indexerName - The name of the indexer. Defaults value is 'default'.
  */
 export function sqliteStorage<TFilter, TBlock>({
   database,
@@ -59,6 +68,7 @@ export function sqliteStorage<TFilter, TBlock>({
   keyValueStore: enableKeyValueStore = true,
   serialize: serializeFn = serialize,
   deserialize: deserializeFn = deserialize,
+  indexerName,
 }: SqliteStorageOptions) {
   return defineIndexerPlugin<TFilter, TBlock>((indexer) => {
     indexer.hooks.hook("run:before", async () => {
@@ -79,7 +89,7 @@ export function sqliteStorage<TFilter, TBlock>({
       }
 
       return await withTransaction(database, async (db) => {
-        const { cursor, filter } = getState<TFilter>(db);
+        const { cursor, filter } = getState<TFilter>({ db, indexerName });
 
         if (cursor) {
           request.startingCursor = cursor;
@@ -87,6 +97,80 @@ export function sqliteStorage<TFilter, TBlock>({
 
         if (filter) {
           request.filter[1] = filter;
+        }
+      });
+    });
+
+    indexer.hooks.hook("connect:after", async ({ request }) => {
+      // On restart, we need to invalidate data for blocks that were processed but not persisted.
+      const cursor = request.startingCursor;
+
+      if (!cursor) {
+        return;
+      }
+
+      await withTransaction(database, async (db) => {
+        if (enablePersistState) {
+          invalidateState({ db, cursor, indexerName });
+        }
+
+        if (enableKeyValueStore) {
+          invalidateKV(db, cursor);
+        }
+      });
+    });
+
+    indexer.hooks.hook("connect:factory", ({ request, endCursor }) => {
+      if (!enablePersistState) {
+        return;
+      }
+
+      // The connect factory hook is called while indexing a block, so the database should be in a transaction
+      // created by the middleware.
+      assertInTransaction(database);
+
+      if (endCursor && request.filter[1]) {
+        persistState({
+          db: database,
+          endCursor,
+          indexerName,
+          filter: request.filter[1],
+        });
+      }
+    });
+
+    indexer.hooks.hook("message:finalize", async ({ message }) => {
+      const { cursor } = message.finalize;
+
+      if (!cursor) {
+        throw new SqliteStorageError("finalized cursor is undefined");
+      }
+
+      await withTransaction(database, async (db) => {
+        if (enablePersistState) {
+          finalizeState({ db, cursor, indexerName });
+        }
+
+        if (enableKeyValueStore) {
+          finalizeKV(db, cursor);
+        }
+      });
+    });
+
+    indexer.hooks.hook("message:invalidate", async ({ message }) => {
+      const { cursor } = message.invalidate;
+
+      if (!cursor) {
+        throw new SqliteStorageError("invalidate cursor is undefined");
+      }
+
+      await withTransaction(database, async (db) => {
+        if (enablePersistState) {
+          invalidateState({ db, cursor, indexerName });
+        }
+
+        if (enableKeyValueStore) {
+          invalidateKV(db, cursor);
         }
       });
     });
@@ -117,7 +201,7 @@ export function sqliteStorage<TFilter, TBlock>({
           await next();
 
           if (enablePersistState) {
-            persistState(db, ctx.endCursor);
+            persistState({ db, endCursor: ctx.endCursor, indexerName });
           }
 
           if (enableKeyValueStore) {
@@ -125,20 +209,6 @@ export function sqliteStorage<TFilter, TBlock>({
           }
         });
       });
-    });
-
-    indexer.hooks.hook("connect:factory", ({ request, endCursor }) => {
-      if (!enablePersistState) {
-        return;
-      }
-
-      // The connect factory hook is called while indexing a block, so the database should be in a transaction
-      // created by the middleware.
-      assertInTransaction(database);
-
-      if (endCursor && request.filter[1]) {
-        persistState(database, endCursor, request.filter[1]);
-      }
     });
   });
 }

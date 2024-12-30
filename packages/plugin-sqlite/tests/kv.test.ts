@@ -11,6 +11,7 @@ import {
 import Database from "better-sqlite3";
 import { describe, expect, it } from "vitest";
 
+import type { Finalize, Invalidate } from "@apibara/protocol";
 import { sqliteStorage, useSqliteKeyValueStore } from "../src";
 
 describe("SQLite key-value store", () => {
@@ -103,6 +104,354 @@ describe("SQLite key-value store", () => {
       },
     });
 
-    expect(() => run(client, indexer)).rejects.toThrow();
+    await expect(run(client, indexer)).rejects.toThrow();
+  });
+
+  it("should invalidate kv store (factory mode)", async () => {
+    const db = new Database(":memory:");
+
+    const client = new MockClient<MockFilter, MockBlock>((request, options) => {
+      const [_factoryFilter, mainFilter] = request.filter;
+
+      if (Object.keys(mainFilter).length === 0) {
+        expect(request.startingCursor?.orderKey).toEqual(100n);
+
+        return [
+          {
+            _tag: "data",
+            data: {
+              finality: "accepted",
+              cursor: { orderKey: 100n },
+              endCursor: { orderKey: 101n },
+              data: [null, null],
+            },
+          },
+          {
+            _tag: "data",
+            data: {
+              finality: "accepted",
+              cursor: { orderKey: 101n },
+              endCursor: { orderKey: 102n },
+              data: [null, null],
+            },
+          },
+          {
+            _tag: "data",
+            data: {
+              finality: "accepted",
+              cursor: { orderKey: 102n },
+              endCursor: { orderKey: 103n },
+              data: [{ data: "B" }, null],
+            },
+          },
+        ];
+      }
+
+      if (mainFilter.filter === "B") {
+        expect(request.startingCursor?.orderKey).toEqual(102n);
+
+        return [
+          {
+            _tag: "data",
+            data: {
+              finality: "accepted",
+              cursor: { orderKey: 102n },
+              endCursor: { orderKey: 103n },
+              data: [{ data: "B" }, { data: "103B" }],
+            },
+          },
+          {
+            _tag: "data",
+            data: {
+              finality: "accepted",
+              cursor: { orderKey: 103n },
+              endCursor: { orderKey: 104n },
+              data: [null, { data: "104B" }],
+            },
+          },
+          {
+            _tag: "data",
+            data: {
+              finality: "accepted",
+              cursor: { orderKey: 104n },
+              endCursor: { orderKey: 105n },
+              data: [null, { data: "105B" }],
+            },
+          },
+          {
+            _tag: "data",
+            data: {
+              finality: "accepted",
+              cursor: { orderKey: 105n },
+              endCursor: { orderKey: 106n },
+              data: [{ data: "C" }, { data: "106B" }],
+            },
+          },
+        ];
+      }
+
+      if (mainFilter.filter === "BC") {
+        expect(request.startingCursor?.orderKey).toEqual(105n);
+
+        return [
+          {
+            _tag: "data",
+            data: {
+              finality: "accepted",
+              cursor: { orderKey: 105n },
+              endCursor: { orderKey: 106n },
+              data: [{ data: "C" }, { data: "106BC" }],
+            },
+          },
+          {
+            _tag: "data",
+            data: {
+              finality: "accepted",
+              cursor: { orderKey: 106n },
+              endCursor: { orderKey: 107n },
+              data: [null, { data: "107BC" }],
+            },
+          },
+          {
+            _tag: "invalidate",
+            invalidate: {
+              cursor: {
+                orderKey: 105n,
+              },
+            },
+          } as Invalidate,
+        ];
+      }
+
+      return [];
+    });
+
+    const indexer = getMockIndexer({
+      plugins: [sqliteStorage({ database: db, keyValueStore: true })],
+      override: {
+        startingCursor: { orderKey: 100n },
+        factory: async ({ block }) => {
+          if (block.data === "B") {
+            return { filter: { filter: "B" } };
+          }
+
+          if (block.data === "C") {
+            return { filter: { filter: "C" } };
+          }
+
+          return {};
+        },
+        transform: async ({ block }) => {
+          const kv = useSqliteKeyValueStore();
+          kv.put(`data-${block.data}`, block.data);
+        },
+      },
+    });
+
+    await run(client, indexer);
+
+    const rows = db.prepare("SELECT * FROM kvs").all();
+
+    expect(rows).toMatchInlineSnapshot(`
+      [
+        {
+          "from_block": 103,
+          "k": "data-103B",
+          "to_block": null,
+          "v": ""103B"",
+        },
+        {
+          "from_block": 104,
+          "k": "data-104B",
+          "to_block": null,
+          "v": ""104B"",
+        },
+        {
+          "from_block": 105,
+          "k": "data-105B",
+          "to_block": null,
+          "v": ""105B"",
+        },
+      ]
+    `);
+  });
+
+  it("should finalize kv store (factory mode)", async () => {
+    const db = new Database(":memory:");
+
+    const client = new MockClient<MockFilter, MockBlock>((request, options) => {
+      const [_factoryFilter, mainFilter] = request.filter;
+
+      if (Object.keys(mainFilter).length === 0) {
+        expect(request.startingCursor?.orderKey).toEqual(100n);
+
+        return [
+          {
+            _tag: "data",
+            data: {
+              finality: "accepted",
+              cursor: { orderKey: 100n },
+              endCursor: { orderKey: 101n },
+              data: [null, null],
+            },
+          },
+          {
+            _tag: "data",
+            data: {
+              finality: "accepted",
+              cursor: { orderKey: 101n },
+              endCursor: { orderKey: 102n },
+              data: [null, null],
+            },
+          },
+          {
+            _tag: "data",
+            data: {
+              finality: "accepted",
+              cursor: { orderKey: 102n },
+              endCursor: { orderKey: 103n },
+              data: [{ data: "B" }, null],
+            },
+          },
+        ];
+      }
+
+      if (mainFilter.filter === "B") {
+        expect(request.startingCursor?.orderKey).toEqual(102n);
+
+        return [
+          {
+            _tag: "data",
+            data: {
+              finality: "accepted",
+              cursor: { orderKey: 102n },
+              endCursor: { orderKey: 103n },
+              data: [{ data: "B" }, { data: "103B" }],
+            },
+          },
+          {
+            _tag: "data",
+            data: {
+              finality: "accepted",
+              cursor: { orderKey: 103n },
+              endCursor: { orderKey: 104n },
+              data: [null, { data: "104B" }],
+            },
+          },
+          {
+            _tag: "data",
+            data: {
+              finality: "accepted",
+              cursor: { orderKey: 104n },
+              endCursor: { orderKey: 105n },
+              data: [null, { data: "105B" }],
+            },
+          },
+          {
+            _tag: "data",
+            data: {
+              finality: "accepted",
+              cursor: { orderKey: 105n },
+              endCursor: { orderKey: 106n },
+              data: [{ data: "C" }, { data: "106B" }],
+            },
+          },
+        ];
+      }
+
+      if (mainFilter.filter === "BC") {
+        expect(request.startingCursor?.orderKey).toEqual(105n);
+
+        return [
+          {
+            _tag: "data",
+            data: {
+              finality: "accepted",
+              cursor: { orderKey: 105n },
+              endCursor: { orderKey: 106n },
+              data: [{ data: "C" }, { data: "106BC" }],
+            },
+          },
+          {
+            _tag: "data",
+            data: {
+              finality: "accepted",
+              cursor: { orderKey: 106n },
+              endCursor: { orderKey: 107n },
+              data: [null, { data: "107BC" }],
+            },
+          },
+          {
+            _tag: "finalize",
+            finalize: {
+              cursor: {
+                orderKey: 107n,
+              },
+            },
+          } as Finalize,
+        ];
+      }
+
+      return [];
+    });
+
+    const indexer = getMockIndexer({
+      plugins: [sqliteStorage({ database: db, keyValueStore: true })],
+      override: {
+        startingCursor: { orderKey: 100n },
+        factory: async ({ block }) => {
+          if (block.data === "B") {
+            return { filter: { filter: "B" } };
+          }
+
+          if (block.data === "C") {
+            return { filter: { filter: "C" } };
+          }
+
+          return {};
+        },
+        transform: async ({ block, endCursor }) => {
+          const kv = useSqliteKeyValueStore();
+          kv.put(`data-${endCursor?.orderKey}`, block.data);
+
+          if (endCursor?.orderKey && endCursor?.orderKey === 106n) {
+            kv.del(`data-${endCursor.orderKey - 1n}`);
+          }
+        },
+      },
+    });
+
+    await run(client, indexer);
+
+    const rows = db.prepare("SELECT * FROM kvs").all();
+
+    expect(rows).toMatchInlineSnapshot(`
+      [
+        {
+          "from_block": 103,
+          "k": "data-103",
+          "to_block": null,
+          "v": ""103B"",
+        },
+        {
+          "from_block": 104,
+          "k": "data-104",
+          "to_block": null,
+          "v": ""104B"",
+        },
+        {
+          "from_block": 106,
+          "k": "data-106",
+          "to_block": null,
+          "v": ""106BC"",
+        },
+        {
+          "from_block": 107,
+          "k": "data-107",
+          "to_block": null,
+          "v": ""107BC"",
+        },
+      ]
+    `);
   });
 });

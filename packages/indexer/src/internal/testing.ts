@@ -10,16 +10,45 @@ import { useIndexerContext } from "../context";
 import { type IndexerConfig, createIndexer, defineIndexer } from "../indexer";
 import { type IndexerPlugin, defineIndexerPlugin } from "../plugins";
 
-export function generateMockMessages(count = 10): MockStreamResponse[] {
-  return [...Array(count)].map((_, i) => ({
-    _tag: "data",
-    data: {
-      cursor: { orderKey: BigInt(5_000_000 + i - 1) },
-      finality: "accepted",
-      data: [{ data: `${5_000_000 + i}` }],
-      endCursor: { orderKey: BigInt(5_000_000 + i) },
-    },
-  }));
+export type MockMessagesOptions = {
+  invalidate?: {
+    invalidateFromIndex: number;
+    invalidateTriggerIndex: number;
+  };
+};
+
+export function generateMockMessages(
+  count = 10,
+  options?: MockMessagesOptions,
+): MockStreamResponse[] {
+  const invalidateAt = options?.invalidate;
+
+  const messages: MockStreamResponse[] = [];
+
+  for (let i = 0; i < count; i++) {
+    if (invalidateAt && i === invalidateAt.invalidateTriggerIndex) {
+      messages.push({
+        _tag: "invalidate",
+        invalidate: {
+          cursor: {
+            orderKey: BigInt(5_000_000 + invalidateAt.invalidateFromIndex),
+          },
+        },
+      });
+    } else {
+      messages.push({
+        _tag: "data",
+        data: {
+          cursor: { orderKey: BigInt(5_000_000 + i - 1) },
+          finality: "accepted",
+          data: [{ data: `${5_000_000 + i}` }],
+          endCursor: { orderKey: BigInt(5_000_000 + i) },
+        },
+      });
+    }
+  }
+
+  return messages;
 }
 
 export function getMockIndexer({
