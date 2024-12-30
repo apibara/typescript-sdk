@@ -6,6 +6,7 @@ import type {
   TablesRelationalConfig,
 } from "drizzle-orm";
 
+import type { Cursor, DataFinality } from "@apibara/protocol";
 import type {
   PgDatabase,
   PgQueryResultHKT,
@@ -190,7 +191,10 @@ export function drizzleStorage<
 
     indexer.hooks.hook("handler:middleware", async ({ use }) => {
       use(async (context, next) => {
-        const { endCursor } = context;
+        const { endCursor, finality } = context as {
+          endCursor: Cursor;
+          finality: DataFinality;
+        };
 
         if (!endCursor) {
           throw new DrizzleStorageError("end cursor is undefined");
@@ -203,7 +207,9 @@ export function drizzleStorage<
             TSchema
           >;
 
-          await registerTriggers(tx, tableNames, endCursor, idColumn);
+          if (finality !== "finalized") {
+            await registerTriggers(tx, tableNames, endCursor, idColumn);
+          }
 
           await next();
           delete context[DRIZZLE_PROPERTY];
@@ -217,8 +223,10 @@ export function drizzleStorage<
           }
         });
 
-        // remove trigger outside of the transaction or it won't be triggered.
-        await removeTriggers(db, tableNames);
+        if (finality !== "finalized") {
+          // remove trigger outside of the transaction or it won't be triggered.
+          await removeTriggers(db, tableNames);
+        }
       });
     });
   });
