@@ -140,16 +140,18 @@ export function drizzleStorage<
       if (!enablePersistence) {
         return;
       }
-      await withTransaction(db, async (tx) => {
-        if (endCursor && request.filter[1]) {
-          await persistState({
-            tx,
-            endCursor,
-            filter: request.filter[1],
-            indexerName,
-          });
-        }
-      });
+      // We can call this hook because this hook is called inside the transaction of handler:middleware
+      // so we have access to the transaction from the context
+      const { db: tx } = useDrizzleStorage(db);
+
+      if (endCursor && request.filter[1]) {
+        await persistState({
+          tx,
+          endCursor,
+          filter: request.filter[1],
+          indexerName,
+        });
+      }
     });
 
     indexer.hooks.hook("message:finalize", async ({ message }) => {
