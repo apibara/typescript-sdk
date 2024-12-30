@@ -8,7 +8,11 @@ import type { PgQueryResultHKT, PgTransaction } from "drizzle-orm/pg-core";
 import { integer, pgTable, primaryKey, text } from "drizzle-orm/pg-core";
 import { DrizzleStorageError, deserialize, serialize } from "./utils";
 
-export const checkpoints = pgTable("checkpoints", {
+const CHECKPOINTS_TABLE_NAME = "__indexer_checkpoints";
+const FILTERS_TABLE_NAME = "__indexer_filters";
+const SCHEMA_VERSION_TABLE_NAME = "__indexer_schema_version";
+
+const checkpoints = pgTable(CHECKPOINTS_TABLE_NAME, {
   id: text("id").notNull().primaryKey(),
   orderKey: integer("order_key").notNull(),
   uniqueKey: text("unique_key")
@@ -17,8 +21,8 @@ export const checkpoints = pgTable("checkpoints", {
     .default(undefined),
 });
 
-export const filters = pgTable(
-  "filters",
+const filters = pgTable(
+  FILTERS_TABLE_NAME,
   {
     id: text("id").notNull(),
     filter: text("filter").notNull(),
@@ -32,19 +36,96 @@ export const filters = pgTable(
   ],
 );
 
+const schemaVersion = pgTable(SCHEMA_VERSION_TABLE_NAME, {
+  k: integer("k").notNull().primaryKey(),
+  version: integer("version").notNull(),
+});
+
+const CURRENT_SCHEMA_VERSION = 0;
+
+// migrations for future schema updates
+const MIGRATIONS: string[][] = [
+  // migrations[0]: v0 -> v1 (for future use)
+  [],
+  // Add more migration arrays for future versions
+];
+
 export async function initializePersistentState<
   TQueryResult extends PgQueryResultHKT,
   TFullSchema extends Record<string, unknown> = Record<string, never>,
   TSchema extends
     TablesRelationalConfig = ExtractTablesWithRelations<TFullSchema>,
 >(tx: PgTransaction<TQueryResult, TFullSchema, TSchema>) {
+  // Create schema version table
+  await tx.execute(`
+    CREATE TABLE IF NOT EXISTS ${SCHEMA_VERSION_TABLE_NAME} (
+      k INTEGER PRIMARY KEY,
+      version INTEGER NOT NULL
+    );
+  `);
+
+  // Get current schema version
+  const versionRows = await tx
+    .select()
+    .from(schemaVersion)
+    .where(eq(schemaVersion.k, 0));
+
+  const storedVersion = versionRows[0]?.version ?? -1;
+
+  // Check for incompatible version
+  if (storedVersion > CURRENT_SCHEMA_VERSION) {
+    throw new DrizzleStorageError(
+      `Database Persistence schema version v${storedVersion} is newer than supported version v${CURRENT_SCHEMA_VERSION}`,
+    );
+  }
+
+  // Begin schema updates
   try {
-    // Try to query both tables
-    await tx.select().from(checkpoints).limit(1);
-    await tx.select().from(filters).limit(1);
+    if (storedVersion === -1) {
+      // First time initialization
+      await tx.execute(`
+        CREATE TABLE IF NOT EXISTS ${CHECKPOINTS_TABLE_NAME} (
+          id TEXT PRIMARY KEY,
+          order_key INTEGER NOT NULL,
+          unique_key TEXT NOT NULL DEFAULT ''
+        );
+      `);
+
+      await tx.execute(`
+        CREATE TABLE IF NOT EXISTS ${FILTERS_TABLE_NAME} (
+          id TEXT NOT NULL,
+          filter TEXT NOT NULL,
+          from_block INTEGER NOT NULL,
+          to_block INTEGER DEFAULT NULL,
+          PRIMARY KEY (id, from_block)
+        );
+      `);
+
+      // Set initial schema version
+      await tx.insert(schemaVersion).values({
+        k: 0,
+        version: CURRENT_SCHEMA_VERSION,
+      });
+    } else {
+      // Run any necessary migrations
+      let currentVersion = storedVersion;
+      while (currentVersion < CURRENT_SCHEMA_VERSION) {
+        const migrationStatements = MIGRATIONS[currentVersion];
+        for (const statement of migrationStatements) {
+          await tx.execute(statement);
+        }
+        currentVersion++;
+      }
+
+      // Update schema version
+      await tx
+        .update(schemaVersion)
+        .set({ version: CURRENT_SCHEMA_VERSION })
+        .where(eq(schemaVersion.k, 0));
+    }
   } catch (error) {
     throw new DrizzleStorageError(
-      "Required tables 'checkpoints' and 'filters' not found for persistence.\nPlease run migrations with 'checkpoints' and 'filters' tables before initializing the plugin with persistence.",
+      `Failed to initialize or migrate database schema: ${error}`,
     );
   }
 }
