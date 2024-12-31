@@ -45,7 +45,7 @@ export function useDrizzleStorage<
   TSchema extends
     TablesRelationalConfig = ExtractTablesWithRelations<TFullSchema>,
 >(
-  _db: PgDatabase<TQueryResult, TFullSchema, TSchema>,
+  _db?: PgDatabase<TQueryResult, TFullSchema, TSchema>,
 ): DrizzleStorage<TQueryResult, TFullSchema, TSchema> {
   const context = useIndexerContext();
 
@@ -96,7 +96,17 @@ export function drizzleStorage<
   idColumn = "id",
 }: DrizzleStorageOptions<TQueryResult, TFullSchema, TSchema>) {
   return defineIndexerPlugin<TFilter, TBlock>((indexer) => {
-    const tableNames = Object.keys(schema ?? db._.schema ?? {});
+    let tableNames: string[] = [];
+
+    try {
+      tableNames = Object.values((schema as TSchema) ?? db._.schema ?? {}).map(
+        (table) => table.dbName,
+      );
+    } catch (error) {
+      throw new DrizzleStorageError("Failed to get table names from schema", {
+        cause: error,
+      });
+    }
 
     indexer.hooks.hook("run:before", async () => {
       await withTransaction(db, async (tx) => {
@@ -170,7 +180,7 @@ export function drizzleStorage<
       const { cursor } = message.finalize;
 
       if (!cursor) {
-        throw new DrizzleStorageError("finalized cursor is undefined");
+        throw new DrizzleStorageError("Finalized Cursor is undefined");
       }
 
       await withTransaction(db, async (tx) => {
@@ -186,7 +196,7 @@ export function drizzleStorage<
       const { cursor } = message.invalidate;
 
       if (!cursor) {
-        throw new DrizzleStorageError("invalidate cursor is undefined");
+        throw new DrizzleStorageError("Invalidate Cursor is undefined");
       }
 
       await withTransaction(db, async (tx) => {
@@ -200,41 +210,49 @@ export function drizzleStorage<
 
     indexer.hooks.hook("handler:middleware", async ({ use }) => {
       use(async (context, next) => {
-        const { endCursor, finality } = context as {
-          endCursor: Cursor;
-          finality: DataFinality;
-        };
+        try {
+          const { endCursor, finality } = context as {
+            endCursor: Cursor;
+            finality: DataFinality;
+          };
 
-        if (!endCursor) {
-          throw new DrizzleStorageError("end cursor is undefined");
-        }
+          if (!endCursor) {
+            throw new DrizzleStorageError("End Cursor is undefined");
+          }
 
-        await withTransaction(db, async (tx) => {
-          context[DRIZZLE_PROPERTY] = { db: tx } as DrizzleStorage<
-            TQueryResult,
-            TFullSchema,
-            TSchema
-          >;
+          await withTransaction(db, async (tx) => {
+            context[DRIZZLE_PROPERTY] = { db: tx } as DrizzleStorage<
+              TQueryResult,
+              TFullSchema,
+              TSchema
+            >;
+
+            if (finality !== "finalized") {
+              await registerTriggers(tx, tableNames, endCursor, idColumn);
+            }
+
+            await next();
+            delete context[DRIZZLE_PROPERTY];
+
+            if (enablePersistence) {
+              await persistState({
+                tx,
+                endCursor,
+                indexerName,
+              });
+            }
+          });
 
           if (finality !== "finalized") {
-            await registerTriggers(tx, tableNames, endCursor, idColumn);
+            // remove trigger outside of the transaction or it won't be triggered.
+            await removeTriggers(db, tableNames);
           }
-
-          await next();
-          delete context[DRIZZLE_PROPERTY];
-
-          if (enablePersistence) {
-            await persistState({
-              tx,
-              endCursor,
-              indexerName,
-            });
-          }
-        });
-
-        if (finality !== "finalized") {
-          // remove trigger outside of the transaction or it won't be triggered.
+        } catch (error) {
           await removeTriggers(db, tableNames);
+
+          throw new DrizzleStorageError("Failed to run handler:middleware", {
+            cause: error,
+          });
         }
       });
     });
