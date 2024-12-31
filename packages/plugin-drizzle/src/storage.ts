@@ -77,10 +77,9 @@ export async function initializeReorgRollbackTable<
       `),
     );
   } catch (error) {
-    console.error(error);
-    throw new DrizzleStorageError(
-      `Failed to initialize reorg rollback table: ${error}`,
-    );
+    throw new DrizzleStorageError("Failed to initialize reorg rollback table", {
+      cause: error,
+    });
   }
 }
 
@@ -110,8 +109,9 @@ export async function registerTriggers<
       );
     }
   } catch (error) {
-    console.error(error);
-    throw new DrizzleStorageError(`Failed to register triggers: ${error}`);
+    throw new DrizzleStorageError("Failed to register triggers", {
+      cause: error,
+    });
   }
 }
 
@@ -128,8 +128,9 @@ export async function removeTriggers<
       );
     }
   } catch (error) {
-    console.error(error);
-    throw new DrizzleStorageError(`Failed to remove triggers: ${error}`);
+    throw new DrizzleStorageError("Failed to remove triggers", {
+      cause: error,
+    });
   }
 }
 
@@ -156,7 +157,9 @@ export async function invalidate<
   )) as { rows: ReorgRollbackRow[] };
 
   if (!Array.isArray(result)) {
-    throw new Error("Invalid result format from reorg_rollback query");
+    throw new DrizzleStorageError(
+      "Invalid result format from reorg_rollback query",
+    );
   }
 
   // Process each operation in reverse order
@@ -164,19 +167,22 @@ export async function invalidate<
     switch (op.op) {
       case "I":
         try {
-          // For inserts, delete the row
-          if (op.row_id) {
-            await tx.execute(
-              sql.raw(`
+          if (!op.row_id) {
+            throw new DrizzleStorageError("Insert operation has no row_id");
+          }
+
+          await tx.execute(
+            sql.raw(`
                 DELETE FROM ${op.table_name}
                 WHERE ${idColumn} = '${op.row_id}'
               `),
-            );
-          }
+          );
         } catch (error) {
-          console.error(error);
           throw new DrizzleStorageError(
-            `Failed to invalidate | Operation - I : ${error}`,
+            "Failed to invalidate | Operation - I",
+            {
+              cause: error,
+            },
           );
         }
 
@@ -185,18 +191,22 @@ export async function invalidate<
       case "D":
         try {
           // For deletes, reinsert the row using json_populate_record
-          if (op.row_value) {
-            await tx.execute(
-              sql.raw(`
-                INSERT INTO ${op.table_name}
-                SELECT * FROM json_populate_record(null::${op.table_name}, '${JSON.stringify(op.row_value)}'::json)
-              `),
-            );
+          if (!op.row_value) {
+            throw new DrizzleStorageError("Delete operation has no row_value");
           }
+
+          await tx.execute(
+            sql.raw(`
+              INSERT INTO ${op.table_name}
+              SELECT * FROM json_populate_record(null::${op.table_name}, '${JSON.stringify(op.row_value)}'::json)
+            `),
+          );
         } catch (error) {
-          console.error(error);
           throw new DrizzleStorageError(
-            `Failed to invalidate | Operation - D : ${error}`,
+            "Failed to invalidate | Operation - D",
+            {
+              cause: error,
+            },
           );
         }
 
@@ -204,20 +214,24 @@ export async function invalidate<
 
       case "U":
         try {
-          // For updates, restore previous values
-          if (op.row_value && op.row_id) {
-            const rowValue =
-              typeof op.row_value === "string"
-                ? JSON.parse(op.row_value)
-                : op.row_value;
-
-            const nonIdKeys = Object.keys(rowValue).filter(
-              (k) => k !== idColumn,
+          if (!op.row_value || !op.row_id) {
+            throw new DrizzleStorageError(
+              "Update operation has no row_value or row_id",
             );
+          }
 
-            const fields = nonIdKeys.map((c) => `${c} = prev.${c}`).join(", ");
+          // For updates, restore previous values
 
-            const query = sql.raw(`
+          const rowValue =
+            typeof op.row_value === "string"
+              ? JSON.parse(op.row_value)
+              : op.row_value;
+
+          const nonIdKeys = Object.keys(rowValue).filter((k) => k !== idColumn);
+
+          const fields = nonIdKeys.map((c) => `${c} = prev.${c}`).join(", ");
+
+          const query = sql.raw(`
               UPDATE ${op.table_name}
               SET ${fields}
               FROM (
@@ -226,15 +240,20 @@ export async function invalidate<
               WHERE ${op.table_name}.${idColumn} = '${op.row_id}'
               `);
 
-            await tx.execute(query);
-          }
+          await tx.execute(query);
         } catch (error) {
-          console.error(error);
           throw new DrizzleStorageError(
-            `Failed to invalidate | Operation - U : ${error}`,
+            "Failed to invalidate | Operation - U",
+            {
+              cause: error,
+            },
           );
         }
         break;
+
+      default: {
+        throw new DrizzleStorageError(`Unknown operation: ${op.op}`);
+      }
     }
   }
 }
@@ -253,7 +272,8 @@ export async function finalize<
     `),
     );
   } catch (error) {
-    console.error(error);
-    throw new DrizzleStorageError(`Failed to finalize: ${error}`);
+    throw new DrizzleStorageError("Failed to finalize", {
+      cause: error,
+    });
   }
 }

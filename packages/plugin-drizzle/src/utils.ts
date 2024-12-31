@@ -9,8 +9,8 @@ import type {
 } from "drizzle-orm/pg-core";
 
 export class DrizzleStorageError extends Error {
-  constructor(message: string) {
-    super(message);
+  constructor(message: string, options?: ErrorOptions) {
+    super(message, options);
     this.name = "DrizzleStorageError";
   }
 }

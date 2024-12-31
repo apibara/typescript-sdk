@@ -124,9 +124,9 @@ export async function initializePersistentState<
         .where(eq(schemaVersion.k, 0));
     }
   } catch (error) {
-    console.error(error);
     throw new DrizzleStorageError(
-      `Failed to initialize or migrate database schema: ${error}`,
+      "Failed to initialize or migrate database schema",
+      { cause: error },
     );
   }
 }
@@ -187,8 +187,9 @@ export async function persistState<
       }
     }
   } catch (error) {
-    console.error(error);
-    throw new DrizzleStorageError(`Failed to persist state: ${error}`);
+    throw new DrizzleStorageError("Failed to persist state", {
+      cause: error,
+    });
   }
 }
 
@@ -228,8 +229,9 @@ export async function getState<
 
     return { cursor, filter };
   } catch (error) {
-    console.error(error);
-    throw new DrizzleStorageError(`Failed to get persistent state: ${error}`);
+    throw new DrizzleStorageError("Failed to get persistent state", {
+      cause: error,
+    });
   }
 }
 
@@ -265,8 +267,9 @@ export async function invalidateState<
         ),
       );
   } catch (error) {
-    console.error(error);
-    throw new DrizzleStorageError(`Failed to invalidate state: ${error}`);
+    throw new DrizzleStorageError("Failed to invalidate state", {
+      cause: error,
+    });
   }
 }
 
@@ -292,7 +295,8 @@ export async function finalizeState<
         ),
       );
   } catch (error) {
-    console.error(error);
-    throw new DrizzleStorageError(`Failed to finalize state: ${error}`);
+    throw new DrizzleStorageError("Failed to finalize state", {
+      cause: error,
+    });
   }
 }
