@@ -50,7 +50,7 @@ describe("Drizzle test", () => {
     const result = await db.select().from(testTable);
     const rollBackResult = await db.select().from(reorgRollbackTable);
 
-    expect(result).toMatchInlineSnapshot(`
+    expect(result.map(({ createdAt, ...r }) => r)).toMatchInlineSnapshot(`
       [
         {
           "blockNumber": 5000000,
@@ -155,6 +155,7 @@ describe("Drizzle test", () => {
         {
           "blockNumber": 5000002,
           "count": 1,
+          "createdAt": null,
           "data": "5000000",
           "id": 1,
           "key": "abc",
@@ -179,6 +180,7 @@ describe("Drizzle test", () => {
           "row_value": {
             "block_number": 5000000,
             "count": 0,
+            "created_at": null,
             "data": "5000000",
             "id": 1,
             "key": "abc",
@@ -193,6 +195,7 @@ describe("Drizzle test", () => {
           "row_value": {
             "block_number": 5000001,
             "count": 1,
+            "created_at": null,
             "data": "5000000",
             "id": 1,
             "key": "abc",
@@ -248,6 +251,7 @@ describe("Drizzle test", () => {
         {
           "blockNumber": 5000002,
           "count": null,
+          "createdAt": null,
           "data": null,
           "id": 2,
           "key": "abc",
@@ -272,6 +276,7 @@ describe("Drizzle test", () => {
           "row_value": {
             "block_number": 5000000,
             "count": null,
+            "created_at": null,
             "data": null,
             "id": 1,
             "key": "abc",
@@ -307,6 +312,8 @@ describe("Drizzle test", () => {
             blockNumber: Number(endCursor?.orderKey),
             count: rows.length,
             data,
+            // non changing date
+            createdAt: new Date("2025-01-01"),
           });
 
           if (Number(endCursor?.orderKey) === 5000004) {
@@ -363,6 +370,7 @@ describe("Drizzle test", () => {
         {
           "blockNumber": 5000000,
           "count": 0,
+          "createdAt": 2025-01-01T00:00:00.000Z,
           "data": "5000000",
           "id": 1,
           "key": null,
@@ -370,6 +378,7 @@ describe("Drizzle test", () => {
         {
           "blockNumber": 5000001,
           "count": 1,
+          "createdAt": 2025-01-01T00:00:00.000Z,
           "data": "5000001",
           "id": 2,
           "key": null,
@@ -377,6 +386,7 @@ describe("Drizzle test", () => {
         {
           "blockNumber": 5000004,
           "count": 4,
+          "createdAt": 2025-01-01T00:00:00.000Z,
           "data": "INSERTED AND UPDATED AT 5000004",
           "id": 5,
           "key": null,
@@ -384,6 +394,7 @@ describe("Drizzle test", () => {
         {
           "blockNumber": 5000005,
           "count": 5,
+          "createdAt": 2025-01-01T00:00:00.000Z,
           "data": "5000005",
           "id": 6,
           "key": null,
@@ -391,6 +402,7 @@ describe("Drizzle test", () => {
         {
           "blockNumber": 5000003,
           "count": 3,
+          "createdAt": 2025-01-01T00:00:00.000Z,
           "data": "5000003",
           "id": 4,
           "key": null,
@@ -398,6 +410,7 @@ describe("Drizzle test", () => {
         {
           "blockNumber": 5000002,
           "count": 2,
+          "createdAt": 2025-01-01T00:00:00.000Z,
           "data": "5000002",
           "id": 3,
           "key": null,
@@ -405,6 +418,7 @@ describe("Drizzle test", () => {
         {
           "blockNumber": 5000009,
           "count": 6,
+          "createdAt": 2025-01-01T00:00:00.000Z,
           "data": "5000009",
           "id": 10,
           "key": null,
@@ -461,6 +475,7 @@ describe("Drizzle test", () => {
           "row_value": {
             "block_number": 5000004,
             "count": 4,
+            "created_at": "2025-01-01T00:00:00",
             "data": "5000004",
             "id": 5,
             "key": null,
@@ -562,6 +577,7 @@ describe("Drizzle test", () => {
         {
           "blockNumber": 5000000,
           "count": 0,
+          "createdAt": null,
           "data": "5000000",
           "id": 1,
           "key": null,
@@ -569,6 +585,7 @@ describe("Drizzle test", () => {
         {
           "blockNumber": 5000001,
           "count": 1,
+          "createdAt": null,
           "data": "5000001",
           "id": 2,
           "key": null,
@@ -576,6 +593,7 @@ describe("Drizzle test", () => {
         {
           "blockNumber": 5000004,
           "count": 4,
+          "createdAt": null,
           "data": "INSERTED AND UPDATED AT 5000004",
           "id": 5,
           "key": null,
@@ -583,6 +601,7 @@ describe("Drizzle test", () => {
         {
           "blockNumber": 5000005,
           "count": 5,
+          "createdAt": null,
           "data": "5000005",
           "id": 6,
           "key": null,
@@ -590,6 +609,7 @@ describe("Drizzle test", () => {
         {
           "blockNumber": 5000003,
           "count": 3,
+          "createdAt": null,
           "data": "5000003",
           "id": 4,
           "key": null,
@@ -597,6 +617,7 @@ describe("Drizzle test", () => {
         {
           "blockNumber": 5000002,
           "count": 2,
+          "createdAt": null,
           "data": "5000002",
           "id": 3,
           "key": null,
@@ -639,7 +660,7 @@ describe("Drizzle test", () => {
     );
 
     await expect(run(mockClient, indexer)).rejects.toThrow(
-      "Intentional error to test persistence",
+      "Failed to run handler:middleware",
     );
 
     const result = (await db.select().from(testTable)).sort(

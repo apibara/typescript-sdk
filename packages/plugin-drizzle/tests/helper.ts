@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { integer, pgTable, serial, text } from "drizzle-orm/pg-core";
+import { integer, pgTable, serial, text, timestamp } from "drizzle-orm/pg-core";
 import { type PgliteDatabase, drizzle } from "drizzle-orm/pglite";
 import { DrizzleStorageError } from "../src/utils";
 
@@ -9,19 +9,19 @@ export const testTable = pgTable("test", {
   key: text("key"),
   count: integer("count"),
   data: text("data"),
+  createdAt: timestamp("created_at"),
 });
 
 export type TestTableType = typeof testTable.$inferSelect;
 
-export type PgLiteDb = PgliteDatabase<{ test: typeof testTable }>;
+export type PgLiteDb = PgliteDatabase<{ testTable: typeof testTable }>;
 
 export async function getPgliteDb(): Promise<PgLiteDb> {
   const dbName = crypto.randomUUID().replace(/-/g, "_");
 
   const db = drizzle({
-    // @ts-ignore
     schema: {
-      test: testTable,
+      testTable,
     },
     connection: {
       // debug: true,
@@ -43,12 +43,14 @@ export async function migratePgliteDb(db: PgLiteDb) {
           block_number INTEGER NOT NULL,
           key TEXT,
           count INTEGER,
-          data TEXT
+          data TEXT,
+          created_at TIMESTAMP
         );
       `),
     );
   } catch (error) {
-    console.error(error);
-    throw new DrizzleStorageError(`Migration failed: ${error}`);
+    throw new DrizzleStorageError("Migration failed", {
+      cause: error,
+    });
   }
 }
