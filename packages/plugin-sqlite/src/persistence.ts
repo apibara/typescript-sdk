@@ -3,8 +3,6 @@ import type { Database } from "better-sqlite3";
 
 import { assertInTransaction, deserialize, serialize } from "./utils";
 
-const DEFAULT_INDEXER_ID = "default";
-
 export function initializePersistentState(db: Database) {
   assertInTransaction(db);
   db.exec(statements.createCheckpointsTable);
@@ -15,9 +13,9 @@ export function persistState<TFilter>(props: {
   db: Database;
   endCursor: Cursor;
   filter?: TFilter;
-  indexerName?: string;
+  indexerName: string;
 }) {
-  const { db, endCursor, filter, indexerName = DEFAULT_INDEXER_ID } = props;
+  const { db, endCursor, filter, indexerName } = props;
 
   assertInTransaction(db);
 
@@ -42,9 +40,9 @@ export function persistState<TFilter>(props: {
 
 export function getState<TFilter>(props: {
   db: Database;
-  indexerName?: string;
+  indexerName: string;
 }) {
-  const { db, indexerName = DEFAULT_INDEXER_ID } = props;
+  const { db, indexerName } = props;
   assertInTransaction(db);
   const storedCursor = db
     .prepare<string, { order_key?: number; unique_key?: string }>(
@@ -75,9 +73,9 @@ export function getState<TFilter>(props: {
 export function finalizeState(props: {
   db: Database;
   cursor: Cursor;
-  indexerName?: string;
+  indexerName: string;
 }) {
-  const { cursor, db, indexerName = DEFAULT_INDEXER_ID } = props;
+  const { cursor, db, indexerName } = props;
   assertInTransaction(db);
   db.prepare<[string, number]>(statements.finalizeFilter).run(
     indexerName,
@@ -88,9 +86,9 @@ export function finalizeState(props: {
 export function invalidateState(props: {
   db: Database;
   cursor: Cursor;
-  indexerName?: string;
+  indexerName: string;
 }) {
-  const { cursor, db, indexerName = DEFAULT_INDEXER_ID } = props;
+  const { cursor, db, indexerName } = props;
   assertInTransaction(db);
   db.prepare<[string, number]>(statements.invalidateFilterDelete).run(
     indexerName,
@@ -149,7 +147,7 @@ const statements = {
     WHERE id = ?`,
   finalizeFilter: `
     DELETE FROM filters
-    WHERE id = ? AND to_block < ?`,
+    WHERE id = ? AND to_block <= ?`,
   invalidateFilterDelete: `
     DELETE FROM filters
     WHERE id = ? AND from_block > ?`,

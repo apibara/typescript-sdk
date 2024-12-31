@@ -68,7 +68,7 @@ export function sqliteStorage<TFilter, TBlock>({
   keyValueStore: enableKeyValueStore = true,
   serialize: serializeFn = serialize,
   deserialize: deserializeFn = deserialize,
-  indexerName,
+  indexerName = "default",
 }: SqliteStorageOptions) {
   return defineIndexerPlugin<TFilter, TBlock>((indexer) => {
     indexer.hooks.hook("run:before", async () => {
