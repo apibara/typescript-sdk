@@ -12,7 +12,7 @@ const CHECKPOINTS_TABLE_NAME = "__indexer_checkpoints";
 const FILTERS_TABLE_NAME = "__indexer_filters";
 const SCHEMA_VERSION_TABLE_NAME = "__indexer_schema_version";
 
-const checkpoints = pgTable(CHECKPOINTS_TABLE_NAME, {
+export const checkpoints = pgTable(CHECKPOINTS_TABLE_NAME, {
   id: text("id").notNull().primaryKey(),
   orderKey: integer("order_key").notNull(),
   uniqueKey: text("unique_key")
@@ -21,7 +21,7 @@ const checkpoints = pgTable(CHECKPOINTS_TABLE_NAME, {
     .default(undefined),
 });
 
-const filters = pgTable(
+export const filters = pgTable(
   FILTERS_TABLE_NAME,
   {
     id: text("id").notNull(),
@@ -36,12 +36,12 @@ const filters = pgTable(
   ],
 );
 
-const schemaVersion = pgTable(SCHEMA_VERSION_TABLE_NAME, {
+export const schemaVersion = pgTable(SCHEMA_VERSION_TABLE_NAME, {
   k: integer("k").notNull().primaryKey(),
   version: integer("version").notNull(),
 });
 
-const CURRENT_SCHEMA_VERSION = 0;
+export const CURRENT_SCHEMA_VERSION = 0;
 
 // migrations for future schema updates
 const MIGRATIONS: string[][] = [
@@ -124,6 +124,7 @@ export async function initializePersistentState<
         .where(eq(schemaVersion.k, 0));
     }
   } catch (error) {
+    console.error(error);
     throw new DrizzleStorageError(
       `Failed to initialize or migrate database schema: ${error}`,
     );
@@ -140,49 +141,54 @@ export async function persistState<
   tx: PgTransaction<TQueryResult, TFullSchema, TSchema>;
   endCursor: Cursor;
   filter?: TFilter;
-  indexerName?: string;
+  indexerName: string;
 }) {
-  const { tx, endCursor, filter, indexerName = "default" } = props;
+  const { tx, endCursor, filter, indexerName } = props;
 
-  if (endCursor) {
-    await tx
-      .insert(checkpoints)
-      .values({
-        id: indexerName,
-        orderKey: Number(endCursor.orderKey),
-        uniqueKey: endCursor.uniqueKey,
-      })
-      .onConflictDoUpdate({
-        target: checkpoints.id,
-        set: {
-          orderKey: Number(endCursor.orderKey),
-          uniqueKey: endCursor.uniqueKey,
-        },
-      });
-
-    if (filter) {
+  try {
+    if (endCursor) {
       await tx
-        .update(filters)
-        .set({ toBlock: Number(endCursor.orderKey) })
-        .where(and(eq(filters.id, indexerName), isNull(filters.toBlock)));
-
-      await tx
-        .insert(filters)
+        .insert(checkpoints)
         .values({
           id: indexerName,
-          filter: serialize(filter),
-          fromBlock: Number(endCursor.orderKey),
-          toBlock: null,
+          orderKey: Number(endCursor.orderKey),
+          uniqueKey: endCursor.uniqueKey,
         })
         .onConflictDoUpdate({
-          target: [filters.id, filters.fromBlock],
+          target: checkpoints.id,
           set: {
+            orderKey: Number(endCursor.orderKey),
+            uniqueKey: endCursor.uniqueKey,
+          },
+        });
+
+      if (filter) {
+        await tx
+          .update(filters)
+          .set({ toBlock: Number(endCursor.orderKey) })
+          .where(and(eq(filters.id, indexerName), isNull(filters.toBlock)));
+
+        await tx
+          .insert(filters)
+          .values({
+            id: indexerName,
             filter: serialize(filter),
             fromBlock: Number(endCursor.orderKey),
             toBlock: null,
-          },
-        });
+          })
+          .onConflictDoUpdate({
+            target: [filters.id, filters.fromBlock],
+            set: {
+              filter: serialize(filter),
+              fromBlock: Number(endCursor.orderKey),
+              toBlock: null,
+            },
+          });
+      }
     }
+  } catch (error) {
+    console.error(error);
+    throw new DrizzleStorageError(`Failed to persist state: ${error}`);
   }
 }
 
@@ -194,32 +200,37 @@ export async function getState<
     TablesRelationalConfig = ExtractTablesWithRelations<TFullSchema>,
 >(props: {
   tx: PgTransaction<TQueryResult, TFullSchema, TSchema>;
-  indexerName?: string;
+  indexerName: string;
 }): Promise<{ cursor?: Cursor; filter?: TFilter }> {
-  const { tx, indexerName = "default" } = props;
+  const { tx, indexerName } = props;
 
-  const checkpointRows = await tx
-    .select()
-    .from(checkpoints)
-    .where(eq(checkpoints.id, indexerName));
+  try {
+    const checkpointRows = await tx
+      .select()
+      .from(checkpoints)
+      .where(eq(checkpoints.id, indexerName));
 
-  const cursor = checkpointRows[0]
-    ? {
-        orderKey: BigInt(checkpointRows[0].orderKey),
-        uniqueKey: checkpointRows[0].uniqueKey,
-      }
-    : undefined;
+    const cursor = checkpointRows[0]
+      ? {
+          orderKey: BigInt(checkpointRows[0].orderKey),
+          uniqueKey: checkpointRows[0].uniqueKey,
+        }
+      : undefined;
 
-  const filterRows = await tx
-    .select()
-    .from(filters)
-    .where(and(eq(filters.id, indexerName), isNull(filters.toBlock)));
+    const filterRows = await tx
+      .select()
+      .from(filters)
+      .where(and(eq(filters.id, indexerName), isNull(filters.toBlock)));
 
-  const filter = filterRows[0]
-    ? deserialize<TFilter>(filterRows[0].filter)
-    : undefined;
+    const filter = filterRows[0]
+      ? deserialize<TFilter>(filterRows[0].filter)
+      : undefined;
 
-  return { cursor, filter };
+    return { cursor, filter };
+  } catch (error) {
+    console.error(error);
+    throw new DrizzleStorageError(`Failed to get persistent state: ${error}`);
+  }
 }
 
 export async function invalidateState<
@@ -230,28 +241,33 @@ export async function invalidateState<
 >(props: {
   tx: PgTransaction<TQueryResult, TFullSchema, TSchema>;
   cursor: Cursor;
-  indexerName?: string;
+  indexerName: string;
 }) {
-  const { tx, cursor, indexerName = "default" } = props;
+  const { tx, cursor, indexerName } = props;
 
-  await tx
-    .delete(filters)
-    .where(
-      and(
-        eq(filters.id, indexerName),
-        gt(filters.fromBlock, Number(cursor.orderKey)),
-      ),
-    );
+  try {
+    await tx
+      .delete(filters)
+      .where(
+        and(
+          eq(filters.id, indexerName),
+          gt(filters.fromBlock, Number(cursor.orderKey)),
+        ),
+      );
 
-  await tx
-    .update(filters)
-    .set({ toBlock: null })
-    .where(
-      and(
-        eq(filters.id, indexerName),
-        gt(filters.toBlock, Number(cursor.orderKey)),
-      ),
-    );
+    await tx
+      .update(filters)
+      .set({ toBlock: null })
+      .where(
+        and(
+          eq(filters.id, indexerName),
+          gt(filters.toBlock, Number(cursor.orderKey)),
+        ),
+      );
+  } catch (error) {
+    console.error(error);
+    throw new DrizzleStorageError(`Failed to invalidate state: ${error}`);
+  }
 }
 
 export async function finalizeState<
@@ -262,16 +278,21 @@ export async function finalizeState<
 >(props: {
   tx: PgTransaction<TQueryResult, TFullSchema, TSchema>;
   cursor: Cursor;
-  indexerName?: string;
+  indexerName: string;
 }) {
-  const { tx, cursor, indexerName = "default" } = props;
+  const { tx, cursor, indexerName } = props;
 
-  await tx
-    .delete(filters)
-    .where(
-      and(
-        eq(filters.id, indexerName),
-        lt(filters.toBlock, Number(cursor.orderKey)),
-      ),
-    );
+  try {
+    await tx
+      .delete(filters)
+      .where(
+        and(
+          eq(filters.id, indexerName),
+          lt(filters.toBlock, Number(cursor.orderKey)),
+        ),
+      );
+  } catch (error) {
+    console.error(error);
+    throw new DrizzleStorageError(`Failed to finalize state: ${error}`);
+  }
 }
