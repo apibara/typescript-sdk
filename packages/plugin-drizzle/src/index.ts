@@ -20,7 +20,9 @@ import {
   persistState,
 } from "./persistence";
 import {
+  finalize,
   initializeReorgRollbackTable,
+  invalidate,
   registerTriggers,
   removeTriggers,
 } from "./storage";
@@ -69,6 +71,16 @@ export interface DrizzleStorageOptions<
   idColumn?: string;
 }
 
+/**
+ * Creates a plugin that uses Drizzle as the storage layer.
+ *
+ * Supports storing the indexer's state and provides a simple Key-Value store.
+ * @param options.db - The Drizzle database instance.
+ * @param options.persistState - Whether to persist the indexer's state. Defaults to true.
+ * @param options.indexerName - The name of the indexer. Defaults value is 'default'.
+ * @param options.schema - The schema of the database.
+ * @param options.idColumn - The column to use as the id. Defaults to 'id'.
+ */
 export function drizzleStorage<
   TFilter,
   TBlock,
@@ -79,12 +91,12 @@ export function drizzleStorage<
 >({
   db,
   persistState: enablePersistence = true,
-  indexerName,
-  schema = {},
+  indexerName = "default",
+  schema,
   idColumn = "id",
 }: DrizzleStorageOptions<TQueryResult, TFullSchema, TSchema>) {
   return defineIndexerPlugin<TFilter, TBlock>((indexer) => {
-    const tableNames = Object.keys(schema ?? db._.schema);
+    const tableNames = Object.keys(schema ?? db._.schema ?? {});
 
     indexer.hooks.hook("run:before", async () => {
       await withTransaction(db, async (tx) => {
@@ -128,8 +140,7 @@ export function drizzleStorage<
       }
 
       await withTransaction(db, async (tx) => {
-        // TODO: Implement invalidate for drizzle/reorg table maybe?
-        // await invalidate(db, cursor, tables);
+        await invalidate(tx, cursor, idColumn);
 
         if (enablePersistence) {
           await invalidateState({ tx, cursor, indexerName });
@@ -163,8 +174,7 @@ export function drizzleStorage<
       }
 
       await withTransaction(db, async (tx) => {
-        // TODO: Implement finalize for drizzle/reorg table maybe?
-        // await finalize(db, cursor, tables);
+        await finalize(tx, cursor);
 
         if (enablePersistence) {
           await finalizeState({ tx, cursor, indexerName });
@@ -180,8 +190,7 @@ export function drizzleStorage<
       }
 
       await withTransaction(db, async (tx) => {
-        // TODO: Implement invalidate for drizzle/reorg table maybe?
-        // await invalidate(db, cursor, tables);
+        await invalidate(tx, cursor, idColumn);
 
         if (enablePersistence) {
           await invalidateState({ tx, cursor, indexerName });

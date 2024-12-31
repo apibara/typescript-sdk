@@ -1,0 +1,7 @@
+{
+  "type": "prerelease",
+  "comment": "indexer: add finalize config in mockStream",
+  "packageName": "@apibara/indexer",
+  "email": "jadejajaipal5@gmail.com",
+  "dependentChangeType": "patch"
+}
