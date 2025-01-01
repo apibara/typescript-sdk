@@ -25,17 +25,22 @@
     "test": "vitest",
     "test:ci": "vitest run"
   },
+  "peerDependencies": {
+    "drizzle-orm": "^0.37.0",
+    "pg": "^8.13.1"
+  },
   "devDependencies": {
     "@electric-sql/pglite": "^0.2.14",
     "@types/node": "^20.14.0",
+    "@types/pg": "^8.11.10",
+    "drizzle-orm": "^0.37.0",
+    "pg": "^8.13.1",
     "unbuild": "^2.0.0",
     "vitest": "^1.6.0"
   },
   "dependencies": {
     "@apibara/indexer": "workspace:*",
     "@apibara/protocol": "workspace:*",
-    "drizzle-orm": "^0.37.0",
-    "pg": "^8.13.1",
     "postgres-range": "^1.1.4"
   }
 }

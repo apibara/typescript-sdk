@@ -105,7 +105,7 @@ const statements = {
     WHERE k = ? AND to_block IS NULL`,
   finalize: `
     DELETE FROM kvs
-    WHERE to_block < ?`,
+    WHERE to_block <= ?`,
   invalidateDelete: `
     DELETE FROM kvs
     WHERE from_block > ?`,

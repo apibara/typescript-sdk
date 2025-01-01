@@ -54,7 +54,7 @@ export function mongoStorage<TFilter, TBlock>({
   dbOptions,
   collections,
   persistState: enablePersistence = true,
-  indexerName,
+  indexerName = "default",
 }: MongoStorageOptions) {
   return defineIndexerPlugin<TFilter, TBlock>((indexer) => {
     indexer.hooks.hook("run:before", async () => {

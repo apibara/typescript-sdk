@@ -1,0 +1,9 @@
+version: "3"
+services:
+  timescaledb:
+    image: timescale/timescaledb-ha:pg14-latest
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"

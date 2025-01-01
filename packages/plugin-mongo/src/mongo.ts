@@ -43,7 +43,7 @@ export async function finalize(
     // Delete documents where the upper bound of _cursor is less than the finalize cursor
     await db.collection(collection).deleteMany(
       {
-        "_cursor.to": { $lt: orderKeyValue },
+        "_cursor.to": { $lte: orderKeyValue },
       },
       { session },
     );

@@ -1,4 +1,4 @@
-import { isCursor } from "@apibara/protocol";
+import { type Finalize, type Invalidate, isCursor } from "@apibara/protocol";
 import {
   type MockBlock,
   type MockFilter,
@@ -15,6 +15,10 @@ export type MockMessagesOptions = {
     invalidateFromIndex: number;
     invalidateTriggerIndex: number;
   };
+  finalize?: {
+    finalizeToIndex: number;
+    finalizeTriggerIndex: number;
+  };
 };
 
 export function generateMockMessages(
@@ -22,7 +26,7 @@ export function generateMockMessages(
   options?: MockMessagesOptions,
 ): MockStreamResponse[] {
   const invalidateAt = options?.invalidate;
-
+  const finalizeAt = options?.finalize;
   const messages: MockStreamResponse[] = [];
 
   for (let i = 0; i < count; i++) {
@@ -34,7 +38,16 @@ export function generateMockMessages(
             orderKey: BigInt(5_000_000 + invalidateAt.invalidateFromIndex),
           },
         },
-      });
+      } as Invalidate);
+    } else if (finalizeAt && i === finalizeAt.finalizeTriggerIndex) {
+      messages.push({
+        _tag: "finalize",
+        finalize: {
+          cursor: {
+            orderKey: BigInt(5_000_000 + finalizeAt.finalizeToIndex),
+          },
+        },
+      } as Finalize);
     } else {
       messages.push({
         _tag: "data",

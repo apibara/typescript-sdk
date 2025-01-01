@@ -38,9 +38,9 @@ export async function persistState<TFilter>(props: {
   session: ClientSession;
   endCursor: Cursor;
   filter?: TFilter;
-  indexerName?: string;
+  indexerName: string;
 }) {
-  const { db, session, endCursor, filter, indexerName = "default" } = props;
+  const { db, session, endCursor, filter, indexerName } = props;
 
   if (endCursor) {
     await db.collection<CheckpointSchema>(checkpointCollectionName).updateOne(
@@ -86,9 +86,9 @@ export async function persistState<TFilter>(props: {
 export async function getState<TFilter>(props: {
   db: Db;
   session: ClientSession;
-  indexerName?: string;
+  indexerName: string;
 }): Promise<{ cursor?: Cursor; filter?: TFilter }> {
-  const { db, session, indexerName = "default" } = props;
+  const { db, session, indexerName } = props;
 
   let cursor: Cursor | undefined;
   let filter: TFilter | undefined;
@@ -125,9 +125,9 @@ export async function invalidateState(props: {
   db: Db;
   session: ClientSession;
   cursor: Cursor;
-  indexerName?: string;
+  indexerName: string;
 }) {
-  const { db, session, cursor, indexerName = "default" } = props;
+  const { db, session, cursor, indexerName } = props;
 
   await db
     .collection<FilterSchema>(filterCollectionName)
@@ -149,14 +149,14 @@ export async function finalizeState(props: {
   db: Db;
   session: ClientSession;
   cursor: Cursor;
-  indexerName?: string;
+  indexerName: string;
 }) {
-  const { db, session, cursor, indexerName = "default" } = props;
+  const { db, session, cursor, indexerName } = props;
 
   await db.collection<FilterSchema>(filterCollectionName).deleteMany(
     {
       id: indexerName,
-      toBlock: { $lt: Number(cursor.orderKey) },
+      toBlock: { $lte: Number(cursor.orderKey) },
     },
     { session },
   );
