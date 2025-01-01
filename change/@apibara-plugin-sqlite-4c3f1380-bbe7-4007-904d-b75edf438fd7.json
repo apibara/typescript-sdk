@@ -1,7 +1,0 @@
-{
-  "type": "prerelease",
-  "comment": "plugin-sqlite: update finalize condition and refactor",
-  "packageName": "@apibara/plugin-sqlite",
-  "email": "jadejajaipal5@gmail.com",
-  "dependentChangeType": "patch"
-}

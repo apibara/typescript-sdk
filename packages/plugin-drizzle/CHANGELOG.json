@@ -2,6 +2,21 @@
   "name": "@apibara/plugin-drizzle",
   "entries": [
     {
+      "date": "Wed, 01 Jan 2025 12:46:17 GMT",
+      "version": "2.0.0-beta.29",
+      "tag": "@apibara/plugin-drizzle_v2.0.0-beta.29",
+      "comments": {
+        "prerelease": [
+          {
+            "author": "jadejajaipal5@gmail.com",
+            "package": "@apibara/plugin-drizzle",
+            "commit": "67bd33f4318b372d104d8ef9b208c9afc75879f0",
+            "comment": "plugin-drizzle: add drizzle plugin"
+          }
+        ]
+      }
+    },
+    {
       "date": "Mon, 23 Dec 2024 11:34:53 GMT",
       "version": "2.0.0-beta.27",
       "tag": "@apibara/plugin-drizzle_v2.0.0-beta.27",
