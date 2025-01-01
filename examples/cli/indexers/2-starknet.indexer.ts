@@ -1,7 +1,5 @@
-import { defineIndexer, useSink } from "@apibara/indexer";
-import { drizzlePersistence } from "@apibara/indexer/plugins/drizzle-persistence";
-import { useLogger } from "@apibara/indexer/plugins/logger";
-import { drizzleSink } from "@apibara/indexer/sinks/drizzle";
+import { defineIndexer } from "@apibara/indexer";
+
 import { StarknetStream } from "@apibara/starknet";
 
 import type { ApibaraRuntimeConfig } from "apibara/types";
@@ -14,6 +12,8 @@ import { hash } from "starknet";
 
 import { db } from "@/lib/db";
 import { starknetUsdcTransfers } from "@/lib/schema";
+import { useLogger } from "@apibara/indexer/plugins";
+import { drizzleStorage, useDrizzleStorage } from "@apibara/plugin-drizzle";
 
 // USDC Transfers on Starknet
 export default function (runtimeConfig: ApibaraRuntimeConfig) {
@@ -34,12 +34,16 @@ export function createIndexer<
     streamUrl: "https://starknet.preview.apibara.org",
     finality: "accepted",
     startingCursor: {
-      orderKey: 800_000n,
+      orderKey: 10_30_000n,
     },
     plugins: [
-      drizzlePersistence({ database, indexerName: "starknet-usdc-transfers" }),
+      drizzleStorage({
+        db: database,
+        idColumn: "_id",
+        persistState: true,
+        indexerName: "starknet-usdc-transfers",
+      }),
     ],
-    sink: drizzleSink({ database, tables: [starknetUsdcTransfers] }),
     filter: {
       events: [
         {
@@ -49,12 +53,17 @@ export function createIndexer<
         },
       ],
     },
-    async transform({ endCursor, block, context }) {
+    async transform({ endCursor, block, context, finality }) {
       const logger = useLogger();
-      const { db } = useSink({ context });
+      const { db } = useDrizzleStorage();
       const { events } = block;
 
-      logger.info("Transforming block ", endCursor?.orderKey);
+      logger.info(
+        "Transforming block | orderKey: ",
+        endCursor?.orderKey,
+        " | finality: ",
+        finality,
+      );
 
       const transactionHashes = new Set<string>();
 
