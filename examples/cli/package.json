@@ -29,6 +29,7 @@
   "dependencies": {
     "@apibara/evm": "workspace:*",
     "@apibara/indexer": "workspace:*",
+    "@apibara/plugin-drizzle": "workspace:*",
     "@apibara/protocol": "workspace:*",
     "@apibara/starknet": "workspace:*",
     "@electric-sql/pglite": "^0.2.14",

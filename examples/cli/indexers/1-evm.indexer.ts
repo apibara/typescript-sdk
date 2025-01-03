@@ -1,8 +1,6 @@
 import { EvmStream } from "@apibara/evm";
-import { defineIndexer, useSink } from "@apibara/indexer";
-import { drizzlePersistence } from "@apibara/indexer/plugins/drizzle-persistence";
-import { useLogger } from "@apibara/indexer/plugins/logger";
-import { drizzleSink } from "@apibara/indexer/sinks/drizzle";
+import { defineIndexer } from "@apibara/indexer";
+import { drizzleStorage, useDrizzleStorage } from "@apibara/plugin-drizzle";
 
 import type { ApibaraRuntimeConfig } from "apibara/types";
 import type {
@@ -14,6 +12,7 @@ import { encodeEventTopics, parseAbi } from "viem";
 
 import { db } from "@/lib/db";
 import { ethereumUsdcTransfers } from "@/lib/schema";
+import { useLogger } from "@apibara/indexer/plugins";
 
 const abi = parseAbi([
   "event Transfer(address indexed from, address indexed to, uint256 value)",
@@ -40,7 +39,7 @@ export function createIndexer<
     streamUrl: "https://ethereum.preview.apibara.org",
     finality: "accepted",
     startingCursor: {
-      orderKey: 10_000_000n,
+      orderKey: 215_30_000n,
     },
     filter: {
       logs: [
@@ -56,18 +55,24 @@ export function createIndexer<
       ],
     },
     plugins: [
-      drizzlePersistence({ database, indexerName: "evm-usdc-transfers" }),
+      drizzleStorage({
+        db: database,
+        persistState: true,
+        idColumn: "_id",
+        indexerName: "evm-usdc-transfers",
+      }),
     ],
-    sink: drizzleSink({
-      database,
-      tables: [ethereumUsdcTransfers],
-    }),
-    async transform({ endCursor, context, block }) {
+    async transform({ endCursor, context, block, finality }) {
       const logger = useLogger();
-      const { db } = useSink({ context });
+      const { db } = useDrizzleStorage();
       const { logs } = block;
 
-      logger.info("Transforming block ", endCursor?.orderKey);
+      logger.info(
+        "Transforming block | orderKey: ",
+        endCursor?.orderKey,
+        " | finality: ",
+        finality,
+      );
 
       for (const log of logs) {
         await db.insert(ethereumUsdcTransfers).values({

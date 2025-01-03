@@ -1,18 +1,13 @@
-import { pgIndexerTable } from "@apibara/indexer/sinks/drizzle";
+import { bigint, pgTable, text, uuid } from "drizzle-orm/pg-core";
 
-import { bigint, text } from "drizzle-orm/pg-core";
-
-export const starknetUsdcTransfers = pgIndexerTable("starknet_usdc_transfers", {
+export const starknetUsdcTransfers = pgTable("starknet_usdc_transfers", {
+  _id: uuid("_id").primaryKey().defaultRandom(),
   number: bigint("number", { mode: "number" }),
   hash: text("hash"),
 });
 
-export const ethereumUsdcTransfers = pgIndexerTable("ethereum_usdc_transfers", {
+export const ethereumUsdcTransfers = pgTable("ethereum_usdc_transfers", {
+  _id: uuid("_id").primaryKey().defaultRandom(),
   number: bigint("number", { mode: "number" }),
   hash: text("hash"),
 });
-
-export {
-  checkpoints,
-  filters,
-} from "@apibara/indexer/plugins/drizzle-persistence";
