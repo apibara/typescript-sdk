@@ -18,7 +18,6 @@ export default function (runtimeConfig: ApibaraRuntimeConfig) {
       orderKey: 800_000n,
     },
     filter: {
-      header: "always",
       events: [
         {
           address:
@@ -42,6 +41,11 @@ export default function (runtimeConfig: ApibaraRuntimeConfig) {
           keys: [SWAP],
         };
       });
+
+      if (poolEvents.length === 0) {
+        return {};
+      }
+
       return {
         filter: {
           events: poolEvents,
