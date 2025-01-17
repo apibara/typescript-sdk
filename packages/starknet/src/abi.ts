@@ -22,7 +22,7 @@ export function getBigIntSelector(name: string): bigint {
 /** Returns the selector of the provided `name` as a FieldElement. */
 export function getSelector(name: string): FieldElement {
   const bn = getBigIntSelector(name);
-  return `0x${bn.toString(16)}`;
+  return `0x${bn.toString(16).padStart(64, "0")}`;
 }
 
 /** Returns the selector of the provided event with `name` as a FieldElement.

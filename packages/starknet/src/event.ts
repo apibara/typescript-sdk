@@ -90,8 +90,8 @@ export function decodeEvent<
     throw new DecodeEventError("enum: not implemented");
   }
 
-  const selector = getEventSelector(eventName);
-  if (selector !== event.keys?.[0]) {
+  const selector = BigInt(getEventSelector(eventName));
+  if ((event.keys && selector !== BigInt(event.keys[0])) || !event.keys) {
     if (strict) {
       throw new DecodeEventError(
         `Selector mismatch. Expected ${selector}, got ${event.keys?.[0]}`,

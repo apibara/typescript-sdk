@@ -69,7 +69,7 @@ export const parseUsize = parseAsBigInt;
 export function parseU256(data: readonly FieldElement[], offset: number) {
   assertInBounds(data, offset + 1);
   return {
-    out: (BigInt(data[offset]) + BigInt(data[offset + 1])) << 128n,
+    out: BigInt(data[offset]) + (BigInt(data[offset + 1]) << 128n),
     offset: offset + 2,
   };
 }

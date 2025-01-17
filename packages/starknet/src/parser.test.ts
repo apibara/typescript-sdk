@@ -63,9 +63,7 @@ describe("Primitive types parser", () => {
   it("can parse a u256", () => {
     const data = ["0x1234567890abcdef1234567890abcdef", "0x0"] as const;
     const { out, offset } = parseU256(data, 0);
-    expect(out).toBe(
-      8234104122482341265491137074636836252923686925670633108214053003575573872640n,
-    );
+    expect(out).toBe(24197857200151252728969465429440056815n);
     expect(offset).toBe(2);
   });
 
