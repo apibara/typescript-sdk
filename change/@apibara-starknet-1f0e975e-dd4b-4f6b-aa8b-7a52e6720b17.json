@@ -1,7 +1,0 @@
-{
-  "type": "prerelease",
-  "comment": "starknet: only re-export Abi type",
-  "packageName": "@apibara/starknet",
-  "email": "francesco@ceccon.me",
-  "dependentChangeType": "patch"
-}

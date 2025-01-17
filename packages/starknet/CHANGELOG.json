@@ -2,6 +2,21 @@
   "name": "@apibara/starknet",
   "entries": [
     {
+      "date": "Fri, 17 Jan 2025 19:26:05 GMT",
+      "version": "2.0.0-beta.32",
+      "tag": "@apibara/starknet_v2.0.0-beta.32",
+      "comments": {
+        "prerelease": [
+          {
+            "author": "francesco@ceccon.me",
+            "package": "@apibara/starknet",
+            "commit": "dcfeb7e8cfbe8d0263eb0dd407d666fe6be14aa9",
+            "comment": "starknet: only re-export Abi type"
+          }
+        ]
+      }
+    },
+    {
       "date": "Fri, 17 Jan 2025 15:20:18 GMT",
       "version": "2.0.0-beta.31",
       "tag": "@apibara/starknet_v2.0.0-beta.31",
