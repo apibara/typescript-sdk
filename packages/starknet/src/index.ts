@@ -1,5 +1,5 @@
 import { StreamConfig } from "@apibara/protocol";
-export { Abi } from "abi-wan-kanabi";
+export type { Abi } from "abi-wan-kanabi";
 import { BlockFromBytes } from "./block";
 import { FilterFromBytes, mergeFilter } from "./filter";
 
