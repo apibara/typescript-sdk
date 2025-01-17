@@ -1,7 +1,0 @@
-{
-  "type": "prerelease",
-  "comment": "Add event decoder",
-  "packageName": "@apibara/starknet",
-  "email": "francesco@ceccon.me",
-  "dependentChangeType": "patch"
-}

@@ -1,8 +1,16 @@
 # Change Log - @apibara/starknet
 
-<!-- This log was last generated on Fri, 29 Nov 2024 13:19:26 GMT and should not be manually modified. -->
+<!-- This log was last generated on Fri, 17 Jan 2025 15:20:18 GMT and should not be manually modified. -->
 
 <!-- Start content -->
+
+## 2.0.0-beta.31
+
+Fri, 17 Jan 2025 15:20:18 GMT
+
+### Changes
+
+- Add event decoder (francesco@ceccon.me)
 
 ## 2.0.0-beta.18
 
