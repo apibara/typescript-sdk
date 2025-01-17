@@ -34,5 +34,7 @@ export const FieldElement = Schema.transform(FieldElementProto, _FieldElement, {
   },
 });
 
+export type FieldElement = Schema.Schema.Type<typeof FieldElement>;
+
 export const feltToProto = Schema.encodeSync(FieldElement);
 export const feltFromProto = Schema.decodeSync(FieldElement);

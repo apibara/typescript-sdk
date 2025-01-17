@@ -3,8 +3,11 @@ import type { Transaction, TransactionReceipt } from "./block";
 /** Returns the transaction receipt for the given transaction index. */
 export function getReceipt(
   transactionIndex: number,
-  receipts: readonly TransactionReceipt[],
+  params:
+    | { receipts: readonly TransactionReceipt[] }
+    | readonly TransactionReceipt[],
 ): TransactionReceipt | undefined {
+  const receipts = "receipts" in params ? params.receipts : params;
   return binarySearch(
     transactionIndex,
     receipts,
@@ -15,8 +18,9 @@ export function getReceipt(
 /** Returns the transaction for the given transaction index. */
 export function getTransaction(
   transactionIndex: number,
-  transactions: readonly Transaction[],
+  params: { transactions: readonly Transaction[] } | readonly Transaction[],
 ): Transaction | undefined {
+  const transactions = "transactions" in params ? params.transactions : params;
   return binarySearch(
     transactionIndex,
     transactions,
