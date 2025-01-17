@@ -1,8 +1,41 @@
 import assert from "node:assert";
 import { createClient } from "@apibara/protocol";
-import { Filter, StarknetStream } from "@apibara/starknet";
+import {
+  type Abi,
+  Filter,
+  StarknetStream,
+  decodeEvent,
+  getSelector,
+} from "@apibara/starknet";
 import { defineCommand, runMain } from "citty";
 import consola from "consola";
+import { colors } from "consola/utils";
+import { formatUnits } from "viem";
+
+const abi = [
+  {
+    kind: "struct",
+    name: "Transfer",
+    type: "event",
+    members: [
+      {
+        kind: "data",
+        name: "from",
+        type: "core::starknet::contract_address::ContractAddress",
+      },
+      {
+        kind: "data",
+        name: "to",
+        type: "core::starknet::contract_address::ContractAddress",
+      },
+      {
+        kind: "data",
+        name: "value",
+        type: "core::integer::u256",
+      },
+    ],
+  },
+] as const satisfies Abi;
 
 const command = defineCommand({
   meta: {
@@ -13,37 +46,12 @@ const command = defineCommand({
   args: {
     stream: {
       type: "string",
-      default: "http://localhost:7007",
+      default: "https://starknet.preview.apibara.org",
       description: "Starknet stream URL",
     },
     authToken: {
       type: "string",
       description: "DNA auth token",
-    },
-    headers: {
-      type: "boolean",
-      description: "Log headers",
-      default: false,
-    },
-    events: {
-      type: "boolean",
-      description: "Log events",
-      default: false,
-    },
-    messages: {
-      type: "boolean",
-      description: "Log messages",
-      default: false,
-    },
-    transactions: {
-      type: "boolean",
-      description: "Log transactions",
-      default: false,
-    },
-    receipts: {
-      type: "boolean",
-      description: "Log receipts",
-      default: false,
     },
   },
   async run({ args }) {
@@ -54,27 +62,13 @@ const command = defineCommand({
     console.log(response);
 
     const filter = Filter.make({
-      storageDiffs: [{}],
-      contractChanges: [{}],
-      nonceUpdates: [{}],
-      // header: "on_data_or_on_new_block",
-      // messages: [
-      //   {
-      //     fromAddress:
-      //       "0x074761a8d48ce002963002becc6d9c3dd8a2a05b1075d55e5967f42296f16bd0",
-      //   },
-      // ],
-      // transactions: [
-      //   {
-      //     transactionStatus: "all",
-      //   },
-      // ],
-      // events: [
-      //   {
-      //     address:
-      //       "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
-      //   },
-      // ],
+      events: [
+        {
+          address:
+            "0x053c91253bc9682c04929ca02ed00b3e423f6710d2ee7e0d5ebb06f3ecf368a8",
+          keys: [getSelector("Transfer")],
+        },
+      ],
     });
 
     const request = StarknetStream.Request.make({
@@ -97,42 +91,16 @@ const command = defineCommand({
             consola.info(
               `Block n=${block.header?.blockNumber} h=${block.header?.blockHash}`,
             );
-            consola.info(`   Events: ${block.events.length}`);
-            consola.info(`   Messages: ${block.messages.length}`);
-            consola.info(`   Transactions: ${block.transactions.length}`);
-            consola.info(`   Receipts: ${block.receipts.length}`);
-            consola.info(`   Storage Diffs: ${block.storageDiffs.length}`);
-            consola.info(
-              `   Contract Changes: ${block.contractChanges.length}`,
-            );
-            consola.info(`   Nonce Updates: ${block.nonceUpdates.length}`);
 
-            if (args.headers) {
-              consola.log(block.header);
-            }
-
-            if (args.events) {
-              for (const event of block.events) {
-                consola.log(event);
-              }
-            }
-
-            if (args.messages) {
-              for (const message of block.messages) {
-                consola.log(message);
-              }
-            }
-
-            if (args.transactions) {
-              for (const transaction of block.transactions) {
-                consola.log(transaction);
-              }
-            }
-
-            if (args.receipts) {
-              for (const receipt of block.receipts) {
-                consola.log(receipt);
-              }
+            for (const event of block.events) {
+              const { args, transactionHash } = decodeEvent({
+                abi,
+                eventName: "Transfer",
+                event,
+              });
+              consola.info(
+                `${prettyAddress(args.from)} -> ${prettyAddress(args.to)} ${formatUnits(args.value, 6)} ${colors.gray(transactionHash ?? "")}`,
+              );
             }
           }
 
@@ -155,5 +123,9 @@ const command = defineCommand({
     }
   },
 });
+
+function prettyAddress(address: string) {
+  return `${address.slice(0, 6)}...${address.slice(-4)}`;
+}
 
 runMain(command);

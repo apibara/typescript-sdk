@@ -1,4 +1,5 @@
 import { StreamConfig } from "@apibara/protocol";
+export { Abi } from "abi-wan-kanabi";
 import { BlockFromBytes } from "./block";
 import { FilterFromBytes, mergeFilter } from "./filter";
 
@@ -9,6 +10,16 @@ export * from "./filter";
 export * from "./block";
 
 export * from "./access";
+export * from "./event";
+export { getBigIntSelector, getEventSelector, getSelector } from "./abi";
+
+declare module "abi-wan-kanabi" {
+  interface Config {
+    FeltType: bigint;
+    BigIntType: bigint;
+    U256Type: bigint;
+  }
+}
 
 export const StarknetStream = new StreamConfig(
   FilterFromBytes,

@@ -14,7 +14,8 @@
     "@apibara/starknet": "workspace:*",
     "citty": "^0.1.6",
     "consola": "^3.2.3",
-    "nice-grpc": "^2.1.8"
+    "nice-grpc": "^2.1.8",
+    "viem": "^2.22.9"
   },
   "devDependencies": {
     "@types/node": "^20.12.12",

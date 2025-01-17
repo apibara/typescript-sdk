@@ -15,6 +15,12 @@
       "import": "./dist/index.mjs",
       "require": "./dist/index.cjs",
       "default": "./dist/index.mjs"
+    },
+    "./parser": {
+      "types": "./dist/parser.d.ts",
+      "import": "./dist/parser.mjs",
+      "require": "./dist/parser.cjs",
+      "default": "./dist/parser.mjs"
     }
   },
   "scripts": {
@@ -38,6 +44,8 @@
   "dependencies": {
     "@apibara/protocol": "workspace:*",
     "@effect/schema": "^0.67.15",
+    "@scure/starknet": "^1.1.0",
+    "abi-wan-kanabi": "^2.2.4",
     "effect": "^3.2.6",
     "long": "^5.2.1",
     "nice-grpc-common": "^2.0.2",
