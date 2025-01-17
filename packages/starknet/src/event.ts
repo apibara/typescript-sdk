@@ -7,6 +7,7 @@ import type {
 import {
   PrimitiveTypeParsers,
   getArrayElementType,
+  getEventSelector,
   getOptionType,
   getSpanType,
   isArrayType,
@@ -17,6 +18,7 @@ import {
 } from "./abi";
 import type { Event } from "./block";
 import {
+  ParseError,
   type Parser,
   parseArray,
   parseEmpty,
@@ -59,6 +61,10 @@ export type DecodeEventReturn<
   ? DecodedEvent<TAbi, TEventName>
   : DecodedEvent<TAbi, TEventName> | null;
 
+/** Decodes a single event.
+ *
+ * If `strict: true`, this function throws on failure. Otherwise, returns null.
+ */
 export function decodeEvent<
   TAbi extends Abi = Abi,
   TEventName extends ExtractAbiEventNames<TAbi> = ExtractAbiEventNames<TAbi>,
@@ -84,27 +90,49 @@ export function decodeEvent<
     throw new DecodeEventError("enum: not implemented");
   }
 
-  // TODO: check selector matches.
+  const selector = getEventSelector(eventName);
+  if (selector !== event.keys?.[0]) {
+    if (strict) {
+      throw new DecodeEventError(
+        `Selector mismatch. Expected ${selector}, got ${event.keys?.[0]}`,
+      );
+    }
+
+    return null as DecodeEventReturn<TAbi, TEventName, TStrict>;
+  }
+
   const keysAbi = eventAbi.members.filter((m) => m.kind === "key");
   const dataAbi = eventAbi.members.filter((m) => m.kind === "data");
 
-  const keysParser = compileEventMembers(abi, keysAbi);
-  const dataParser = compileEventMembers(abi, dataAbi);
+  try {
+    const keysParser = compileEventMembers(abi, keysAbi);
+    const dataParser = compileEventMembers(abi, dataAbi);
 
-  const keysWithoutSelector = event.keys?.slice(1) ?? [];
-  const { out: decodedKeys } = keysParser(keysWithoutSelector, 0);
-  const { out: decodedData } = dataParser(event.data ?? [], 0);
+    const keysWithoutSelector = event.keys?.slice(1) ?? [];
+    const { out: decodedKeys } = keysParser(keysWithoutSelector, 0);
+    const { out: decodedData } = dataParser(event.data ?? [], 0);
 
-  const decoded = {
-    ...decodedKeys,
-    ...decodedData,
-  } as EventToPrimitiveType<TAbi, TEventName>;
+    const decoded = {
+      ...decodedKeys,
+      ...decodedData,
+    } as EventToPrimitiveType<TAbi, TEventName>;
 
-  return {
-    ...event,
-    eventName,
-    args: decoded,
-  } as DecodedEvent<TAbi, TEventName>;
+    return {
+      ...event,
+      eventName,
+      args: decoded,
+    } as DecodedEvent<TAbi, TEventName>;
+  } catch (error) {
+    if (error instanceof DecodeEventError && !strict) {
+      return null as DecodeEventReturn<TAbi, TEventName, TStrict>;
+    }
+
+    if (error instanceof ParseError && !strict) {
+      return null as DecodeEventReturn<TAbi, TEventName, TStrict>;
+    }
+
+    throw error;
+  }
 }
 
 function compileEventMembers<T extends Record<string, unknown>>(

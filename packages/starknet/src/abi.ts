@@ -1,3 +1,6 @@
+import { keccak } from "@scure/starknet";
+
+import type { FieldElement } from "./common";
 import {
   parseBool,
   parseContractAddress,
@@ -9,6 +12,27 @@ import {
   parseU128,
   parseU256,
 } from "./parser";
+
+/** Returns the selector of the provided `name` as a bigint. */
+export function getBigIntSelector(name: string): bigint {
+  const asBytes = new TextEncoder().encode(name);
+  return keccak(asBytes);
+}
+
+/** Returns the selector of the provided `name` as a FieldElement. */
+export function getSelector(name: string): FieldElement {
+  const bn = getBigIntSelector(name);
+  return `0x${bn.toString(16)}`;
+}
+
+/** Returns the selector of the provided event with `name` as a FieldElement.
+ *
+ * If the name is fully qualified, only the last part is used to compute the selector.
+ */
+export function getEventSelector(name: string): FieldElement {
+  const parts = name.split("::");
+  return getSelector(parts[parts.length - 1]);
+}
 
 export const PrimitiveTypeParsers = {
   "core::bool": parseBool,

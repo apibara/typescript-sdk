@@ -41,11 +41,21 @@ export class ParseError extends Error {
 
 // Primitive types.
 
+function assertInBounds(data: readonly FieldElement[], offset: number) {
+  if (offset >= data.length) {
+    throw new ParseError(
+      `Offset out of bounds. Data length ${data.length}, offset ${offset}`,
+    );
+  }
+}
+
 export function parseBool(data: readonly FieldElement[], offset: number) {
+  assertInBounds(data, offset);
   return { out: BigInt(data[offset]) > 0n, offset: offset + 1 };
 }
 
 export function parseAsBigInt(data: readonly FieldElement[], offset: number) {
+  assertInBounds(data, offset);
   return { out: BigInt(data[offset]), offset: offset + 1 };
 }
 
@@ -57,6 +67,7 @@ export const parseU128 = parseAsBigInt;
 export const parseUsize = parseAsBigInt;
 
 export function parseU256(data: readonly FieldElement[], offset: number) {
+  assertInBounds(data, offset + 1);
   return {
     out: (BigInt(data[offset]) + BigInt(data[offset + 1])) << 128n,
     offset: offset + 2,
@@ -64,6 +75,7 @@ export function parseU256(data: readonly FieldElement[], offset: number) {
 }
 
 export function parseAsHex(data: readonly FieldElement[], offset: number) {
+  assertInBounds(data, offset);
   return {
     out: String(data[offset]),
     offset: offset + 1,
@@ -77,6 +89,7 @@ export const parseClassHash = parseAsHex;
 export const parseBytes31 = parseAsHex;
 
 export function parseFelt252(data: readonly FieldElement[], offset: number) {
+  assertInBounds(data, offset);
   return {
     out: BigInt(data[offset]),
     offset: offset + 1,
@@ -93,13 +106,8 @@ export function parseArray<T>(type: Parser<T>): Parser<T[]> {
   return (data: readonly FieldElement[], startingOffset: number) => {
     let offset = startingOffset;
     const length = BigInt(data[offset]);
-    offset++;
 
-    if (length > data.length - offset) {
-      throw new ParseError(
-        "Array length is greater than the remaining data length",
-      );
-    }
+    offset++;
 
     const out: T[] = [];
     for (let i = 0; i < length; i++) {

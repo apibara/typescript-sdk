@@ -7,6 +7,91 @@ import { chainlinkAbi } from "./fixtures/chainlink-abi";
 import { ekuboAbi } from "./fixtures/ekubo-abi";
 
 describe("decodeEvent", () => {
+  describe("non strict mode", () => {
+    it("returns null if the selector does not match", () => {
+      const abi = ekuboAbi;
+
+      const event = {
+        transactionHash:
+          "0x008691c1fa0f5c650b3492396dc1c22423c04e9a8843a12eaab03799d0a45cd0",
+        address:
+          "0x00000005dd3d2f4429af886cd1a3b08289dbcea99a294197e9eb43b0e0325b4b",
+        keys: [
+          "0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+        ],
+        data: [
+          "0x2e0af29598b407c8716b17f6d2795eca1b471413fa03fb145a5e33722184067",
+          "0x49d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+          "0x53c91253bc9682c04929ca02ed00b3e423f6710d2ee7e0d5ebb06f3ecf368a8",
+          "0x0",
+          "0x3eb",
+          "0x0",
+          "0x111fcd",
+          "0x129cfc1",
+          "0x1",
+          "0x129cbd6",
+          "0x1",
+          "0xe55231bfe9f8e3f",
+          "0x0",
+          "0x7c585087238003f8",
+          "0x0",
+          "0x0",
+          "0x0",
+        ],
+      } as const satisfies Event;
+
+      const decoded = decodeEvent({
+        abi,
+        event,
+        eventName: "ekubo::core::Core::PositionUpdated",
+        strict: false,
+      });
+
+      expect(decoded).toBeNull();
+    });
+
+    it("returns null if parsing fails", () => {
+      const abi = ekuboAbi;
+
+      const event = {
+        transactionHash:
+          "0x008691c1fa0f5c650b3492396dc1c22423c04e9a8843a12eaab03799d0a45cd0",
+        address:
+          "0x00000005dd3d2f4429af886cd1a3b08289dbcea99a294197e9eb43b0e0325b4b",
+        keys: [
+          "0x3a7adca3546c213ce791fabf3b04090c163e419c808c9830fb343a4a395946e",
+        ],
+        data: [
+          "0x2e0af29598b407c8716b17f6d2795eca1b471413fa03fb145a5e33722184067",
+          "0x49d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+          "0x53c91253bc9682c04929ca02ed00b3e423f6710d2ee7e0d5ebb06f3ecf368a8",
+          "0x0",
+          "0x3eb",
+          "0x0",
+          "0x111fcd",
+          "0x129cfc1",
+          "0x1",
+          "0x129cbd6",
+          "0x1",
+          "0xe55231bfe9f8e3f",
+          "0x0",
+          "0x7c585087238003f8",
+          "0x0",
+          "0x0",
+        ],
+      } as const satisfies Event;
+
+      const decoded = decodeEvent({
+        abi,
+        event,
+        eventName: "ekubo::core::Core::PositionUpdated",
+        strict: false,
+      });
+
+      expect(decoded).toBeNull();
+    });
+  });
+
   it("can handle events with nested structs", () => {
     const abi = ekuboAbi;
 
