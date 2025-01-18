@@ -1,0 +1,7 @@
+{
+  "type": "prerelease",
+  "comment": "protocol: add data production field",
+  "packageName": "@apibara/plugin-drizzle",
+  "email": "francesco@ceccon.me",
+  "dependentChangeType": "patch"
+}
