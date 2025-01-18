@@ -1,8 +1,16 @@
 # Change Log - @apibara/indexer
 
-<!-- This log was last generated on Wed, 01 Jan 2025 12:46:17 GMT and should not be manually modified. -->
+<!-- This log was last generated on Sat, 18 Jan 2025 15:53:04 GMT and should not be manually modified. -->
 
 <!-- Start content -->
+
+## 2.0.0-beta.33
+
+Sat, 18 Jan 2025 15:53:04 GMT
+
+### Changes
+
+- protocol: add data production field (francesco@ceccon.me)
 
 ## 2.0.0-beta.30
 

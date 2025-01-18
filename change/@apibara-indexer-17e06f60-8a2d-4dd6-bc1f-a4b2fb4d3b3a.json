@@ -1,7 +1,0 @@
-{
-  "type": "prerelease",
-  "comment": "protocol: add data production field",
-  "packageName": "@apibara/indexer",
-  "email": "francesco@ceccon.me",
-  "dependentChangeType": "patch"
-}

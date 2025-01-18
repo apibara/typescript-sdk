@@ -2,6 +2,21 @@
   "name": "@apibara/plugin-sqlite",
   "entries": [
     {
+      "date": "Sat, 18 Jan 2025 15:53:04 GMT",
+      "version": "2.0.0-beta.32",
+      "tag": "@apibara/plugin-sqlite_v2.0.0-beta.32",
+      "comments": {
+        "prerelease": [
+          {
+            "author": "francesco@ceccon.me",
+            "package": "@apibara/plugin-sqlite",
+            "commit": "c806dccffce348a28365b9c02b39f88b22218be0",
+            "comment": "protocol: add data production field"
+          }
+        ]
+      }
+    },
+    {
       "date": "Wed, 01 Jan 2025 12:46:17 GMT",
       "version": "2.0.0-beta.29",
       "tag": "@apibara/plugin-sqlite_v2.0.0-beta.29",

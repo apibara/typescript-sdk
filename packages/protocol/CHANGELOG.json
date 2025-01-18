@@ -2,6 +2,21 @@
   "name": "@apibara/protocol",
   "entries": [
     {
+      "date": "Sat, 18 Jan 2025 15:53:04 GMT",
+      "version": "2.0.0-beta.33",
+      "tag": "@apibara/protocol_v2.0.0-beta.33",
+      "comments": {
+        "prerelease": [
+          {
+            "author": "francesco@ceccon.me",
+            "package": "@apibara/protocol",
+            "commit": "c806dccffce348a28365b9c02b39f88b22218be0",
+            "comment": "Add data production field to data messages"
+          }
+        ]
+      }
+    },
+    {
       "date": "Mon, 23 Dec 2024 11:34:53 GMT",
       "version": "2.0.0-beta.28",
       "tag": "@apibara/protocol_v2.0.0-beta.28",

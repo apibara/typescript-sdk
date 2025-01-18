@@ -1,8 +1,16 @@
 # Change Log - @apibara/protocol
 
-<!-- This log was last generated on Mon, 23 Dec 2024 11:34:53 GMT and should not be manually modified. -->
+<!-- This log was last generated on Sat, 18 Jan 2025 15:53:04 GMT and should not be manually modified. -->
 
 <!-- Start content -->
+
+## 2.0.0-beta.33
+
+Sat, 18 Jan 2025 15:53:04 GMT
+
+### Changes
+
+- Add data production field to data messages (francesco@ceccon.me)
 
 ## 2.0.0-beta.28
 
