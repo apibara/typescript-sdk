@@ -442,6 +442,7 @@ export type TransactionReceipt = typeof TransactionReceipt.Type;
  * @prop transactionIndex The transaction index in the block.
  * @prop transactionHash The transaction hash.
  * @prop transactionStatus The transaction status.
+ * @prop eventIndexInTransaction The event index in the transaction.
  */
 export const Event = Schema.Struct({
   filterIds: Schema.optional(Schema.Array(Schema.Number)),
@@ -452,6 +453,7 @@ export const Event = Schema.Struct({
   transactionIndex: Schema.optional(Schema.Number),
   transactionHash: Schema.optional(FieldElement),
   transactionStatus: Schema.optional(TransactionStatus),
+  eventIndexInTransaction: Schema.optional(Schema.Number),
 });
 
 export type Event = typeof Event.Type;
@@ -465,6 +467,7 @@ export type Event = typeof Event.Type;
  * @prop transactionIndex The transaction index in the block.
  * @prop transactionHash The transaction hash.
  * @prop transactionStatus The transaction status.
+ * @prop messageIndexInTransaction The message index in the transaction.
  */
 export const MessageToL1 = Schema.Struct({
   filterIds: Schema.optional(Schema.Array(Schema.Number)),
@@ -475,6 +478,7 @@ export const MessageToL1 = Schema.Struct({
   transactionIndex: Schema.optional(Schema.Number),
   transactionHash: Schema.optional(FieldElement),
   transactionStatus: Schema.optional(TransactionStatus),
+  messageIndexInTransaction: Schema.optional(Schema.Number),
 });
 
 export type MessageToL1 = typeof MessageToL1.Type;

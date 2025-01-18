@@ -135,6 +135,7 @@ export const Log = Schema.Struct({
   topics: Schema.Array(B256),
   data: BytesFromUint8Array,
   logIndex: Schema.Number,
+  logIndexInTransaction: Schema.Number,
   transactionIndex: Schema.Number,
   transactionHash: Schema.optional(B256),
   transactionStatus: Schema.optional(TransactionStatus),
