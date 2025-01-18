@@ -95,6 +95,7 @@ describe("StreamDataResponse", () => {
         data: {
           finality: "accepted",
           data: [{ value: "hello" }, { value: "world" }],
+          production: "backfill",
         },
       } as const;
 
@@ -120,6 +121,7 @@ describe("StreamDataResponse", () => {
               ],
             ],
             "finality": 2,
+            "production": 1,
           },
         }
       `);

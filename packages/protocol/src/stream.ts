@@ -34,6 +34,35 @@ export const DataFinality = Schema.transform(
 
 export type DataFinality = typeof DataFinality.Type;
 
+/** Data production mode. */
+export const DataProduction = Schema.transform(
+  Schema.Enums(proto.stream.DataProduction),
+  Schema.Literal("backfill", "live", "unknown"),
+  {
+    decode(value) {
+      const enumMap = {
+        [proto.stream.DataProduction.BACKFILL]: "backfill",
+        [proto.stream.DataProduction.LIVE]: "live",
+        [proto.stream.DataProduction.UNKNOWN]: "unknown",
+        [proto.stream.DataProduction.UNRECOGNIZED]: "unknown",
+      } as const;
+
+      return enumMap[value] ?? "unknown";
+    },
+    encode(value) {
+      const enumMap = {
+        backfill: proto.stream.DataProduction.BACKFILL,
+        live: proto.stream.DataProduction.LIVE,
+        unknown: proto.stream.DataProduction.UNKNOWN,
+      };
+
+      return enumMap[value] ?? proto.stream.DataProduction.UNKNOWN;
+    },
+  },
+);
+
+export type DataProduction = typeof DataProduction.Type;
+
 export const Duration = Schema.Struct({
   seconds: Schema.BigIntFromSelf,
   nanos: Schema.Number,
@@ -112,6 +141,7 @@ export const Data = <TA, TR>(
       cursor: Schema.optional(Cursor),
       endCursor: Schema.optional(Cursor),
       finality: DataFinality,
+      production: DataProduction,
       data: Schema.Array(schema),
     }),
   });
@@ -136,6 +166,7 @@ export type StreamDataResponse<TA> =
         cursor?: Cursor | undefined;
         endCursor?: Cursor | undefined;
         finality: DataFinality;
+        production: DataProduction;
         data: readonly (TA | null)[];
       };
     };

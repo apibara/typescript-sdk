@@ -61,6 +61,7 @@ describe("SQLite persistence", () => {
               cursor: { orderKey: 100n },
               endCursor: { orderKey: 101n },
               data: [null, null],
+              production: "backfill",
             },
           },
           {
@@ -70,6 +71,7 @@ describe("SQLite persistence", () => {
               cursor: { orderKey: 101n },
               endCursor: { orderKey: 102n },
               data: [null, null],
+              production: "backfill",
             },
           },
           {
@@ -79,6 +81,7 @@ describe("SQLite persistence", () => {
               cursor: { orderKey: 102n },
               endCursor: { orderKey: 103n },
               data: [{ data: "B" }, null],
+              production: "backfill",
             },
           },
         ];
@@ -95,6 +98,7 @@ describe("SQLite persistence", () => {
               cursor: { orderKey: 102n },
               endCursor: { orderKey: 103n },
               data: [{ data: "B" }, { data: "103B" }],
+              production: "backfill",
             },
           },
           {
@@ -104,6 +108,7 @@ describe("SQLite persistence", () => {
               cursor: { orderKey: 103n },
               endCursor: { orderKey: 104n },
               data: [null, { data: "104B" }],
+              production: "backfill",
             },
           },
           {
@@ -113,6 +118,7 @@ describe("SQLite persistence", () => {
               cursor: { orderKey: 104n },
               endCursor: { orderKey: 105n },
               data: [null, { data: "105B" }],
+              production: "backfill",
             },
           },
           {
@@ -122,6 +128,7 @@ describe("SQLite persistence", () => {
               cursor: { orderKey: 105n },
               endCursor: { orderKey: 106n },
               data: [{ data: "C" }, { data: "106B" }],
+              production: "backfill",
             },
           },
         ];
@@ -138,6 +145,7 @@ describe("SQLite persistence", () => {
               cursor: { orderKey: 105n },
               endCursor: { orderKey: 106n },
               data: [{ data: "C" }, { data: "106BC" }],
+              production: "backfill",
             },
           },
           {
@@ -147,6 +155,7 @@ describe("SQLite persistence", () => {
               cursor: { orderKey: 106n },
               endCursor: { orderKey: 107n },
               data: [null, { data: "107BC" }],
+              production: "backfill",
             },
           },
           {
@@ -156,6 +165,7 @@ describe("SQLite persistence", () => {
               cursor: { orderKey: 107n },
               endCursor: { orderKey: 108n },
               data: [null, { data: "108BC" }],
+              production: "backfill",
             },
           },
         ];
@@ -290,6 +300,7 @@ describe("SQLite persistence", () => {
               cursor: { orderKey: 100n },
               endCursor: { orderKey: 101n },
               data: [null, null],
+              production: "backfill",
             },
           },
           {
@@ -299,6 +310,7 @@ describe("SQLite persistence", () => {
               cursor: { orderKey: 101n },
               endCursor: { orderKey: 102n },
               data: [null, null],
+              production: "backfill",
             },
           },
           {
@@ -308,6 +320,7 @@ describe("SQLite persistence", () => {
               cursor: { orderKey: 102n },
               endCursor: { orderKey: 103n },
               data: [{ data: "B" }, null],
+              production: "backfill",
             },
           },
         ];
@@ -324,6 +337,7 @@ describe("SQLite persistence", () => {
               cursor: { orderKey: 102n },
               endCursor: { orderKey: 103n },
               data: [{ data: "B" }, { data: "103B" }],
+              production: "backfill",
             },
           },
           {
@@ -333,6 +347,7 @@ describe("SQLite persistence", () => {
               cursor: { orderKey: 103n },
               endCursor: { orderKey: 104n },
               data: [null, { data: "104B" }],
+              production: "backfill",
             },
           },
           {
@@ -342,6 +357,7 @@ describe("SQLite persistence", () => {
               cursor: { orderKey: 104n },
               endCursor: { orderKey: 105n },
               data: [null, { data: "105B" }],
+              production: "backfill",
             },
           },
           {
@@ -351,6 +367,7 @@ describe("SQLite persistence", () => {
               cursor: { orderKey: 105n },
               endCursor: { orderKey: 106n },
               data: [{ data: "C" }, { data: "106B" }],
+              production: "backfill",
             },
           },
         ];
@@ -367,6 +384,7 @@ describe("SQLite persistence", () => {
               cursor: { orderKey: 105n },
               endCursor: { orderKey: 106n },
               data: [{ data: "C" }, { data: "106BC" }],
+              production: "backfill",
             },
           },
           {
@@ -376,6 +394,7 @@ describe("SQLite persistence", () => {
               cursor: { orderKey: 106n },
               endCursor: { orderKey: 107n },
               data: [null, { data: "107BC" }],
+              production: "backfill",
             },
           },
           {
@@ -457,6 +476,7 @@ describe("SQLite persistence", () => {
               cursor: { orderKey: 100n },
               endCursor: { orderKey: 101n },
               data: [null, null],
+              production: "backfill",
             },
           },
           {
@@ -466,6 +486,7 @@ describe("SQLite persistence", () => {
               cursor: { orderKey: 101n },
               endCursor: { orderKey: 102n },
               data: [null, null],
+              production: "backfill",
             },
           },
           {
@@ -475,6 +496,7 @@ describe("SQLite persistence", () => {
               cursor: { orderKey: 102n },
               endCursor: { orderKey: 103n },
               data: [{ data: "B" }, null],
+              production: "backfill",
             },
           },
         ];
@@ -491,6 +513,7 @@ describe("SQLite persistence", () => {
               cursor: { orderKey: 102n },
               endCursor: { orderKey: 103n },
               data: [{ data: "B" }, { data: "103B" }],
+              production: "backfill",
             },
           },
           {
@@ -500,6 +523,7 @@ describe("SQLite persistence", () => {
               cursor: { orderKey: 103n },
               endCursor: { orderKey: 104n },
               data: [null, { data: "104B" }],
+              production: "backfill",
             },
           },
           {
@@ -509,6 +533,7 @@ describe("SQLite persistence", () => {
               cursor: { orderKey: 104n },
               endCursor: { orderKey: 105n },
               data: [null, { data: "105B" }],
+              production: "backfill",
             },
           },
           {
@@ -518,6 +543,7 @@ describe("SQLite persistence", () => {
               cursor: { orderKey: 105n },
               endCursor: { orderKey: 106n },
               data: [{ data: "C" }, { data: "106B" }],
+              production: "backfill",
             },
           },
         ];
@@ -534,6 +560,7 @@ describe("SQLite persistence", () => {
               cursor: { orderKey: 105n },
               endCursor: { orderKey: 106n },
               data: [{ data: "C" }, { data: "106BC" }],
+              production: "backfill",
             },
           },
           {
@@ -543,6 +570,7 @@ describe("SQLite persistence", () => {
               cursor: { orderKey: 106n },
               endCursor: { orderKey: 107n },
               data: [null, { data: "107BC" }],
+              production: "backfill",
             },
           },
           {

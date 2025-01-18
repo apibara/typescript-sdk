@@ -1,0 +1,7 @@
+{
+  "type": "prerelease",
+  "comment": "Add data production field to data messages",
+  "packageName": "@apibara/protocol",
+  "email": "francesco@ceccon.me",
+  "dependentChangeType": "patch"
+}

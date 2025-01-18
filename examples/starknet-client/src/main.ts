@@ -75,11 +75,13 @@ const command = defineCommand({
       filter: [filter],
       finality: "accepted",
       startingCursor: {
-        orderKey: 800_000n,
+        orderKey: 1_078_335n,
       },
     });
 
-    for await (const message of client.streamData(request)) {
+    for await (const message of client.streamData(request, {
+      timeout: 40_000,
+    })) {
       switch (message._tag) {
         case "data": {
           consola.info("Data", message.data.endCursor?.orderKey);

@@ -9,7 +9,11 @@ describe("MockClient", () => {
       return [
         {
           _tag: "data",
-          data: { finality: "finalized", data: [{ data: "hello" }] },
+          data: {
+            finality: "finalized",
+            data: [{ data: "hello" }],
+            production: "backfill",
+          },
         },
       ];
     });
@@ -30,6 +34,7 @@ describe("MockClient", () => {
               },
             ],
             "finality": "finalized",
+            "production": "backfill",
           },
         },
       ]
@@ -41,7 +46,11 @@ describe("MockClient", () => {
       return [
         {
           _tag: "data",
-          data: { finality: "finalized", data: [{ data: "hello" }, null] },
+          data: {
+            finality: "finalized",
+            data: [{ data: "hello" }, null],
+            production: "backfill",
+          },
         },
       ];
     });
@@ -63,6 +72,7 @@ describe("MockClient", () => {
               null,
             ],
             "finality": "finalized",
+            "production": "backfill",
           },
         },
       ]
