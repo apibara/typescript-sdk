@@ -351,7 +351,11 @@ export interface Log {
     | B256
     | undefined;
   /** The transaction status. */
-  readonly transactionStatus?: TransactionStatus | undefined;
+  readonly transactionStatus?:
+    | TransactionStatus
+    | undefined;
+  /** Index of the log in the transaction. */
+  readonly logIndexInTransaction?: number | undefined;
 }
 
 export interface Signature {
@@ -1830,6 +1834,7 @@ function createBaseLog(): Log {
     transactionIndex: 0,
     transactionHash: undefined,
     transactionStatus: 0,
+    logIndexInTransaction: 0,
   };
 }
 
@@ -1864,6 +1869,9 @@ export const Log = {
     }
     if (message.transactionStatus !== undefined && message.transactionStatus !== 0) {
       writer.uint32(64).int32(message.transactionStatus);
+    }
+    if (message.logIndexInTransaction !== undefined && message.logIndexInTransaction !== 0) {
+      writer.uint32(72).uint32(message.logIndexInTransaction);
     }
     return writer;
   },
@@ -1941,6 +1949,13 @@ export const Log = {
 
           message.transactionStatus = reader.int32() as any;
           continue;
+        case 9:
+          if (tag !== 72) {
+            break;
+          }
+
+          message.logIndexInTransaction = reader.uint32();
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -1962,6 +1977,7 @@ export const Log = {
       transactionIndex: isSet(object.transactionIndex) ? globalThis.Number(object.transactionIndex) : 0,
       transactionHash: isSet(object.transactionHash) ? B256.fromJSON(object.transactionHash) : undefined,
       transactionStatus: isSet(object.transactionStatus) ? transactionStatusFromJSON(object.transactionStatus) : 0,
+      logIndexInTransaction: isSet(object.logIndexInTransaction) ? globalThis.Number(object.logIndexInTransaction) : 0,
     };
   },
 
@@ -1991,6 +2007,9 @@ export const Log = {
     if (message.transactionStatus !== undefined && message.transactionStatus !== 0) {
       obj.transactionStatus = transactionStatusToJSON(message.transactionStatus);
     }
+    if (message.logIndexInTransaction !== undefined && message.logIndexInTransaction !== 0) {
+      obj.logIndexInTransaction = Math.round(message.logIndexInTransaction);
+    }
     return obj;
   },
 
@@ -2011,6 +2030,7 @@ export const Log = {
       ? B256.fromPartial(object.transactionHash)
       : undefined;
     message.transactionStatus = object.transactionStatus ?? 0;
+    message.logIndexInTransaction = object.logIndexInTransaction ?? 0;
     return message;
   },
 };
