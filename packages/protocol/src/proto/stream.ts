@@ -63,6 +63,48 @@ export function dataFinalityToJSON(object: DataFinality): string {
   }
 }
 
+/** Data production mode. */
+export enum DataProduction {
+  UNKNOWN = 0,
+  /** BACKFILL - Data is for a backfilled block. */
+  BACKFILL = 1,
+  /** LIVE - Data is for a live block. */
+  LIVE = 2,
+  UNRECOGNIZED = -1,
+}
+
+export function dataProductionFromJSON(object: any): DataProduction {
+  switch (object) {
+    case 0:
+    case "DATA_PRODUCTION_UNKNOWN":
+      return DataProduction.UNKNOWN;
+    case 1:
+    case "DATA_PRODUCTION_BACKFILL":
+      return DataProduction.BACKFILL;
+    case 2:
+    case "DATA_PRODUCTION_LIVE":
+      return DataProduction.LIVE;
+    case -1:
+    case "UNRECOGNIZED":
+    default:
+      return DataProduction.UNRECOGNIZED;
+  }
+}
+
+export function dataProductionToJSON(object: DataProduction): string {
+  switch (object) {
+    case DataProduction.UNKNOWN:
+      return "DATA_PRODUCTION_UNKNOWN";
+    case DataProduction.BACKFILL:
+      return "DATA_PRODUCTION_BACKFILL";
+    case DataProduction.LIVE:
+      return "DATA_PRODUCTION_LIVE";
+    case DataProduction.UNRECOGNIZED:
+    default:
+      return "UNRECOGNIZED";
+  }
+}
+
 /** A cursor over the stream content. */
 export interface Cursor {
   /**
@@ -192,6 +234,8 @@ export interface Data {
    * This message contains chain-specific data serialized using protobuf.
    */
   readonly data: readonly Uint8Array[];
+  /** The production mode of the block. */
+  readonly production: DataProduction;
 }
 
 /** Sent to clients to check if stream is still connected. */
@@ -838,7 +882,7 @@ export const Finalize = {
 };
 
 function createBaseData(): Data {
-  return { cursor: undefined, endCursor: undefined, finality: 0, data: [] };
+  return { cursor: undefined, endCursor: undefined, finality: 0, data: [], production: 0 };
 }
 
 export const Data = {
@@ -854,6 +898,9 @@ export const Data = {
     }
     for (const v of message.data) {
       writer.uint32(34).bytes(v!);
+    }
+    if (message.production !== 0) {
+      writer.uint32(40).int32(message.production);
     }
     return writer;
   },
@@ -893,6 +940,13 @@ export const Data = {
 
           message.data.push(reader.bytes());
           continue;
+        case 5:
+          if (tag !== 40) {
+            break;
+          }
+
+          message.production = reader.int32() as any;
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -908,6 +962,7 @@ export const Data = {
       endCursor: isSet(object.endCursor) ? Cursor.fromJSON(object.endCursor) : undefined,
       finality: isSet(object.finality) ? dataFinalityFromJSON(object.finality) : 0,
       data: globalThis.Array.isArray(object?.data) ? object.data.map((e: any) => bytesFromBase64(e)) : [],
+      production: isSet(object.production) ? dataProductionFromJSON(object.production) : 0,
     };
   },
 
@@ -925,6 +980,9 @@ export const Data = {
     if (message.data?.length) {
       obj.data = message.data.map((e) => base64FromBytes(e));
     }
+    if (message.production !== 0) {
+      obj.production = dataProductionToJSON(message.production);
+    }
     return obj;
   },
 
@@ -941,6 +999,7 @@ export const Data = {
       : undefined;
     message.finality = object.finality ?? 0;
     message.data = object.data?.map((e) => e) || [];
+    message.production = object.production ?? 0;
     return message;
   },
 };

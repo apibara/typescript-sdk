@@ -56,6 +56,7 @@ export function generateMockMessages(
           finality: "accepted",
           data: [{ data: `${5_000_000 + i}` }],
           endCursor: { orderKey: BigInt(5_000_000 + i) },
+          production: "backfill",
         },
       });
     }
