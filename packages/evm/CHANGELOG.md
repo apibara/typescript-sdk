@@ -1,8 +1,16 @@
 # Change Log - @apibara/evm
 
-<!-- This log was last generated on Sun, 20 Oct 2024 18:49:49 GMT and should not be manually modified. -->
+<!-- This log was last generated on Sat, 18 Jan 2025 22:34:42 GMT and should not be manually modified. -->
 
 <!-- Start content -->
+
+## 2.0.1-beta.26
+
+Sat, 18 Jan 2025 22:34:42 GMT
+
+### Changes
+
+- starknet: add event and message index in transaction (francesco@ceccon.me)
 
 ## 2.0.1-beta.0
 

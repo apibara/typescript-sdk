@@ -2,6 +2,21 @@
   "name": "@apibara/starknet",
   "entries": [
     {
+      "date": "Sat, 18 Jan 2025 22:34:42 GMT",
+      "version": "2.0.0-beta.34",
+      "tag": "@apibara/starknet_v2.0.0-beta.34",
+      "comments": {
+        "prerelease": [
+          {
+            "author": "francesco@ceccon.me",
+            "package": "@apibara/starknet",
+            "commit": "207bd64408db832fde969c7121f76a825d8fa508",
+            "comment": "evm: add log index in transaction field"
+          }
+        ]
+      }
+    },
+    {
       "date": "Fri, 17 Jan 2025 19:26:05 GMT",
       "version": "2.0.0-beta.32",
       "tag": "@apibara/starknet_v2.0.0-beta.32",

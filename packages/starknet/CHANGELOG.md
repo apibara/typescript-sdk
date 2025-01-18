@@ -1,8 +1,16 @@
 # Change Log - @apibara/starknet
 
-<!-- This log was last generated on Fri, 17 Jan 2025 19:26:05 GMT and should not be manually modified. -->
+<!-- This log was last generated on Sat, 18 Jan 2025 22:34:42 GMT and should not be manually modified. -->
 
 <!-- Start content -->
+
+## 2.0.0-beta.34
+
+Sat, 18 Jan 2025 22:34:42 GMT
+
+### Changes
+
+- evm: add log index in transaction field (francesco@ceccon.me)
 
 ## 2.0.0-beta.32
 

@@ -1,7 +1,0 @@
-{
-  "type": "prerelease",
-  "comment": "evm: add log index in transaction field",
-  "packageName": "@apibara/starknet",
-  "email": "francesco@ceccon.me",
-  "dependentChangeType": "patch"
-}

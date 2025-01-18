@@ -2,6 +2,21 @@
   "name": "@apibara/evm",
   "entries": [
     {
+      "date": "Sat, 18 Jan 2025 22:34:42 GMT",
+      "version": "2.0.1-beta.26",
+      "tag": "@apibara/evm_v2.0.1-beta.26",
+      "comments": {
+        "prerelease": [
+          {
+            "author": "francesco@ceccon.me",
+            "package": "@apibara/evm",
+            "commit": "207bd64408db832fde969c7121f76a825d8fa508",
+            "comment": "starknet: add event and message index in transaction"
+          }
+        ]
+      }
+    },
+    {
       "date": "Sun, 20 Oct 2024 18:49:49 GMT",
       "version": "2.0.1-beta.0",
       "tag": "@apibara/evm_v2.0.1-beta.0",
