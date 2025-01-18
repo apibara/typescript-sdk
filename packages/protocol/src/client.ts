@@ -23,14 +23,25 @@ import { type StreamDataRequest, StreamDataResponse } from "./stream";
 
 export { ClientError, Status } from "nice-grpc";
 
+const DEFAULT_TIMEOUT_MS = 45_000;
+
+export class TimeoutError extends Error {
+  constructor(timeout: number) {
+    super(`No message received in ${timeout}ms`);
+    this.name = "TimeoutError";
+  }
+}
+
 /** Client call options. */
 export interface ClientCallOptions {
   signal?: AbortSignal;
 }
 
 export interface StreamDataOptions extends ClientCallOptions {
-  /** Stop at the specified cursor (inclusive) */
+  /** Stop at the specified cursor (inclusive). */
   endingCursor?: Cursor;
+  /** Timeout between messages, in milliseconds. */
+  timeout?: number;
 }
 
 /** DNA client. */
@@ -112,8 +123,10 @@ export class StreamDataIterable<TBlock> {
     const inner = this.it[Symbol.asyncIterator]();
     const schema = StreamDataResponse(this.schema);
     const decoder = Schema.decodeSync(schema);
-    const { endingCursor } = this.options ?? {};
+    const { endingCursor, timeout = DEFAULT_TIMEOUT_MS } = this.options ?? {};
     let shouldStop = false;
+
+    let clock: string | number | NodeJS.Timeout | undefined;
 
     return {
       async next() {
@@ -121,35 +134,50 @@ export class StreamDataIterable<TBlock> {
           return { done: true, value: undefined };
         }
 
-        const { done, value } = await inner.next();
+        // biome-ignore lint/suspicious/noExplicitAny: any is ok
+        const t: Promise<{ done: boolean; value: any }> = new Promise(
+          (_, reject) => {
+            clock = setTimeout(() => {
+              reject(new TimeoutError(timeout));
+            }, timeout);
+          },
+        );
 
-        if (done || value.message === undefined) {
-          return { done: true, value: undefined };
-        }
+        try {
+          const { done, value } = await Promise.race([inner.next(), t]);
 
-        const decodedMessage = decoder(value.message);
+          clearTimeout(clock);
 
-        if (endingCursor) {
-          assert(value.message.$case === "data");
-          assert(decodedMessage._tag === "data");
+          if (done || value.message === undefined) {
+            return { done: true, value: undefined };
+          }
 
-          const { orderKey, uniqueKey } = endingCursor;
-          const endCursor = decodedMessage.data.endCursor;
+          const decodedMessage = decoder(value.message);
 
-          // Check if the orderKey matches
-          if (orderKey === endCursor?.orderKey) {
-            // If a uniqueKey is specified, it must also match
-            if (!uniqueKey || uniqueKey === endCursor.uniqueKey) {
-              shouldStop = true;
-              return { done: false, value: decodedMessage };
+          if (endingCursor) {
+            assert(value.message.$case === "data");
+            assert(decodedMessage._tag === "data");
+
+            const { orderKey, uniqueKey } = endingCursor;
+            const endCursor = decodedMessage.data.endCursor;
+
+            // Check if the orderKey matches
+            if (orderKey === endCursor?.orderKey) {
+              // If a uniqueKey is specified, it must also match
+              if (!uniqueKey || uniqueKey === endCursor.uniqueKey) {
+                shouldStop = true;
+                return { done: false, value: decodedMessage };
+              }
             }
           }
-        }
 
-        return {
-          done: false,
-          value: decodedMessage,
-        };
+          return {
+            done: false,
+            value: decodedMessage,
+          };
+        } finally {
+          clearTimeout(clock);
+        }
       },
     };
   }
