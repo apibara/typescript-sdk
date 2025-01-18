@@ -518,7 +518,11 @@ export interface Event {
     | FieldElement
     | undefined;
   /** Transaction status. */
-  readonly transactionStatus?: TransactionStatus | undefined;
+  readonly transactionStatus?:
+    | TransactionStatus
+    | undefined;
+  /** Event index in the transaction. */
+  readonly eventIndexInTransaction?: number | undefined;
 }
 
 export interface MessageToL1 {
@@ -550,7 +554,11 @@ export interface MessageToL1 {
     | FieldElement
     | undefined;
   /** Transaction status. */
-  readonly transactionStatus?: TransactionStatus | undefined;
+  readonly transactionStatus?:
+    | TransactionStatus
+    | undefined;
+  /** Message index in the transaction. */
+  readonly messageIndexInTransaction?: number | undefined;
 }
 
 /** Price of a unit of a resource. */
@@ -4141,6 +4149,7 @@ function createBaseEvent(): Event {
     transactionIndex: 0,
     transactionHash: undefined,
     transactionStatus: 0,
+    eventIndexInTransaction: 0,
   };
 }
 
@@ -4177,6 +4186,9 @@ export const Event = {
     }
     if (message.transactionStatus !== undefined && message.transactionStatus !== 0) {
       writer.uint32(64).int32(message.transactionStatus);
+    }
+    if (message.eventIndexInTransaction !== undefined && message.eventIndexInTransaction !== 0) {
+      writer.uint32(72).uint32(message.eventIndexInTransaction);
     }
     return writer;
   },
@@ -4254,6 +4266,13 @@ export const Event = {
 
           message.transactionStatus = reader.int32() as any;
           continue;
+        case 9:
+          if (tag !== 72) {
+            break;
+          }
+
+          message.eventIndexInTransaction = reader.uint32();
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -4275,6 +4294,9 @@ export const Event = {
       transactionIndex: isSet(object.transactionIndex) ? globalThis.Number(object.transactionIndex) : 0,
       transactionHash: isSet(object.transactionHash) ? FieldElement.fromJSON(object.transactionHash) : undefined,
       transactionStatus: isSet(object.transactionStatus) ? transactionStatusFromJSON(object.transactionStatus) : 0,
+      eventIndexInTransaction: isSet(object.eventIndexInTransaction)
+        ? globalThis.Number(object.eventIndexInTransaction)
+        : 0,
     };
   },
 
@@ -4304,6 +4326,9 @@ export const Event = {
     if (message.transactionStatus !== undefined && message.transactionStatus !== 0) {
       obj.transactionStatus = transactionStatusToJSON(message.transactionStatus);
     }
+    if (message.eventIndexInTransaction !== undefined && message.eventIndexInTransaction !== 0) {
+      obj.eventIndexInTransaction = Math.round(message.eventIndexInTransaction);
+    }
     return obj;
   },
 
@@ -4324,6 +4349,7 @@ export const Event = {
       ? FieldElement.fromPartial(object.transactionHash)
       : undefined;
     message.transactionStatus = object.transactionStatus ?? 0;
+    message.eventIndexInTransaction = object.eventIndexInTransaction ?? 0;
     return message;
   },
 };
@@ -4338,6 +4364,7 @@ function createBaseMessageToL1(): MessageToL1 {
     transactionIndex: 0,
     transactionHash: undefined,
     transactionStatus: 0,
+    messageIndexInTransaction: 0,
   };
 }
 
@@ -4372,6 +4399,9 @@ export const MessageToL1 = {
     }
     if (message.transactionStatus !== undefined && message.transactionStatus !== 0) {
       writer.uint32(64).int32(message.transactionStatus);
+    }
+    if (message.messageIndexInTransaction !== undefined && message.messageIndexInTransaction !== 0) {
+      writer.uint32(72).uint32(message.messageIndexInTransaction);
     }
     return writer;
   },
@@ -4449,6 +4479,13 @@ export const MessageToL1 = {
 
           message.transactionStatus = reader.int32() as any;
           continue;
+        case 9:
+          if (tag !== 72) {
+            break;
+          }
+
+          message.messageIndexInTransaction = reader.uint32();
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -4472,6 +4509,9 @@ export const MessageToL1 = {
       transactionIndex: isSet(object.transactionIndex) ? globalThis.Number(object.transactionIndex) : 0,
       transactionHash: isSet(object.transactionHash) ? FieldElement.fromJSON(object.transactionHash) : undefined,
       transactionStatus: isSet(object.transactionStatus) ? transactionStatusFromJSON(object.transactionStatus) : 0,
+      messageIndexInTransaction: isSet(object.messageIndexInTransaction)
+        ? globalThis.Number(object.messageIndexInTransaction)
+        : 0,
     };
   },
 
@@ -4501,6 +4541,9 @@ export const MessageToL1 = {
     if (message.transactionStatus !== undefined && message.transactionStatus !== 0) {
       obj.transactionStatus = transactionStatusToJSON(message.transactionStatus);
     }
+    if (message.messageIndexInTransaction !== undefined && message.messageIndexInTransaction !== 0) {
+      obj.messageIndexInTransaction = Math.round(message.messageIndexInTransaction);
+    }
     return obj;
   },
 
@@ -4523,6 +4566,7 @@ export const MessageToL1 = {
       ? FieldElement.fromPartial(object.transactionHash)
       : undefined;
     message.transactionStatus = object.transactionStatus ?? 0;
+    message.messageIndexInTransaction = object.messageIndexInTransaction ?? 0;
     return message;
   },
 };
