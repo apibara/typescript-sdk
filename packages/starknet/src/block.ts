@@ -76,13 +76,13 @@ export const U128 = Schema.transform(
 );
 
 export const ResourceBounds = Schema.Struct({
-  maxAmount: Schema.optional(Schema.BigIntFromSelf),
-  maxPricePerUnit: Schema.optional(U128),
+  maxAmount: Schema.BigIntFromSelf,
+  maxPricePerUnit: U128,
 });
 
 export const ResourceBoundsMapping = Schema.Struct({
-  l1Gas: Schema.optional(ResourceBounds),
-  l2Gas: Schema.optional(ResourceBounds),
+  l1Gas: ResourceBounds,
+  l2Gas: ResourceBounds,
 });
 
 export const DataAvailabilityMode = Schema.transform(
@@ -120,15 +120,15 @@ export const DataAvailabilityMode = Schema.transform(
  */
 export const BlockHeader = Schema.Struct({
   blockHash: Schema.optional(FieldElement),
-  parentBlockHash: Schema.optional(FieldElement),
+  parentBlockHash: FieldElement,
   blockNumber: Schema.BigIntFromSelf,
-  sequencerAddress: Schema.optional(FieldElement),
+  sequencerAddress: FieldElement,
   newRoot: Schema.optional(FieldElement),
-  timestamp: Schema.optional(Schema.DateFromSelf),
-  starknetVersion: Schema.optional(Schema.String),
-  l1GasPrice: Schema.optional(ResourcePrice),
-  l1DataGasPrice: Schema.optional(ResourcePrice),
-  l1DataAvailabilityMode: Schema.optional(L1DataAvailabilityMode),
+  timestamp: Schema.DateFromSelf,
+  starknetVersion: Schema.String,
+  l1GasPrice: ResourcePrice,
+  l1DataGasPrice: ResourcePrice,
+  l1DataAvailabilityMode: L1DataAvailabilityMode,
 });
 
 export type BlockHeader = typeof BlockHeader.Type;
@@ -142,9 +142,9 @@ export type BlockHeader = typeof BlockHeader.Type;
  * @prop transactionStatus The transaction status.
  */
 export const TransactionMeta = Schema.Struct({
-  transactionIndex: Schema.optional(Schema.Number),
-  transactionHash: Schema.optional(FieldElement),
-  transactionStatus: Schema.optional(TransactionStatus),
+  transactionIndex: Schema.Number,
+  transactionHash: FieldElement,
+  transactionStatus: TransactionStatus,
 });
 
 export type TransactionMeta = typeof TransactionMeta.Type;
@@ -152,135 +152,135 @@ export type TransactionMeta = typeof TransactionMeta.Type;
 export const InvokeTransactionV0 = Schema.Struct({
   _tag: tag("invokeV0"),
   invokeV0: Schema.Struct({
-    maxFee: Schema.optional(FieldElement),
-    signature: Schema.optional(Schema.Array(FieldElement)),
-    contractAddress: Schema.optional(FieldElement),
-    entryPointSelector: Schema.optional(FieldElement),
-    calldata: Schema.optional(Schema.Array(FieldElement)),
+    maxFee: FieldElement,
+    signature: Schema.Array(FieldElement),
+    contractAddress: FieldElement,
+    entryPointSelector: FieldElement,
+    calldata: Schema.Array(FieldElement),
   }),
 });
 
 export const InvokeTransactionV1 = Schema.Struct({
   _tag: tag("invokeV1"),
   invokeV1: Schema.Struct({
-    senderAddress: Schema.optional(FieldElement),
-    calldata: Schema.optional(Schema.Array(FieldElement)),
-    maxFee: Schema.optional(FieldElement),
-    signature: Schema.optional(Schema.Array(FieldElement)),
-    nonce: Schema.optional(FieldElement),
+    senderAddress: FieldElement,
+    calldata: Schema.Array(FieldElement),
+    maxFee: FieldElement,
+    signature: Schema.Array(FieldElement),
+    nonce: FieldElement,
   }),
 });
 
 export const InvokeTransactionV3 = Schema.Struct({
   _tag: tag("invokeV3"),
   invokeV3: Schema.Struct({
-    senderAddress: Schema.optional(FieldElement),
-    calldata: Schema.optional(Schema.Array(FieldElement)),
-    signature: Schema.optional(Schema.Array(FieldElement)),
-    nonce: Schema.optional(FieldElement),
-    resourceBounds: Schema.optional(ResourceBoundsMapping),
-    tip: Schema.optional(Schema.BigIntFromSelf),
-    paymasterData: Schema.optional(Schema.Array(FieldElement)),
-    accountDeploymentData: Schema.optional(Schema.Array(FieldElement)),
-    nonceDataAvailabilityMode: Schema.optional(DataAvailabilityMode),
-    feeDataAvailabilityMode: Schema.optional(DataAvailabilityMode),
+    senderAddress: FieldElement,
+    calldata: Schema.Array(FieldElement),
+    signature: Schema.Array(FieldElement),
+    nonce: FieldElement,
+    resourceBounds: ResourceBoundsMapping,
+    tip: Schema.BigIntFromSelf,
+    paymasterData: Schema.Array(FieldElement),
+    accountDeploymentData: Schema.Array(FieldElement),
+    nonceDataAvailabilityMode: DataAvailabilityMode,
+    feeDataAvailabilityMode: DataAvailabilityMode,
   }),
 });
 
 export const L1HandlerTransaction = Schema.Struct({
   _tag: tag("l1Handler"),
   l1Handler: Schema.Struct({
-    nonce: Schema.optional(Schema.BigIntFromSelf),
-    contractAddress: Schema.optional(FieldElement),
-    entryPointSelector: Schema.optional(FieldElement),
-    calldata: Schema.optional(Schema.Array(FieldElement)),
+    nonce: Schema.BigIntFromSelf,
+    contractAddress: FieldElement,
+    entryPointSelector: FieldElement,
+    calldata: Schema.Array(FieldElement),
   }),
 });
 
 export const DeployTransaction = Schema.Struct({
   _tag: tag("deploy"),
   deploy: Schema.Struct({
-    contractAddressSalt: Schema.optional(FieldElement),
-    constructorCalldata: Schema.optional(Schema.Array(FieldElement)),
-    classHash: Schema.optional(FieldElement),
+    contractAddressSalt: FieldElement,
+    constructorCalldata: Schema.Array(FieldElement),
+    classHash: FieldElement,
   }),
 });
 
 export const DeclareTransactionV0 = Schema.Struct({
   _tag: tag("declareV0"),
   declareV0: Schema.Struct({
-    senderAddress: Schema.optional(FieldElement),
-    maxFee: Schema.optional(FieldElement),
-    signature: Schema.optional(Schema.Array(FieldElement)),
-    classHash: Schema.optional(FieldElement),
+    senderAddress: FieldElement,
+    maxFee: FieldElement,
+    signature: Schema.Array(FieldElement),
+    classHash: FieldElement,
   }),
 });
 
 export const DeclareTransactionV1 = Schema.Struct({
   _tag: tag("declareV1"),
   declareV1: Schema.Struct({
-    senderAddress: Schema.optional(FieldElement),
-    maxFee: Schema.optional(FieldElement),
-    signature: Schema.optional(Schema.Array(FieldElement)),
-    nonce: Schema.optional(FieldElement),
-    classHash: Schema.optional(FieldElement),
+    senderAddress: FieldElement,
+    maxFee: FieldElement,
+    signature: Schema.Array(FieldElement),
+    nonce: FieldElement,
+    classHash: FieldElement,
   }),
 });
 
 export const DeclareTransactionV2 = Schema.Struct({
   _tag: tag("declareV2"),
   declareV2: Schema.Struct({
-    senderAddress: Schema.optional(FieldElement),
-    compiledClassHash: Schema.optional(FieldElement),
-    maxFee: Schema.optional(FieldElement),
-    signature: Schema.optional(Schema.Array(FieldElement)),
-    nonce: Schema.optional(FieldElement),
-    classHash: Schema.optional(FieldElement),
+    senderAddress: FieldElement,
+    compiledClassHash: FieldElement,
+    maxFee: FieldElement,
+    signature: Schema.Array(FieldElement),
+    nonce: FieldElement,
+    classHash: FieldElement,
   }),
 });
 
 export const DeclareTransactionV3 = Schema.Struct({
   _tag: tag("declareV3"),
   declareV3: Schema.Struct({
-    senderAddress: Schema.optional(FieldElement),
-    compiledClassHash: Schema.optional(FieldElement),
-    signature: Schema.optional(Schema.Array(FieldElement)),
-    nonce: Schema.optional(FieldElement),
-    classHash: Schema.optional(FieldElement),
-    resourceBounds: Schema.optional(ResourceBoundsMapping),
-    tip: Schema.optional(Schema.BigIntFromSelf),
-    paymasterData: Schema.optional(Schema.Array(FieldElement)),
-    accountDeploymentData: Schema.optional(Schema.Array(FieldElement)),
-    nonceDataAvailabilityMode: Schema.optional(DataAvailabilityMode),
-    feeDataAvailabilityMode: Schema.optional(DataAvailabilityMode),
+    senderAddress: FieldElement,
+    compiledClassHash: FieldElement,
+    signature: Schema.Array(FieldElement),
+    nonce: FieldElement,
+    classHash: FieldElement,
+    resourceBounds: ResourceBoundsMapping,
+    tip: Schema.BigIntFromSelf,
+    paymasterData: Schema.Array(FieldElement),
+    accountDeploymentData: Schema.Array(FieldElement),
+    nonceDataAvailabilityMode: DataAvailabilityMode,
+    feeDataAvailabilityMode: DataAvailabilityMode,
   }),
 });
 
 export const DeployAccountTransactionV1 = Schema.Struct({
   _tag: tag("deployAccountV1"),
   deployAccountV1: Schema.Struct({
-    maxFee: Schema.optional(FieldElement),
-    signature: Schema.optional(Schema.Array(FieldElement)),
-    nonce: Schema.optional(FieldElement),
-    contractAddressSalt: Schema.optional(FieldElement),
-    constructorCalldata: Schema.optional(Schema.Array(FieldElement)),
-    classHash: Schema.optional(FieldElement),
+    maxFee: FieldElement,
+    signature: Schema.Array(FieldElement),
+    nonce: FieldElement,
+    contractAddressSalt: FieldElement,
+    constructorCalldata: Schema.Array(FieldElement),
+    classHash: FieldElement,
   }),
 });
 
 export const DeployAccountTransactionV3 = Schema.Struct({
   _tag: tag("deployAccountV3"),
   deployAccountV3: Schema.Struct({
-    signature: Schema.optional(Schema.Array(FieldElement)),
-    nonce: Schema.optional(FieldElement),
-    contractAddressSalt: Schema.optional(FieldElement),
-    constructorCalldata: Schema.optional(Schema.Array(FieldElement)),
-    classHash: Schema.optional(FieldElement),
-    resourceBounds: Schema.optional(ResourceBoundsMapping),
-    tip: Schema.optional(Schema.BigIntFromSelf),
-    paymasterData: Schema.optional(Schema.Array(FieldElement)),
-    nonceDataAvailabilityMode: Schema.optional(DataAvailabilityMode),
-    feeDataAvailabilityMode: Schema.optional(DataAvailabilityMode),
+    signature: Schema.Array(FieldElement),
+    nonce: FieldElement,
+    contractAddressSalt: FieldElement,
+    constructorCalldata: Schema.Array(FieldElement),
+    classHash: FieldElement,
+    resourceBounds: ResourceBoundsMapping,
+    tip: Schema.BigIntFromSelf,
+    paymasterData: Schema.Array(FieldElement),
+    nonceDataAvailabilityMode: DataAvailabilityMode,
+    feeDataAvailabilityMode: DataAvailabilityMode,
   }),
 });
 
@@ -289,22 +289,20 @@ export const DeployAccountTransactionV3 = Schema.Struct({
  * @prop meta Transaction metadata.
  */
 export const Transaction = Schema.Struct({
-  filterIds: Schema.optional(Schema.Array(Schema.Number)),
-  meta: Schema.optional(TransactionMeta),
-  transaction: Schema.optional(
-    Schema.Union(
-      InvokeTransactionV0,
-      InvokeTransactionV1,
-      InvokeTransactionV3,
-      L1HandlerTransaction,
-      DeployTransaction,
-      DeclareTransactionV0,
-      DeclareTransactionV1,
-      DeclareTransactionV2,
-      DeclareTransactionV3,
-      DeployAccountTransactionV1,
-      DeployAccountTransactionV3,
-    ),
+  filterIds: Schema.Array(Schema.Number),
+  meta: TransactionMeta,
+  transaction: Schema.Union(
+    InvokeTransactionV0,
+    InvokeTransactionV1,
+    InvokeTransactionV3,
+    L1HandlerTransaction,
+    DeployTransaction,
+    DeclareTransactionV0,
+    DeclareTransactionV1,
+    DeclareTransactionV2,
+    DeclareTransactionV3,
+    DeployAccountTransactionV1,
+    DeployAccountTransactionV3,
   ),
 });
 
@@ -331,12 +329,12 @@ export const PriceUnit = Schema.transform(
 );
 
 export const FeePayment = Schema.Struct({
-  amount: Schema.optional(FieldElement),
-  unit: Schema.optional(PriceUnit),
+  amount: FieldElement,
+  unit: PriceUnit,
 });
 
 export const ComputationResources = Schema.Struct({
-  steps: Schema.optional(Schema.BigIntFromSelf),
+  steps: Schema.BigIntFromSelf,
   memoryHoles: Schema.optional(Schema.BigIntFromSelf),
   rangeCheckBuiltinApplications: Schema.optional(Schema.BigIntFromSelf),
   pedersenBuiltinApplications: Schema.optional(Schema.BigIntFromSelf),
@@ -349,13 +347,13 @@ export const ComputationResources = Schema.Struct({
 });
 
 export const DataAvailabilityResources = Schema.Struct({
-  l1Gas: Schema.optional(Schema.BigIntFromSelf),
-  l1DataGas: Schema.optional(Schema.BigIntFromSelf),
+  l1Gas: Schema.BigIntFromSelf,
+  l1DataGas: Schema.BigIntFromSelf,
 });
 
 export const ExecutionResources = Schema.Struct({
-  computation: Schema.optional(ComputationResources),
-  dataAvailability: Schema.optional(DataAvailabilityResources),
+  computation: ComputationResources,
+  dataAvailability: DataAvailabilityResources,
 });
 
 export const ExecutionSucceeded = Schema.Struct({
@@ -372,13 +370,11 @@ export const ExecutionReverted = Schema.Struct({
 
 /** Common fields for all transaction receipts. */
 export const TransactionReceiptMeta = Schema.Struct({
-  transactionIndex: Schema.optional(Schema.Number),
-  transactionHash: Schema.optional(FieldElement),
-  actualFee: Schema.optional(FeePayment),
-  executionResources: Schema.optional(ExecutionResources),
-  executionResult: Schema.optional(
-    Schema.Union(ExecutionSucceeded, ExecutionReverted),
-  ),
+  transactionIndex: Schema.Number,
+  transactionHash: FieldElement,
+  actualFee: FeePayment,
+  executionResources: ExecutionResources,
+  executionResult: Schema.Union(ExecutionSucceeded, ExecutionReverted),
 });
 
 export const InvokeTransactionReceipt = Schema.Struct({
@@ -389,7 +385,7 @@ export const InvokeTransactionReceipt = Schema.Struct({
 export const L1HandlerTransactionReceipt = Schema.Struct({
   _tag: tag("l1Handler"),
   l1Handler: Schema.Struct({
-    messageHash: Schema.optional(Schema.Uint8ArrayFromSelf),
+    messageHash: Schema.Uint8ArrayFromSelf,
   }),
 });
 
@@ -401,14 +397,14 @@ export const DeclareTransactionReceipt = Schema.Struct({
 export const DeployTransactionReceipt = Schema.Struct({
   _tag: tag("deploy"),
   deploy: Schema.Struct({
-    contractAddress: Schema.optional(FieldElement),
+    contractAddress: FieldElement,
   }),
 });
 
 export const DeployAccountTransactionReceipt = Schema.Struct({
   _tag: tag("deployAccount"),
   deployAccount: Schema.Struct({
-    contractAddress: Schema.optional(FieldElement),
+    contractAddress: FieldElement,
   }),
 });
 
@@ -418,16 +414,14 @@ export const DeployAccountTransactionReceipt = Schema.Struct({
  * @prop receipt Transaction-specific receipt.
  */
 export const TransactionReceipt = Schema.Struct({
-  filterIds: Schema.optional(Schema.Array(Schema.Number)),
-  meta: Schema.optional(TransactionReceiptMeta),
-  receipt: Schema.optional(
-    Schema.Union(
-      InvokeTransactionReceipt,
-      L1HandlerTransactionReceipt,
-      DeclareTransactionReceipt,
-      DeployTransactionReceipt,
-      DeployAccountTransactionReceipt,
-    ),
+  filterIds: Schema.Array(Schema.Number),
+  meta: TransactionReceiptMeta,
+  receipt: Schema.Union(
+    InvokeTransactionReceipt,
+    L1HandlerTransactionReceipt,
+    DeclareTransactionReceipt,
+    DeployTransactionReceipt,
+    DeployAccountTransactionReceipt,
   ),
 });
 
@@ -445,15 +439,15 @@ export type TransactionReceipt = typeof TransactionReceipt.Type;
  * @prop eventIndexInTransaction The event index in the transaction.
  */
 export const Event = Schema.Struct({
-  filterIds: Schema.optional(Schema.Array(Schema.Number)),
-  address: Schema.optional(FieldElement),
-  keys: Schema.optional(Schema.Array(FieldElement)),
-  data: Schema.optional(Schema.Array(FieldElement)),
-  eventIndex: Schema.optional(Schema.Number),
-  transactionIndex: Schema.optional(Schema.Number),
-  transactionHash: Schema.optional(FieldElement),
-  transactionStatus: Schema.optional(TransactionStatus),
-  eventIndexInTransaction: Schema.optional(Schema.Number),
+  filterIds: Schema.Array(Schema.Number),
+  address: FieldElement,
+  keys: Schema.Array(FieldElement),
+  data: Schema.Array(FieldElement),
+  eventIndex: Schema.Number,
+  transactionIndex: Schema.Number,
+  transactionHash: FieldElement,
+  transactionStatus: TransactionStatus,
+  eventIndexInTransaction: Schema.Number,
 });
 
 export type Event = typeof Event.Type;
@@ -470,15 +464,15 @@ export type Event = typeof Event.Type;
  * @prop messageIndexInTransaction The message index in the transaction.
  */
 export const MessageToL1 = Schema.Struct({
-  filterIds: Schema.optional(Schema.Array(Schema.Number)),
-  fromAddress: Schema.optional(FieldElement),
-  toAddress: Schema.optional(FieldElement),
-  payload: Schema.optional(Schema.Array(FieldElement)),
-  messageIndex: Schema.optional(Schema.Number),
-  transactionIndex: Schema.optional(Schema.Number),
-  transactionHash: Schema.optional(FieldElement),
-  transactionStatus: Schema.optional(TransactionStatus),
-  messageIndexInTransaction: Schema.optional(Schema.Number),
+  filterIds: Schema.Array(Schema.Number),
+  fromAddress: FieldElement,
+  toAddress: FieldElement,
+  payload: Schema.Array(FieldElement),
+  messageIndex: Schema.Number,
+  transactionIndex: Schema.Number,
+  transactionHash: FieldElement,
+  transactionStatus: TransactionStatus,
+  messageIndexInTransaction: Schema.Number,
 });
 
 export type MessageToL1 = typeof MessageToL1.Type;
@@ -489,8 +483,8 @@ export type MessageToL1 = typeof MessageToL1.Type;
  * @prop value The new value at the storage location.
  */
 export const StorageEntry = Schema.Struct({
-  key: Schema.optional(FieldElement),
-  value: Schema.optional(FieldElement),
+  key: FieldElement,
+  value: FieldElement,
 });
 
 export type StorageEntry = typeof StorageEntry.Type;
@@ -501,9 +495,9 @@ export type StorageEntry = typeof StorageEntry.Type;
  * @prop storageEntries The entries that changed.
  */
 export const StorageDiff = Schema.Struct({
-  filterIds: Schema.optional(Schema.Array(Schema.Number)),
-  contractAddress: Schema.optional(FieldElement),
-  storageEntries: Schema.optional(Schema.Array(StorageEntry)),
+  filterIds: Schema.Array(Schema.Number),
+  contractAddress: FieldElement,
+  storageEntries: Schema.Array(StorageEntry),
 });
 
 export type StorageDiff = typeof StorageDiff.Type;
@@ -559,10 +553,8 @@ export type DeployedContract = typeof DeployedContract.Type;
  * @prop change The change.
  */
 export const ContractChange = Schema.Struct({
-  filterIds: Schema.optional(Schema.Array(Schema.Number)),
-  change: Schema.optional(
-    Schema.Union(DeclaredClass, ReplacedClass, DeployedContract),
-  ),
+  filterIds: Schema.Array(Schema.Number),
+  change: Schema.Union(DeclaredClass, ReplacedClass, DeployedContract),
 });
 
 export type ContractChange = typeof ContractChange.Type;
@@ -573,9 +565,9 @@ export type ContractChange = typeof ContractChange.Type;
  * @prop nonce The new nonce.
  */
 export const NonceUpdate = Schema.Struct({
-  filterIds: Schema.optional(Schema.Array(Schema.Number)),
-  contractAddress: Schema.optional(FieldElement),
-  nonce: Schema.optional(FieldElement),
+  filterIds: Schema.Array(Schema.Number),
+  contractAddress: FieldElement,
+  nonce: FieldElement,
 });
 
 export type NonceUpdate = typeof NonceUpdate.Type;
@@ -591,7 +583,7 @@ export type NonceUpdate = typeof NonceUpdate.Type;
  * @prop contractChanges The changes to contracts and classes.
  */
 export const Block = Schema.Struct({
-  header: Schema.optional(BlockHeader),
+  header: BlockHeader,
   transactions: Schema.Array(Transaction),
   receipts: Schema.Array(TransactionReceipt),
   events: Schema.Array(Event),
