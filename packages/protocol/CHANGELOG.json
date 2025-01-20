@@ -2,6 +2,21 @@
   "name": "@apibara/protocol",
   "entries": [
     {
+      "date": "Mon, 20 Jan 2025 21:39:48 GMT",
+      "version": "2.0.0-beta.37",
+      "tag": "@apibara/protocol_v2.0.0-beta.37",
+      "comments": {
+        "prerelease": [
+          {
+            "author": "francesco@ceccon.me",
+            "package": "@apibara/protocol",
+            "commit": "740f19300f162102e7a15605aa17036131409534",
+            "comment": "protocol: make endCursor non-nullable"
+          }
+        ]
+      }
+    },
+    {
       "date": "Sat, 18 Jan 2025 15:53:04 GMT",
       "version": "2.0.0-beta.33",
       "tag": "@apibara/protocol_v2.0.0-beta.33",

@@ -1,8 +1,16 @@
 # Change Log - @apibara/protocol
 
-<!-- This log was last generated on Sat, 18 Jan 2025 15:53:04 GMT and should not be manually modified. -->
+<!-- This log was last generated on Mon, 20 Jan 2025 21:39:48 GMT and should not be manually modified. -->
 
 <!-- Start content -->
+
+## 2.0.0-beta.37
+
+Mon, 20 Jan 2025 21:39:48 GMT
+
+### Changes
+
+- protocol: make endCursor non-nullable (francesco@ceccon.me)
 
 ## 2.0.0-beta.33
 
