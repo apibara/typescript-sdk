@@ -126,7 +126,7 @@ export type StdErr = typeof StdErr.Type;
 export const SystemMessage = Schema.Struct({
   _tag: tag("systemMessage"),
   systemMessage: Schema.Struct({
-    output: Schema.optional(Schema.Union(StdOut, StdErr)),
+    output: Schema.Union(StdOut, StdErr),
   }),
 });
 
@@ -139,7 +139,7 @@ export const Data = <TA, TR>(
     _tag: tag("data"),
     data: Schema.Struct({
       cursor: Schema.optional(Cursor),
-      endCursor: Schema.optional(Cursor),
+      endCursor: Cursor,
       finality: DataFinality,
       production: DataProduction,
       data: Schema.Array(schema),
@@ -164,7 +164,7 @@ export type StreamDataResponse<TA> =
       _tag: "data";
       data: {
         cursor?: Cursor | undefined;
-        endCursor?: Cursor | undefined;
+        endCursor: Cursor;
         finality: DataFinality;
         production: DataProduction;
         data: readonly (TA | null)[];

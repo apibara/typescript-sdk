@@ -96,6 +96,10 @@ describe("StreamDataResponse", () => {
           finality: "accepted",
           data: [{ value: "hello" }, { value: "world" }],
           production: "backfill",
+          endCursor: {
+            orderKey: 5_000_000n,
+            uniqueKey: "0x1234567890",
+          },
         },
       } as const;
 
@@ -120,6 +124,16 @@ describe("StreamDataResponse", () => {
                 100,
               ],
             ],
+            "endCursor": {
+              "orderKey": 5000000n,
+              "uniqueKey": Uint8Array [
+                18,
+                52,
+                86,
+                120,
+                144,
+              ],
+            },
             "finality": 2,
             "production": 1,
           },
