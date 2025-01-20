@@ -13,6 +13,10 @@ describe("MockClient", () => {
             finality: "finalized",
             data: [{ data: "hello" }],
             production: "backfill",
+            endCursor: {
+              orderKey: 5_000_000n,
+              uniqueKey: "0x1234567890",
+            },
           },
         },
       ];
@@ -33,6 +37,10 @@ describe("MockClient", () => {
                 "data": "hello",
               },
             ],
+            "endCursor": {
+              "orderKey": 5000000n,
+              "uniqueKey": "0x1234567890",
+            },
             "finality": "finalized",
             "production": "backfill",
           },
@@ -50,6 +58,10 @@ describe("MockClient", () => {
             finality: "finalized",
             data: [{ data: "hello" }, null],
             production: "backfill",
+            endCursor: {
+              orderKey: 5_000_000n,
+              uniqueKey: "0x1234567890",
+            },
           },
         },
       ];
@@ -71,6 +83,10 @@ describe("MockClient", () => {
               },
               null,
             ],
+            "endCursor": {
+              "orderKey": 5000000n,
+              "uniqueKey": "0x1234567890",
+            },
             "finality": "finalized",
             "production": "backfill",
           },
