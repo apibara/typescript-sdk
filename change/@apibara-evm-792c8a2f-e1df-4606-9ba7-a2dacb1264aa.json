@@ -1,7 +1,0 @@
-{
-  "type": "prerelease",
-  "comment": "evm: make more fields required",
-  "packageName": "@apibara/evm",
-  "email": "francesco@ceccon.me",
-  "dependentChangeType": "patch"
-}

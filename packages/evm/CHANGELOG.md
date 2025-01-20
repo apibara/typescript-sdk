@@ -1,8 +1,16 @@
 # Change Log - @apibara/evm
 
-<!-- This log was last generated on Sat, 18 Jan 2025 22:34:42 GMT and should not be manually modified. -->
+<!-- This log was last generated on Mon, 20 Jan 2025 15:38:48 GMT and should not be manually modified. -->
 
 <!-- Start content -->
+
+## 2.0.1-beta.27
+
+Mon, 20 Jan 2025 15:38:48 GMT
+
+### Changes
+
+- evm: make more fields required (francesco@ceccon.me)
 
 ## 2.0.1-beta.26
 

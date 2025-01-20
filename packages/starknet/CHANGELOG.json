@@ -2,6 +2,21 @@
   "name": "@apibara/starknet",
   "entries": [
     {
+      "date": "Mon, 20 Jan 2025 15:38:48 GMT",
+      "version": "2.0.0-beta.35",
+      "tag": "@apibara/starknet_v2.0.0-beta.35",
+      "comments": {
+        "prerelease": [
+          {
+            "author": "francesco@ceccon.me",
+            "package": "@apibara/starknet",
+            "commit": "854fcc7400be65217baed478d05c2f009001e378",
+            "comment": "starknet: make some types required"
+          }
+        ]
+      }
+    },
+    {
       "date": "Sat, 18 Jan 2025 22:34:42 GMT",
       "version": "2.0.0-beta.34",
       "tag": "@apibara/starknet_v2.0.0-beta.34",

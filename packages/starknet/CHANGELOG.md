@@ -1,8 +1,16 @@
 # Change Log - @apibara/starknet
 
-<!-- This log was last generated on Sat, 18 Jan 2025 22:34:42 GMT and should not be manually modified. -->
+<!-- This log was last generated on Mon, 20 Jan 2025 15:38:48 GMT and should not be manually modified. -->
 
 <!-- Start content -->
+
+## 2.0.0-beta.35
+
+Mon, 20 Jan 2025 15:38:48 GMT
+
+### Changes
+
+- starknet: make some types required (francesco@ceccon.me)
 
 ## 2.0.0-beta.34
 

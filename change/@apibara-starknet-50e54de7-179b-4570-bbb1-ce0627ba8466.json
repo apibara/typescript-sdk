@@ -1,7 +1,0 @@
-{
-  "type": "prerelease",
-  "comment": "starknet: make some types required",
-  "packageName": "@apibara/starknet",
-  "email": "francesco@ceccon.me",
-  "dependentChangeType": "patch"
-}

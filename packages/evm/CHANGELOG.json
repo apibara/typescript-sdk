@@ -2,6 +2,21 @@
   "name": "@apibara/evm",
   "entries": [
     {
+      "date": "Mon, 20 Jan 2025 15:38:48 GMT",
+      "version": "2.0.1-beta.27",
+      "tag": "@apibara/evm_v2.0.1-beta.27",
+      "comments": {
+        "prerelease": [
+          {
+            "author": "francesco@ceccon.me",
+            "package": "@apibara/evm",
+            "commit": "854fcc7400be65217baed478d05c2f009001e378",
+            "comment": "evm: make more fields required"
+          }
+        ]
+      }
+    },
+    {
       "date": "Sat, 18 Jan 2025 22:34:42 GMT",
       "version": "2.0.1-beta.26",
       "tag": "@apibara/evm_v2.0.1-beta.26",

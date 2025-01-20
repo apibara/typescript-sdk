@@ -2,6 +2,21 @@
   "name": "@apibara/beaconchain",
   "entries": [
     {
+      "date": "Mon, 20 Jan 2025 15:38:48 GMT",
+      "version": "2.0.1-beta.27",
+      "tag": "@apibara/beaconchain_v2.0.1-beta.27",
+      "comments": {
+        "prerelease": [
+          {
+            "author": "francesco@ceccon.me",
+            "package": "@apibara/beaconchain",
+            "commit": "854fcc7400be65217baed478d05c2f009001e378",
+            "comment": "beaconchain: make fields required"
+          }
+        ]
+      }
+    },
+    {
       "date": "Sun, 20 Oct 2024 18:49:49 GMT",
       "version": "2.0.1-beta.0",
       "tag": "@apibara/beaconchain_v2.0.1-beta.0",

@@ -1,7 +1,0 @@
-{
-  "type": "prerelease",
-  "comment": "beaconchain: make fields required",
-  "packageName": "@apibara/beaconchain",
-  "email": "francesco@ceccon.me",
-  "dependentChangeType": "patch"
-}
