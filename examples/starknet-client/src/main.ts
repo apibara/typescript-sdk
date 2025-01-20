@@ -1,16 +1,8 @@
 import assert from "node:assert";
 import { createClient } from "@apibara/protocol";
-import {
-  type Abi,
-  Filter,
-  StarknetStream,
-  decodeEvent,
-  getSelector,
-} from "@apibara/starknet";
+import { type Abi, Filter, StarknetStream } from "@apibara/starknet";
 import { defineCommand, runMain } from "citty";
 import consola from "consola";
-import { colors } from "consola/utils";
-import { formatUnits } from "viem";
 
 const abi = [
   {
@@ -62,20 +54,19 @@ const command = defineCommand({
     console.log(response);
 
     const filter = Filter.make({
-      events: [
-        {
-          address:
-            "0x053c91253bc9682c04929ca02ed00b3e423f6710d2ee7e0d5ebb06f3ecf368a8",
-          keys: [getSelector("Transfer")],
-        },
-      ],
+      transactions: [{ includeReceipt: true }],
+      messages: [{}],
+      events: [{}],
+      storageDiffs: [{}],
+      contractChanges: [{}],
+      nonceUpdates: [{}],
     });
 
     const request = StarknetStream.Request.make({
       filter: [filter],
-      finality: "accepted",
+      finality: "pending",
       startingCursor: {
-        orderKey: 1_078_335n,
+        orderKey: 1_083_705n,
       },
     });
 
@@ -95,14 +86,14 @@ const command = defineCommand({
             );
 
             for (const event of block.events) {
-              const { args, transactionHash } = decodeEvent({
-                abi,
-                eventName: "Transfer",
-                event,
-              });
-              consola.info(
-                `${prettyAddress(args.from)} -> ${prettyAddress(args.to)} ${formatUnits(args.value, 6)} ${colors.gray(transactionHash ?? "")}`,
-              );
+              // const { args, transactionHash } = decodeEvent({
+              //   abi,
+              //   eventName: "Transfer",
+              //   event,
+              // });
+              // consola.info(
+              //   `${prettyAddress(args.from)} -> ${prettyAddress(args.to)} ${formatUnits(args.value, 6)} ${colors.gray(transactionHash ?? "")}`,
+              // );
             }
           }
 

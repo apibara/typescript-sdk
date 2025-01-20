@@ -38,17 +38,9 @@ const command = defineCommand({
     console.log(response);
 
     const filter = Filter.make({
-      // blobs: [{ includeTransaction: true }],
-      // transactions: [
-      //   {
-      //     // create: true,
-      //     // to: "0xFf00000000000000000000000000000000102421",
-      //     // to: "0xAD3C787556B1E9D32D3AE4f2A0B4b1dC6692eDAc",
-      //     // includeBlob: true,
-      //   },
-      // ],
+      validators: [{}],
+      transactions: [{}],
       blobs: [{}],
-      // validators: [{}],
     });
 
     const startBlock = 5_931_000;

@@ -20,7 +20,7 @@ const command = defineCommand({
   args: {
     stream: {
       type: "string",
-      default: "https://sepolia.ethereum.a5a.ch",
+      default: "https://ethereum-sepolia.preview.apibara.org",
       description: "EVM stream URL",
     },
     authToken: {
@@ -36,8 +36,9 @@ const command = defineCommand({
     console.log(response);
 
     const filter = Filter.make({
-      header: "on_data",
-      transactions: [{}],
+      transactions: [
+        { includeReceipt: true, transactionStatus: "all", includeLogs: true },
+      ],
       withdrawals: [{}],
       logs: [{}],
     });
