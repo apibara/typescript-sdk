@@ -36,7 +36,9 @@ const command = defineCommand({
     console.log(response);
 
     const filter = Filter.make({
-      transactions: [{ includeReceipt: true, transactionStatus: "all", includeLogs: true }],
+      transactions: [
+        { includeReceipt: true, transactionStatus: "all", includeLogs: true },
+      ],
       withdrawals: [{}],
       logs: [{}],
     });
