@@ -1,6 +1,6 @@
 {
   "name": "@apibara/starknet",
-  "version": "2.0.0-beta.35",
+  "version": "2.0.0-beta.36",
   "type": "module",
   "files": [
     "dist",

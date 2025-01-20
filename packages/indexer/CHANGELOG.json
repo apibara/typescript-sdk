@@ -2,6 +2,21 @@
   "name": "@apibara/indexer",
   "entries": [
     {
+      "date": "Mon, 20 Jan 2025 16:37:28 GMT",
+      "version": "2.0.0-beta.36",
+      "tag": "@apibara/indexer_v2.0.0-beta.36",
+      "comments": {
+        "prerelease": [
+          {
+            "author": "francesco@ceccon.me",
+            "package": "@apibara/indexer",
+            "commit": "069644dc94de3901ab4b66f00964a9f08d835c4d",
+            "comment": "indexer: add `startingBlock` option"
+          }
+        ]
+      }
+    },
+    {
       "date": "Sat, 18 Jan 2025 15:53:04 GMT",
       "version": "2.0.0-beta.33",
       "tag": "@apibara/indexer_v2.0.0-beta.33",
