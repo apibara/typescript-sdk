@@ -63,11 +63,24 @@ export interface IndexerHooks<TFilter, TBlock> {
   "message:systemMessage": ({ message }: { message: SystemMessage }) => void;
 }
 
-export interface IndexerConfig<TFilter, TBlock> {
+export type IndexerStartingCursor =
+  | {
+      startingCursor?: never;
+      startingBlock: bigint;
+    }
+  | {
+      startingCursor: Cursor;
+      startingBlock?: never;
+    }
+  | {
+      startingCursor?: never;
+      startingBlock?: never;
+    };
+
+export type IndexerConfig<TFilter, TBlock> = {
   streamUrl: string;
   filter: TFilter;
   finality?: DataFinality;
-  startingCursor?: Cursor;
   factory?: ({
     block,
     context,
@@ -84,12 +97,14 @@ export interface IndexerConfig<TFilter, TBlock> {
   hooks?: NestedHooks<IndexerHooks<TFilter, TBlock>>;
   plugins?: ReadonlyArray<IndexerPlugin<TFilter, TBlock>>;
   debug?: boolean;
-}
+} & IndexerStartingCursor;
 
-export interface IndexerWithStreamConfig<TFilter, TBlock>
-  extends IndexerConfig<TFilter, TBlock> {
+export type IndexerWithStreamConfig<TFilter, TBlock> = IndexerConfig<
+  TFilter,
+  TBlock
+> & {
   streamConfig: StreamConfig<TFilter, TBlock>;
-}
+};
 
 export function defineIndexer<TFilter, TBlock>(
   streamConfig: StreamConfig<TFilter, TBlock>,
@@ -203,16 +218,25 @@ export async function run<TFilter, TBlock>(
 
     await indexer.hooks.callHook("run:before");
 
-    // Check if the it's factory mode or not
     const isFactoryMode = indexer.options.factory !== undefined;
 
-    // if factory mode we add a empty filter
+    // Give priority to startingCursor over startingBlock.
+    let startingCursor: Cursor | undefined;
+    if (indexer.options.startingCursor) {
+      startingCursor = indexer.options.startingCursor;
+    } else if (indexer.options.startingBlock !== undefined) {
+      startingCursor = {
+        orderKey: indexer.options.startingBlock,
+      };
+    }
+
+    // if factory mode we add a empty filter at the end of the filter array.
     const request = indexer.streamConfig.Request.make({
       filter: isFactoryMode
         ? [indexer.options.filter, {} as TFilter]
         : [indexer.options.filter],
       finality: indexer.options.finality,
-      startingCursor: indexer.options.startingCursor,
+      startingCursor,
     });
 
     const options: StreamDataOptions = {};
@@ -225,7 +249,6 @@ export async function run<TFilter, TBlock>(
       mainFilter = request.filter[1];
     }
 
-    // create stream
     let stream: AsyncIterator<
       StreamDataResponse<TBlock>,
       StreamDataResponse<TBlock>

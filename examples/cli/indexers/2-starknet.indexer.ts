@@ -33,9 +33,7 @@ export function createIndexer<
   return defineIndexer(StarknetStream)({
     streamUrl: "https://starknet.preview.apibara.org",
     finality: "accepted",
-    startingCursor: {
-      orderKey: 10_30_000n,
-    },
+    startingBlock: 10_30_000n,
     plugins: [
       drizzleStorage({
         db: database,
