@@ -1,0 +1,7 @@
+{
+  "type": "prerelease",
+  "comment": "protocol: make endCursor non-nullable",
+  "packageName": "@apibara/protocol",
+  "email": "francesco@ceccon.me",
+  "dependentChangeType": "patch"
+}
