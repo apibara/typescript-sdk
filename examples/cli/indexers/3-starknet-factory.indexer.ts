@@ -14,9 +14,7 @@ export default function (runtimeConfig: ApibaraRuntimeConfig) {
   return defineIndexer(StarknetStream)({
     streamUrl: "https://starknet.preview.apibara.org",
     finality: "accepted",
-    startingCursor: {
-      orderKey: 800_000n,
-    },
+    startingBlock: 800_000n,
     filter: {
       events: [
         {

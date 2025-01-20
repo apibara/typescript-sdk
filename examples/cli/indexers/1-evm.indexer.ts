@@ -38,9 +38,7 @@ export function createIndexer<
   return defineIndexer(EvmStream)({
     streamUrl: "https://ethereum.preview.apibara.org",
     finality: "accepted",
-    startingCursor: {
-      orderKey: 215_30_000n,
-    },
+    startingBlock: 215_30_000n,
     filter: {
       logs: [
         {
