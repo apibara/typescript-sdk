@@ -7,6 +7,8 @@ export default defineBuildConfig({
     "./src/vcr/index.ts",
     "./src/plugins/index.ts",
     "./src/internal/testing.ts",
+    "./src/internal/plugins.ts",
+    "./src/internal/index.ts",
   ],
   clean: true,
   outDir: "./dist",

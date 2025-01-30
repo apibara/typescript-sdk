@@ -8,7 +8,8 @@ import {
 
 import { useIndexerContext } from "../context";
 import { type IndexerConfig, createIndexer, defineIndexer } from "../indexer";
-import { type IndexerPlugin, defineIndexerPlugin } from "../plugins";
+import { defineIndexerPlugin } from "../plugins";
+import { type InternalContext, internalContext } from "./plugins";
 
 export type MockMessagesOptions = {
   invalidate?: {
@@ -65,21 +66,32 @@ export function generateMockMessages(
   return messages;
 }
 
-export function getMockIndexer({
-  plugins,
-  override,
-}: {
-  plugins?: ReadonlyArray<IndexerPlugin<MockFilter, MockBlock>>;
+type MockIndexerParams = {
+  internalContext?: InternalContext;
   override?: Partial<IndexerConfig<MockFilter, MockBlock>>;
-} = {}) {
+};
+
+export function getMockIndexer(params?: MockIndexerParams) {
+  const { internalContext: contextParams, override } = params ?? {};
+  const { plugins, ...rest } = override ?? {};
+
   return createIndexer(
     defineIndexer(MockStream)({
       streamUrl: "https://sepolia.ethereum.a5a.ch",
       finality: "accepted",
       filter: {},
-      async transform({ block: { data }, context }) {},
-      plugins,
-      ...override,
+      async transform() {},
+      plugins: [
+        internalContext(
+          contextParams ??
+            ({
+              availableIndexers: ["testing"],
+              indexerName: "testing",
+            } as InternalContext),
+        ),
+        ...(plugins ?? []),
+      ],
+      ...(rest ?? {}),
     }),
   );
 }
