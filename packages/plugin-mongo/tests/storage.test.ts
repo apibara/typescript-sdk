@@ -2,7 +2,7 @@ import { run } from "@apibara/indexer";
 import {
   generateMockMessages,
   getMockIndexer,
-} from "@apibara/indexer/internal";
+} from "@apibara/indexer/internal/testing";
 import {
   type MockBlock,
   MockClient,
@@ -10,6 +10,7 @@ import {
 } from "@apibara/protocol/testing";
 import { describe, expect, it } from "vitest";
 
+import { generateIndexerId } from "@apibara/indexer/internal";
 import type { Finalize, Invalidate } from "@apibara/protocol";
 import { MongoClient } from "mongodb";
 import { mongoStorage, useMongoStorage } from "../src";
@@ -30,6 +31,8 @@ type TestSchema = {
     to: number | null;
   };
 };
+
+const indexerId = generateIndexerId("testing");
 
 describe("MongoDB Test", () => {
   it("should store data with a cursor", async () => {
@@ -366,7 +369,6 @@ describe("MongoDB Test", () => {
 
   it("should persist state", async () => {
     const { db, client, dbName } = getRandomDatabase();
-    const indexerName = "persist-test";
 
     const indexer = getMockIndexer({
       override: {
@@ -376,7 +378,6 @@ describe("MongoDB Test", () => {
             dbName,
             collections: ["test"],
             persistState: true,
-            indexerName,
           }),
         ],
         async transform({ endCursor }) {
@@ -420,7 +421,7 @@ describe("MongoDB Test", () => {
       const persistence = await getState({
         db,
         session,
-        indexerName,
+        indexerId,
       });
       expect(persistence).toMatchInlineSnapshot(`
         {
@@ -436,7 +437,6 @@ describe("MongoDB Test", () => {
 
   it("should persist the filters and latest block number (factory mode)", async () => {
     const { db, client, dbName } = getRandomDatabase();
-    const indexerName = "persist-test";
 
     const mockClient = new MockClient<MockFilter, MockBlock>(
       (request, options) => {
@@ -568,16 +568,15 @@ describe("MongoDB Test", () => {
     );
 
     const indexer = getMockIndexer({
-      plugins: [
-        mongoStorage({
-          client,
-          dbName,
-          collections: ["test"],
-          persistState: true,
-          indexerName,
-        }),
-      ],
       override: {
+        plugins: [
+          mongoStorage({
+            client,
+            dbName,
+            collections: ["test"],
+            persistState: true,
+          }),
+        ],
         startingCursor: { orderKey: 100n },
         factory: async ({ block }) => {
           if (block.data === "B") {
@@ -609,7 +608,7 @@ describe("MongoDB Test", () => {
     ).toMatchInlineSnapshot(`
       [
         {
-          "id": "persist-test",
+          "id": "indexer_testing_default",
           "orderKey": 108,
           "uniqueKey": null,
         },
@@ -622,7 +621,7 @@ describe("MongoDB Test", () => {
             "filter": "B",
           },
           "fromBlock": 103,
-          "id": "persist-test",
+          "id": "indexer_testing_default",
           "toBlock": 106,
         },
         {
@@ -630,7 +629,7 @@ describe("MongoDB Test", () => {
             "filter": "BC",
           },
           "fromBlock": 106,
-          "id": "persist-test",
+          "id": "indexer_testing_default",
           "toBlock": null,
         },
       ]
@@ -769,16 +768,15 @@ describe("MongoDB Test", () => {
     );
 
     const indexer = getMockIndexer({
-      plugins: [
-        mongoStorage({
-          client,
-          dbName,
-          collections: ["test"],
-          persistState: true,
-          indexerName,
-        }),
-      ],
       override: {
+        plugins: [
+          mongoStorage({
+            client,
+            dbName,
+            collections: ["test"],
+            persistState: true,
+          }),
+        ],
         startingCursor: { orderKey: 100n },
         factory: async ({ block }) => {
           if (block.data === "B") {
@@ -810,7 +808,7 @@ describe("MongoDB Test", () => {
     ).toMatchInlineSnapshot(`
       [
         {
-          "id": "persist-test",
+          "id": "indexer_testing_default",
           "orderKey": 107,
           "uniqueKey": null,
         },
@@ -823,7 +821,7 @@ describe("MongoDB Test", () => {
             "filter": "B",
           },
           "fromBlock": 103,
-          "id": "persist-test",
+          "id": "indexer_testing_default",
           "toBlock": null,
         },
       ]
@@ -962,16 +960,15 @@ describe("MongoDB Test", () => {
     );
 
     const indexer = getMockIndexer({
-      plugins: [
-        mongoStorage({
-          client,
-          dbName,
-          collections: ["test"],
-          persistState: true,
-          indexerName,
-        }),
-      ],
       override: {
+        plugins: [
+          mongoStorage({
+            client,
+            dbName,
+            collections: ["test"],
+            persistState: true,
+          }),
+        ],
         startingCursor: { orderKey: 100n },
         factory: async ({ block }) => {
           if (block.data === "B") {
@@ -1003,7 +1000,7 @@ describe("MongoDB Test", () => {
     ).toMatchInlineSnapshot(`
       [
         {
-          "id": "persist-test",
+          "id": "indexer_testing_default",
           "orderKey": 107,
           "uniqueKey": null,
         },
@@ -1016,7 +1013,7 @@ describe("MongoDB Test", () => {
             "filter": "BC",
           },
           "fromBlock": 106,
-          "id": "persist-test",
+          "id": "indexer_testing_default",
           "toBlock": null,
         },
       ]

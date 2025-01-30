@@ -2,7 +2,7 @@ import { run } from "@apibara/indexer";
 import {
   generateMockMessages,
   getMockIndexer,
-} from "@apibara/indexer/internal";
+} from "@apibara/indexer/internal/testing";
 import type { Finalize, Invalidate } from "@apibara/protocol";
 import {
   type MockBlock,
@@ -22,9 +22,7 @@ describe("Drizzle test", () => {
 
     const indexer = getMockIndexer({
       override: {
-        plugins: [
-          drizzleStorage({ db, persistState: true, indexerName: "testing" }),
-        ],
+        plugins: [drizzleStorage({ db, persistState: true })],
         async transform({ endCursor, block: { data } }) {
           const { db: tx } = useDrizzleStorage(db);
 
@@ -79,6 +77,7 @@ describe("Drizzle test", () => {
       [
         {
           "cursor": 5000000,
+          "indexer_id": "indexer_testing_default",
           "n": 1,
           "op": "I",
           "row_id": "1",
@@ -87,6 +86,7 @@ describe("Drizzle test", () => {
         },
         {
           "cursor": 5000001,
+          "indexer_id": "indexer_testing_default",
           "n": 2,
           "op": "I",
           "row_id": "2",
@@ -95,6 +95,7 @@ describe("Drizzle test", () => {
         },
         {
           "cursor": 5000002,
+          "indexer_id": "indexer_testing_default",
           "n": 3,
           "op": "I",
           "row_id": "3",
@@ -110,9 +111,7 @@ describe("Drizzle test", () => {
 
     const indexer = getMockIndexer({
       override: {
-        plugins: [
-          drizzleStorage({ db, persistState: true, indexerName: "testing" }),
-        ],
+        plugins: [drizzleStorage({ db, persistState: true })],
         async transform({ endCursor, block: { data } }) {
           const { db: tx } = useDrizzleStorage(db);
 
@@ -166,6 +165,7 @@ describe("Drizzle test", () => {
       [
         {
           "cursor": 5000000,
+          "indexer_id": "indexer_testing_default",
           "n": 1,
           "op": "I",
           "row_id": "1",
@@ -174,6 +174,7 @@ describe("Drizzle test", () => {
         },
         {
           "cursor": 5000001,
+          "indexer_id": "indexer_testing_default",
           "n": 2,
           "op": "U",
           "row_id": "1",
@@ -189,6 +190,7 @@ describe("Drizzle test", () => {
         },
         {
           "cursor": 5000002,
+          "indexer_id": "indexer_testing_default",
           "n": 3,
           "op": "U",
           "row_id": "1",
@@ -211,9 +213,7 @@ describe("Drizzle test", () => {
 
     const indexer = getMockIndexer({
       override: {
-        plugins: [
-          drizzleStorage({ db, persistState: true, indexerName: "testing" }),
-        ],
+        plugins: [drizzleStorage({ db, persistState: true })],
         async transform({ endCursor, block: { data } }) {
           const { db: tx } = useDrizzleStorage(db);
 
@@ -262,6 +262,7 @@ describe("Drizzle test", () => {
       [
         {
           "cursor": 5000000,
+          "indexer_id": "indexer_testing_default",
           "n": 1,
           "op": "I",
           "row_id": "1",
@@ -270,6 +271,7 @@ describe("Drizzle test", () => {
         },
         {
           "cursor": 5000001,
+          "indexer_id": "indexer_testing_default",
           "n": 2,
           "op": "D",
           "row_id": "1",
@@ -285,6 +287,7 @@ describe("Drizzle test", () => {
         },
         {
           "cursor": 5000002,
+          "indexer_id": "indexer_testing_default",
           "n": 3,
           "op": "I",
           "row_id": "2",
@@ -300,9 +303,7 @@ describe("Drizzle test", () => {
 
     const indexer = getMockIndexer({
       override: {
-        plugins: [
-          drizzleStorage({ db, persistState: true, indexerName: "testing" }),
-        ],
+        plugins: [drizzleStorage({ db, persistState: true })],
         async transform({ endCursor, block: { data } }) {
           const { db: tx } = useDrizzleStorage(db);
 
@@ -429,6 +430,7 @@ describe("Drizzle test", () => {
       [
         {
           "cursor": 5000000,
+          "indexer_id": "indexer_testing_default",
           "n": 1,
           "op": "I",
           "row_id": "1",
@@ -437,6 +439,7 @@ describe("Drizzle test", () => {
         },
         {
           "cursor": 5000001,
+          "indexer_id": "indexer_testing_default",
           "n": 2,
           "op": "I",
           "row_id": "2",
@@ -445,6 +448,7 @@ describe("Drizzle test", () => {
         },
         {
           "cursor": 5000002,
+          "indexer_id": "indexer_testing_default",
           "n": 3,
           "op": "I",
           "row_id": "3",
@@ -453,6 +457,7 @@ describe("Drizzle test", () => {
         },
         {
           "cursor": 5000003,
+          "indexer_id": "indexer_testing_default",
           "n": 4,
           "op": "I",
           "row_id": "4",
@@ -461,6 +466,7 @@ describe("Drizzle test", () => {
         },
         {
           "cursor": 5000004,
+          "indexer_id": "indexer_testing_default",
           "n": 5,
           "op": "I",
           "row_id": "5",
@@ -469,6 +475,7 @@ describe("Drizzle test", () => {
         },
         {
           "cursor": 5000004,
+          "indexer_id": "indexer_testing_default",
           "n": 6,
           "op": "U",
           "row_id": "5",
@@ -484,6 +491,7 @@ describe("Drizzle test", () => {
         },
         {
           "cursor": 5000005,
+          "indexer_id": "indexer_testing_default",
           "n": 7,
           "op": "I",
           "row_id": "6",
@@ -492,6 +500,7 @@ describe("Drizzle test", () => {
         },
         {
           "cursor": 5000009,
+          "indexer_id": "indexer_testing_default",
           "n": 13,
           "op": "I",
           "row_id": "10",
@@ -508,9 +517,7 @@ describe("Drizzle test", () => {
 
     const indexer = getMockIndexer({
       override: {
-        plugins: [
-          drizzleStorage({ db, persistState: true, indexerName: "testing" }),
-        ],
+        plugins: [drizzleStorage({ db, persistState: true })],
         async transform({ endCursor, block: { data } }) {
           const { db: tx } = useDrizzleStorage(db);
 
@@ -632,9 +639,7 @@ describe("Drizzle test", () => {
 
     const indexer = getMockIndexer({
       override: {
-        plugins: [
-          drizzleStorage({ db, persistState: true, indexerName: "testing" }),
-        ],
+        plugins: [drizzleStorage({ db, persistState: true })],
         async transform({ endCursor, block: { data } }) {
           const { db: tx } = useDrizzleStorage(db);
 
@@ -673,7 +678,7 @@ describe("Drizzle test", () => {
     expect(checkpointsResult).toMatchInlineSnapshot(`
       [
         {
-          "id": "testing",
+          "id": "indexer_testing_default",
           "orderKey": 5000005,
           "uniqueKey": "",
         },
@@ -815,9 +820,7 @@ describe("Drizzle test", () => {
 
     const indexer = getMockIndexer({
       override: {
-        plugins: [
-          drizzleStorage({ db, persistState: true, indexerName: "testing" }),
-        ],
+        plugins: [drizzleStorage({ db, persistState: true })],
         startingCursor: { orderKey: 100n },
         factory: async ({ block }) => {
           if (block.data === "B") {
@@ -841,7 +844,7 @@ describe("Drizzle test", () => {
     expect(checkpointsResult).toMatchInlineSnapshot(`
       [
         {
-          "id": "testing",
+          "id": "indexer_testing_default",
           "orderKey": 108,
           "uniqueKey": "",
         },
@@ -854,7 +857,7 @@ describe("Drizzle test", () => {
       	"filter": "B"
       }",
           "fromBlock": 103,
-          "id": "testing",
+          "id": "indexer_testing_default",
           "toBlock": 106,
         },
         {
@@ -862,7 +865,7 @@ describe("Drizzle test", () => {
       	"filter": "BC"
       }",
           "fromBlock": 106,
-          "id": "testing",
+          "id": "indexer_testing_default",
           "toBlock": null,
         },
       ]
@@ -1001,9 +1004,7 @@ describe("Drizzle test", () => {
 
     const indexer = getMockIndexer({
       override: {
-        plugins: [
-          drizzleStorage({ db, persistState: true, indexerName: "testing" }),
-        ],
+        plugins: [drizzleStorage({ db, persistState: true })],
         startingCursor: { orderKey: 100n },
         factory: async ({ block }) => {
           if (block.data === "B") {
@@ -1027,7 +1028,7 @@ describe("Drizzle test", () => {
     expect(checkpointsResult).toMatchInlineSnapshot(`
       [
         {
-          "id": "testing",
+          "id": "indexer_testing_default",
           "orderKey": 107,
           "uniqueKey": "",
         },
@@ -1040,7 +1041,7 @@ describe("Drizzle test", () => {
       	"filter": "B"
       }",
           "fromBlock": 103,
-          "id": "testing",
+          "id": "indexer_testing_default",
           "toBlock": null,
         },
       ]
@@ -1179,9 +1180,7 @@ describe("Drizzle test", () => {
 
     const indexer = getMockIndexer({
       override: {
-        plugins: [
-          drizzleStorage({ db, persistState: true, indexerName: "testing" }),
-        ],
+        plugins: [drizzleStorage({ db, persistState: true })],
         startingCursor: { orderKey: 100n },
         factory: async ({ block }) => {
           if (block.data === "B") {
@@ -1205,7 +1204,7 @@ describe("Drizzle test", () => {
     expect(checkpointsResult).toMatchInlineSnapshot(`
       [
         {
-          "id": "testing",
+          "id": "indexer_testing_default",
           "orderKey": 107,
           "uniqueKey": "",
         },
@@ -1218,7 +1217,7 @@ describe("Drizzle test", () => {
       	"filter": "BC"
       }",
           "fromBlock": 106,
-          "id": "testing",
+          "id": "indexer_testing_default",
           "toBlock": null,
         },
       ]
@@ -1230,9 +1229,7 @@ describe("Drizzle test", () => {
 
     const indexer = getMockIndexer({
       override: {
-        plugins: [
-          drizzleStorage({ db, persistState: true, indexerName: "testing" }),
-        ],
+        plugins: [drizzleStorage({ db, persistState: true })],
         async transform({ endCursor, block: { data } }) {
           const { db: tx } = useDrizzleStorage(db);
 
