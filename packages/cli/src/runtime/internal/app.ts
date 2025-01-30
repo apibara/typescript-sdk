@@ -1,13 +1,15 @@
 import { createIndexer as _createIndexer } from "@apibara/indexer";
 import {
+  type InternalContext,
+  internalContext,
+} from "@apibara/indexer/internal/plugins";
+import {
   type ConsolaReporter,
   inMemoryPersistence,
   logger,
 } from "@apibara/indexer/plugins";
-
 import { config } from "#apibara-internal-virtual/config";
 import { indexers } from "#apibara-internal-virtual/indexers";
-
 import { createLogger } from "./logger";
 
 export const availableIndexers = indexers.map((i) => i.name);
@@ -63,6 +65,10 @@ export function createIndexer(indexerName: string, preset?: string) {
   // persistence plugin.
   // Put the logger last since we want to override any user-defined logger.
   definition.plugins = [
+    internalContext({
+      indexerName,
+      availableIndexers,
+    } as InternalContext),
     inMemoryPersistence(),
     ...(definition.plugins ?? []),
     logger({ logger: reporter }),
