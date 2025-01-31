@@ -16,6 +16,11 @@ import {
   text,
 } from "drizzle-orm/pg-core";
 import { DrizzleStorageError } from "./utils";
+
+function getReorgTriggerName(table: string, indexerId: string) {
+  return `${table}_reorg_${indexerId}`;
+}
+
 export type ReorgOperation = "I" | "U" | "D";
 
 export const reorgRollbackTable = pgTable("__reorg_rollback", {
@@ -25,6 +30,7 @@ export const reorgRollbackTable = pgTable("__reorg_rollback", {
   cursor: integer("cursor").notNull(),
   row_id: text("row_id"),
   row_value: jsonb("row_value"),
+  indexer_id: text("indexer_id").notNull(),
 });
 
 export type ReorgRollbackRow = typeof reorgRollbackTable.$inferSelect;
@@ -34,7 +40,7 @@ export async function initializeReorgRollbackTable<
   TFullSchema extends Record<string, unknown> = Record<string, never>,
   TSchema extends
     TablesRelationalConfig = ExtractTablesWithRelations<TFullSchema>,
->(tx: PgTransaction<TQueryResult, TFullSchema, TSchema>) {
+>(tx: PgTransaction<TQueryResult, TFullSchema, TSchema>, indexerId: string) {
   try {
     // Create the audit log table
     await tx.execute(
@@ -45,41 +51,58 @@ export async function initializeReorgRollbackTable<
           table_name TEXT NOT NULL,
           cursor INTEGER NOT NULL,
           row_id TEXT,
-          row_value JSONB
+          row_value JSONB,
+          indexer_id TEXT NOT NULL
         );
       `),
     );
 
-    // Create the trigger function
     await tx.execute(
       sql.raw(`
-        CREATE OR REPLACE FUNCTION reorg_checkpoint()
-        RETURNS TRIGGER AS $$
-        DECLARE
-          id_col TEXT := TG_ARGV[0]::TEXT;
-          order_key INTEGER := TG_ARGV[1]::INTEGER;
-          new_id_value TEXT := row_to_json(NEW.*)->>id_col;
-          old_id_value TEXT := row_to_json(OLD.*)->>id_col;
-        BEGIN
-          IF (TG_OP = 'DELETE') THEN
-            INSERT INTO __reorg_rollback(op, table_name, cursor, row_id, row_value)
-              SELECT 'D', TG_TABLE_NAME, order_key, old_id_value, row_to_json(OLD.*);
-          ELSIF (TG_OP = 'UPDATE') THEN
-            INSERT INTO __reorg_rollback(op, table_name, cursor, row_id, row_value)
-              SELECT 'U', TG_TABLE_NAME, order_key, new_id_value, row_to_json(OLD.*);
-          ELSIF (TG_OP = 'INSERT') THEN
-            INSERT INTO __reorg_rollback(op, table_name, cursor, row_id, row_value)
-              SELECT 'I', TG_TABLE_NAME, order_key, new_id_value, null;
-          END IF;
-          RETURN NULL;
-        END;
-        $$ LANGUAGE plpgsql;
+        CREATE INDEX IF NOT EXISTS idx_reorg_rollback_indexer_id_cursor ON __reorg_rollback(indexer_id, cursor);
       `),
     );
   } catch (error) {
     throw new DrizzleStorageError("Failed to initialize reorg rollback table", {
       cause: error,
     });
+  }
+
+  try {
+    // Create the trigger function
+    await tx.execute(
+      sql.raw(`
+      CREATE OR REPLACE FUNCTION reorg_checkpoint()
+      RETURNS TRIGGER AS $$
+      DECLARE
+        id_col TEXT := TG_ARGV[0]::TEXT;
+        order_key INTEGER := TG_ARGV[1]::INTEGER;
+        indexer_id TEXT := TG_ARGV[2]::TEXT;
+        new_id_value TEXT := row_to_json(NEW.*)->>id_col;
+        old_id_value TEXT := row_to_json(OLD.*)->>id_col;
+      BEGIN
+        IF (TG_OP = 'DELETE') THEN
+          INSERT INTO __reorg_rollback(op, table_name, cursor, row_id, row_value, indexer_id)
+            SELECT 'D', TG_TABLE_NAME, order_key, old_id_value, row_to_json(OLD.*), indexer_id;
+        ELSIF (TG_OP = 'UPDATE') THEN
+          INSERT INTO __reorg_rollback(op, table_name, cursor, row_id, row_value, indexer_id)
+            SELECT 'U', TG_TABLE_NAME, order_key, new_id_value, row_to_json(OLD.*), indexer_id;
+        ELSIF (TG_OP = 'INSERT') THEN
+          INSERT INTO __reorg_rollback(op, table_name, cursor, row_id, row_value, indexer_id)
+            SELECT 'I', TG_TABLE_NAME, order_key, new_id_value, null, indexer_id;
+        END IF;
+        RETURN NULL;
+      END;
+      $$ LANGUAGE plpgsql;
+    `),
+    );
+  } catch (error) {
+    throw new DrizzleStorageError(
+      "Failed to create reorg checkpoint function",
+      {
+        cause: error,
+      },
+    );
   }
 }
 
@@ -93,18 +116,21 @@ export async function registerTriggers<
   tables: string[],
   endCursor: Cursor,
   idColumn: string,
+  indexerId: string,
 ) {
   try {
     for (const table of tables) {
       await tx.execute(
-        sql.raw(`DROP TRIGGER IF EXISTS ${table}_reorg ON ${table};`),
+        sql.raw(
+          `DROP TRIGGER IF EXISTS ${getReorgTriggerName(table, indexerId)} ON ${table};`,
+        ),
       );
       await tx.execute(
         sql.raw(`
-          CREATE CONSTRAINT TRIGGER ${table}_reorg
+          CREATE CONSTRAINT TRIGGER ${getReorgTriggerName(table, indexerId)}
           AFTER INSERT OR UPDATE OR DELETE ON ${table}
           DEFERRABLE INITIALLY DEFERRED
-          FOR EACH ROW EXECUTE FUNCTION reorg_checkpoint('${idColumn}', ${`${Number(endCursor.orderKey)}`});
+          FOR EACH ROW EXECUTE FUNCTION reorg_checkpoint('${idColumn}', ${`${Number(endCursor.orderKey)}`}, '${indexerId}');
         `),
       );
     }
@@ -120,11 +146,17 @@ export async function removeTriggers<
   TFullSchema extends Record<string, unknown> = Record<string, never>,
   TSchema extends
     TablesRelationalConfig = ExtractTablesWithRelations<TFullSchema>,
->(db: PgDatabase<TQueryResult, TFullSchema, TSchema>, tables: string[]) {
+>(
+  db: PgDatabase<TQueryResult, TFullSchema, TSchema>,
+  tables: string[],
+  indexerId: string,
+) {
   try {
     for (const table of tables) {
       await db.execute(
-        sql.raw(`DROP TRIGGER IF EXISTS ${table}_reorg ON ${table};`),
+        sql.raw(
+          `DROP TRIGGER IF EXISTS ${getReorgTriggerName(table, indexerId)} ON ${table};`,
+        ),
       );
     }
   } catch (error) {
@@ -143,6 +175,7 @@ export async function invalidate<
   tx: PgTransaction<TQueryResult, TFullSchema, TSchema>,
   cursor: Cursor,
   idColumn: string,
+  indexerId: string,
 ) {
   // Get and delete operations after cursor in one query, ordered by newest first
   const { rows: result } = (await tx.execute(
@@ -150,6 +183,7 @@ export async function invalidate<
       WITH deleted AS (
         DELETE FROM __reorg_rollback
         WHERE cursor > ${Number(cursor.orderKey)}
+        AND indexer_id = '${indexerId}'
         RETURNING *
       )
       SELECT * FROM deleted ORDER BY n DESC;
@@ -263,12 +297,17 @@ export async function finalize<
   TFullSchema extends Record<string, unknown> = Record<string, never>,
   TSchema extends
     TablesRelationalConfig = ExtractTablesWithRelations<TFullSchema>,
->(tx: PgTransaction<TQueryResult, TFullSchema, TSchema>, cursor: Cursor) {
+>(
+  tx: PgTransaction<TQueryResult, TFullSchema, TSchema>,
+  cursor: Cursor,
+  indexerId: string,
+) {
   try {
     await tx.execute(
       sql.raw(`
       DELETE FROM __reorg_rollback
       WHERE cursor <= ${Number(cursor.orderKey)}
+      AND indexer_id = '${indexerId}'
     `),
     );
   } catch (error) {

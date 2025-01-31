@@ -4,8 +4,8 @@ export type SerializeFn = <T>(value: T) => string;
 export type DeserializeFn = <T>(value: string) => T;
 
 export class SqliteStorageError extends Error {
-  constructor(message: string) {
-    super(message);
+  constructor(message: string, options?: ErrorOptions) {
+    super(message, options);
     this.name = "SqliteStorageError";
   }
 }
@@ -44,4 +44,8 @@ export function serialize<T>(obj: T): string {
     (_, value) => (typeof value === "bigint" ? `${value.toString()}n` : value),
     "\t",
   );
+}
+
+export function sleep(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }

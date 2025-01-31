@@ -6,6 +6,8 @@ import type {
   TablesRelationalConfig,
 } from "drizzle-orm";
 
+import { generateIndexerId } from "@apibara/indexer/internal";
+import { useInternalContext } from "@apibara/indexer/internal/plugins";
 import type { Cursor, DataFinality } from "@apibara/protocol";
 import type {
   PgDatabase,
@@ -26,9 +28,10 @@ import {
   registerTriggers,
   removeTriggers,
 } from "./storage";
-import { DrizzleStorageError, withTransaction } from "./utils";
+import { DrizzleStorageError, sleep, withTransaction } from "./utils";
 
 const DRIZZLE_PROPERTY = "_drizzle";
+const MAX_RETRIES = 5;
 
 export type DrizzleStorage<
   TQueryResult extends PgQueryResultHKT,
@@ -91,12 +94,13 @@ export function drizzleStorage<
 >({
   db,
   persistState: enablePersistence = true,
-  indexerName = "default",
+  indexerName: identifier = "default",
   schema,
   idColumn = "id",
 }: DrizzleStorageOptions<TQueryResult, TFullSchema, TSchema>) {
   return defineIndexerPlugin<TFilter, TBlock>((indexer) => {
     let tableNames: string[] = [];
+    let indexerId = "";
 
     try {
       tableNames = Object.values((schema as TSchema) ?? db._.schema ?? {}).map(
@@ -109,12 +113,35 @@ export function drizzleStorage<
     }
 
     indexer.hooks.hook("run:before", async () => {
-      await withTransaction(db, async (tx) => {
-        await initializeReorgRollbackTable(tx);
-        if (enablePersistence) {
-          await initializePersistentState(tx);
+      const { indexerName: indexerFileName, availableIndexers } =
+        useInternalContext();
+
+      indexerId = generateIndexerId(indexerFileName, identifier);
+
+      let retries = 0;
+
+      while (retries <= MAX_RETRIES) {
+        try {
+          await withTransaction(db, async (tx) => {
+            await initializeReorgRollbackTable(tx, indexerId);
+            if (enablePersistence) {
+              await initializePersistentState(tx);
+            }
+          });
+          break;
+        } catch (error) {
+          if (retries === MAX_RETRIES) {
+            throw new DrizzleStorageError(
+              "Initialization failed after 5 retries",
+              {
+                cause: error,
+              },
+            );
+          }
+          await sleep(retries * 1000);
+          retries++;
         }
-      });
+      }
     });
 
     indexer.hooks.hook("connect:before", async ({ request }) => {
@@ -130,7 +157,7 @@ export function drizzleStorage<
           TSchema
         >({
           tx,
-          indexerName,
+          indexerId,
         });
         if (cursor) {
           request.startingCursor = cursor;
@@ -150,10 +177,10 @@ export function drizzleStorage<
       }
 
       await withTransaction(db, async (tx) => {
-        await invalidate(tx, cursor, idColumn);
+        await invalidate(tx, cursor, idColumn, indexerId);
 
         if (enablePersistence) {
-          await invalidateState({ tx, cursor, indexerName });
+          await invalidateState({ tx, cursor, indexerId });
         }
       });
     });
@@ -171,7 +198,7 @@ export function drizzleStorage<
           tx,
           endCursor,
           filter: request.filter[1],
-          indexerName,
+          indexerId,
         });
       }
     });
@@ -184,10 +211,10 @@ export function drizzleStorage<
       }
 
       await withTransaction(db, async (tx) => {
-        await finalize(tx, cursor);
+        await finalize(tx, cursor, indexerId);
 
         if (enablePersistence) {
-          await finalizeState({ tx, cursor, indexerName });
+          await finalizeState({ tx, cursor, indexerId });
         }
       });
     });
@@ -200,10 +227,10 @@ export function drizzleStorage<
       }
 
       await withTransaction(db, async (tx) => {
-        await invalidate(tx, cursor, idColumn);
+        await invalidate(tx, cursor, idColumn, indexerId);
 
         if (enablePersistence) {
-          await invalidateState({ tx, cursor, indexerName });
+          await invalidateState({ tx, cursor, indexerId });
         }
       });
     });
@@ -228,7 +255,13 @@ export function drizzleStorage<
             >;
 
             if (finality !== "finalized") {
-              await registerTriggers(tx, tableNames, endCursor, idColumn);
+              await registerTriggers(
+                tx,
+                tableNames,
+                endCursor,
+                idColumn,
+                indexerId,
+              );
             }
 
             await next();
@@ -238,17 +271,17 @@ export function drizzleStorage<
               await persistState({
                 tx,
                 endCursor,
-                indexerName,
+                indexerId,
               });
             }
           });
 
           if (finality !== "finalized") {
             // remove trigger outside of the transaction or it won't be triggered.
-            await removeTriggers(db, tableNames);
+            await removeTriggers(db, tableNames, indexerId);
           }
         } catch (error) {
-          await removeTriggers(db, tableNames);
+          await removeTriggers(db, tableNames, indexerId);
 
           throw new DrizzleStorageError("Failed to run handler:middleware", {
             cause: error,

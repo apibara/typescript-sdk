@@ -35,10 +35,22 @@
       "default": "./dist/plugins/index.mjs"
     },
     "./internal": {
+      "types": "./dist/internal/index.d.ts",
+      "import": "./dist/internal/index.mjs",
+      "require": "./dist/internal/index.cjs",
+      "default": "./dist/internal/index.mjs"
+    },
+    "./internal/testing": {
       "types": "./dist/internal/testing.d.ts",
       "import": "./dist/internal/testing.mjs",
       "require": "./dist/internal/testing.cjs",
       "default": "./dist/internal/testing.mjs"
+    },
+    "./internal/plugins": {
+      "types": "./dist/internal/plugins.d.ts",
+      "import": "./dist/internal/plugins.mjs",
+      "require": "./dist/internal/plugins.cjs",
+      "default": "./dist/internal/plugins.mjs"
     }
   },
   "scripts": {

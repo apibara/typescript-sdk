@@ -2,7 +2,7 @@ import { run } from "@apibara/indexer";
 import {
   generateMockMessages,
   getMockIndexer,
-} from "@apibara/indexer/internal";
+} from "@apibara/indexer/internal/testing";
 import {
   type MockBlock,
   MockClient,
@@ -14,7 +14,6 @@ import { describe, expect, it } from "vitest";
 import type { Finalize, Invalidate } from "@apibara/protocol";
 import { sqliteStorage } from "../src";
 
-const indexerName = "test-indexer";
 describe("SQLite persistence", () => {
   it("should store the latest block number", async () => {
     const db = new Database(":memory:");
@@ -25,7 +24,7 @@ describe("SQLite persistence", () => {
 
     const indexer = getMockIndexer({
       override: {
-        plugins: [sqliteStorage({ database: db, indexerName })],
+        plugins: [sqliteStorage({ database: db })],
       },
     });
 
@@ -36,7 +35,7 @@ describe("SQLite persistence", () => {
     expect(rows).toMatchInlineSnapshot(`
       [
         {
-          "id": "test-indexer",
+          "id": "indexer_testing_default",
           "order_key": 5000002,
           "unique_key": null,
         },
@@ -175,10 +174,8 @@ describe("SQLite persistence", () => {
     });
 
     const indexer = getMockIndexer({
-      plugins: [
-        sqliteStorage({ database: db, persistState: true, indexerName }),
-      ],
       override: {
+        plugins: [sqliteStorage({ database: db, persistState: true })],
         startingCursor: { orderKey: 100n },
         factory: async ({ block }) => {
           if (block.data === "B") {
@@ -202,7 +199,7 @@ describe("SQLite persistence", () => {
     expect(checkpointsRows).toMatchInlineSnapshot(`
       [
         {
-          "id": "test-indexer",
+          "id": "indexer_testing_default",
           "order_key": 108,
           "unique_key": null,
         },
@@ -215,7 +212,7 @@ describe("SQLite persistence", () => {
       	"filter": "B"
       }",
           "from_block": 103,
-          "id": "test-indexer",
+          "id": "indexer_testing_default",
           "to_block": 106,
         },
         {
@@ -223,7 +220,7 @@ describe("SQLite persistence", () => {
       	"filter": "BC"
       }",
           "from_block": 106,
-          "id": "test-indexer",
+          "id": "indexer_testing_default",
           "to_block": null,
         },
       ]
@@ -239,7 +236,7 @@ describe("SQLite persistence", () => {
 
     const indexer = getMockIndexer({
       override: {
-        plugins: [sqliteStorage({ database: db, indexerName })],
+        plugins: [sqliteStorage({ database: db })],
         async transform({ endCursor }) {
           if (endCursor?.orderKey === 5000002n) {
             throw new Error("test");
@@ -255,7 +252,7 @@ describe("SQLite persistence", () => {
     expect(rows).toMatchInlineSnapshot(`
       [
         {
-          "id": "test-indexer",
+          "id": "indexer_testing_default",
           "order_key": 5000001,
           "unique_key": null,
         },
@@ -272,9 +269,7 @@ describe("SQLite persistence", () => {
 
     const indexer = getMockIndexer({
       override: {
-        plugins: [
-          sqliteStorage({ database: db, persistState: false, indexerName }),
-        ],
+        plugins: [sqliteStorage({ database: db, persistState: false })],
       },
     });
 
@@ -412,10 +407,8 @@ describe("SQLite persistence", () => {
     });
 
     const indexer = getMockIndexer({
-      plugins: [
-        sqliteStorage({ database: db, persistState: true, indexerName }),
-      ],
       override: {
+        plugins: [sqliteStorage({ database: db, persistState: true })],
         startingCursor: { orderKey: 100n },
         factory: async ({ block }) => {
           if (block.data === "B") {
@@ -439,7 +432,7 @@ describe("SQLite persistence", () => {
     expect(checkpointsRows).toMatchInlineSnapshot(`
       [
         {
-          "id": "test-indexer",
+          "id": "indexer_testing_default",
           "order_key": 107,
           "unique_key": null,
         },
@@ -452,7 +445,7 @@ describe("SQLite persistence", () => {
       	"filter": "B"
       }",
           "from_block": 103,
-          "id": "test-indexer",
+          "id": "indexer_testing_default",
           "to_block": null,
         },
       ]
@@ -588,10 +581,8 @@ describe("SQLite persistence", () => {
     });
 
     const indexer = getMockIndexer({
-      plugins: [
-        sqliteStorage({ database: db, persistState: true, indexerName }),
-      ],
       override: {
+        plugins: [sqliteStorage({ database: db, persistState: true })],
         startingCursor: { orderKey: 100n },
         factory: async ({ block }) => {
           if (block.data === "B") {
@@ -615,7 +606,7 @@ describe("SQLite persistence", () => {
     expect(checkpointsRows).toMatchInlineSnapshot(`
       [
         {
-          "id": "test-indexer",
+          "id": "indexer_testing_default",
           "order_key": 107,
           "unique_key": null,
         },
@@ -628,7 +619,7 @@ describe("SQLite persistence", () => {
       	"filter": "BC"
       }",
           "from_block": 106,
-          "id": "test-indexer",
+          "id": "indexer_testing_default",
           "to_block": null,
         },
       ]

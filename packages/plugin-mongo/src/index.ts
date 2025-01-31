@@ -2,6 +2,8 @@ import { useIndexerContext } from "@apibara/indexer";
 import { defineIndexerPlugin } from "@apibara/indexer/plugins";
 import type { DbOptions, MongoClient } from "mongodb";
 
+import { generateIndexerId } from "@apibara/indexer/internal";
+import { useInternalContext } from "@apibara/indexer/internal/plugins";
 import { finalize, invalidate } from "./mongo";
 import {
   finalizeState,
@@ -54,10 +56,15 @@ export function mongoStorage<TFilter, TBlock>({
   dbOptions,
   collections,
   persistState: enablePersistence = true,
-  indexerName = "default",
+  indexerName: identifier = "default",
 }: MongoStorageOptions) {
   return defineIndexerPlugin<TFilter, TBlock>((indexer) => {
+    let indexerId = "";
+
     indexer.hooks.hook("run:before", async () => {
+      const { indexerName } = useInternalContext();
+      indexerId = generateIndexerId(indexerName, identifier);
+
       await withTransaction(client, async (session) => {
         const db = client.db(dbName, dbOptions);
         if (enablePersistence) {
@@ -76,7 +83,7 @@ export function mongoStorage<TFilter, TBlock>({
         const { cursor, filter } = await getState<TFilter>({
           db,
           session,
-          indexerName,
+          indexerId,
         });
 
         if (cursor) {
@@ -102,7 +109,7 @@ export function mongoStorage<TFilter, TBlock>({
         await invalidate(db, session, cursor, collections);
 
         if (enablePersistence) {
-          await invalidateState({ db, session, cursor, indexerName });
+          await invalidateState({ db, session, cursor, indexerId });
         }
       });
     });
@@ -119,7 +126,7 @@ export function mongoStorage<TFilter, TBlock>({
             endCursor,
             session,
             filter: request.filter[1],
-            indexerName,
+            indexerId,
           });
         }
       });
@@ -137,7 +144,7 @@ export function mongoStorage<TFilter, TBlock>({
         await finalize(db, session, cursor, collections);
 
         if (enablePersistence) {
-          await finalizeState({ db, session, cursor, indexerName });
+          await finalizeState({ db, session, cursor, indexerId });
         }
       });
     });
@@ -154,7 +161,7 @@ export function mongoStorage<TFilter, TBlock>({
         await invalidate(db, session, cursor, collections);
 
         if (enablePersistence) {
-          await invalidateState({ db, session, cursor, indexerName });
+          await invalidateState({ db, session, cursor, indexerId });
         }
       });
     });
@@ -175,7 +182,12 @@ export function mongoStorage<TFilter, TBlock>({
           delete context[MONGO_PROPERTY];
 
           if (enablePersistence) {
-            await persistState({ db, endCursor, session, indexerName });
+            await persistState({
+              db,
+              endCursor,
+              session,
+              indexerId,
+            });
           }
         });
       });

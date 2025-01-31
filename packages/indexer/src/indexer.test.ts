@@ -248,8 +248,8 @@ describe("Run Test", () => {
     const metadata: Record<string, unknown> = {};
 
     const indexer = getMockIndexer({
-      plugins: [mockSink({ output, metadata })],
       override: {
+        plugins: [mockSink({ output, metadata })],
         startingCursor: { orderKey: 100n },
         factory: async ({ block }) => {
           if (block.data === "B") {
@@ -400,8 +400,8 @@ describe("Run Test", () => {
     const metadata: Record<string, unknown> = {};
 
     const indexer = getMockIndexer({
-      plugins: [mockSink({ output, metadata })],
       override: {
+        plugins: [mockSink({ output, metadata })],
         startingCursor: { orderKey: 100n },
         factory: async ({ block }) => {
           if (block.data === "B") {

@@ -2,7 +2,7 @@ import { run } from "@apibara/indexer";
 import {
   generateMockMessages,
   getMockIndexer,
-} from "@apibara/indexer/internal";
+} from "@apibara/indexer/internal/testing";
 import {
   type MockBlock,
   MockClient,
@@ -236,8 +236,8 @@ describe("SQLite key-value store", () => {
     });
 
     const indexer = getMockIndexer({
-      plugins: [sqliteStorage({ database: db, keyValueStore: true })],
       override: {
+        plugins: [sqliteStorage({ database: db, keyValueStore: true })],
         startingCursor: { orderKey: 100n },
         factory: async ({ block }) => {
           if (block.data === "B") {
@@ -414,8 +414,8 @@ describe("SQLite key-value store", () => {
     });
 
     const indexer = getMockIndexer({
-      plugins: [sqliteStorage({ database: db, keyValueStore: true })],
       override: {
+        plugins: [sqliteStorage({ database: db, keyValueStore: true })],
         startingCursor: { orderKey: 100n },
         factory: async ({ block }) => {
           if (block.data === "B") {
