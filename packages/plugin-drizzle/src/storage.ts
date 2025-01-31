@@ -16,6 +16,11 @@ import {
   text,
 } from "drizzle-orm/pg-core";
 import { DrizzleStorageError } from "./utils";
+
+function getReorgTriggerName(table: string, indexerId: string) {
+  return `${table}_reorg_${indexerId}`;
+}
+
 export type ReorgOperation = "I" | "U" | "D";
 
 export const reorgRollbackTable = pgTable("__reorg_rollback", {
@@ -54,13 +59,7 @@ export async function initializeReorgRollbackTable<
 
     await tx.execute(
       sql.raw(`
-        CREATE INDEX IF NOT EXISTS idx_reorg_rollback_indexer_id ON __reorg_rollback(indexer_id);
-      `),
-    );
-
-    await tx.execute(
-      sql.raw(`
-        CREATE INDEX IF NOT EXISTS idx_reorg_rollback_cursor ON __reorg_rollback(cursor);
+        CREATE INDEX IF NOT EXISTS idx_reorg_rollback_indexer_id_cursor ON __reorg_rollback(indexer_id, cursor);
       `),
     );
   } catch (error) {
@@ -123,12 +122,12 @@ export async function registerTriggers<
     for (const table of tables) {
       await tx.execute(
         sql.raw(
-          `DROP TRIGGER IF EXISTS ${table}_reorg_${indexerId} ON ${table};`,
+          `DROP TRIGGER IF EXISTS ${getReorgTriggerName(table, indexerId)} ON ${table};`,
         ),
       );
       await tx.execute(
         sql.raw(`
-          CREATE CONSTRAINT TRIGGER ${table}_reorg_${indexerId}
+          CREATE CONSTRAINT TRIGGER ${getReorgTriggerName(table, indexerId)}
           AFTER INSERT OR UPDATE OR DELETE ON ${table}
           DEFERRABLE INITIALLY DEFERRED
           FOR EACH ROW EXECUTE FUNCTION reorg_checkpoint('${idColumn}', ${`${Number(endCursor.orderKey)}`}, '${indexerId}');
@@ -156,7 +155,7 @@ export async function removeTriggers<
     for (const table of tables) {
       await db.execute(
         sql.raw(
-          `DROP TRIGGER IF EXISTS ${table}_reorg_${indexerId} ON ${table};`,
+          `DROP TRIGGER IF EXISTS ${getReorgTriggerName(table, indexerId)} ON ${table};`,
         ),
       );
     }
