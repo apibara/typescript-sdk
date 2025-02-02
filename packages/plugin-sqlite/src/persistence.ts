@@ -13,14 +13,14 @@ export function persistState<TFilter>(props: {
   db: Database;
   endCursor: Cursor;
   filter?: TFilter;
-  indexerName: string;
+  indexerId: string;
 }) {
-  const { db, endCursor, filter, indexerName } = props;
+  const { db, endCursor, filter, indexerId } = props;
 
   assertInTransaction(db);
 
   db.prepare(statements.putCheckpoint).run(
-    indexerName,
+    indexerId,
     Number(endCursor.orderKey),
     endCursor.uniqueKey,
   );
@@ -28,10 +28,10 @@ export function persistState<TFilter>(props: {
   if (filter) {
     db.prepare(statements.updateFilterToBlock).run(
       Number(endCursor.orderKey),
-      indexerName,
+      indexerId,
     );
     db.prepare(statements.insertFilter).run(
-      indexerName,
+      indexerId,
       serialize(filter as Record<string, unknown>),
       Number(endCursor.orderKey),
     );
@@ -40,18 +40,18 @@ export function persistState<TFilter>(props: {
 
 export function getState<TFilter>(props: {
   db: Database;
-  indexerName: string;
+  indexerId: string;
 }) {
-  const { db, indexerName } = props;
+  const { db, indexerId } = props;
   assertInTransaction(db);
   const storedCursor = db
     .prepare<string, { order_key?: number; unique_key?: string }>(
       statements.getCheckpoint,
     )
-    .get(indexerName);
+    .get(indexerId);
   const storedFilter = db
     .prepare<string, { filter: string }>(statements.getFilter)
-    .get(indexerName);
+    .get(indexerId);
 
   let cursor: Cursor | undefined;
   let filter: TFilter | undefined;
@@ -73,12 +73,12 @@ export function getState<TFilter>(props: {
 export function finalizeState(props: {
   db: Database;
   cursor: Cursor;
-  indexerName: string;
+  indexerId: string;
 }) {
-  const { cursor, db, indexerName } = props;
+  const { cursor, db, indexerId } = props;
   assertInTransaction(db);
   db.prepare<[string, number]>(statements.finalizeFilter).run(
-    indexerName,
+    indexerId,
     Number(cursor.orderKey),
   );
 }
@@ -86,16 +86,16 @@ export function finalizeState(props: {
 export function invalidateState(props: {
   db: Database;
   cursor: Cursor;
-  indexerName: string;
+  indexerId: string;
 }) {
-  const { cursor, db, indexerName } = props;
+  const { cursor, db, indexerId } = props;
   assertInTransaction(db);
   db.prepare<[string, number]>(statements.invalidateFilterDelete).run(
-    indexerName,
+    indexerId,
     Number(cursor.orderKey),
   );
   db.prepare<[string, number]>(statements.invalidateFilterUpdate).run(
-    indexerName,
+    indexerId,
     Number(cursor.orderKey),
   );
 }

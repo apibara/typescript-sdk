@@ -3,6 +3,8 @@ import { defineIndexerPlugin } from "@apibara/indexer/plugins";
 import { isCursor } from "@apibara/protocol";
 import type { Database as SqliteDatabase } from "better-sqlite3";
 
+import { generateIndexerId } from "@apibara/indexer/internal";
+import { useInternalContext } from "@apibara/indexer/internal/plugins";
 import {
   KeyValueStore,
   finalizeKV,
@@ -23,10 +25,12 @@ import {
   assertInTransaction,
   deserialize,
   serialize,
+  sleep,
   withTransaction,
 } from "./utils";
 
 const KV_PROPERTY = "_kv_sqlite" as const;
+const MAX_RETRIES = 5;
 
 export { KeyValueStore } from "./kv";
 
@@ -68,19 +72,44 @@ export function sqliteStorage<TFilter, TBlock>({
   keyValueStore: enableKeyValueStore = true,
   serialize: serializeFn = serialize,
   deserialize: deserializeFn = deserialize,
-  indexerName = "default",
+  indexerName: identifier = "default",
 }: SqliteStorageOptions) {
   return defineIndexerPlugin<TFilter, TBlock>((indexer) => {
-    indexer.hooks.hook("run:before", async () => {
-      await withTransaction(database, async (db) => {
-        if (enablePersistState) {
-          initializePersistentState(db);
-        }
+    let indexerId = "";
 
-        if (enableKeyValueStore) {
-          initializeKeyValueStore(db);
+    indexer.hooks.hook("run:before", async () => {
+      const { indexerName: indexerFileName, availableIndexers } =
+        useInternalContext();
+
+      indexerId = generateIndexerId(indexerFileName, identifier);
+
+      let retries = 0;
+
+      while (retries <= MAX_RETRIES) {
+        try {
+          await withTransaction(database, async (db) => {
+            if (enablePersistState) {
+              initializePersistentState(db);
+            }
+
+            if (enableKeyValueStore) {
+              initializeKeyValueStore(db);
+            }
+          });
+          break;
+        } catch (error) {
+          if (retries === MAX_RETRIES) {
+            throw new SqliteStorageError(
+              "Initialization failed after 5 retries",
+              {
+                cause: error,
+              },
+            );
+          }
+          await sleep(retries * 1000);
+          retries++;
         }
-      });
+      }
     });
 
     indexer.hooks.hook("connect:before", async ({ request }) => {
@@ -89,7 +118,7 @@ export function sqliteStorage<TFilter, TBlock>({
       }
 
       return await withTransaction(database, async (db) => {
-        const { cursor, filter } = getState<TFilter>({ db, indexerName });
+        const { cursor, filter } = getState<TFilter>({ db, indexerId });
 
         if (cursor) {
           request.startingCursor = cursor;
@@ -111,7 +140,7 @@ export function sqliteStorage<TFilter, TBlock>({
 
       await withTransaction(database, async (db) => {
         if (enablePersistState) {
-          invalidateState({ db, cursor, indexerName });
+          invalidateState({ db, cursor, indexerId });
         }
 
         if (enableKeyValueStore) {
@@ -133,7 +162,7 @@ export function sqliteStorage<TFilter, TBlock>({
         persistState({
           db: database,
           endCursor,
-          indexerName,
+          indexerId,
           filter: request.filter[1],
         });
       }
@@ -148,7 +177,7 @@ export function sqliteStorage<TFilter, TBlock>({
 
       await withTransaction(database, async (db) => {
         if (enablePersistState) {
-          finalizeState({ db, cursor, indexerName });
+          finalizeState({ db, cursor, indexerId });
         }
 
         if (enableKeyValueStore) {
@@ -166,7 +195,7 @@ export function sqliteStorage<TFilter, TBlock>({
 
       await withTransaction(database, async (db) => {
         if (enablePersistState) {
-          invalidateState({ db, cursor, indexerName });
+          invalidateState({ db, cursor, indexerId });
         }
 
         if (enableKeyValueStore) {
@@ -201,7 +230,7 @@ export function sqliteStorage<TFilter, TBlock>({
           await next();
 
           if (enablePersistState) {
-            persistState({ db, endCursor: ctx.endCursor, indexerName });
+            persistState({ db, endCursor: ctx.endCursor, indexerId });
           }
 
           if (enableKeyValueStore) {

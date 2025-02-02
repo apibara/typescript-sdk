@@ -141,16 +141,16 @@ export async function persistState<
   tx: PgTransaction<TQueryResult, TFullSchema, TSchema>;
   endCursor: Cursor;
   filter?: TFilter;
-  indexerName: string;
+  indexerId: string;
 }) {
-  const { tx, endCursor, filter, indexerName } = props;
+  const { tx, endCursor, filter, indexerId } = props;
 
   try {
     if (endCursor) {
       await tx
         .insert(checkpoints)
         .values({
-          id: indexerName,
+          id: indexerId,
           orderKey: Number(endCursor.orderKey),
           uniqueKey: endCursor.uniqueKey,
         })
@@ -166,12 +166,12 @@ export async function persistState<
         await tx
           .update(filters)
           .set({ toBlock: Number(endCursor.orderKey) })
-          .where(and(eq(filters.id, indexerName), isNull(filters.toBlock)));
+          .where(and(eq(filters.id, indexerId), isNull(filters.toBlock)));
 
         await tx
           .insert(filters)
           .values({
-            id: indexerName,
+            id: indexerId,
             filter: serialize(filter),
             fromBlock: Number(endCursor.orderKey),
             toBlock: null,
@@ -201,15 +201,15 @@ export async function getState<
     TablesRelationalConfig = ExtractTablesWithRelations<TFullSchema>,
 >(props: {
   tx: PgTransaction<TQueryResult, TFullSchema, TSchema>;
-  indexerName: string;
+  indexerId: string;
 }): Promise<{ cursor?: Cursor; filter?: TFilter }> {
-  const { tx, indexerName } = props;
+  const { tx, indexerId } = props;
 
   try {
     const checkpointRows = await tx
       .select()
       .from(checkpoints)
-      .where(eq(checkpoints.id, indexerName));
+      .where(eq(checkpoints.id, indexerId));
 
     const cursor = checkpointRows[0]
       ? {
@@ -221,7 +221,7 @@ export async function getState<
     const filterRows = await tx
       .select()
       .from(filters)
-      .where(and(eq(filters.id, indexerName), isNull(filters.toBlock)));
+      .where(and(eq(filters.id, indexerId), isNull(filters.toBlock)));
 
     const filter = filterRows[0]
       ? deserialize<TFilter>(filterRows[0].filter)
@@ -243,16 +243,16 @@ export async function invalidateState<
 >(props: {
   tx: PgTransaction<TQueryResult, TFullSchema, TSchema>;
   cursor: Cursor;
-  indexerName: string;
+  indexerId: string;
 }) {
-  const { tx, cursor, indexerName } = props;
+  const { tx, cursor, indexerId } = props;
 
   try {
     await tx
       .delete(filters)
       .where(
         and(
-          eq(filters.id, indexerName),
+          eq(filters.id, indexerId),
           gt(filters.fromBlock, Number(cursor.orderKey)),
         ),
       );
@@ -262,7 +262,7 @@ export async function invalidateState<
       .set({ toBlock: null })
       .where(
         and(
-          eq(filters.id, indexerName),
+          eq(filters.id, indexerId),
           gt(filters.toBlock, Number(cursor.orderKey)),
         ),
       );
@@ -281,16 +281,16 @@ export async function finalizeState<
 >(props: {
   tx: PgTransaction<TQueryResult, TFullSchema, TSchema>;
   cursor: Cursor;
-  indexerName: string;
+  indexerId: string;
 }) {
-  const { tx, cursor, indexerName } = props;
+  const { tx, cursor, indexerId } = props;
 
   try {
     await tx
       .delete(filters)
       .where(
         and(
-          eq(filters.id, indexerName),
+          eq(filters.id, indexerId),
           lt(filters.toBlock, Number(cursor.orderKey)),
         ),
       );

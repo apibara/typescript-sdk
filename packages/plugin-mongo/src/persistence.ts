@@ -38,13 +38,13 @@ export async function persistState<TFilter>(props: {
   session: ClientSession;
   endCursor: Cursor;
   filter?: TFilter;
-  indexerName: string;
+  indexerId: string;
 }) {
-  const { db, session, endCursor, filter, indexerName } = props;
+  const { db, session, endCursor, filter, indexerId } = props;
 
   if (endCursor) {
     await db.collection<CheckpointSchema>(checkpointCollectionName).updateOne(
-      { id: indexerName },
+      { id: indexerId },
       {
         $set: {
           orderKey: Number(endCursor.orderKey),
@@ -59,7 +59,7 @@ export async function persistState<TFilter>(props: {
       await db
         .collection<FilterSchema>(filterCollectionName)
         .updateMany(
-          { id: indexerName, toBlock: null },
+          { id: indexerId, toBlock: null },
           { $set: { toBlock: Number(endCursor.orderKey) } },
           { session },
         );
@@ -67,7 +67,7 @@ export async function persistState<TFilter>(props: {
       // Insert new filter
       await db.collection<FilterSchema>(filterCollectionName).updateOne(
         {
-          id: indexerName,
+          id: indexerId,
           fromBlock: Number(endCursor.orderKey),
         },
         {
@@ -86,16 +86,16 @@ export async function persistState<TFilter>(props: {
 export async function getState<TFilter>(props: {
   db: Db;
   session: ClientSession;
-  indexerName: string;
+  indexerId: string;
 }): Promise<{ cursor?: Cursor; filter?: TFilter }> {
-  const { db, session, indexerName } = props;
+  const { db, session, indexerId } = props;
 
   let cursor: Cursor | undefined;
   let filter: TFilter | undefined;
 
   const checkpointRow = await db
     .collection<CheckpointSchema>(checkpointCollectionName)
-    .findOne({ id: indexerName }, { session });
+    .findOne({ id: indexerId }, { session });
 
   if (checkpointRow) {
     cursor = {
@@ -108,7 +108,7 @@ export async function getState<TFilter>(props: {
     .collection<FilterSchema>(filterCollectionName)
     .findOne(
       {
-        id: indexerName,
+        id: indexerId,
         toBlock: null,
       },
       { session },
@@ -125,21 +125,21 @@ export async function invalidateState(props: {
   db: Db;
   session: ClientSession;
   cursor: Cursor;
-  indexerName: string;
+  indexerId: string;
 }) {
-  const { db, session, cursor, indexerName } = props;
+  const { db, session, cursor, indexerId } = props;
 
   await db
     .collection<FilterSchema>(filterCollectionName)
     .deleteMany(
-      { id: indexerName, fromBlock: { $gt: Number(cursor.orderKey) } },
+      { id: indexerId, fromBlock: { $gt: Number(cursor.orderKey) } },
       { session },
     );
 
   await db
     .collection<FilterSchema>(filterCollectionName)
     .updateMany(
-      { id: indexerName, toBlock: { $gt: Number(cursor.orderKey) } },
+      { id: indexerId, toBlock: { $gt: Number(cursor.orderKey) } },
       { $set: { toBlock: null } },
       { session },
     );
@@ -149,13 +149,13 @@ export async function finalizeState(props: {
   db: Db;
   session: ClientSession;
   cursor: Cursor;
-  indexerName: string;
+  indexerId: string;
 }) {
-  const { db, session, cursor, indexerName } = props;
+  const { db, session, cursor, indexerId } = props;
 
   await db.collection<FilterSchema>(filterCollectionName).deleteMany(
     {
-      id: indexerName,
+      id: indexerId,
       toBlock: { $lte: Number(cursor.orderKey) },
     },
     { session },
