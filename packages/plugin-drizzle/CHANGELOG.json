@@ -2,6 +2,21 @@
   "name": "@apibara/plugin-drizzle",
   "entries": [
     {
+      "date": "Sun, 02 Feb 2025 09:38:12 GMT",
+      "version": "2.0.0-beta.37",
+      "tag": "@apibara/plugin-drizzle_v2.0.0-beta.37",
+      "comments": {
+        "prerelease": [
+          {
+            "author": "jadejajaipal5@gmail.com",
+            "package": "@apibara/plugin-drizzle",
+            "commit": "3cb4eae954098dea58f593acfbf7f212d43a6c11",
+            "comment": "plugin-drizzle: resolve concurrency issues with retries"
+          }
+        ]
+      }
+    },
+    {
       "date": "Sat, 18 Jan 2025 15:53:04 GMT",
       "version": "2.0.0-beta.32",
       "tag": "@apibara/plugin-drizzle_v2.0.0-beta.32",

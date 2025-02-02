@@ -2,6 +2,21 @@
   "name": "@apibara/plugin-mongo",
   "entries": [
     {
+      "date": "Sun, 02 Feb 2025 09:38:12 GMT",
+      "version": "2.0.0-beta.38",
+      "tag": "@apibara/plugin-mongo_v2.0.0-beta.38",
+      "comments": {
+        "prerelease": [
+          {
+            "author": "jadejajaipal5@gmail.com",
+            "package": "@apibara/plugin-mongo",
+            "commit": "3cb4eae954098dea58f593acfbf7f212d43a6c11",
+            "comment": "plugins: add indexerId and update tests"
+          }
+        ]
+      }
+    },
+    {
       "date": "Sat, 18 Jan 2025 15:53:04 GMT",
       "version": "2.0.0-beta.33",
       "tag": "@apibara/plugin-mongo_v2.0.0-beta.33",

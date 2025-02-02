@@ -1,7 +1,0 @@
-{
-  "type": "prerelease",
-  "comment": "cli: add internalContext plugin for runtime context",
-  "packageName": "apibara",
-  "email": "jadejajaipal5@gmail.com",
-  "dependentChangeType": "patch"
-}

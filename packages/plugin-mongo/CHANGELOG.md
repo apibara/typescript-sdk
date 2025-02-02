@@ -1,8 +1,16 @@
 # Change Log - @apibara/plugin-mongo
 
-<!-- This log was last generated on Sat, 18 Jan 2025 15:53:04 GMT and should not be manually modified. -->
+<!-- This log was last generated on Sun, 02 Feb 2025 09:38:12 GMT and should not be manually modified. -->
 
 <!-- Start content -->
+
+## 2.0.0-beta.38
+
+Sun, 02 Feb 2025 09:38:12 GMT
+
+### Changes
+
+- plugins: add indexerId and update tests (jadejajaipal5@gmail.com)
 
 ## 2.0.0-beta.33
 

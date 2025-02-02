@@ -2,6 +2,21 @@
   "name": "@apibara/indexer",
   "entries": [
     {
+      "date": "Sun, 02 Feb 2025 09:38:12 GMT",
+      "version": "2.0.0-beta.38",
+      "tag": "@apibara/indexer_v2.0.0-beta.38",
+      "comments": {
+        "prerelease": [
+          {
+            "author": "jadejajaipal5@gmail.com",
+            "package": "@apibara/indexer",
+            "commit": "3cb4eae954098dea58f593acfbf7f212d43a6c11",
+            "comment": "indexer: add internalContext plugin and update mock methods"
+          }
+        ]
+      }
+    },
+    {
       "date": "Mon, 20 Jan 2025 16:37:28 GMT",
       "version": "2.0.0-beta.36",
       "tag": "@apibara/indexer_v2.0.0-beta.36",

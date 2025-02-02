@@ -1,8 +1,16 @@
 # Change Log - apibara
 
-<!-- This log was last generated on Mon, 23 Dec 2024 11:34:53 GMT and should not be manually modified. -->
+<!-- This log was last generated on Sun, 02 Feb 2025 09:38:12 GMT and should not be manually modified. -->
 
 <!-- Start content -->
+
+## 2.0.0-beta.38
+
+Sun, 02 Feb 2025 09:38:12 GMT
+
+### Changes
+
+- cli: add internalContext plugin for runtime context (jadejajaipal5@gmail.com)
 
 ## 2.0.0-beta.28
 

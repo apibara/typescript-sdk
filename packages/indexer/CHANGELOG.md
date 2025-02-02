@@ -1,8 +1,16 @@
 # Change Log - @apibara/indexer
 
-<!-- This log was last generated on Mon, 20 Jan 2025 16:37:28 GMT and should not be manually modified. -->
+<!-- This log was last generated on Sun, 02 Feb 2025 09:38:12 GMT and should not be manually modified. -->
 
 <!-- Start content -->
+
+## 2.0.0-beta.38
+
+Sun, 02 Feb 2025 09:38:12 GMT
+
+### Changes
+
+- indexer: add internalContext plugin and update mock methods (jadejajaipal5@gmail.com)
 
 ## 2.0.0-beta.36
 

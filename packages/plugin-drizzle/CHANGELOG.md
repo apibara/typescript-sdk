@@ -1,8 +1,16 @@
 # Change Log - @apibara/plugin-drizzle
 
-<!-- This log was last generated on Sat, 18 Jan 2025 15:53:04 GMT and should not be manually modified. -->
+<!-- This log was last generated on Sun, 02 Feb 2025 09:38:12 GMT and should not be manually modified. -->
 
 <!-- Start content -->
+
+## 2.0.0-beta.37
+
+Sun, 02 Feb 2025 09:38:12 GMT
+
+### Changes
+
+- plugin-drizzle: resolve concurrency issues with retries (jadejajaipal5@gmail.com)
 
 ## 2.0.0-beta.32
 
