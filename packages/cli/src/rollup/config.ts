@@ -5,7 +5,6 @@ import { nodeResolve } from "@rollup/plugin-node-resolve";
 import type { Apibara, RollupConfig } from "apibara/types";
 import { join } from "pathe";
 import type { OutputPluginOption } from "rollup";
-import esbuild from "rollup-plugin-esbuild";
 
 import defu from "defu";
 import { appConfig } from "./plugins/config";
@@ -52,7 +51,8 @@ export function getRollupConfig(apibara: Apibara): RollupConfig {
             warning.code || "",
           ) &&
           !warning.message.includes("Unsupported source map comment") &&
-          !warning.message.includes("@__PURE__")
+          !warning.message.includes("@__PURE__") &&
+          !warning.message.includes("/*#__PURE__*/")
         ) {
           rollupWarn(warning);
         }
@@ -80,14 +80,6 @@ export function getRollupConfig(apibara: Apibara): RollupConfig {
       mainFields: ["main"],
     }),
   );
-
-  rollupConfig.plugins.push(
-    esbuild({
-      target: "es2022",
-      sourceMap: apibara.options.sourceMap,
-    }),
-  );
-
   rollupConfig.plugins.push(indexers(apibara));
   rollupConfig.plugins.push(appConfig(apibara));
 
