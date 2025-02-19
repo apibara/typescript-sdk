@@ -1,7 +1,0 @@
-{
-  "type": "prerelease",
-  "comment": "cli: remove esbuild plugin from rollup",
-  "packageName": "apibara",
-  "email": "jadejajaipal5@gmail.com",
-  "dependentChangeType": "patch"
-}

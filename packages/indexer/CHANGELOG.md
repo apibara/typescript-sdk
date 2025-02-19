@@ -1,8 +1,16 @@
 # Change Log - @apibara/indexer
 
-<!-- This log was last generated on Sun, 02 Feb 2025 09:38:12 GMT and should not be manually modified. -->
+<!-- This log was last generated on Wed, 19 Feb 2025 12:45:45 GMT and should not be manually modified. -->
 
 <!-- Start content -->
+
+## 2.0.0-beta.39
+
+Wed, 19 Feb 2025 12:45:45 GMT
+
+### Changes
+
+- indexer: add internalContext plugin to vcr (jadejajaipal5@gmail.com)
 
 ## 2.0.0-beta.38
 

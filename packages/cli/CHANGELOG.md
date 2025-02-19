@@ -1,8 +1,16 @@
 # Change Log - apibara
 
-<!-- This log was last generated on Sun, 02 Feb 2025 09:38:12 GMT and should not be manually modified. -->
+<!-- This log was last generated on Wed, 19 Feb 2025 12:45:45 GMT and should not be manually modified. -->
 
 <!-- Start content -->
+
+## 2.0.0-beta.39
+
+Wed, 19 Feb 2025 12:45:45 GMT
+
+### Changes
+
+- cli: remove esbuild plugin from rollup (jadejajaipal5@gmail.com)
 
 ## 2.0.0-beta.38
 
