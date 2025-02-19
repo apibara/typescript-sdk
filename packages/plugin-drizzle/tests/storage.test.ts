@@ -680,7 +680,7 @@ describe("Drizzle test", () => {
         {
           "id": "indexer_testing_default",
           "orderKey": 5000005,
-          "uniqueKey": "",
+          "uniqueKey": null,
         },
       ]
     `);
@@ -846,7 +846,7 @@ describe("Drizzle test", () => {
         {
           "id": "indexer_testing_default",
           "orderKey": 108,
-          "uniqueKey": "",
+          "uniqueKey": null,
         },
       ]
     `);
@@ -1030,7 +1030,7 @@ describe("Drizzle test", () => {
         {
           "id": "indexer_testing_default",
           "orderKey": 107,
-          "uniqueKey": "",
+          "uniqueKey": null,
         },
       ]
     `);
@@ -1206,7 +1206,7 @@ describe("Drizzle test", () => {
         {
           "id": "indexer_testing_default",
           "orderKey": 107,
-          "uniqueKey": "",
+          "uniqueKey": null,
         },
       ]
     `);

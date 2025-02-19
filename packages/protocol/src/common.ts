@@ -67,3 +67,27 @@ export const cursorFromBytes = Schema.decodeSync(CursorFromBytes);
 export function isCursor(value: unknown): value is Cursor {
   return Schema.is(Cursor)(value);
 }
+
+/** Normalize a cursor.
+ *
+ * The challenge is that the `Cursor` validator expects `uniqueKey` to be either a `0x${string}`
+ * or not present at all. Setting the field to `undefined` will result in a validation error.
+ *
+ * @param cursor The cursor to normalize
+ */
+export function normalizeCursor(cursor: {
+  orderKey: bigint;
+  uniqueKey: string | null;
+}): Cursor {
+  if (cursor.uniqueKey !== null && cursor.uniqueKey.length > 0) {
+    const uniqueKey = cursor.uniqueKey as `0x${string}`;
+    return {
+      orderKey: BigInt(cursor.orderKey),
+      uniqueKey,
+    };
+  }
+
+  return {
+    orderKey: BigInt(cursor.orderKey),
+  };
+}

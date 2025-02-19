@@ -1,4 +1,4 @@
-import type { Cursor } from "@apibara/protocol";
+import { type Cursor, normalizeCursor } from "@apibara/protocol";
 import type { Database } from "better-sqlite3";
 
 import { assertInTransaction, deserialize, serialize } from "./utils";
@@ -57,10 +57,10 @@ export function getState<TFilter>(props: {
   let filter: TFilter | undefined;
 
   if (storedCursor?.order_key) {
-    cursor = {
+    cursor = normalizeCursor({
       orderKey: BigInt(storedCursor.order_key),
-      uniqueKey: storedCursor.unique_key as `0x${string}`,
-    };
+      uniqueKey: storedCursor.unique_key ? storedCursor.unique_key : null,
+    });
   }
 
   if (storedFilter) {

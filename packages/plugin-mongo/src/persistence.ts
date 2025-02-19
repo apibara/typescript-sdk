@@ -1,10 +1,10 @@
-import type { Cursor } from "@apibara/protocol";
+import { type Cursor, normalizeCursor } from "@apibara/protocol";
 import type { ClientSession, Db } from "mongodb";
 
 export type CheckpointSchema = {
   id: string;
   orderKey: number;
-  uniqueKey?: `0x${string}`;
+  uniqueKey: string | null;
 };
 
 export type FilterSchema = {
@@ -98,10 +98,10 @@ export async function getState<TFilter>(props: {
     .findOne({ id: indexerId }, { session });
 
   if (checkpointRow) {
-    cursor = {
+    cursor = normalizeCursor({
       orderKey: BigInt(checkpointRow.orderKey),
       uniqueKey: checkpointRow.uniqueKey,
-    };
+    });
   }
 
   const filterRow = await db

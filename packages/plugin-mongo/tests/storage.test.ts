@@ -427,7 +427,6 @@ describe("MongoDB Test", () => {
         {
           "cursor": {
             "orderKey": 5000005n,
-            "uniqueKey": null,
           },
           "filter": undefined,
         }
