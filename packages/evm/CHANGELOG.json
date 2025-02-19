@@ -2,6 +2,21 @@
   "name": "@apibara/evm",
   "entries": [
     {
+      "date": "Wed, 19 Feb 2025 14:05:45 GMT",
+      "version": "2.0.1-beta.40",
+      "tag": "@apibara/evm_v2.0.1-beta.40",
+      "comments": {
+        "prerelease": [
+          {
+            "author": "francesco@ceccon.me",
+            "package": "@apibara/evm",
+            "commit": "47db783c93c716174c6daec6eed297bebf58251e",
+            "comment": "plugins: fix issue caused by cursors with empty unique key"
+          }
+        ]
+      }
+    },
+    {
       "date": "Mon, 20 Jan 2025 15:38:48 GMT",
       "version": "2.0.1-beta.27",
       "tag": "@apibara/evm_v2.0.1-beta.27",

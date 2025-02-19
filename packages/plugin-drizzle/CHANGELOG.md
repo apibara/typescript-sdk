@@ -1,8 +1,16 @@
 # Change Log - @apibara/plugin-drizzle
 
-<!-- This log was last generated on Sun, 02 Feb 2025 09:38:12 GMT and should not be manually modified. -->
+<!-- This log was last generated on Wed, 19 Feb 2025 14:05:45 GMT and should not be manually modified. -->
 
 <!-- Start content -->
+
+## 2.0.0-beta.40
+
+Wed, 19 Feb 2025 14:05:45 GMT
+
+### Changes
+
+- plugin-drizzle: fix issue caused by cursors with empty unique key (francesco@ceccon.me)
 
 ## 2.0.0-beta.37
 

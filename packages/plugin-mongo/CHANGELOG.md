@@ -1,8 +1,16 @@
 # Change Log - @apibara/plugin-mongo
 
-<!-- This log was last generated on Sun, 02 Feb 2025 09:38:12 GMT and should not be manually modified. -->
+<!-- This log was last generated on Wed, 19 Feb 2025 14:05:45 GMT and should not be manually modified. -->
 
 <!-- Start content -->
+
+## 2.0.0-beta.40
+
+Wed, 19 Feb 2025 14:05:45 GMT
+
+### Changes
+
+- plugins: fix issue caused by cursors with empty unique key (francesco@ceccon.me)
 
 ## 2.0.0-beta.38
 

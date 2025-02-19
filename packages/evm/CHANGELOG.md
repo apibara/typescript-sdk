@@ -1,8 +1,16 @@
 # Change Log - @apibara/evm
 
-<!-- This log was last generated on Mon, 20 Jan 2025 15:38:48 GMT and should not be manually modified. -->
+<!-- This log was last generated on Wed, 19 Feb 2025 14:05:45 GMT and should not be manually modified. -->
 
 <!-- Start content -->
+
+## 2.0.1-beta.40
+
+Wed, 19 Feb 2025 14:05:45 GMT
+
+### Changes
+
+- plugins: fix issue caused by cursors with empty unique key (francesco@ceccon.me)
 
 ## 2.0.1-beta.27
 

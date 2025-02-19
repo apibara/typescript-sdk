@@ -2,6 +2,21 @@
   "name": "@apibara/plugin-drizzle",
   "entries": [
     {
+      "date": "Wed, 19 Feb 2025 14:05:45 GMT",
+      "version": "2.0.0-beta.40",
+      "tag": "@apibara/plugin-drizzle_v2.0.0-beta.40",
+      "comments": {
+        "prerelease": [
+          {
+            "author": "francesco@ceccon.me",
+            "package": "@apibara/plugin-drizzle",
+            "commit": "47db783c93c716174c6daec6eed297bebf58251e",
+            "comment": "plugin-drizzle: fix issue caused by cursors with empty unique key"
+          }
+        ]
+      }
+    },
+    {
       "date": "Sun, 02 Feb 2025 09:38:12 GMT",
       "version": "2.0.0-beta.37",
       "tag": "@apibara/plugin-drizzle_v2.0.0-beta.37",

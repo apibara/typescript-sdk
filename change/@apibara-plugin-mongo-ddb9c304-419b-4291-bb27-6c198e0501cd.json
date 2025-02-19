@@ -1,7 +1,0 @@
-{
-  "type": "prerelease",
-  "comment": "plugins: fix issue caused by cursors with empty unique key",
-  "packageName": "@apibara/plugin-mongo",
-  "email": "francesco@ceccon.me",
-  "dependentChangeType": "patch"
-}
