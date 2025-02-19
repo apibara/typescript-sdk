@@ -35,7 +35,10 @@
           "packages/evm",
           "packages/indexer",
           "packages/protocol",
-          "packages/starknet"
+          "packages/starknet",
+          "packages/plugin-drizzle",
+          "packages/plugin-mongo",
+          "packages/plugin-sqlite"
         ]
       }
     ],
