@@ -30,8 +30,11 @@ export type InternalContext = {
 
 export function useInternalContext(): InternalContext {
   const ctx = useIndexerContext();
-  if (!ctx[INTERNAL_CONTEXT_PROPERTY]) {
-    throw new Error("Internal context is not available");
+
+  if (ctx[INTERNAL_CONTEXT_PROPERTY] === undefined) {
+    throw new Error(
+      "Internal context is not available, possibly 'internalContext' plugin is missing!",
+    );
   }
   return ctx[INTERNAL_CONTEXT_PROPERTY];
 }
