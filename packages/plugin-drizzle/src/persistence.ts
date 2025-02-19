@@ -1,4 +1,4 @@
-import type { Cursor } from "@apibara/protocol";
+import { type Cursor, normalizeCursor } from "@apibara/protocol";
 import { and, eq, gt, isNull, lt } from "drizzle-orm";
 import type {
   ExtractTablesWithRelations,
@@ -15,10 +15,7 @@ const SCHEMA_VERSION_TABLE_NAME = "__indexer_schema_version";
 export const checkpoints = pgTable(CHECKPOINTS_TABLE_NAME, {
   id: text("id").notNull().primaryKey(),
   orderKey: integer("order_key").notNull(),
-  uniqueKey: text("unique_key")
-    .$type<`0x${string}` | undefined>()
-    .notNull()
-    .default(undefined),
+  uniqueKey: text("unique_key"),
 });
 
 export const filters = pgTable(
@@ -87,7 +84,7 @@ export async function initializePersistentState<
         CREATE TABLE IF NOT EXISTS ${CHECKPOINTS_TABLE_NAME} (
           id TEXT PRIMARY KEY,
           order_key INTEGER NOT NULL,
-          unique_key TEXT NOT NULL DEFAULT ''
+          unique_key TEXT
         );
       `);
 
@@ -212,10 +209,10 @@ export async function getState<
       .where(eq(checkpoints.id, indexerId));
 
     const cursor = checkpointRows[0]
-      ? {
+      ? normalizeCursor({
           orderKey: BigInt(checkpointRows[0].orderKey),
           uniqueKey: checkpointRows[0].uniqueKey,
-        }
+        })
       : undefined;
 
     const filterRows = await tx
