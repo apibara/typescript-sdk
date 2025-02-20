@@ -13,6 +13,7 @@
       "apibara/rollup": ["./src/rollup"],
       "apibara/types": ["./src/types"],
       "apibara/hooks": ["./src/hooks"],
+      "apibara/create": ["./src/create"],
       "apibara/runtime/meta": ["./runtime-meta"],
       "#apibara-internal-virtual/*": ["./src/types/virtual/*"]
     }
