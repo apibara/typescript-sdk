@@ -1,7 +1,0 @@
-{
-  "type": "prerelease",
-  "comment": "drizzle: bump @electric-sql/pglite version",
-  "packageName": "@apibara/plugin-drizzle",
-  "email": "jadejajaipal5@gmail.com",
-  "dependentChangeType": "patch"
-}

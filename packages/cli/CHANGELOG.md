@@ -1,8 +1,16 @@
 # Change Log - apibara
 
-<!-- This log was last generated on Fri, 21 Feb 2025 14:35:19 GMT and should not be manually modified. -->
+<!-- This log was last generated on Fri, 21 Feb 2025 16:21:00 GMT and should not be manually modified. -->
 
 <!-- Start content -->
+
+## 2.0.0-beta.42
+
+Fri, 21 Feb 2025 16:21:00 GMT
+
+### Changes
+
+- cli: bump @electric-sql/pglite version (jadejajaipal5@gmail.com)
 
 ## 2.0.0-beta.41
 

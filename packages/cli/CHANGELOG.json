@@ -2,6 +2,21 @@
   "name": "apibara",
   "entries": [
     {
+      "date": "Fri, 21 Feb 2025 16:21:00 GMT",
+      "version": "2.0.0-beta.42",
+      "tag": "apibara_v2.0.0-beta.42",
+      "comments": {
+        "prerelease": [
+          {
+            "author": "jadejajaipal5@gmail.com",
+            "package": "apibara",
+            "commit": "a87deb2fd5fc3c1aa9160fd756be9ba72805dfd1",
+            "comment": "cli: bump @electric-sql/pglite version"
+          }
+        ]
+      }
+    },
+    {
       "date": "Fri, 21 Feb 2025 14:35:19 GMT",
       "version": "2.0.0-beta.41",
       "tag": "apibara_v2.0.0-beta.41",

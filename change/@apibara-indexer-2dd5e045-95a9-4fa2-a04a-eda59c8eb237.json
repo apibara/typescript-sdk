@@ -1,7 +1,0 @@
-{
-  "type": "prerelease",
-  "comment": "indexer: bump @electric-sql/pglite version",
-  "packageName": "@apibara/indexer",
-  "email": "jadejajaipal5@gmail.com",
-  "dependentChangeType": "patch"
-}
