@@ -14,6 +14,7 @@ import {
   cancelOperation,
   emptyDir,
   getLanguageFromAlias,
+  getPackageManager,
   isEmpty,
   validateLanguage,
 } from "./utils";
@@ -153,9 +154,10 @@ export async function initializeProject({
 
     await addIndexer({});
   } else {
+    const pkgManager = getPackageManager();
     consola.info(
       "Run ",
-      green("npm run install"),
+      green(`${pkgManager.name} run install`),
       " to install all dependencies",
     );
   }

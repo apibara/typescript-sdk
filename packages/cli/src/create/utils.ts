@@ -3,7 +3,7 @@ import path, { basename } from "node:path";
 import prompts from "prompts";
 import { blue, cyan, red, yellow } from "./colors";
 import { dnaUrls, networks } from "./constants";
-import type { Chain, Language, Network } from "./types";
+import type { Chain, Language, Network, PkgInfo } from "./types";
 
 export function isEmpty(path: string) {
   const files = fs.readdirSync(path);
@@ -292,12 +292,17 @@ export function convertKebabToCamelCase(_str: string): string {
 
 export async function checkFileExists(
   path: string,
-  askPrompt = false,
-  fileName?: string,
+  options?: {
+    askPrompt?: boolean;
+    fileName?: string;
+    allowIgnore?: boolean;
+  },
 ): Promise<{
   exists: boolean;
   overwrite: boolean;
 }> {
+  const { askPrompt = false, fileName, allowIgnore = false } = options ?? {};
+
   if (!fs.existsSync(path)) {
     return {
       exists: false,
@@ -312,6 +317,14 @@ export async function checkFileExists(
       message: `${fileName ?? basename(path)} already exists. Please choose how to proceed:`,
       initial: 0,
       choices: [
+        ...(allowIgnore
+          ? [
+              {
+                title: "Keep original file",
+                value: "ignore",
+              },
+            ]
+          : []),
         {
           title: "Cancel operation",
           value: "no",
@@ -325,6 +338,13 @@ export async function checkFileExists(
 
     if (overwrite === "no") {
       cancelOperation();
+    }
+
+    if (overwrite === "ignore") {
+      return {
+        exists: true,
+        overwrite: false,
+      };
     }
 
     return {
@@ -341,4 +361,52 @@ export async function checkFileExists(
 
 export function cancelOperation(message?: string) {
   throw new Error(red("✖") + (message ?? " Operation cancelled"));
+}
+
+export function getPackageManager(): PkgInfo {
+  const userAgent = process.env.npm_config_user_agent;
+  const pkgInfo = pkgFromUserAgent(userAgent);
+  if (pkgInfo) {
+    return pkgInfo;
+  }
+  return {
+    name: "npm",
+  };
+}
+
+/**
+ 
+https://github.com/vitejs/vite/blob/07091a1e804e5934208ef0b6324a04317dd0d815/packages/create-vite/src/index.ts#L585
+
+MIT License
+
+Copyright (c) 2019-present, VoidZero Inc. and Vite contributors
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+ */
+function pkgFromUserAgent(userAgent: string | undefined): PkgInfo | undefined {
+  if (!userAgent) return undefined;
+  const pkgSpec = userAgent.split(" ")[0];
+  const pkgSpecArr = pkgSpec.split("/");
+  return {
+    name: pkgSpecArr[0],
+    version: pkgSpecArr[1],
+  };
 }

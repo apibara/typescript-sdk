@@ -20,6 +20,7 @@ import {
   cancelOperation,
   convertKebabToCamelCase,
   getApibaraConfigLanguage,
+  getPackageManager,
   hasApibaraConfig,
   validateChain,
   validateDnaUrl,
@@ -180,6 +181,8 @@ export async function addIndexer({
 
   const indexerFileId = argIndexerId! ?? prompt_indexerId!;
 
+  const pkgManager = getPackageManager();
+
   const options: IndexerOptions = {
     cwd: process.cwd(),
     indexerFileId,
@@ -189,6 +192,7 @@ export async function addIndexer({
     storage: (argStorage as Storage) ?? prompt_storage?.name!,
     dnaUrl: argDnaUrl ?? prompt_dnaUrl,
     language,
+    packageManager: pkgManager.name,
   };
 
   updateApibaraConfigFile(options);
@@ -212,8 +216,10 @@ export async function addIndexer({
   console.log();
 
   consola.info(
-    `Before running the indexer, run ${cyan("npm run install")}${
-      language === "typescript" ? " & " + cyan("npm run prepare") : ""
+    `Before running the indexer, run ${cyan(`${options.packageManager} run install`)}${
+      language === "typescript"
+        ? " & " + cyan(`${options.packageManager} run prepare`)
+        : ""
     }`,
   );
 }

@@ -24,5 +24,11 @@ export type IndexerOptions = {
   network: Network;
   storage: Storage;
   dnaUrl?: string;
+  packageManager: string;
   language: Language;
+};
+
+export type PkgInfo = {
+  name: string;
+  version?: string;
 };
