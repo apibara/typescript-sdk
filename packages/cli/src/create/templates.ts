@@ -314,11 +314,14 @@ export async function createDrizzleStorageFiles(options: IndexerOptions) {
   if (!exists || overwrite) {
     const drizzleConfigContent = `${language === "typescript" ? 'import type { Config } from "drizzle-kit";' : ""}
 
-    export default {
-      schema: "./lib/schema.ts",
-      out: "./drizzle",
-      dialect: "postgresql",
-    }${language === "typescript" ? " satisfies Config" : ""};`;
+export default {
+  schema: "./lib/schema.ts",
+  out: "./drizzle",
+  dialect: "postgresql",
+  dbCredentials: {
+    url: process.env["POSTGRES_CONNECTION_STRING"] ?? "",
+  },
+}${language === "typescript" ? " satisfies Config" : ""};`;
 
     fs.writeFileSync(drizzleConfigPath, drizzleConfigContent);
 
