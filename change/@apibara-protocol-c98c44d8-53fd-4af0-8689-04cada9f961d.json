@@ -1,0 +1,7 @@
+{
+  "type": "prerelease",
+  "comment": "Update all public packages to version 2.1.0-beta.0",
+  "packageName": "@apibara/protocol",
+  "email": "francesco@ceccon.me",
+  "dependentChangeType": "patch"
+}
