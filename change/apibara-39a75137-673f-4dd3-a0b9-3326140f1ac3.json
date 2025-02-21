@@ -1,7 +1,0 @@
-{
-  "type": "prerelease",
-  "comment": "cli: init and add command ",
-  "packageName": "apibara",
-  "email": "jadejajaipal5@gmail.com",
-  "dependentChangeType": "patch"
-}

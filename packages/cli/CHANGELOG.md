@@ -1,8 +1,16 @@
 # Change Log - apibara
 
-<!-- This log was last generated on Wed, 19 Feb 2025 12:45:45 GMT and should not be manually modified. -->
+<!-- This log was last generated on Fri, 21 Feb 2025 14:35:19 GMT and should not be manually modified. -->
 
 <!-- Start content -->
+
+## 2.0.0-beta.41
+
+Fri, 21 Feb 2025 14:35:19 GMT
+
+### Changes
+
+- cli: init and add command  (jadejajaipal5@gmail.com)
 
 ## 2.0.0-beta.39
 

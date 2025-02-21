@@ -2,6 +2,21 @@
   "name": "apibara",
   "entries": [
     {
+      "date": "Fri, 21 Feb 2025 14:35:19 GMT",
+      "version": "2.0.0-beta.41",
+      "tag": "apibara_v2.0.0-beta.41",
+      "comments": {
+        "prerelease": [
+          {
+            "author": "jadejajaipal5@gmail.com",
+            "package": "apibara",
+            "commit": "dc5bfc2a1717128741d124960cd30dbc50ef403e",
+            "comment": "cli: init and add command "
+          }
+        ]
+      }
+    },
+    {
       "date": "Wed, 19 Feb 2025 12:45:45 GMT",
       "version": "2.0.0-beta.39",
       "tag": "apibara_v2.0.0-beta.39",
