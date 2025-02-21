@@ -11,6 +11,8 @@ export const mainCli = defineCommand({
     build: () => import("./commands/build").then((r) => r.default),
     start: () => import("./commands/start").then((r) => r.default),
     prepare: () => import("./commands/prepare").then((r) => r.default),
+    init: () => import("./commands/init").then((r) => r.default),
+    add: () => import("./commands/add").then((r) => r.default),
   },
 });
 

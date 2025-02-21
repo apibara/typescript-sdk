@@ -10,6 +10,7 @@ const modules = [
   "types",
   "hooks",
   "runtime",
+  "create",
 ];
 
 // @ts-ignore
@@ -23,6 +24,7 @@ export default defineBuildConfig({
     { input: "./src/rollup/index.ts" },
     { input: "./src/types/index.ts" },
     { input: "./src/hooks/index.ts" },
+    { input: "./src/create/index.ts" },
     { input: "./src/runtime/", outDir: "./dist/runtime", format: "esm" },
   ],
   clean: true,

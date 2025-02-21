@@ -10,8 +10,12 @@
       "correctness": {
         "noUnusedImports": "error"
       },
+      "complexity": {
+        "useLiteralKeys": "off"
+      },
       "style": {
-        "noNonNullAssertion": "off"
+        "noNonNullAssertion": "off",
+        "useTemplate": "off"
       }
     }
   },

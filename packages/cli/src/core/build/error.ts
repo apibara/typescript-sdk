@@ -23,7 +23,6 @@ export function formatRollupError(
         (error as rollup.RollupError).frame;
 
       logs.push(
-        // biome-ignore lint/style/useTemplate: <explanation>
         `Rollup error while processing \`${path}\`` + text ? "\n\n" + text : "",
       );
     }
