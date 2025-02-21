@@ -159,7 +159,9 @@ export async function createIndexerFile(options: IndexerOptions) {
     `${options.indexerFileId}.indexer.${options.language === "typescript" ? "ts" : "js"}`,
   );
 
-  const { exists, overwrite } = await checkFileExists(indexerFilePath, true);
+  const { exists, overwrite } = await checkFileExists(indexerFilePath, {
+    askPrompt: true,
+  });
 
   if (exists && !overwrite) return;
 
@@ -304,21 +306,24 @@ export async function createDrizzleStorageFiles(options: IndexerOptions) {
   // create drizzle.config.ts
   const drizzleConfigPath = path.join(cwd, drizzleConfigFileName);
 
-  const { exists, overwrite } = await checkFileExists(drizzleConfigPath, true);
+  const { exists, overwrite } = await checkFileExists(drizzleConfigPath, {
+    askPrompt: true,
+    allowIgnore: true,
+  });
 
-  if (exists && !overwrite) return;
+  if (!exists || overwrite) {
+    const drizzleConfigContent = `${language === "typescript" ? 'import type { Config } from "drizzle-kit";' : ""}
 
-  const drizzleConfigContent = `${language === "typescript" ? 'import type { Config } from "drizzle-kit";' : ""}
+    export default {
+      schema: "./lib/schema.ts",
+      out: "./drizzle",
+      dialect: "postgresql",
+    }${language === "typescript" ? " satisfies Config" : ""};`;
 
-export default {
-  schema: "./lib/schema.ts",
-  out: "./drizzle",
-  dialect: "postgresql",
-}${language === "typescript" ? " satisfies Config" : ""};`;
+    fs.writeFileSync(drizzleConfigPath, drizzleConfigContent);
 
-  fs.writeFileSync(drizzleConfigPath, drizzleConfigContent);
-
-  consola.success(`Created ${cyan(drizzleConfigFileName)}`);
+    consola.success(`Created ${cyan(drizzleConfigFileName)}`);
+  }
 
   /**
    *
@@ -333,11 +338,14 @@ export default {
   const schemaPath = path.join(cwd, "lib", schemaFileName);
 
   const { exists: schemaExists, overwrite: schemaOverwrite } =
-    await checkFileExists(schemaPath, true, `lib/${schemaFileName}`);
+    await checkFileExists(schemaPath, {
+      askPrompt: true,
+      allowIgnore: true,
+      fileName: `lib/${schemaFileName}`,
+    });
 
-  if (schemaExists && !schemaOverwrite) return;
-
-  const schemaContent = `//  --- Add your pg table schemas here ---- 
+  if (!schemaExists || schemaOverwrite) {
+    const schemaContent = `//  --- Add your pg table schemas here ---- 
 
 // import { bigint, pgTable, text, uuid } from "drizzle-orm/pg-core";
 
@@ -350,11 +358,12 @@ export default {
 export {};
   `;
 
-  consola.success(`Created ${cyan("lib/schema.ts")}`);
+    // create directory if it doesn't exist
+    fs.mkdirSync(path.dirname(schemaPath), { recursive: true });
+    fs.writeFileSync(schemaPath, schemaContent);
 
-  // create directory if it doesn't exist
-  fs.mkdirSync(path.dirname(schemaPath), { recursive: true });
-  fs.writeFileSync(schemaPath, schemaContent);
+    consola.success(`Created ${cyan("lib/schema.ts")}`);
+  }
 
   /**
    *
@@ -369,13 +378,15 @@ export {};
 
   const { exists: dbExists, overwrite: dbOverwrite } = await checkFileExists(
     dbPath,
-    true,
-    `lib/${dbFileName}`,
+    {
+      askPrompt: true,
+      fileName: `lib/${dbFileName}`,
+      allowIgnore: true,
+    },
   );
 
-  if (dbExists && !dbOverwrite) return;
-
-  const dbContent = `import * as schema from "./schema";
+  if (!dbExists || dbOverwrite) {
+    const dbContent = `import * as schema from "./schema";
 import { drizzle as nodePgDrizzle } from "drizzle-orm/node-postgres";
 import { drizzle as pgLiteDrizzle } from "drizzle-orm/pglite";
 import pg from "pg";
@@ -402,21 +413,24 @@ export function getDrizzlePgDatabase(connectionString${language === "typescript"
   return { db: nodePgDrizzle(pool, { schema }) };
 }`;
 
-  // create directory if it doesn't exist
-  fs.mkdirSync(path.dirname(dbPath), { recursive: true });
-  fs.writeFileSync(dbPath, dbContent);
+    // create directory if it doesn't exist
+    fs.mkdirSync(path.dirname(dbPath), { recursive: true });
+    fs.writeFileSync(dbPath, dbContent);
 
-  consola.success(`Created ${cyan(`lib/${dbFileName}`)}`);
+    consola.success(`Created ${cyan(`lib/${dbFileName}`)}`);
+  }
 
   console.log("\n");
 
-  consola.info(
-    `Make sure to export your pgTables in ${cyan(`lib/${schemaFileName}`)}`,
-  );
+  // If schema file is created, show the example
+  if (!schemaExists || schemaOverwrite) {
+    consola.info(
+      `Make sure to export your pgTables in ${cyan(`lib/${schemaFileName}`)}`,
+    );
 
-  console.log();
+    console.log();
 
-  consola.info(`${magenta("Example:")}
+    consola.info(`${magenta("Example:")}
     
 ${yellow(`
 ┌──────────────────────────────────────────┐
@@ -431,10 +445,11 @@ export const exampleTable = pgTable("example_table", {
   hash: text("hash"),
 });`)}`);
 
-  console.log("\n");
+    console.log("\n");
+  }
 
   consola.info(
-    `Run ${green("npm run drizzle:generate")} & ${green("npm run drizzle:migrate")} to generate and apply migrations.`,
+    `Run ${green(`${options.packageManager} run drizzle:generate`)} & ${green(`${options.packageManager} run drizzle:migrate`)} to generate and apply migrations.`,
   );
 }
 
