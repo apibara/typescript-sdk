@@ -1,8 +1,16 @@
 # Change Log - @apibara/starknet
 
-<!-- This log was last generated on Mon, 20 Jan 2025 15:38:48 GMT and should not be manually modified. -->
+<!-- This log was last generated on Fri, 21 Feb 2025 19:49:06 GMT and should not be manually modified. -->
 
 <!-- Start content -->
+
+## 2.1.0-beta.1
+
+Fri, 21 Feb 2025 19:49:06 GMT
+
+### Changes
+
+- Update all public packages to version 2.1.0-beta.0 (francesco@ceccon.me)
 
 ## 2.0.0-beta.35
 
