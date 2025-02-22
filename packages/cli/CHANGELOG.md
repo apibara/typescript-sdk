@@ -1,8 +1,16 @@
 # Change Log - apibara
 
-<!-- This log was last generated on Fri, 21 Feb 2025 19:49:06 GMT and should not be manually modified. -->
+<!-- This log was last generated on Sat, 22 Feb 2025 19:04:40 GMT and should not be manually modified. -->
 
 <!-- Start content -->
+
+## 2.1.0-beta.3
+
+Sat, 22 Feb 2025 19:04:40 GMT
+
+### Changes
+
+- cli: prettier formatting and noIndexer flag (jadejajaipal5@gmail.com)
 
 ## 2.1.0-beta.1
 

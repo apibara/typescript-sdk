@@ -1,7 +1,0 @@
-{
-  "type": "prerelease",
-  "comment": "cli: prettier formatting and noIndexer flag",
-  "packageName": "apibara",
-  "email": "jadejajaipal5@gmail.com",
-  "dependentChangeType": "patch"
-}

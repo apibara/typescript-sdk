@@ -2,6 +2,21 @@
   "name": "@apibara/indexer",
   "entries": [
     {
+      "date": "Sat, 22 Feb 2025 19:04:40 GMT",
+      "version": "2.1.0-beta.3",
+      "tag": "@apibara/indexer_v2.1.0-beta.3",
+      "comments": {
+        "prerelease": [
+          {
+            "author": "jadejajaipal5@gmail.com",
+            "package": "@apibara/indexer",
+            "commit": "118e2491ead736166106a63aa1304b8a0d2ae7d1",
+            "comment": "indexer: fix startingBlock validation"
+          }
+        ]
+      }
+    },
+    {
       "date": "Fri, 21 Feb 2025 19:49:06 GMT",
       "version": "2.1.0-beta.1",
       "tag": "@apibara/indexer_v2.1.0-beta.1",
