@@ -1,0 +1,7 @@
+{
+  "type": "prerelease",
+  "comment": "cli: set package versions to \"next\"",
+  "packageName": "apibara",
+  "email": "francesco@ceccon.me",
+  "dependentChangeType": "patch"
+}
