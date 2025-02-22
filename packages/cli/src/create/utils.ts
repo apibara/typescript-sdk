@@ -1,5 +1,6 @@
 import fs from "node:fs";
 import path, { basename } from "node:path";
+import * as prettier from "prettier";
 import prompts from "prompts";
 import { blue, cyan, red, yellow } from "./colors";
 import { dnaUrls, networks } from "./constants";
@@ -409,4 +410,13 @@ function pkgFromUserAgent(userAgent: string | undefined): PkgInfo | undefined {
     name: pkgSpecArr[0],
     version: pkgSpecArr[1],
   };
+}
+
+export async function formatFile(path: string) {
+  const file = fs.readFileSync(path, "utf8");
+  const formatted = await prettier.format(file, {
+    filepath: path,
+    tabWidth: 2,
+  });
+  fs.writeFileSync(path, formatted);
 }

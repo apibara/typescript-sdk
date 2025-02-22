@@ -18,23 +18,19 @@ export default defineCommand({
       default: "ts",
       alias: "l",
     },
-    "no-create-indexer": {
+    noIndexer: {
       type: "boolean",
       description: "Do not create an indexer after initialization",
       default: false,
     },
   },
   async run({ args }) {
-    const {
-      dir: targetDir,
-      "no-create-indexer": noCreateIndexer,
-      language,
-    } = args;
+    const { dir: targetDir, noIndexer, language } = args;
 
     await initializeProject({
       argTargetDir: targetDir,
       argLanguage: language,
-      argNoCreateIndexer: noCreateIndexer,
+      argNoCreateIndexer: noIndexer,
     });
   },
 });

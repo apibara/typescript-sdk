@@ -5,7 +5,7 @@ import { type ObjectLiteralExpression, Project, SyntaxKind } from "ts-morph";
 import { cyan, green, magenta, yellow } from "./colors";
 import { packageVersions } from "./constants";
 import type { IndexerOptions } from "./types";
-import { checkFileExists, getDnaUrl } from "./utils";
+import { checkFileExists, formatFile, getDnaUrl } from "./utils";
 
 export function generatePackageJson(isTypeScript: boolean) {
   return {
@@ -78,19 +78,19 @@ export function generateIndexer({
   chain,
   language,
 }: IndexerOptions) {
-  return `${
-    chain === "ethereum"
-      ? `import { EvmStream } from "@apibara/evm";`
-      : chain === "beaconchain"
-        ? `import { BeaconChainStream } from "@apibara/beaconchain";`
-        : chain === "starknet"
-          ? `import { StarknetStream } from "@apibara/starknet";`
-          : ""
-  }
-import { defineIndexer } from "@apibara/indexer";
-${storage === "postgres" ? `import { drizzleStorage } from "@apibara/plugin-drizzle";` : ""}
-${language === "typescript" ? `import type { ApibaraRuntimeConfig } from "apibara/types";` : ""}
+  return `import { defineIndexer } from "@apibara/indexer";
 import { useLogger } from "@apibara/indexer/plugins";
+${storage === "postgres" ? `import { drizzleStorage } from "@apibara/plugin-drizzle";` : ""}
+${
+  chain === "ethereum"
+    ? `import { EvmStream } from "@apibara/evm";`
+    : chain === "beaconchain"
+      ? `import { BeaconChainStream } from "@apibara/beaconchain";`
+      : chain === "starknet"
+        ? `import { StarknetStream } from "@apibara/starknet";`
+        : ""
+}
+${language === "typescript" ? `import type { ApibaraRuntimeConfig } from "apibara/types";` : ""}
 ${
   storage === "postgres"
     ? `import { getDrizzlePgDatabase } from "../lib/db";`
@@ -169,17 +169,19 @@ export async function createIndexerFile(options: IndexerOptions) {
 
   fs.mkdirSync(path.dirname(indexerFilePath), { recursive: true });
   fs.writeFileSync(indexerFilePath, indexerContent);
+
+  await formatFile(indexerFilePath);
 }
 
-export function updatePackageJson({
+export async function updatePackageJson({
   cwd,
   chain,
   storage,
   language,
 }: IndexerOptions) {
-  const packageJson = JSON.parse(
-    fs.readFileSync(path.join(cwd, "package.json"), "utf8"),
-  );
+  const packageJsonPath = path.join(cwd, "package.json");
+
+  const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, "utf8"));
 
   if (chain === "ethereum") {
     packageJson.dependencies["@apibara/evm"] = packageVersions["@apibara/evm"];
@@ -212,13 +214,12 @@ export function updatePackageJson({
     }
   }
 
-  fs.writeFileSync(
-    path.join(cwd, "package.json"),
-    JSON.stringify(packageJson, null, 2),
-  );
+  fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2));
+
+  await formatFile(packageJsonPath);
 }
 
-export function updateApibaraConfigFile({
+export async function updateApibaraConfigFile({
   indexerId,
   cwd,
   chain,
@@ -279,11 +280,7 @@ export function updateApibaraConfigFile({
   // Save the changes
   sourceFile.saveSync();
 
-  sourceFile.formatText({
-    tabSize: 2,
-    insertSpaceAfterOpeningAndBeforeClosingEmptyBraces: true,
-    insertSpaceAfterOpeningAndBeforeClosingNonemptyBraces: true,
-  });
+  await formatFile(pathToConfig);
 }
 
 export async function createDrizzleStorageFiles(options: IndexerOptions) {
@@ -325,6 +322,8 @@ export default {
 
     fs.writeFileSync(drizzleConfigPath, drizzleConfigContent);
 
+    await formatFile(drizzleConfigPath);
+
     consola.success(`Created ${cyan(drizzleConfigFileName)}`);
   }
 
@@ -364,6 +363,8 @@ export {};
     // create directory if it doesn't exist
     fs.mkdirSync(path.dirname(schemaPath), { recursive: true });
     fs.writeFileSync(schemaPath, schemaContent);
+
+    await formatFile(schemaPath);
 
     consola.success(`Created ${cyan("lib/schema.ts")}`);
   }
@@ -419,6 +420,8 @@ export function getDrizzlePgDatabase(connectionString${language === "typescript"
     // create directory if it doesn't exist
     fs.mkdirSync(path.dirname(dbPath), { recursive: true });
     fs.writeFileSync(dbPath, dbContent);
+
+    await formatFile(dbPath);
 
     consola.success(`Created ${cyan(`lib/${dbFileName}`)}`);
   }
