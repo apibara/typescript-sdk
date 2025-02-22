@@ -1,3 +1,4 @@
+import path from "node:path";
 import consola from "consola";
 import prompts from "prompts";
 import { cyan, red, reset } from "./colors";
@@ -18,6 +19,7 @@ import {
 import type { Chain, IndexerOptions, Network, Storage } from "./types";
 import {
   cancelOperation,
+  checkFileExists,
   convertKebabToCamelCase,
   getApibaraConfigLanguage,
   getPackageManager,
@@ -88,8 +90,19 @@ export async function addIndexer({
         message: reset("Indexer ID:"),
         initial: argIndexerId ?? "my-indexer",
         validate: (id) =>
-          validateIndexerId(id) ||
-          "Invalid indexer ID cannot be empty and must be in kebab-case format",
+          validateIndexerId(id)
+            ? checkFileExists(
+                path.join(
+                  process.cwd(),
+                  "indexers",
+                  `${id}.indexer.${language === "typescript" ? "ts" : "js"}`,
+                ),
+              ).then(({ exists }) =>
+                exists
+                  ? `Indexer ${cyan(`${id}.indexer.${language === "typescript" ? "ts" : "js"}`)} already exists`
+                  : true,
+              )
+            : "Invalid indexer ID, it cannot be empty and must be in kebab-case format",
       },
       {
         type: argChain ? null : "select",
@@ -195,13 +208,13 @@ export async function addIndexer({
     packageManager: pkgManager.name,
   };
 
-  updateApibaraConfigFile(options);
+  await updateApibaraConfigFile(options);
 
   consola.success(
     `Updated ${cyan("apibara.config." + (language === "typescript" ? "ts" : "js"))}`,
   );
 
-  updatePackageJson(options);
+  await updatePackageJson(options);
 
   consola.success(`Updated ${cyan("package.json")}`);
 
