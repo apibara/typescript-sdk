@@ -225,9 +225,13 @@ export async function run<TFilter, TBlock>(
     if (indexer.options.startingCursor) {
       startingCursor = indexer.options.startingCursor;
     } else if (indexer.options.startingBlock !== undefined) {
-      startingCursor = {
-        orderKey: indexer.options.startingBlock,
-      };
+      if (indexer.options.startingBlock === 0n) {
+        startingCursor = undefined;
+      } else if (indexer.options.startingBlock > 0n) {
+        startingCursor = {
+          orderKey: indexer.options.startingBlock - 1n,
+        };
+      }
     }
 
     // if factory mode we add a empty filter at the end of the filter array.
