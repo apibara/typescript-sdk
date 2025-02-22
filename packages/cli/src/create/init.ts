@@ -13,6 +13,7 @@ import type { Language } from "./types";
 import {
   cancelOperation,
   emptyDir,
+  formatFile,
   getLanguageFromAlias,
   getPackageManager,
   isEmpty,
@@ -121,30 +122,40 @@ export async function initializeProject({
   consola.info(`Initializing project in ${argTargetDir}\n\n`);
 
   // Generate package.json
+  const packageJsonPath = path.join(root, "package.json");
   const packageJson = generatePackageJson(isTs);
   fs.writeFileSync(
-    path.join(root, "package.json"),
+    packageJsonPath,
     JSON.stringify(packageJson, null, 2) + "\n",
   );
+  await formatFile(packageJsonPath);
   consola.success("Created ", cyan("package.json"));
 
   // Generate tsconfig.json if TypeScript
   if (isTs) {
+    const tsConfigPath = path.join(root, "tsconfig.json");
     const tsConfig = generateTsConfig();
-    fs.writeFileSync(
-      path.join(root, "tsconfig.json"),
-      JSON.stringify(tsConfig, null, 2) + "\n",
-    );
+    fs.writeFileSync(tsConfigPath, JSON.stringify(tsConfig, null, 2) + "\n");
+    await formatFile(tsConfigPath);
     consola.success("Created ", cyan("tsconfig.json"));
   }
 
+  const apibaraConfigPath = path.join(root, `apibara.config.${configExt}`);
   // Generate apibara.config
   const apibaraConfig = generateApibaraConfig(isTs);
-  fs.writeFileSync(
-    path.join(root, `apibara.config.${configExt}`),
-    apibaraConfig,
-  );
-  consola.success("Created ", cyan(`apibara.config.${configExt}`), "\n\n");
+  fs.writeFileSync(apibaraConfigPath, apibaraConfig);
+  await formatFile(apibaraConfigPath);
+  consola.success("Created ", cyan(`apibara.config.${configExt}`));
+
+  // Create "indexers" directory if not exists
+  const indexersDir = path.join(root, "indexers");
+  if (!fs.existsSync(indexersDir)) {
+    fs.mkdirSync(indexersDir, { recursive: true });
+    consola.success(`Created ${cyan("indexers")} directory`);
+  }
+
+  console.log("\n");
+
   consola.ready(green("Project initialized successfully"));
 
   console.log();
