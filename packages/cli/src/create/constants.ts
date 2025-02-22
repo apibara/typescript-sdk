@@ -66,17 +66,17 @@ export const storages: StorageDataType[] = [
 
 export const packageVersions = {
   // Required Dependencies
-  apibara: "^2.1.0-beta.1",
-  "@apibara/indexer": "^2.1.0-beta.1",
-  "@apibara/protocol": "^2.1.0-beta.1",
+  apibara: "^2.1.0-beta.2",
+  "@apibara/indexer": "^2.1.0-beta.2",
+  "@apibara/protocol": "^2.1.0-beta.2",
   // Chain Dependencies
-  "@apibara/evm": "^2.1.0-beta.1",
-  "@apibara/beaconchain": "^2.1.0-beta.1",
-  "@apibara/starknet": "^2.1.0-beta.1",
+  "@apibara/evm": "^2.1.0-beta.2",
+  "@apibara/beaconchain": "^2.1.0-beta.2",
+  "@apibara/starknet": "^2.1.0-beta.2",
   // Storage Dependencies
-  "@apibara/plugin-drizzle": "^2.1.0-beta.1",
-  "@apibara/plugin-mongo": "^2.1.0-beta.1",
-  "@apibara/plugin-sqlite": "^2.1.0-beta.1",
+  "@apibara/plugin-drizzle": "^2.1.0-beta.2",
+  "@apibara/plugin-mongo": "^2.1.0-beta.2",
+  "@apibara/plugin-sqlite": "^2.1.0-beta.2",
   // Postgres Dependencies
   "@electric-sql/pglite": "^0.2.17",
   "drizzle-orm": "^0.37.0",
