@@ -2,6 +2,21 @@
   "name": "apibara",
   "entries": [
     {
+      "date": "Sat, 22 Feb 2025 19:44:04 GMT",
+      "version": "2.1.0-beta.4",
+      "tag": "apibara_v2.1.0-beta.4",
+      "comments": {
+        "prerelease": [
+          {
+            "author": "francesco@ceccon.me",
+            "package": "apibara",
+            "commit": "da2cfe06bf4c421d09eb9593849f9fd05f0adb74",
+            "comment": "cli: set package versions to \"next\""
+          }
+        ]
+      }
+    },
+    {
       "date": "Sat, 22 Feb 2025 19:04:40 GMT",
       "version": "2.1.0-beta.3",
       "tag": "apibara_v2.1.0-beta.3",

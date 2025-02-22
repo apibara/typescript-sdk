@@ -1,8 +1,16 @@
 # Change Log - apibara
 
-<!-- This log was last generated on Sat, 22 Feb 2025 19:04:40 GMT and should not be manually modified. -->
+<!-- This log was last generated on Sat, 22 Feb 2025 19:44:04 GMT and should not be manually modified. -->
 
 <!-- Start content -->
+
+## 2.1.0-beta.4
+
+Sat, 22 Feb 2025 19:44:04 GMT
+
+### Changes
+
+- cli: set package versions to "next" (francesco@ceccon.me)
 
 ## 2.1.0-beta.3
 
