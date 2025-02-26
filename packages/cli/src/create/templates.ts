@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { consola } from "consola";
+import prompts from "prompts";
 import { type ObjectLiteralExpression, Project, SyntaxKind } from "ts-morph";
 import { cyan, green, magenta, yellow } from "./colors";
 import { packageVersions } from "./constants";
@@ -465,4 +466,104 @@ export async function createStorageRelatedFiles(options: IndexerOptions) {
   if (storage === "postgres") {
     await createDrizzleStorageFiles(options);
   }
+}
+
+const gitIgnoreItems: {
+  isRecommended: boolean;
+  description?: string;
+  value: string;
+}[] = [
+  {
+    isRecommended: false,
+    value: "node_modules",
+  },
+  {
+    isRecommended: false,
+    value: "dist",
+  },
+  {
+    isRecommended: true,
+    description: "build and dev files of apibara",
+    value: ".apibara",
+  },
+  {
+    isRecommended: false,
+    value: ".env",
+  },
+  {
+    isRecommended: false,
+    description: "for mac users",
+    value: ".DS_Store",
+  },
+];
+
+export async function createGitIgnoreFile(cwd: string) {
+  const gitIgnorePath = path.join(cwd, ".gitignore");
+
+  if (fs.existsSync(gitIgnorePath)) {
+    const result = await prompts([
+      {
+        type: "select",
+        name: "overwrite",
+        message: `${cyan(".gitignore")} already exists. Please choose how to proceed:`,
+        initial: 0,
+        choices: [
+          {
+            title: "Choose items to append in your .gitignore",
+            value: "append",
+          },
+          {
+            title: "Keep original",
+            value: "ignore",
+          },
+          {
+            title: "Overwrite",
+            value: "overwrite",
+          },
+        ],
+      },
+      {
+        type: (overwrite: "append" | "ignore" | "overwrite") =>
+          overwrite === "append" ? "multiselect" : null,
+        name: "ignoreItems",
+        message: "Choose items to append in your .gitignore",
+        choices: gitIgnoreItems.map((item) => ({
+          title: `${yellow(item.value)}${
+            item.description ? ` - ${item.description}` : ""
+          }${item.isRecommended ? ` ${green("(recommended)")}` : ""}`,
+          value: item.value,
+        })),
+      },
+    ]);
+
+    const { overwrite, ignoreItems } = result as {
+      overwrite: "append" | "ignore" | "overwrite";
+      ignoreItems: string[];
+    };
+
+    if (overwrite === "append" && ignoreItems.length > 0) {
+      const gitIgnoreContent = fs.readFileSync(gitIgnorePath, "utf8");
+      fs.writeFileSync(
+        gitIgnorePath,
+        `${gitIgnoreContent}\n${result.ignoreItems.join("\n")}`,
+      );
+      consola.success(`Updated ${cyan(".gitignore")}`);
+      return;
+    }
+
+    if (overwrite === "overwrite") {
+      fs.writeFileSync(
+        gitIgnorePath,
+        gitIgnoreItems.map((item) => item.value).join("\n"),
+      );
+      consola.success(`Updated ${cyan(".gitignore")}`);
+      return;
+    }
+  }
+
+  fs.writeFileSync(
+    gitIgnorePath,
+    gitIgnoreItems.map((item) => item.value).join("\n"),
+  );
+  consola.success(`Created ${cyan(".gitignore")}`);
 }

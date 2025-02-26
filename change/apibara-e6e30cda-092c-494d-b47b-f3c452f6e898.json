@@ -1,0 +1,7 @@
+{
+  "type": "prerelease",
+  "comment": "cli: add .gitignore template",
+  "packageName": "apibara",
+  "email": "jadejajaipal5@gmail.com",
+  "dependentChangeType": "patch"
+}
