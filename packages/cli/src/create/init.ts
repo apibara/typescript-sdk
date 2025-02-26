@@ -5,6 +5,7 @@ import prompts from "prompts";
 import { addIndexer } from "./add";
 import { cyan, green } from "./colors";
 import {
+  createGitIgnoreFile,
   generateApibaraConfig,
   generatePackageJson,
   generateTsConfig,
@@ -129,7 +130,7 @@ export async function initializeProject({
     JSON.stringify(packageJson, null, 2) + "\n",
   );
   await formatFile(packageJsonPath);
-  consola.success("Created ", cyan("package.json"));
+  consola.success("Created", cyan("package.json"));
 
   // Generate tsconfig.json if TypeScript
   if (isTs) {
@@ -137,7 +138,7 @@ export async function initializeProject({
     const tsConfig = generateTsConfig();
     fs.writeFileSync(tsConfigPath, JSON.stringify(tsConfig, null, 2) + "\n");
     await formatFile(tsConfigPath);
-    consola.success("Created ", cyan("tsconfig.json"));
+    consola.success("Created", cyan("tsconfig.json"));
   }
 
   const apibaraConfigPath = path.join(root, `apibara.config.${configExt}`);
@@ -145,7 +146,7 @@ export async function initializeProject({
   const apibaraConfig = generateApibaraConfig(isTs);
   fs.writeFileSync(apibaraConfigPath, apibaraConfig);
   await formatFile(apibaraConfigPath);
-  consola.success("Created ", cyan(`apibara.config.${configExt}`));
+  consola.success("Created", cyan(`apibara.config.${configExt}`));
 
   // Create "indexers" directory if not exists
   const indexersDir = path.join(root, "indexers");
@@ -153,6 +154,8 @@ export async function initializeProject({
     fs.mkdirSync(indexersDir, { recursive: true });
     consola.success(`Created ${cyan("indexers")} directory`);
   }
+
+  await createGitIgnoreFile(root);
 
   console.log("\n");
 
