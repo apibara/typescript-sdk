@@ -1,8 +1,16 @@
 # Change Log - apibara
 
-<!-- This log was last generated on Sat, 22 Feb 2025 19:44:04 GMT and should not be manually modified. -->
+<!-- This log was last generated on Wed, 26 Feb 2025 19:47:55 GMT and should not be manually modified. -->
 
 <!-- Start content -->
+
+## 2.1.0-beta.5
+
+Wed, 26 Feb 2025 19:47:55 GMT
+
+### Changes
+
+- cli: add .gitignore template (jadejajaipal5@gmail.com)
 
 ## 2.1.0-beta.4
 

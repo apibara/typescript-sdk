@@ -2,6 +2,21 @@
   "name": "apibara",
   "entries": [
     {
+      "date": "Wed, 26 Feb 2025 19:47:55 GMT",
+      "version": "2.1.0-beta.5",
+      "tag": "apibara_v2.1.0-beta.5",
+      "comments": {
+        "prerelease": [
+          {
+            "author": "jadejajaipal5@gmail.com",
+            "package": "apibara",
+            "commit": "8e74dc416a017994b6d11d444a72fa855b330f1d",
+            "comment": "cli: add .gitignore template"
+          }
+        ]
+      }
+    },
+    {
       "date": "Sat, 22 Feb 2025 19:44:04 GMT",
       "version": "2.1.0-beta.4",
       "tag": "apibara_v2.1.0-beta.4",
