@@ -1,8 +1,16 @@
 # Change Log - apibara
 
-<!-- This log was last generated on Wed, 26 Feb 2025 19:47:55 GMT and should not be manually modified. -->
+<!-- This log was last generated on Fri, 28 Feb 2025 19:17:34 GMT and should not be manually modified. -->
 
 <!-- Start content -->
+
+## 2.1.0-beta.6
+
+Fri, 28 Feb 2025 19:17:34 GMT
+
+### Changes
+
+- cli: fix build if the indexer file doesn't export anything (francesco@ceccon.me)
 
 ## 2.1.0-beta.5
 

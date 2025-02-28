@@ -2,6 +2,21 @@
   "name": "apibara",
   "entries": [
     {
+      "date": "Fri, 28 Feb 2025 19:17:34 GMT",
+      "version": "2.1.0-beta.6",
+      "tag": "apibara_v2.1.0-beta.6",
+      "comments": {
+        "prerelease": [
+          {
+            "author": "francesco@ceccon.me",
+            "package": "apibara",
+            "commit": "6bbbb782c992727cfd8d4df7deb165ccb188a273",
+            "comment": "cli: fix build if the indexer file doesn't export anything"
+          }
+        ]
+      }
+    },
+    {
       "date": "Wed, 26 Feb 2025 19:47:55 GMT",
       "version": "2.1.0-beta.5",
       "tag": "apibara_v2.1.0-beta.5",
