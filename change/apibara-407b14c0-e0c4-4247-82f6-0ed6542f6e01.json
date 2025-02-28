@@ -1,0 +1,7 @@
+{
+  "type": "prerelease",
+  "comment": "cli: fix build if the indexer file doesn't export anything",
+  "packageName": "apibara",
+  "email": "francesco@ceccon.me",
+  "dependentChangeType": "patch"
+}
