@@ -76,10 +76,12 @@ export function getRollupConfig(apibara: Apibara): RollupConfig {
   rollupConfig.plugins.push(
     nodeResolve({
       extensions,
-      preferBuiltins: true,
+      preferBuiltins: !!apibara.options.node,
       mainFields: ["main"],
+      exportConditions: apibara.options.exportConditions,
     }),
   );
+
   rollupConfig.plugins.push(indexers(apibara));
   rollupConfig.plugins.push(appConfig(apibara));
 
