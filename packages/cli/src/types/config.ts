@@ -84,6 +84,8 @@ export interface ApibaraOptions<
   sourceMap?: boolean;
   entry: string;
   commonJS?: RollupCommonJSOptions;
+  node: boolean;
+  exportConditions?: string[];
 
   // Advanced
   typescript: {

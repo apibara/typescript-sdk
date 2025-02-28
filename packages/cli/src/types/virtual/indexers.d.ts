@@ -7,4 +7,7 @@ export type IndexerConstructor =
     ) => IndexerWithStreamConfig<unknown, unknown, unknown>)
   | IndexerWithStreamConfig<unknown, unknown, unknown>;
 
-export const indexers: { name: string; indexer: IndexerConstructor }[] = [];
+export const indexers: {
+  name: string;
+  indexer: { default?: IndexerConstructor | undefined };
+}[] = [];

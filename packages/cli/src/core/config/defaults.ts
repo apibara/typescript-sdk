@@ -14,4 +14,7 @@ export const ApibaraDefaults: ApibaraConfig = {
     generateRuntimeConfigTypes: true,
     internalPaths: false,
   },
+
+  node: true,
+  exportConditions: ["node"],
 };

@@ -99,7 +99,6 @@
     "citty": "^0.1.6",
     "consola": "^3.2.3",
     "defu": "^6.1.4",
-    "esbuild": "^0.23.0",
     "fs-extra": "^11.2.0",
     "hookable": "^5.5.3",
     "klona": "^2.0.6",
@@ -111,8 +110,7 @@
     "pkg-types": "^1.1.3",
     "prettier": "^3.5.2",
     "prompts": "^2.4.2",
-    "rollup": "^4.18.1",
-    "rollup-plugin-esbuild": "^6.1.1",
+    "rollup": "^4.34.8",
     "ts-morph": "^25.0.1",
     "tslib": "^2.6.3",
     "untyped": "^1.4.2"

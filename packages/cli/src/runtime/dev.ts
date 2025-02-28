@@ -37,6 +37,9 @@ const startCommand = defineCommand({
     await Promise.all(
       selectedIndexers.map(async (indexer) => {
         const indexerInstance = createIndexer(indexer, preset);
+        if (!indexerInstance) {
+          return;
+        }
 
         const client = createClient(
           indexerInstance.streamConfig,

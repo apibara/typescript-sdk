@@ -1,6 +1,7 @@
 import { runWithReconnect } from "@apibara/indexer";
 import { createClient } from "@apibara/protocol";
 import { defineCommand, runMain } from "citty";
+import consola from "consola";
 import { createIndexer } from "./internal/app";
 
 const startCommand = defineCommand({
@@ -23,6 +24,10 @@ const startCommand = defineCommand({
     const { indexer, preset } = args;
 
     const indexerInstance = createIndexer(indexer, preset);
+    if (!indexerInstance) {
+      consola.error(`Specified indexer "${indexer}" but it was not defined`);
+      process.exit(1);
+    }
 
     const client = createClient(
       indexerInstance.streamConfig,

@@ -8,6 +8,7 @@ import {
   inMemoryPersistence,
   logger,
 } from "@apibara/indexer/plugins";
+import consola from "consola";
 import { config } from "#apibara-internal-virtual/config";
 import { indexers } from "#apibara-internal-virtual/indexers";
 import { createLogger } from "./logger";
@@ -42,10 +43,18 @@ export function createIndexer(indexerName: string, preset?: string) {
     );
   }
 
+  const indexerModule = indexerDefinition.indexer?.default;
+  if (indexerModule === undefined) {
+    consola.warn(
+      `Specified indexer "${indexerName}" but it does not export a default. Ignoring.`,
+    );
+    return;
+  }
+
   const definition =
-    typeof indexerDefinition.indexer === "function"
-      ? indexerDefinition.indexer(runtimeConfig)
-      : indexerDefinition.indexer;
+    typeof indexerModule === "function"
+      ? indexerModule(runtimeConfig)
+      : indexerModule;
 
   let reporter: ConsolaReporter = createLogger({
     indexer: indexerName,

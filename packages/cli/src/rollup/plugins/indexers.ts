@@ -7,7 +7,7 @@ export function indexers(apibara: Apibara) {
 
   return virtual({
     "#apibara-internal-virtual/indexers": `
-    ${indexers.map((i) => `import _${hash(i)} from '${i.indexer}';`).join("\n")}
+    ${indexers.map((i) => `import * as _${hash(i)} from '${i.indexer}';`).join("\n")}
 
     export const indexers = [
       ${indexers.map((i) => `{ name: "${i.name}", indexer: _${hash(i)} }`).join(",\n")}
