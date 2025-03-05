@@ -66,6 +66,7 @@
     "@types/better-sqlite3": "^7.6.11",
     "@types/node": "^20.14.0",
     "@types/pg": "^8.11.10",
+    "drizzle-orm": "^0.37.0",
     "unbuild": "^2.0.0",
     "vitest": "^1.6.0"
   },
