@@ -10,24 +10,24 @@ export default defineCommand({
   args: {
     indexerId: {
       type: "positional",
-      description: "Indexer ID",
+      description: "Indexer ID - must be in kebab-case",
       required: false,
     },
     chain: {
       type: "string",
-      description: "Chain",
+      description: "Blockchain - ethereum, beaconchain, starknet",
     },
     network: {
       type: "string",
-      description: "Network",
+      description: "Network - mainnet, sepolia, other",
     },
     storage: {
       type: "string",
-      description: "Storage",
+      description: "Storage - postgres, none",
     },
     dnaUrl: {
       type: "string",
-      description: "DNA URL",
+      description: "DNA URL - https://custom-dna-url.apibara.org",
     },
   },
   async run({ args }) {

@@ -229,9 +229,12 @@ export async function addIndexer({
   console.log();
 
   consola.info(
-    `Before running the indexer, run ${cyan(`${options.packageManager} run install`)}${
+    `Before running the indexer, run ${cyan(`${options.packageManager}${options.packageManager === "npm" ? " run" : ""} install`)}${
       language === "typescript"
-        ? " & " + cyan(`${options.packageManager} run prepare`)
+        ? " & " +
+          cyan(
+            `${options.packageManager}${options.packageManager === "npm" ? " run" : ""} prepare`,
+          )
         : ""
     }`,
   );
