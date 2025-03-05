@@ -14,6 +14,7 @@ import type {
   PgQueryResultHKT,
   PgTransaction,
 } from "drizzle-orm/pg-core";
+import { type MigrateOptions, migrate } from "./helper";
 import {
   finalizeState,
   getState,
@@ -72,6 +73,7 @@ export interface DrizzleStorageOptions<
   indexerName?: string;
   schema?: Record<string, unknown>;
   idColumn?: string;
+  migrate?: MigrateOptions;
 }
 
 /**
@@ -83,6 +85,7 @@ export interface DrizzleStorageOptions<
  * @param options.indexerName - The name of the indexer. Defaults value is 'default'.
  * @param options.schema - The schema of the database.
  * @param options.idColumn - The column to use as the id. Defaults to 'id'.
+ * @param options.migrate - The options for the database migration. when provided, the database will automatically run migrations before the indexer runs.
  */
 export function drizzleStorage<
   TFilter,
@@ -97,6 +100,7 @@ export function drizzleStorage<
   indexerName: identifier = "default",
   schema,
   idColumn = "id",
+  migrate: migrateOptions,
 }: DrizzleStorageOptions<TQueryResult, TFullSchema, TSchema>) {
   return defineIndexerPlugin<TFilter, TBlock>((indexer) => {
     let tableNames: string[] = [];
@@ -113,8 +117,12 @@ export function drizzleStorage<
     }
 
     indexer.hooks.hook("run:before", async () => {
-      const { indexerName: indexerFileName, availableIndexers } =
-        useInternalContext();
+      const context = useInternalContext();
+
+      // @ts-ignore drizzleStorageDB missing error.
+      context["drizzleStorageDB"] = db;
+
+      const { indexerName: indexerFileName, availableIndexers } = context;
 
       indexerId = generateIndexerId(indexerFileName, identifier);
 
@@ -122,6 +130,10 @@ export function drizzleStorage<
 
       while (retries <= MAX_RETRIES) {
         try {
+          if (migrateOptions) {
+            // @ts-ignore type mismatch for db
+            await migrate(db, migrateOptions);
+          }
           await withTransaction(db, async (tx) => {
             await initializeReorgRollbackTable(tx, indexerId);
             if (enablePersistence) {
