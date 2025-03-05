@@ -5,3 +5,4 @@ bun.lockb
 .vscode
 .apibara
 .persistence
+.env

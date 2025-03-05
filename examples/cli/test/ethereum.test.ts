@@ -1,35 +1,24 @@
 import { createVcr } from "@apibara/indexer/testing";
 
-import { drizzle } from "drizzle-orm/pglite";
-import { beforeAll, describe, expect, it } from "vitest";
-
-import { createIndexer } from "@/indexers/1-evm.indexer";
+import createIndexer from "@/indexers/1-evm.indexer";
 import { ethereumUsdcTransfers } from "@/lib/schema";
-import * as schema from "@/lib/schema";
-
-import { migratePglite } from "./helper";
+import { describe, expect, it } from "vitest";
 
 const vcr = createVcr();
 
-const database = drizzle({
-  schema,
-  connection: {
-    dataDir: "memory://ethereum",
-  },
-});
+const connectionString = "memory://ethereum";
 
 describe("Ethereum USDC Transfers indexer", () => {
-  beforeAll(async () => {
-    await migratePglite(database);
-  });
-
   it("should work", async () => {
-    const indexer = createIndexer({ database });
+    const indexer = createIndexer({ connectionString });
 
     await vcr.run("ethereum-usdc-transfers", indexer, {
       fromBlock: 10_000_000n,
       toBlock: 10_000_005n,
     });
+
+    const database = vcr.getDrizzleDB();
+
     const rows = await database.select().from(ethereumUsdcTransfers);
 
     expect(rows.map(({ _id, ...rest }) => rest)).toMatchInlineSnapshot(`
