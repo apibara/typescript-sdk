@@ -15,6 +15,12 @@
       "import": "./dist/index.mjs",
       "require": "./dist/index.cjs",
       "default": "./dist/index.mjs"
+    },
+    "./helper": {
+      "types": "./dist/helper.d.ts",
+      "import": "./dist/helper.mjs",
+      "require": "./dist/helper.cjs",
+      "default": "./dist/helper.mjs"
     }
   },
   "scripts": {
