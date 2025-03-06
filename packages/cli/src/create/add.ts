@@ -228,14 +228,7 @@ export async function addIndexer({
 
   console.log();
 
-  consola.info(
-    `Before running the indexer, run ${cyan(`${options.packageManager}${options.packageManager === "npm" ? " run" : ""} install`)}${
-      language === "typescript"
-        ? " & " +
-          cyan(
-            `${options.packageManager}${options.packageManager === "npm" ? " run" : ""} prepare`,
-          )
-        : ""
-    }`,
-  );
+  const baseCommand = `${options.packageManager} install`;
+  const tsCommand = `${baseCommand} && ${options.packageManager} run prepare`;
+  consola.info(`Before running the indexer, run ${cyan(language === "typescript" ? tsCommand : baseCommand)}`);
 }
