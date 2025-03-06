@@ -73,7 +73,9 @@
     "playground:prepare": "pnpm playground prepare --dir playground",
     "playground:dev": "pnpm playground dev --dir playground",
     "playground:build": "pnpm playground build --dir playground",
-    "playground:start": "pnpm playground start --dir playground --indexer starknet"
+    "playground:start": "pnpm playground start --dir playground --indexer starknet",
+    "playground:init": "pnpm playground init playground",
+    "playground:add": "pnpm playground add --dir playground"
   },
   "devDependencies": {
     "@apibara/starknet": "workspace:*",
