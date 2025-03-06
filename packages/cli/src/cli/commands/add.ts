@@ -29,9 +29,14 @@ export default defineCommand({
       type: "string",
       description: "DNA URL - https://custom-dna-url.apibara.org",
     },
+    dir: {
+      type: "string",
+      description:
+        "Root directory - apibara project root where apibara.config is located | default: current working directory",
+    },
   },
   async run({ args }) {
-    const { indexerId, chain, network, storage, dnaUrl } = args;
+    const { indexerId, chain, network, storage, dnaUrl, dir } = args;
 
     await addIndexer({
       argIndexerId: indexerId,
@@ -39,6 +44,7 @@ export default defineCommand({
       argNetwork: network,
       argStorage: storage,
       argDnaUrl: dnaUrl,
+      argRootDir: dir,
     });
   },
 });
