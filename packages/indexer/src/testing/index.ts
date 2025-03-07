@@ -1,6 +1,5 @@
 import { createClient } from "@apibara/protocol";
 import ci from "ci-info";
-import type { PgDatabase, PgQueryResultHKT } from "drizzle-orm/pg-core";
 import { type IndexerWithStreamConfig, createIndexer } from "../indexer";
 import {
   type InternalContext,
@@ -13,8 +12,12 @@ import { isCassetteAvailable } from "../vcr/helper";
 import { record } from "../vcr/record";
 import { replay } from "../vcr/replay";
 
+export type VcrResult = {
+  internalContext: InternalContext;
+};
+
 export function createVcr() {
-  let drizzleDB: PgDatabase<PgQueryResultHKT>;
+  let result: VcrResult;
 
   return {
     async run<TFilter, TBlock>(
@@ -49,9 +52,10 @@ export function createVcr() {
 
       indexer.hooks.hook("run:after", () => {
         const context = useInternalContext();
-
-        // @ts-ignore drizzleStorageDB missing error.
-        drizzleDB = context["drizzleStorageDB"];
+        result = {
+          ...(result ?? {}),
+          internalContext: context,
+        };
       });
 
       if (!isCassetteAvailable(vcrConfig, cassetteName)) {
@@ -67,15 +71,8 @@ export function createVcr() {
       } else {
         await replay(vcrConfig, indexer, cassetteName);
       }
-    },
-    getDrizzleDB() {
-      if (!drizzleDB) {
-        throw new Error(
-          "Drizzle database not found, call this method only after you have run the indexer",
-        );
-      }
 
-      return drizzleDB;
+      return result;
     },
   };
 }
