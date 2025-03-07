@@ -5,10 +5,9 @@ import {
   MockStream,
   type MockStreamResponse,
 } from "@apibara/protocol/testing";
-
 import { useIndexerContext } from "../context";
 import { type IndexerConfig, createIndexer, defineIndexer } from "../indexer";
-import { defineIndexerPlugin } from "../plugins";
+import { defineIndexerPlugin, logger } from "../plugins";
 import { type InternalContext, internalContext } from "./plugins";
 
 export type MockMessagesOptions = {
@@ -82,6 +81,7 @@ export function getMockIndexer(params?: MockIndexerParams) {
       filter: {},
       async transform() {},
       plugins: [
+        logger(),
         internalContext(
           contextParams ??
             ({
