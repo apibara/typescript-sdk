@@ -7,7 +7,7 @@ import { encodeEventTopics, parseAbi } from "viem";
 
 import { ethereumUsdcTransfers } from "@/lib/schema";
 import { useLogger } from "@apibara/indexer/plugins";
-import { drizzle } from "@apibara/plugin-drizzle/helper";
+import { drizzle } from "@apibara/plugin-drizzle";
 
 const abi = parseAbi([
   "event Transfer(address indexed from, address indexed to, uint256 value)",
@@ -49,7 +49,6 @@ export default function (runtimeConfig: ApibaraRuntimeConfig) {
         indexerName: "evm-usdc-transfers",
         migrate: {
           migrationsFolder: "./drizzle",
-          connectionString,
         },
       }),
     ],

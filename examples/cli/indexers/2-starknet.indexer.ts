@@ -1,6 +1,6 @@
 import { defineIndexer } from "@apibara/indexer";
 import { drizzleStorage, useDrizzleStorage } from "@apibara/plugin-drizzle";
-import { drizzle } from "@apibara/plugin-drizzle/helper";
+import { drizzle } from "@apibara/plugin-drizzle";
 import { StarknetStream } from "@apibara/starknet";
 
 import { starknetUsdcTransfers } from "@/lib/schema";
@@ -31,7 +31,6 @@ export default function (runtimeConfig: ApibaraRuntimeConfig) {
         indexerName: "starknet-usdc-transfers",
         migrate: {
           migrationsFolder: "./drizzle",
-          connectionString,
         },
       }),
     ],

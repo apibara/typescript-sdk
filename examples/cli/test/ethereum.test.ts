@@ -2,6 +2,7 @@ import { createVcr } from "@apibara/indexer/testing";
 
 import createIndexer from "@/indexers/1-evm.indexer";
 import { ethereumUsdcTransfers } from "@/lib/schema";
+import { getTestDatabase } from "@apibara/plugin-drizzle/testing";
 import { describe, expect, it } from "vitest";
 
 const vcr = createVcr();
@@ -12,12 +13,12 @@ describe("Ethereum USDC Transfers indexer", () => {
   it("should work", async () => {
     const indexer = createIndexer({ connectionString });
 
-    await vcr.run("ethereum-usdc-transfers", indexer, {
+    const testResult = await vcr.run("ethereum-usdc-transfers", indexer, {
       fromBlock: 10_000_000n,
       toBlock: 10_000_005n,
     });
 
-    const database = vcr.getDrizzleDB();
+    const database = getTestDatabase(testResult);
 
     const rows = await database.select().from(ethereumUsdcTransfers);
 

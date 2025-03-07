@@ -4,6 +4,7 @@ import { describe, expect, it } from "vitest";
 import createIndexer from "@/indexers/2-starknet.indexer";
 
 import { starknetUsdcTransfers } from "@/lib/schema";
+import { getTestDatabase } from "@apibara/plugin-drizzle/testing";
 
 const vcr = createVcr();
 const connectionString = "memory://starknet";
@@ -12,12 +13,12 @@ describe("Starknet USDC Transfers indexer", () => {
   it("should work", async () => {
     const indexer = createIndexer({ connectionString });
 
-    await vcr.run("starknet-usdc-transfers", indexer, {
+    const testResult = await vcr.run("starknet-usdc-transfers", indexer, {
       fromBlock: 800_000n,
       toBlock: 800_005n,
     });
 
-    const database = vcr.getDrizzleDB();
+    const database = getTestDatabase(testResult);
 
     const rows = await database.select().from(starknetUsdcTransfers);
 
