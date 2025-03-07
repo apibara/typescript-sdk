@@ -82,7 +82,7 @@ export function generateIndexer({
   return `import { defineIndexer } from "@apibara/indexer";
 import { useLogger } from "@apibara/indexer/plugins";
 ${storage === "postgres" ? `import { drizzleStorage } from "@apibara/plugin-drizzle";` : ""}
-${storage === "postgres" ? `import { drizzle } from "@apibara/plugin-drizzle/helper";` : ""}
+${storage === "postgres" ? `import { drizzle } from "@apibara/plugin-drizzle";` : ""}
 ${
   chain === "ethereum"
     ? `import { EvmStream } from "@apibara/evm";`
@@ -123,7 +123,7 @@ export default function (runtimeConfig${language === "typescript" ? ": ApibaraRu
     filter: {
       header: "always",
     },
-    plugins: [${storage === "postgres" ? "drizzleStorage({ db, persistState: true })" : ""}],
+    plugins: [${storage === "postgres" ? "drizzleStorage({ db, migrate: { migrationsFolder: './drizzle' } })" : ""}],
     async transform({ endCursor, finality }) {
       const logger = useLogger();
 
@@ -146,16 +146,6 @@ export default function (runtimeConfig${language === "typescript" ? ": ApibaraRu
           : ""
       }
     },
-    ${
-      storage === "postgres"
-        ? `// hooks: {
-    //   async "run:before"() {
-    //     // Generate migrations before running the indexer using \`drizzle:generate\`
-    //     await migrate(db, { migrationsFolder: "./drizzle" });
-    //   },
-    // },`
-        : ""
-    }
   });
 }   
 `;
@@ -293,7 +283,7 @@ export async function updateApibaraConfigFile({
 }
 
 export async function createDrizzleStorageFiles(options: IndexerOptions) {
-  const { cwd, language, storage } = options;
+  const { cwd, language, storage, indexerId } = options;
 
   if (storage !== "postgres") return;
 
@@ -321,11 +311,11 @@ export async function createDrizzleStorageFiles(options: IndexerOptions) {
     const drizzleConfigContent = `${language === "typescript" ? 'import type { Config } from "drizzle-kit";' : ""}
 
 export default {
-  schema: "./lib/schema.ts",
+  schema: "./lib/schema.${fileExtension}",
   out: "./drizzle",
   dialect: "postgresql",
   dbCredentials: {
-    url: process.env["POSTGRES_CONNECTION_STRING"] ?? "",
+    url: process.env["POSTGRES_CONNECTION_STRING"] ?? "memory://${indexerId}",
   },
 }${language === "typescript" ? " satisfies Config" : ""};`;
 

@@ -72,15 +72,14 @@ export function createIndexer(indexerName: string, preset?: string) {
 
   // Put the in-memory persistence plugin first so that it can be overridden by any user-defined
   // persistence plugin.
-  // Put the logger last since we want to override any user-defined logger.
   definition.plugins = [
     internalContext({
       indexerName,
       availableIndexers,
     } as InternalContext),
+    logger({ logger: reporter }),
     inMemoryPersistence(),
     ...(definition.plugins ?? []),
-    logger({ logger: reporter }),
   ];
 
   return _createIndexer(definition);
