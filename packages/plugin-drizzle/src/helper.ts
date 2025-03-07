@@ -1,4 +1,4 @@
-import type { PGlite, PGliteOptions } from "@electric-sql/pglite";
+import { PGlite, type PGliteOptions } from "@electric-sql/pglite";
 import type { DrizzleConfig } from "drizzle-orm";
 import type { MigrationConfig } from "drizzle-orm/migrator";
 import {
@@ -13,6 +13,7 @@ import {
 } from "drizzle-orm/pglite";
 import { migrate as migratePGLite } from "drizzle-orm/pglite/migrator";
 import pg from "pg";
+import { DrizzleStorageError } from "./utils";
 
 /**
  * Union type of all possible drizzle database options
@@ -152,73 +153,40 @@ export function drizzle<
 /**
  * Options for database migration
  */
-export type MigrateOptions = MigrationConfig &
-  (
-    | {
-        /**
-         * Type of database to use -
-         * - "pglite" - PGLite database
-         * - "node-postgres" - Node-Postgres database
-         * @default "pglite"
-         */
-        type?: "pglite" | "node-postgres";
-        /**
-         * Connection string for the database
-         */
-        connectionString?: never;
-      }
-    | {
-        /**
-         * Connection string for the database
-         */
-        connectionString: string;
-        /**
-         * Type of database to use -
-         * - "pglite" - PGLite database
-         * - "node-postgres" - Node-Postgres database
-         * @default "pglite"
-         */
-        type?: never;
-      }
-  );
+export type MigrateOptions = MigrationConfig;
 
 /**
  * Performs database migration based on the provided configuration
  * @param db - The database instance to migrate
  * @param options - Migration configuration options
  *
- * @important If you provide a type, it will be used to determine the type of database to use.
- * Otherwise, the type will be inferred from the connection string.
- *
- * @property `options.type` - The type of database to use -
- * - "pglite" - PGLite database
- * - "node-postgres" - Node-Postgres database
- * @default "pglite"
- *
- * @property `options.connectionString` - if the connection string for the database starts with `postgres://`, the database will be migrated using node-postgres
- * otherwise it will be migrated using PGLite
+ * @important This function runs migrations on the database instance provided to the `drizzleStorage` plugin.
+ * It automatically detects the type of database and runs the appropriate migrate function
+ * (PGLite or Node-Postgres).
  *
  * @example
  * ```ts
- * // Migrating a PGLite database
  * await migrate(db, { migrationsFolder: "./drizzle" });
- *
- * // Migrating a Node-Postgres database
- * await migrate(db, { migrationsFolder: "./drizzle", type: "node-postgres" });
  * ```
  */
 export async function migrate<TSchema extends Record<string, unknown>>(
   db: PgliteDatabase<TSchema> | NodePgDatabase<TSchema>,
   options: MigrateOptions,
 ) {
-  const { type = "pglite", connectionString, ...rest } = options;
-  const _type =
-    type ??
-    (connectionString?.startsWith("postgres://") ? "node-postgres" : "pglite");
+  const isPglite = !!("$client" in db && db.$client instanceof PGlite);
 
-  if (_type === "pglite") {
-    await migratePGLite(db as PgliteDatabase<TSchema>, rest);
-  } else if (_type === "node-postgres") {
-    await migrateNode(db as NodePgDatabase<TSchema>, rest);
+  try {
+    if (isPglite) {
+      await migratePGLite(db as PgliteDatabase<TSchema>, options);
+    } else {
+      await migrateNode(db as NodePgDatabase<TSchema>, options);
+    }
+  } catch (error) {
+    throw new DrizzleStorageError(
+      "Failed to apply migrations! Please check if you have generated migrations using drizzle:generate",
+      {
+        cause: error,
+      },
+    );
   }
 }

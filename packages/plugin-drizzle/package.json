@@ -16,11 +16,11 @@
       "require": "./dist/index.cjs",
       "default": "./dist/index.mjs"
     },
-    "./helper": {
-      "types": "./dist/helper.d.ts",
-      "import": "./dist/helper.mjs",
-      "require": "./dist/helper.cjs",
-      "default": "./dist/helper.mjs"
+    "./testing": {
+      "types": "./dist/testing.d.ts",
+      "import": "./dist/testing.mjs",
+      "require": "./dist/testing.cjs",
+      "default": "./dist/testing.mjs"
     }
   },
   "scripts": {
