@@ -1,14 +1,14 @@
-import { getRollupConfig } from "apibara/rollup";
+import { getRolldownConfig } from "apibara/rolldown";
 import type { Apibara } from "apibara/types";
 import { watchDev } from "./dev";
 import { buildProduction } from "./prod";
 
 export async function build(apibara: Apibara) {
-  const rollupConfig = getRollupConfig(apibara);
+  const rolldownConfig = getRolldownConfig(apibara);
 
-  await apibara.hooks.callHook("rollup:before", apibara, rollupConfig);
+  await apibara.hooks.callHook("rolldown:before", apibara, rolldownConfig);
 
   return apibara.options.dev
-    ? await watchDev(apibara, rollupConfig)
-    : await buildProduction(apibara, rollupConfig);
+    ? await watchDev(apibara, rolldownConfig)
+    : await buildProduction(apibara, rolldownConfig);
 }

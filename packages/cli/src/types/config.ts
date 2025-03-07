@@ -1,5 +1,4 @@
 import type { ConsolaReporter } from "@apibara/indexer/plugins";
-import type { RollupCommonJSOptions } from "@rollup/plugin-commonjs";
 import type {
   C12InputConfig,
   ConfigWatcher,
@@ -8,9 +7,9 @@ import type {
 } from "c12";
 import type { WatchOptions } from "chokidar";
 import type { NestedHooks } from "hookable";
+import type { RolldownOptions } from "rolldown";
 import type { DeepPartial } from "./_utils";
 import type { ApibaraHooks } from "./hooks";
-import type { RollupConfig } from "./rollup";
 
 export type LoggerFactory = ({
   indexer,
@@ -79,11 +78,10 @@ export interface ApibaraOptions<
   // Logging
   logger?: LoggerFactory;
 
-  // Rollup
-  rollupConfig?: Partial<RollupConfig>;
+  // Rolldown
+  rolldownConfig?: Partial<RolldownOptions>;
   sourceMap?: boolean;
   entry: string;
-  commonJS?: RollupCommonJSOptions;
   node: boolean;
   exportConditions?: string[];
 
