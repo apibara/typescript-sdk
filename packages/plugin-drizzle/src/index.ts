@@ -1,5 +1,5 @@
 import { useIndexerContext } from "@apibara/indexer";
-import { defineIndexerPlugin } from "@apibara/indexer/plugins";
+import { defineIndexerPlugin, useLogger } from "@apibara/indexer/plugins";
 
 import type {
   ExtractTablesWithRelations,
@@ -30,6 +30,8 @@ import {
   removeTriggers,
 } from "./storage";
 import { DrizzleStorageError, sleep, withTransaction } from "./utils";
+
+export * from "./helper";
 
 const DRIZZLE_PROPERTY = "_drizzle";
 const MAX_RETRIES = 5;
@@ -68,11 +70,29 @@ export interface DrizzleStorageOptions<
   TSchema extends
     TablesRelationalConfig = ExtractTablesWithRelations<TFullSchema>,
 > {
+  /**
+   * The Drizzle database instance.
+   */
   db: PgDatabase<TQueryResult, TFullSchema, TSchema>;
+  /**
+   * Whether to persist the indexer's state. Defaults to true.
+   */
   persistState?: boolean;
+  /**
+   * The name of the indexer. Default value is 'default'.
+   */
   indexerName?: string;
+  /**
+   * The schema of the database.
+   */
   schema?: Record<string, unknown>;
+  /**
+   * The column to use as the id. Defaults to 'id'.
+   */
   idColumn?: string;
+  /**
+   * The options for the database migration. When provided, the database will automatically run migrations before the indexer runs.
+   */
   migrate?: MigrateOptions;
 }
 
@@ -117,22 +137,29 @@ export function drizzleStorage<
     }
 
     indexer.hooks.hook("run:before", async () => {
-      const context = useInternalContext();
+      const internalContext = useInternalContext();
+      const logger = useLogger();
 
-      // @ts-ignore drizzleStorageDB missing error.
-      context["drizzleStorageDB"] = db;
+      // For testing purposes using vcr.
+      internalContext.drizzleStorageDB = db;
 
-      const { indexerName: indexerFileName, availableIndexers } = context;
+      const { indexerName: indexerFileName, availableIndexers } =
+        internalContext;
 
       indexerId = generateIndexerId(indexerFileName, identifier);
 
       let retries = 0;
 
+      // incase the migrations are already applied, we don't want to run them again
+      let migrationsApplied = false;
+
       while (retries <= MAX_RETRIES) {
         try {
-          if (migrateOptions) {
+          if (migrateOptions && !migrationsApplied) {
             // @ts-ignore type mismatch for db
             await migrate(db, migrateOptions);
+            migrationsApplied = true;
+            logger.success("Migrations applied");
           }
           await withTransaction(db, async (tx) => {
             await initializeReorgRollbackTable(tx, indexerId);
@@ -143,6 +170,9 @@ export function drizzleStorage<
           break;
         } catch (error) {
           if (retries === MAX_RETRIES) {
+            if (error instanceof DrizzleStorageError) {
+              throw error;
+            }
             throw new DrizzleStorageError(
               "Initialization failed after 5 retries",
               {
