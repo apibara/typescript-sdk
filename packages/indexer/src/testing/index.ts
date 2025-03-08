@@ -1,20 +1,15 @@
 import { createClient } from "@apibara/protocol";
 import ci from "ci-info";
+import { useIndexerContext } from "../context";
 import { type IndexerWithStreamConfig, createIndexer } from "../indexer";
-import {
-  type InternalContext,
-  internalContext,
-  useInternalContext,
-} from "../plugins/context";
+import { type InternalContext, internalContext } from "../plugins/context";
 import { logger } from "../plugins/logger";
 import type { CassetteOptions, VcrConfig } from "../vcr/config";
 import { isCassetteAvailable } from "../vcr/helper";
 import { record } from "../vcr/record";
 import { replay } from "../vcr/replay";
 
-export type VcrResult = {
-  internalContext: InternalContext;
-};
+export type VcrResult = Record<string, unknown>;
 
 export function createVcr() {
   let result: VcrResult;
@@ -51,11 +46,7 @@ export function createVcr() {
       const indexer = createIndexer(indexerConfig);
 
       indexer.hooks.hook("run:after", () => {
-        const context = useInternalContext();
-        result = {
-          ...(result ?? {}),
-          internalContext: context,
-        };
+        result = useIndexerContext();
       });
 
       if (!isCassetteAvailable(vcrConfig, cassetteName)) {

@@ -1,16 +1,13 @@
 import type { VcrResult } from "@apibara/indexer/testing";
 import type { PgDatabase, PgQueryResultHKT } from "drizzle-orm/pg-core";
+import { DRIZZLE_STORAGE_DB_PROPERTY } from "./constants";
 
 export function getTestDatabase(context: VcrResult) {
-  const { internalContext } = context;
+  const db = context[DRIZZLE_STORAGE_DB_PROPERTY];
 
-  if (!internalContext) {
-    throw new Error("Internal context not found");
+  if (!db) {
+    throw new Error("Drizzle database not found in context");
   }
 
-  if (!internalContext.drizzleStorageDB) {
-    throw new Error("Drizzle database not found in Internal Context");
-  }
-
-  return internalContext.drizzleStorageDB as PgDatabase<PgQueryResultHKT>;
+  return db as PgDatabase<PgQueryResultHKT>;
 }

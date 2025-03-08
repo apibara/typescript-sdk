@@ -26,7 +26,6 @@ export function internalContext<TFilter, TBlock, TTxnParams>(
 export type InternalContext = {
   indexerName: string;
   availableIndexers: string[];
-  drizzleStorageDB?: unknown;
 };
 
 export function useInternalContext(): InternalContext {

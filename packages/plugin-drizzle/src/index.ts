@@ -14,6 +14,7 @@ import type {
   PgQueryResultHKT,
   PgTransaction,
 } from "drizzle-orm/pg-core";
+import { DRIZZLE_PROPERTY, DRIZZLE_STORAGE_DB_PROPERTY } from "./constants";
 import { type MigrateOptions, migrate } from "./helper";
 import {
   finalizeState,
@@ -33,7 +34,6 @@ import { DrizzleStorageError, sleep, withTransaction } from "./utils";
 
 export * from "./helper";
 
-const DRIZZLE_PROPERTY = "_drizzle";
 const MAX_RETRIES = 5;
 
 export type DrizzleStorage<
@@ -138,10 +138,11 @@ export function drizzleStorage<
 
     indexer.hooks.hook("run:before", async () => {
       const internalContext = useInternalContext();
+      const context = useIndexerContext();
       const logger = useLogger();
 
       // For testing purposes using vcr.
-      internalContext.drizzleStorageDB = db;
+      context[DRIZZLE_STORAGE_DB_PROPERTY] = db;
 
       const { indexerName: indexerFileName, availableIndexers } =
         internalContext;
