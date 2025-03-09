@@ -1,5 +1,5 @@
 import { useIndexerContext } from "@apibara/indexer";
-import { defineIndexerPlugin } from "@apibara/indexer/plugins";
+import { defineIndexerPlugin, useLogger } from "@apibara/indexer/plugins";
 
 import type {
   ExtractTablesWithRelations,
@@ -14,6 +14,8 @@ import type {
   PgQueryResultHKT,
   PgTransaction,
 } from "drizzle-orm/pg-core";
+import { DRIZZLE_PROPERTY, DRIZZLE_STORAGE_DB_PROPERTY } from "./constants";
+import { type MigrateOptions, migrate } from "./helper";
 import {
   finalizeState,
   getState,
@@ -30,7 +32,8 @@ import {
 } from "./storage";
 import { DrizzleStorageError, sleep, withTransaction } from "./utils";
 
-const DRIZZLE_PROPERTY = "_drizzle";
+export * from "./helper";
+
 const MAX_RETRIES = 5;
 
 export type DrizzleStorage<
@@ -67,11 +70,30 @@ export interface DrizzleStorageOptions<
   TSchema extends
     TablesRelationalConfig = ExtractTablesWithRelations<TFullSchema>,
 > {
+  /**
+   * The Drizzle database instance.
+   */
   db: PgDatabase<TQueryResult, TFullSchema, TSchema>;
+  /**
+   * Whether to persist the indexer's state. Defaults to true.
+   */
   persistState?: boolean;
+  /**
+   * The name of the indexer. Default value is 'default'.
+   */
   indexerName?: string;
+  /**
+   * The schema of the database.
+   */
   schema?: Record<string, unknown>;
+  /**
+   * The column to use as the id. Defaults to 'id'.
+   */
   idColumn?: string;
+  /**
+   * The options for the database migration. When provided, the database will automatically run migrations before the indexer runs.
+   */
+  migrate?: MigrateOptions;
 }
 
 /**
@@ -83,6 +105,7 @@ export interface DrizzleStorageOptions<
  * @param options.indexerName - The name of the indexer. Defaults value is 'default'.
  * @param options.schema - The schema of the database.
  * @param options.idColumn - The column to use as the id. Defaults to 'id'.
+ * @param options.migrate - The options for the database migration. when provided, the database will automatically run migrations before the indexer runs.
  */
 export function drizzleStorage<
   TFilter,
@@ -97,6 +120,7 @@ export function drizzleStorage<
   indexerName: identifier = "default",
   schema,
   idColumn = "id",
+  migrate: migrateOptions,
 }: DrizzleStorageOptions<TQueryResult, TFullSchema, TSchema>) {
   return defineIndexerPlugin<TFilter, TBlock>((indexer) => {
     let tableNames: string[] = [];
@@ -113,15 +137,31 @@ export function drizzleStorage<
     }
 
     indexer.hooks.hook("run:before", async () => {
+      const internalContext = useInternalContext();
+      const context = useIndexerContext();
+      const logger = useLogger();
+
+      // For testing purposes using vcr.
+      context[DRIZZLE_STORAGE_DB_PROPERTY] = db;
+
       const { indexerName: indexerFileName, availableIndexers } =
-        useInternalContext();
+        internalContext;
 
       indexerId = generateIndexerId(indexerFileName, identifier);
 
       let retries = 0;
 
+      // incase the migrations are already applied, we don't want to run them again
+      let migrationsApplied = false;
+
       while (retries <= MAX_RETRIES) {
         try {
+          if (migrateOptions && !migrationsApplied) {
+            // @ts-ignore type mismatch for db
+            await migrate(db, migrateOptions);
+            migrationsApplied = true;
+            logger.success("Migrations applied");
+          }
           await withTransaction(db, async (tx) => {
             await initializeReorgRollbackTable(tx, indexerId);
             if (enablePersistence) {
@@ -131,6 +171,9 @@ export function drizzleStorage<
           break;
         } catch (error) {
           if (retries === MAX_RETRIES) {
+            if (error instanceof DrizzleStorageError) {
+              throw error;
+            }
             throw new DrizzleStorageError(
               "Initialization failed after 5 retries",
               {

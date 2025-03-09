@@ -1,5 +1,6 @@
 import { createClient } from "@apibara/protocol";
 import ci from "ci-info";
+import { useIndexerContext } from "../context";
 import { type IndexerWithStreamConfig, createIndexer } from "../indexer";
 import { type InternalContext, internalContext } from "../plugins/context";
 import { logger } from "../plugins/logger";
@@ -8,7 +9,11 @@ import { isCassetteAvailable } from "../vcr/helper";
 import { record } from "../vcr/record";
 import { replay } from "../vcr/replay";
 
+export type VcrResult = Record<string, unknown>;
+
 export function createVcr() {
+  let result: VcrResult;
+
   return {
     async run<TFilter, TBlock>(
       cassetteName: string,
@@ -40,6 +45,10 @@ export function createVcr() {
 
       const indexer = createIndexer(indexerConfig);
 
+      indexer.hooks.hook("run:after", () => {
+        result = useIndexerContext();
+      });
+
       if (!isCassetteAvailable(vcrConfig, cassetteName)) {
         if (ci.isCI) {
           throw new Error("Cannot record cassette in CI");
@@ -53,6 +62,8 @@ export function createVcr() {
       } else {
         await replay(vcrConfig, indexer, cassetteName);
       }
+
+      return result;
     },
   };
 }

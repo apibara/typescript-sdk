@@ -4,12 +4,12 @@ import type { Plugin } from "apibara/rollup";
 
 export default defineConfig({
   runtimeConfig: {
-    pgLiteDBPath: "memory://persistence",
+    connectionString: process.env["POSTGRES_CONNECTION_STRING"] ?? "memory://",
   },
   presets: {
     dev: {
       runtimeConfig: {
-        pgLiteDBPath: "./.persistence",
+        connectionString: "memory://",
       },
     },
   },

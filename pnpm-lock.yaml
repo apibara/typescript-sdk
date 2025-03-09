@@ -493,9 +493,6 @@ importers:
       '@apibara/protocol':
         specifier: workspace:*
         version: link:../protocol
-      better-sqlite3:
-        specifier: ^9.0.0
-        version: 9.6.0
     devDependencies:
       '@types/better-sqlite3':
         specifier: ^7.6.11
@@ -503,6 +500,9 @@ importers:
       '@types/node':
         specifier: ^20.14.0
         version: 20.14.0
+      better-sqlite3:
+        specifier: ^9.0.0
+        version: 9.6.0
       unbuild:
         specifier: ^2.0.0
         version: 2.0.0(typescript@5.6.2)
@@ -851,6 +851,7 @@ packages:
 
   '@effect/schema@0.67.15':
     resolution: {integrity: sha512-+AO29qX0GIDARbQE1TcnWz3cUBCOm3x8KP6SXpWUot1cfG4ccoWrrfzVBaaCl1FDT5egvAtwfQ26GPVMJEobEg==}
+    deprecated: this package has been merged into the main effect package
     peerDependencies:
       effect: ^3.2.6
 

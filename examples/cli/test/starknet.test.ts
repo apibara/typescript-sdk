@@ -1,35 +1,25 @@
 import { createVcr } from "@apibara/indexer/testing";
+import { describe, expect, it } from "vitest";
 
-import { drizzle } from "drizzle-orm/pglite";
-import { beforeAll, describe, expect, it } from "vitest";
+import createIndexer from "@/indexers/2-starknet.indexer";
 
-import { createIndexer } from "@/indexers/2-starknet.indexer";
 import { starknetUsdcTransfers } from "@/lib/schema";
-import * as schema from "@/lib/schema";
-
-import { migratePglite } from "./helper";
+import { getTestDatabase } from "@apibara/plugin-drizzle/testing";
 
 const vcr = createVcr();
-
-const database = drizzle({
-  schema,
-  connection: {
-    dataDir: "memory://starknet",
-  },
-});
+const connectionString = "memory://starknet";
 
 describe("Starknet USDC Transfers indexer", () => {
-  beforeAll(async () => {
-    await migratePglite(database);
-  });
-
   it("should work", async () => {
-    const indexer = createIndexer({ database });
+    const indexer = createIndexer({ connectionString });
 
-    await vcr.run("starknet-usdc-transfers", indexer, {
+    const testResult = await vcr.run("starknet-usdc-transfers", indexer, {
       fromBlock: 800_000n,
       toBlock: 800_005n,
     });
+
+    const database = getTestDatabase(testResult);
+
     const rows = await database.select().from(starknetUsdcTransfers);
 
     expect(rows.map(({ _id, ...rest }) => rest)).toMatchInlineSnapshot(`

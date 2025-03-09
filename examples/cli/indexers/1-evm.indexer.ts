@@ -3,16 +3,11 @@ import { defineIndexer } from "@apibara/indexer";
 import { drizzleStorage, useDrizzleStorage } from "@apibara/plugin-drizzle";
 
 import type { ApibaraRuntimeConfig } from "apibara/types";
-import type {
-  ExtractTablesWithRelations,
-  TablesRelationalConfig,
-} from "drizzle-orm";
-import type { PgDatabase, PgQueryResultHKT } from "drizzle-orm/pg-core";
 import { encodeEventTopics, parseAbi } from "viem";
 
-import { db } from "@/lib/db";
 import { ethereumUsdcTransfers } from "@/lib/schema";
 import { useLogger } from "@apibara/indexer/plugins";
+import { drizzle } from "@apibara/plugin-drizzle";
 
 const abi = parseAbi([
   "event Transfer(address indexed from, address indexed to, uint256 value)",
@@ -20,21 +15,15 @@ const abi = parseAbi([
 
 // USDC Transfers on Ethereum
 export default function (runtimeConfig: ApibaraRuntimeConfig) {
-  return createIndexer({
-    database: db,
-  });
-}
+  const { connectionString } = runtimeConfig;
 
-export function createIndexer<
-  TQueryResult extends PgQueryResultHKT,
-  TFullSchema extends Record<string, unknown> = Record<string, never>,
-  TSchema extends
-    TablesRelationalConfig = ExtractTablesWithRelations<TFullSchema>,
->({
-  database,
-}: {
-  database: PgDatabase<TQueryResult, TFullSchema, TSchema>;
-}) {
+  const database = drizzle({
+    schema: {
+      ethereumUsdcTransfers,
+    },
+    connectionString,
+  });
+
   return defineIndexer(EvmStream)({
     streamUrl: "https://ethereum.preview.apibara.org",
     finality: "accepted",
@@ -58,6 +47,9 @@ export function createIndexer<
         persistState: true,
         idColumn: "_id",
         indexerName: "evm-usdc-transfers",
+        migrate: {
+          migrationsFolder: "./drizzle",
+        },
       }),
     ],
     async transform({ endCursor, context, block, finality }) {

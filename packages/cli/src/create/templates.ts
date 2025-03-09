@@ -82,6 +82,7 @@ export function generateIndexer({
   return `import { defineIndexer } from "@apibara/indexer";
 import { useLogger } from "@apibara/indexer/plugins";
 ${storage === "postgres" ? `import { drizzleStorage } from "@apibara/plugin-drizzle";` : ""}
+${storage === "postgres" ? `import { drizzle } from "@apibara/plugin-drizzle";` : ""}
 ${
   chain === "ethereum"
     ? `import { EvmStream } from "@apibara/evm";`
@@ -92,11 +93,7 @@ ${
         : ""
 }
 ${language === "typescript" ? `import type { ApibaraRuntimeConfig } from "apibara/types";` : ""}
-${
-  storage === "postgres"
-    ? `import { getDrizzlePgDatabase } from "../lib/db";`
-    : ""
-}
+${storage === "postgres" ? `import * as schema from "../lib/schema";` : ""}
 
 
 export default function (runtimeConfig${language === "typescript" ? ": ApibaraRuntimeConfig" : ""}) {
@@ -104,7 +101,10 @@ export default function (runtimeConfig${language === "typescript" ? ": ApibaraRu
   const { startingBlock, streamUrl${storage === "postgres" ? ", postgresConnectionString" : ""} } = runtimeConfig[indexerId];
   ${
     storage === "postgres"
-      ? "const { db } = getDrizzlePgDatabase(postgresConnectionString);"
+      ? `const db = drizzle({
+    schema,
+    connectionString: postgresConnectionString,
+  });`
       : ""
   }
 
@@ -123,7 +123,7 @@ export default function (runtimeConfig${language === "typescript" ? ": ApibaraRu
     filter: {
       header: "always",
     },
-    plugins: [${storage === "postgres" ? "drizzleStorage({ db, persistState: true })" : ""}],
+    plugins: [${storage === "postgres" ? "drizzleStorage({ db, migrate: { migrationsFolder: './drizzle' } })" : ""}],
     async transform({ endCursor, finality }) {
       const logger = useLogger();
 
@@ -137,14 +137,12 @@ export default function (runtimeConfig${language === "typescript" ? ": ApibaraRu
       ${
         storage === "postgres"
           ? `// Example snippet to insert data into db using drizzle with postgres
-      //   const { db } = useDrizzleStorage();
-      //   const { logs } = block;
-      //   for (const log of logs) {
-      //     await db.insert(exampleTable).values({
-      //       number: Number(endCursor?.orderKey),
-      //       hash: log.transactionHash,
-      //     });
-      //   }`
+      // const { db: database } = useDrizzleStorage();
+
+      // await database.insert(schema.cursorTable).values({
+      //   endCursor: Number(endCursor?.orderKey),
+      //   uniqueKey: \`\${endCursor?.uniqueKey}\`,
+      // });`
           : ""
       }
     },
@@ -285,7 +283,7 @@ export async function updateApibaraConfigFile({
 }
 
 export async function createDrizzleStorageFiles(options: IndexerOptions) {
-  const { cwd, language, storage } = options;
+  const { cwd, language, storage, indexerId } = options;
 
   if (storage !== "postgres") return;
 
@@ -313,11 +311,11 @@ export async function createDrizzleStorageFiles(options: IndexerOptions) {
     const drizzleConfigContent = `${language === "typescript" ? 'import type { Config } from "drizzle-kit";' : ""}
 
 export default {
-  schema: "./lib/schema.ts",
+  schema: "./lib/schema.${fileExtension}",
   out: "./drizzle",
   dialect: "postgresql",
   dbCredentials: {
-    url: process.env["POSTGRES_CONNECTION_STRING"] ?? "",
+    url: process.env["POSTGRES_CONNECTION_STRING"] ?? "memory://${indexerId}",
   },
 }${language === "typescript" ? " satisfies Config" : ""};`;
 
@@ -348,14 +346,14 @@ export default {
     });
 
   if (!schemaExists || schemaOverwrite) {
-    const schemaContent = `//  --- Add your pg table schemas here ---- 
+    const schemaContent = `//  --- Add your pg table schemas here ----
 
 // import { bigint, pgTable, text, uuid } from "drizzle-orm/pg-core";
 
-// export const exampleTable = pgTable("example_table", {
+// export const cursorTable = pgTable("cursor_table", {
 //   id: uuid("id").primaryKey().defaultRandom(),
-//   number: bigint("number", { mode: "number" }),
-//   hash: text("hash"),
+//   endCursor: bigint("end_cursor", { mode: "number" }),
+//   uniqueKey: text("unique_key"),
 // });
 
 export {};
@@ -368,63 +366,6 @@ export {};
     await formatFile(schemaPath);
 
     consola.success(`Created ${cyan("lib/schema.ts")}`);
-  }
-
-  /**
-   *
-   *
-   * DB File
-   *
-   *
-   */
-  const dbFileName = `db.${fileExtension}`;
-
-  const dbPath = path.join(cwd, "lib", dbFileName);
-
-  const { exists: dbExists, overwrite: dbOverwrite } = await checkFileExists(
-    dbPath,
-    {
-      askPrompt: true,
-      fileName: `lib/${dbFileName}`,
-      allowIgnore: true,
-    },
-  );
-
-  if (!dbExists || dbOverwrite) {
-    const dbContent = `import * as schema from "./schema";
-import { drizzle as nodePgDrizzle } from "drizzle-orm/node-postgres";
-import { drizzle as pgLiteDrizzle } from "drizzle-orm/pglite";
-import pg from "pg";
-
-
-export function getDrizzlePgDatabase(connectionString${language === "typescript" ? ": string" : ""}) {
-  // Create pglite instance
-  if (connectionString.includes("memory")) {
-    return {
-      db: pgLiteDrizzle({
-        schema,
-        connection: {
-          dataDir: connectionString,
-        },
-      }),
-    };
-  }
-
-  // Create node-postgres instance
-  const pool = new pg.Pool({
-    connectionString,
-  });
-
-  return { db: nodePgDrizzle(pool, { schema }) };
-}`;
-
-    // create directory if it doesn't exist
-    fs.mkdirSync(path.dirname(dbPath), { recursive: true });
-    fs.writeFileSync(dbPath, dbContent);
-
-    await formatFile(dbPath);
-
-    consola.success(`Created ${cyan(`lib/${dbFileName}`)}`);
   }
 
   console.log("\n");
@@ -446,17 +387,17 @@ ${yellow(`
 
 import { bigint, pgTable, text, uuid } from "drizzle-orm/pg-core";
 
-export const exampleTable = pgTable("example_table", {
+export const cursorTable = pgTable("cursor_table", {
   id: uuid("id").primaryKey().defaultRandom(),
-  number: bigint("number", { mode: "number" }),
-  hash: text("hash"),
+  endCursor: bigint("end_cursor", { mode: "number" }),
+  uniqueKey: text("unique_key"),
 });`)}`);
 
     console.log("\n");
   }
 
   consola.info(
-    `Run ${green(`${options.packageManager} run drizzle:generate`)} & ${green(`${options.packageManager} run drizzle:migrate`)} to generate and apply migrations.`,
+    `Run ${green(`${options.packageManager}${options.packageManager === "npm" ? " run" : ""} drizzle:generate`)} & ${green(`${options.packageManager}${options.packageManager === "npm" ? " run" : ""} drizzle:migrate`)} to generate and apply migrations.`,
   );
 }
 

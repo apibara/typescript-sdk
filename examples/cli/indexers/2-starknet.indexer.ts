@@ -1,35 +1,24 @@
 import { defineIndexer } from "@apibara/indexer";
-
+import { drizzleStorage, useDrizzleStorage } from "@apibara/plugin-drizzle";
+import { drizzle } from "@apibara/plugin-drizzle";
 import { StarknetStream } from "@apibara/starknet";
 
-import type { ApibaraRuntimeConfig } from "apibara/types";
-import type {
-  ExtractTablesWithRelations,
-  TablesRelationalConfig,
-} from "drizzle-orm";
-import type { PgDatabase, PgQueryResultHKT } from "drizzle-orm/pg-core";
-import { hash } from "starknet";
-
-import { db } from "@/lib/db";
 import { starknetUsdcTransfers } from "@/lib/schema";
 import { useLogger } from "@apibara/indexer/plugins";
-import { drizzleStorage, useDrizzleStorage } from "@apibara/plugin-drizzle";
+import type { ApibaraRuntimeConfig } from "apibara/types";
+import { hash } from "starknet";
 
 // USDC Transfers on Starknet
 export default function (runtimeConfig: ApibaraRuntimeConfig) {
-  return createIndexer({ database: db });
-}
+  const { connectionString } = runtimeConfig;
 
-export function createIndexer<
-  TQueryResult extends PgQueryResultHKT,
-  TFullSchema extends Record<string, unknown> = Record<string, never>,
-  TSchema extends
-    TablesRelationalConfig = ExtractTablesWithRelations<TFullSchema>,
->({
-  database,
-}: {
-  database: PgDatabase<TQueryResult, TFullSchema, TSchema>;
-}) {
+  const database = drizzle({
+    schema: {
+      starknetUsdcTransfers,
+    },
+    connectionString,
+  });
+
   return defineIndexer(StarknetStream)({
     streamUrl: "https://starknet.preview.apibara.org",
     finality: "accepted",
@@ -40,6 +29,9 @@ export function createIndexer<
         idColumn: "_id",
         persistState: true,
         indexerName: "starknet-usdc-transfers",
+        migrate: {
+          migrationsFolder: "./drizzle",
+        },
       }),
     ],
     filter: {
