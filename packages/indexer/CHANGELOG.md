@@ -1,8 +1,16 @@
 # Change Log - @apibara/indexer
 
-<!-- This log was last generated on Sat, 22 Feb 2025 19:04:40 GMT and should not be manually modified. -->
+<!-- This log was last generated on Sun, 09 Mar 2025 05:58:19 GMT and should not be manually modified. -->
 
 <!-- Start content -->
+
+## 2.1.0-beta.7
+
+Sun, 09 Mar 2025 05:58:19 GMT
+
+### Changes
+
+- indexer: add getDrizzleDB method to vcr (jadejajaipal5@gmail.com)
 
 ## 2.1.0-beta.3
 

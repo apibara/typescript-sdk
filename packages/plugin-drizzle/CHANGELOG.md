@@ -1,8 +1,16 @@
 # Change Log - @apibara/plugin-drizzle
 
-<!-- This log was last generated on Fri, 21 Feb 2025 19:49:06 GMT and should not be manually modified. -->
+<!-- This log was last generated on Sun, 09 Mar 2025 05:58:19 GMT and should not be manually modified. -->
 
 <!-- Start content -->
+
+## 2.1.0-beta.7
+
+Sun, 09 Mar 2025 05:58:19 GMT
+
+### Changes
+
+- plugin-drizzle: add drizzle and migrate helper methods (jadejajaipal5@gmail.com)
 
 ## 2.1.0-beta.1
 

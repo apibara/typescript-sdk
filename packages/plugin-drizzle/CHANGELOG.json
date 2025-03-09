@@ -2,6 +2,21 @@
   "name": "@apibara/plugin-drizzle",
   "entries": [
     {
+      "date": "Sun, 09 Mar 2025 05:58:19 GMT",
+      "version": "2.1.0-beta.7",
+      "tag": "@apibara/plugin-drizzle_v2.1.0-beta.7",
+      "comments": {
+        "prerelease": [
+          {
+            "author": "jadejajaipal5@gmail.com",
+            "package": "@apibara/plugin-drizzle",
+            "commit": "d3eb6f4573082fc33d791cdaaf35bef4e8083102",
+            "comment": "plugin-drizzle: add drizzle and migrate helper methods"
+          }
+        ]
+      }
+    },
+    {
       "date": "Fri, 21 Feb 2025 19:49:06 GMT",
       "version": "2.1.0-beta.1",
       "tag": "@apibara/plugin-drizzle_v2.1.0-beta.1",

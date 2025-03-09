@@ -1,7 +1,0 @@
-{
-  "type": "prerelease",
-  "comment": "rebuild better-sqlite3",
-  "packageName": "@apibara/plugin-sqlite",
-  "email": "jadejajaipal5@gmail.com",
-  "dependentChangeType": "patch"
-}
