@@ -1,0 +1,7 @@
+{
+  "type": "prerelease",
+  "comment": "fix: install command doesn't require 'run'",
+  "packageName": "apibara",
+  "email": "nicolascoquelet@gmail.com",
+  "dependentChangeType": "patch"
+}
