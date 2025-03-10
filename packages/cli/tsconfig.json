@@ -10,7 +10,7 @@
       "apibara/cli": ["./src/cli"],
       "apibara/config": ["./src/config"],
       "apibara/core": ["./src/core"],
-      "apibara/rollup": ["./src/rollup"],
+      "apibara/rolldown": ["./src/rolldown"],
       "apibara/types": ["./src/types"],
       "apibara/hooks": ["./src/hooks"],
       "apibara/create": ["./src/create"],
@@ -18,5 +18,6 @@
       "#apibara-internal-virtual/*": ["./src/types/virtual/*"]
     }
   },
-  "include": ["src/"]
+  "include": ["src/**/*"],
+  "exclude": ["src/playground/**/*"]
 }

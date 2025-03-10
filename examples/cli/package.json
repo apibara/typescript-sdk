@@ -36,6 +36,7 @@
     "apibara": "workspace:*",
     "drizzle-orm": "^0.37.0",
     "pg": "^8.13.1",
+    "rolldown": "1.0.0-beta.3",
     "starknet": "^6.11.0",
     "viem": "^2.21.53"
   }

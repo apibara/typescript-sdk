@@ -79,19 +79,21 @@ export default defineCommand({
       await writeTypes(apibara);
       await build(apibara);
 
-      apibara.hooks.hook("dev:restart", () => {
+      apibara.hooks.hook("dev:restart", async () => {
         if (childProcess) {
           apibara.logger.info("Change detected, stopping indexers to restart");
-          childProcess.kill();
+          await killProcess(childProcess);
           childProcess = undefined;
         }
       });
 
-      apibara.hooks.hook("dev:reload", () => {
+      apibara.hooks.hook("dev:reload", async () => {
         if (childProcess) {
-          childProcess.kill();
+          apibara.logger.info("Restarting indexers");
+          await killProcess(childProcess);
+          childProcess = undefined;
         } else {
-          apibara.logger.success("Restarting indexers");
+          apibara.logger.info("Starting indexers");
         }
 
         const childArgs = [
@@ -118,3 +120,12 @@ export default defineCommand({
     await reload();
   },
 });
+
+async function killProcess(childProcess: ChildProcess | undefined) {
+  if (childProcess) {
+    await new Promise((resolve) => {
+      childProcess.once("exit", resolve);
+      childProcess.kill();
+    });
+  }
+}

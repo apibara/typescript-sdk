@@ -166,7 +166,7 @@ export async function initializeProject({
   if (!argNoCreateIndexer) {
     consola.info("Let's create an indexer\n");
 
-    await addIndexer({});
+    await addIndexer({ argRootDir: argTargetDir });
   } else {
     const pkgManager = getPackageManager();
     consola.info(

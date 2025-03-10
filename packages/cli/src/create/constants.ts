@@ -85,7 +85,6 @@ export const packageVersions = {
   "drizzle-kit": "^0.29.0",
   // Typescript Dependencies
   typescript: "^5.6.2",
-  "@rollup/plugin-typescript": "^11.1.6",
   "@types/node": "^20.5.2",
 };
 

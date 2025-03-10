@@ -37,6 +37,7 @@ type Options = {
   argNetwork?: string;
   argStorage?: string;
   argDnaUrl?: string;
+  argRootDir?: string;
 };
 
 export async function addIndexer({
@@ -45,8 +46,10 @@ export async function addIndexer({
   argNetwork,
   argStorage,
   argDnaUrl,
+  argRootDir,
 }: Options) {
-  const configExists = hasApibaraConfig(process.cwd());
+  const cwd = path.join(process.cwd(), argRootDir ?? ".");
+  const configExists = hasApibaraConfig(cwd);
 
   if (!configExists) {
     consola.error("No apibara.config found in the current directory.");
@@ -74,7 +77,7 @@ export async function addIndexer({
     }
   }
 
-  const language = getApibaraConfigLanguage(process.cwd());
+  const language = getApibaraConfigLanguage(cwd);
 
   validateIndexerId(argIndexerId, true);
   validateChain(argChain, true);
@@ -93,7 +96,7 @@ export async function addIndexer({
           validateIndexerId(id)
             ? checkFileExists(
                 path.join(
-                  process.cwd(),
+                  cwd,
                   "indexers",
                   `${id}.indexer.${language === "typescript" ? "ts" : "js"}`,
                 ),
@@ -197,7 +200,7 @@ export async function addIndexer({
   const pkgManager = getPackageManager();
 
   const options: IndexerOptions = {
-    cwd: process.cwd(),
+    cwd: cwd,
     indexerFileId,
     indexerId: convertKebabToCamelCase(indexerFileId),
     chain: (argChain as Chain) ?? prompt_chain?.name!,

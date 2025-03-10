@@ -6,3 +6,4 @@ bun.lockb
 .apibara
 .persistence
 .env
+playground/

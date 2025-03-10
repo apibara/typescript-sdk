@@ -15,7 +15,7 @@ export function generatePackageJson(isTypeScript: boolean) {
     private: true,
     type: "module",
     scripts: {
-      prepare: "apibara prepare",
+      ...(isTypeScript && { prepare: "apibara prepare" }),
       dev: "apibara dev",
       start: "apibara start",
       build: "apibara build",
@@ -28,8 +28,6 @@ export function generatePackageJson(isTypeScript: boolean) {
     },
     devDependencies: {
       ...(isTypeScript && {
-        "@rollup/plugin-typescript":
-          packageVersions["@rollup/plugin-typescript"],
         "@types/node": packageVersions["@types/node"],
         typescript: packageVersions.typescript,
       }),
@@ -59,17 +57,10 @@ export function generateTsConfig() {
 }
 
 export function generateApibaraConfig(isTypeScript: boolean) {
-  return `${isTypeScript ? 'import typescript from "@rollup/plugin-typescript";\nimport type { Plugin } from "apibara/rollup";\n' : ""}import { defineConfig } from "apibara/config";
+  return `import { defineConfig } from "apibara/config";
 
 export default defineConfig({
-  runtimeConfig: {},${
-    isTypeScript
-      ? `
-  rollupConfig: {
-    plugins: [typescript()${isTypeScript ? " as Plugin" : ""}],
-  },`
-      : ""
-  }
+  runtimeConfig: {},
 });\n`;
 }
 
