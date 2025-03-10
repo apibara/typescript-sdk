@@ -1,0 +1,7 @@
+{
+  "type": "prerelease",
+  "comment": "cli: refactor and replace rollup with rolldown",
+  "packageName": "apibara",
+  "email": "jadejajaipal5@gmail.com",
+  "dependentChangeType": "patch"
+}
