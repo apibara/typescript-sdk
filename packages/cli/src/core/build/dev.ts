@@ -20,7 +20,7 @@ export async function watchDev(
   }
   const reload = debounce(async () => await load());
 
-  const watchPatterns = [join(apibara.options.rootDir, "indexers")];
+  const watchPatterns = getWatchPatterns(apibara);
 
   const watchReloadEvents = new Set(["add", "addDir", "unlink", "unlinkDir"]);
   const reloadWatcher = watch(watchPatterns, { ignoreInitial: true }).on(
@@ -46,10 +46,12 @@ function startRolldownWatcher(
   apibara: Apibara,
   rolldownConfig: rolldown.RolldownOptions,
 ) {
+  const ignorePatterns = getIgnorePatterns(apibara);
   const watcher = rolldown.watch(
     defu(rolldownConfig, {
       watch: {
-        chokidar: apibara.options.watchOptions,
+        exclude: ignorePatterns,
+        ...((apibara.options.watchOptions ?? {}) as rolldown.WatchOptions),
       },
     }),
   );
@@ -88,3 +90,16 @@ function startRolldownWatcher(
   });
   return watcher;
 }
+
+const getWatchPatterns = (apibara: Apibara) => [
+  join(apibara.options.rootDir, "indexers"),
+];
+
+const getIgnorePatterns = (apibara: Apibara) => [
+  "**/.apibara/**",
+  "**/.git/**",
+  "**/.DS_Store",
+  "**/node_modules/**",
+  "**/dist/**",
+  "**/.turbo/**",
+];

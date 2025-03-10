@@ -5,8 +5,8 @@ import type {
   ResolvedConfig,
   WatchConfigOptions,
 } from "c12";
-import type { WatchOptions } from "chokidar";
 import type { NestedHooks } from "hookable";
+import type { WatchOptions } from "rolldown";
 import type { RolldownOptions } from "rolldown";
 import type { DeepPartial } from "./_utils";
 import type { ApibaraHooks } from "./hooks";
@@ -70,7 +70,7 @@ export interface ApibaraOptions<
 
   // Dev
   dev: boolean;
-  watchOptions: WatchOptions;
+  watchOptions: WatchOptions["watch"];
 
   // Hooks
   hooks: NestedHooks<ApibaraHooks>;
