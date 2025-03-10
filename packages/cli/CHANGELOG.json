@@ -2,6 +2,21 @@
   "name": "apibara",
   "entries": [
     {
+      "date": "Mon, 10 Mar 2025 10:36:18 GMT",
+      "version": "2.1.0-beta.8",
+      "tag": "apibara_v2.1.0-beta.8",
+      "comments": {
+        "prerelease": [
+          {
+            "author": "nicolascoquelet@gmail.com",
+            "package": "apibara",
+            "commit": "05ae45d95b0b6044019e64800dba1afc0a087492",
+            "comment": "fix: install command doesn't require 'run'"
+          }
+        ]
+      }
+    },
+    {
       "date": "Sun, 09 Mar 2025 05:58:19 GMT",
       "version": "2.1.0-beta.7",
       "tag": "apibara_v2.1.0-beta.7",

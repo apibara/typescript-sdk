@@ -1,8 +1,16 @@
 # Change Log - apibara
 
-<!-- This log was last generated on Sun, 09 Mar 2025 05:58:19 GMT and should not be manually modified. -->
+<!-- This log was last generated on Mon, 10 Mar 2025 10:36:18 GMT and should not be manually modified. -->
 
 <!-- Start content -->
+
+## 2.1.0-beta.8
+
+Mon, 10 Mar 2025 10:36:18 GMT
+
+### Changes
+
+- fix: install command doesn't require 'run' (nicolascoquelet@gmail.com)
 
 ## 2.1.0-beta.7
 
