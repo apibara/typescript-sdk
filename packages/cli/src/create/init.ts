@@ -171,9 +171,7 @@ export async function initializeProject({
     const pkgManager = getPackageManager();
     consola.info(
       "Run ",
-      green(
-        `${pkgManager.name}${pkgManager.name === "npm" ? " run" : ""} install`,
-      ),
+      green(`${pkgManager.name} install`),
       " to install all dependencies",
     );
   }
