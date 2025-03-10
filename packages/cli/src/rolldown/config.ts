@@ -15,7 +15,9 @@ const runtimeDependencies = [
   "better-sqlite3",
   "@electric-sql/pglite",
   "pg",
-  "ws",
+  // https://socket.io/docs/v4/server-installation/#additional-packages
+  "utf-8-validate",
+  "bufferutil",
   "node-fetch",
 ];
 

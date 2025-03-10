@@ -80,6 +80,11 @@ export interface ApibaraOptions<
 
   // Rolldown
   rolldownConfig?: Partial<RolldownOptions>;
+
+  /**
+   * @deprecated Use rolldownConfig instead. This option will be removed in future releases.
+   */
+  rollupConfig?: unknown;
   sourceMap?: boolean;
   entry: string;
   node: boolean;
