@@ -230,5 +230,7 @@ export async function addIndexer({
 
   const baseCommand = `${options.packageManager} install`;
   const tsCommand = `${baseCommand} && ${options.packageManager} run prepare`;
-  consola.info(`Before running the indexer, run ${cyan(language === "typescript" ? tsCommand : baseCommand)}`);
+  consola.info(
+    `Before running the indexer, run ${cyan(language === "typescript" ? tsCommand : baseCommand)}`,
+  );
 }
