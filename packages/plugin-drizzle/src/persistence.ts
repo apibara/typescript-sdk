@@ -297,3 +297,24 @@ export async function finalizeState<
     });
   }
 }
+
+export async function resetPersistence<
+  TQueryResult extends PgQueryResultHKT,
+  TFullSchema extends Record<string, unknown> = Record<string, never>,
+  TSchema extends
+    TablesRelationalConfig = ExtractTablesWithRelations<TFullSchema>,
+>(props: {
+  tx: PgTransaction<TQueryResult, TFullSchema, TSchema>;
+  indexerId: string;
+}) {
+  const { tx, indexerId } = props;
+
+  try {
+    await tx.delete(checkpoints).where(eq(checkpoints.id, indexerId));
+    await tx.delete(filters).where(eq(filters.id, indexerId));
+  } catch (error) {
+    throw new DrizzleStorageError("Failed to reset persistence state", {
+      cause: error,
+    });
+  }
+}
