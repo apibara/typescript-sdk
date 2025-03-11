@@ -49,3 +49,18 @@ export async function finalize(
     );
   }
 }
+
+export async function cleanupStorage(
+  db: Db,
+  session: ClientSession,
+  collections: string[],
+) {
+  for (const collection of collections) {
+    try {
+      // Delete all documents in the collection
+      await db.collection(collection).deleteMany({}, { session });
+    } catch (error) {
+      throw new Error(`Failed to clean up collection ${collection}: ${error}`);
+    }
+  }
+}

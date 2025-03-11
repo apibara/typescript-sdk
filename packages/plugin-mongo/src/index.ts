@@ -1,16 +1,17 @@
 import { useIndexerContext } from "@apibara/indexer";
-import { defineIndexerPlugin } from "@apibara/indexer/plugins";
+import { defineIndexerPlugin, useLogger } from "@apibara/indexer/plugins";
 import type { DbOptions, MongoClient } from "mongodb";
 
 import { generateIndexerId } from "@apibara/indexer/internal";
 import { useInternalContext } from "@apibara/indexer/internal/plugins";
-import { finalize, invalidate } from "./mongo";
+import { cleanupStorage, finalize, invalidate } from "./mongo";
 import {
   finalizeState,
   getState,
   initializePersistentState,
   invalidateState,
   persistState,
+  resetPersistence,
 } from "./persistence";
 import { MongoStorage } from "./storage";
 import { MongoStorageError, withTransaction } from "./utils";
@@ -60,10 +61,30 @@ export function mongoStorage<TFilter, TBlock>({
 }: MongoStorageOptions) {
   return defineIndexerPlugin<TFilter, TBlock>((indexer) => {
     let indexerId = "";
+    const alwaysReindex = process.env["APIBARA_ALWAYS_REINDEX"] === "true";
 
     indexer.hooks.hook("run:before", async () => {
       const { indexerName } = useInternalContext();
       indexerId = generateIndexerId(indexerName, identifier);
+      const logger = useLogger();
+
+      if (alwaysReindex) {
+        logger.warn(
+          `Reindexing: Deleting all data from collections - ${collections.join(", ")}`,
+        );
+
+        await withTransaction(client, async (session) => {
+          const db = client.db(dbName, dbOptions);
+
+          await cleanupStorage(db, session, collections);
+
+          if (enablePersistence) {
+            await resetPersistence({ db, session, indexerId });
+          }
+
+          logger.success("All data has been cleaned up for reindexing");
+        });
+      }
 
       await withTransaction(client, async (session) => {
         const db = client.db(dbName, dbOptions);
