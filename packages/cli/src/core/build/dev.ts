@@ -1,59 +1,67 @@
-import type { Apibara, RollupConfig } from "apibara/types";
+import type { Apibara } from "apibara/types";
 import { watch } from "chokidar";
 import defu from "defu";
 import { join } from "pathe";
 import { debounce } from "perfect-debounce";
-import * as rollup from "rollup";
-import { formatRollupError } from "./error";
+import * as rolldown from "rolldown";
+import { formatRolldownError } from "./error";
 
-export async function watchDev(apibara: Apibara, rollupConfig: RollupConfig) {
-  let rollupWatcher: rollup.RollupWatcher;
-
+export async function watchDev(
+  apibara: Apibara,
+  rolldownConfig: rolldown.RolldownOptions,
+) {
+  let rolldownWatcher: rolldown.RolldownWatcher;
   async function load() {
-    if (rollupWatcher) {
-      await rollupWatcher.close();
+    apibara.logger.start("Setting up a dev server");
+    if (rolldownWatcher) {
+      await rolldownWatcher.close();
     }
-    rollupWatcher = startRollupWatcher(apibara, rollupConfig);
+    rolldownWatcher = startRolldownWatcher(apibara, rolldownConfig);
   }
-  const reload = debounce(load);
+  const reload = debounce(async () => await load());
 
-  const watchPatterns = [join(apibara.options.rootDir, "indexers")];
+  const watchPatterns = getWatchPatterns(apibara);
 
   const watchReloadEvents = new Set(["add", "addDir", "unlink", "unlinkDir"]);
   const reloadWatcher = watch(watchPatterns, { ignoreInitial: true }).on(
     "all",
-    (event) => {
+    async (event) => {
       if (watchReloadEvents.has(event)) {
-        reload();
+        await reload();
       }
     },
   );
 
   apibara.hooks.hook("close", () => {
-    rollupWatcher.close();
+    rolldownWatcher.close();
     reloadWatcher.close();
   });
 
-  apibara.hooks.hook("rollup:reload", () => reload());
+  apibara.hooks.hook("rolldown:reload", async () => await reload());
 
   await load();
 }
 
-function startRollupWatcher(apibara: Apibara, rollupConfig: RollupConfig) {
-  const watcher = rollup.watch(
-    defu(rollupConfig, {
+function startRolldownWatcher(
+  apibara: Apibara,
+  rolldownConfig: rolldown.RolldownOptions,
+) {
+  const ignorePatterns = getIgnorePatterns(apibara);
+  const watcher = rolldown.watch(
+    defu(rolldownConfig, {
       watch: {
-        chokidar: apibara.options.watchOptions,
+        exclude: ignorePatterns,
+        ...((apibara.options.watchOptions ?? {}) as rolldown.WatchOptions),
       },
     }),
   );
   let start: number;
 
-  watcher.on("event", (event) => {
+  watcher.on("event", async (event) => {
     switch (event.code) {
       // The watcher is (re)starting
       case "START": {
-        apibara.hooks.callHook("dev:restart");
+        await apibara.hooks.callHook("dev:restart");
         return;
       }
 
@@ -70,15 +78,28 @@ function startRollupWatcher(apibara: Apibara, rollupConfig: RollupConfig) {
           "Indexers built",
           start ? `in ${Date.now() - start} ms` : "",
         );
-        apibara.hooks.callHook("dev:reload");
+        await apibara.hooks.callHook("dev:reload");
         return;
       }
 
       // Encountered an error while bundling
       case "ERROR": {
-        apibara.logger.error(formatRollupError(event.error));
+        apibara.logger.error(formatRolldownError(event.error));
       }
     }
   });
   return watcher;
 }
+
+const getWatchPatterns = (apibara: Apibara) => [
+  join(apibara.options.rootDir, "indexers"),
+];
+
+const getIgnorePatterns = (apibara: Apibara) => [
+  "**/.apibara/**",
+  "**/.git/**",
+  "**/.DS_Store",
+  "**/node_modules/**",
+  "**/dist/**",
+  "**/.turbo/**",
+];

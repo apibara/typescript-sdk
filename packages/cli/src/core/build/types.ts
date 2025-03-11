@@ -5,6 +5,14 @@ import { type JSValue, generateTypes, resolveSchema } from "untyped";
 import { prettyPath } from "../path";
 
 export async function writeTypes(apibara: Apibara) {
+  // Check if the config file has a TypeScript extension so we assume it's a TypeScript project
+  const isTypeScript = apibara.options._c12.configFile?.endsWith(".ts");
+
+  if (!isTypeScript) {
+    // If it's not a TypeScript project, we don't need to generate the types
+    return;
+  }
+
   const typesDir = resolve(apibara.options.buildDir, "types");
 
   const config = [

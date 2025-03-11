@@ -1,16 +1,15 @@
 import type { ConsolaReporter } from "@apibara/indexer/plugins";
-import type { RollupCommonJSOptions } from "@rollup/plugin-commonjs";
 import type {
   C12InputConfig,
   ConfigWatcher,
   ResolvedConfig,
   WatchConfigOptions,
 } from "c12";
-import type { WatchOptions } from "chokidar";
 import type { NestedHooks } from "hookable";
+import type { WatchOptions } from "rolldown";
+import type { RolldownOptions } from "rolldown";
 import type { DeepPartial } from "./_utils";
 import type { ApibaraHooks } from "./hooks";
-import type { RollupConfig } from "./rollup";
 
 export type LoggerFactory = ({
   indexer,
@@ -71,7 +70,7 @@ export interface ApibaraOptions<
 
   // Dev
   dev: boolean;
-  watchOptions: WatchOptions;
+  watchOptions: WatchOptions["watch"];
 
   // Hooks
   hooks: NestedHooks<ApibaraHooks>;
@@ -79,11 +78,15 @@ export interface ApibaraOptions<
   // Logging
   logger?: LoggerFactory;
 
-  // Rollup
-  rollupConfig?: Partial<RollupConfig>;
+  // Rolldown
+  rolldownConfig?: Partial<RolldownOptions>;
+
+  /**
+   * @deprecated Use rolldownConfig instead. This option will be removed in future releases.
+   */
+  rollupConfig?: unknown;
   sourceMap?: boolean;
   entry: string;
-  commonJS?: RollupCommonJSOptions;
   node: boolean;
   exportConditions?: string[];
 
