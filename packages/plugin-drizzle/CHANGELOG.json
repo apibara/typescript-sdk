@@ -2,6 +2,21 @@
   "name": "@apibara/plugin-drizzle",
   "entries": [
     {
+      "date": "Tue, 11 Mar 2025 08:30:59 GMT",
+      "version": "2.1.0-beta.10",
+      "tag": "@apibara/plugin-drizzle_v2.1.0-beta.10",
+      "comments": {
+        "prerelease": [
+          {
+            "author": "jadejajaipal5@gmail.com",
+            "package": "@apibara/plugin-drizzle",
+            "commit": "07c2484dd7141b365e1770fdf4eeec41c4750e9f",
+            "comment": "plugin-drizzle: add cleanup implementation for alwaysReindex flag"
+          }
+        ]
+      }
+    },
+    {
       "date": "Sun, 09 Mar 2025 05:58:19 GMT",
       "version": "2.1.0-beta.7",
       "tag": "@apibara/plugin-drizzle_v2.1.0-beta.7",

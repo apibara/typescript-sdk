@@ -1,8 +1,16 @@
 # Change Log - @apibara/plugin-drizzle
 
-<!-- This log was last generated on Sun, 09 Mar 2025 05:58:19 GMT and should not be manually modified. -->
+<!-- This log was last generated on Tue, 11 Mar 2025 08:30:59 GMT and should not be manually modified. -->
 
 <!-- Start content -->
+
+## 2.1.0-beta.10
+
+Tue, 11 Mar 2025 08:30:59 GMT
+
+### Changes
+
+- plugin-drizzle: add cleanup implementation for alwaysReindex flag (jadejajaipal5@gmail.com)
 
 ## 2.1.0-beta.7
 

@@ -2,6 +2,21 @@
   "name": "@apibara/plugin-mongo",
   "entries": [
     {
+      "date": "Tue, 11 Mar 2025 08:30:59 GMT",
+      "version": "2.1.0-beta.10",
+      "tag": "@apibara/plugin-mongo_v2.1.0-beta.10",
+      "comments": {
+        "prerelease": [
+          {
+            "author": "jadejajaipal5@gmail.com",
+            "package": "@apibara/plugin-mongo",
+            "commit": "07c2484dd7141b365e1770fdf4eeec41c4750e9f",
+            "comment": "plugin-mongo: add cleanup implementation for alwaysReindex flag"
+          }
+        ]
+      }
+    },
+    {
       "date": "Fri, 21 Feb 2025 19:49:06 GMT",
       "version": "2.1.0-beta.1",
       "tag": "@apibara/plugin-mongo_v2.1.0-beta.1",

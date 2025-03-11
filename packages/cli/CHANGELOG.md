@@ -1,8 +1,16 @@
 # Change Log - apibara
 
-<!-- This log was last generated on Tue, 11 Mar 2025 08:18:43 GMT and should not be manually modified. -->
+<!-- This log was last generated on Tue, 11 Mar 2025 08:30:59 GMT and should not be manually modified. -->
 
 <!-- Start content -->
+
+## 2.1.0-beta.10
+
+Tue, 11 Mar 2025 08:30:59 GMT
+
+### Changes
+
+- cli: add alwaysReindex flag to reset database/persistence states on dev restarts (jadejajaipal5@gmail.com)
 
 ## 2.1.0-beta.9
 

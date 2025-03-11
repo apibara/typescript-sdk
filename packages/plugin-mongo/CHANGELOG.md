@@ -1,8 +1,16 @@
 # Change Log - @apibara/plugin-mongo
 
-<!-- This log was last generated on Fri, 21 Feb 2025 19:49:06 GMT and should not be manually modified. -->
+<!-- This log was last generated on Tue, 11 Mar 2025 08:30:59 GMT and should not be manually modified. -->
 
 <!-- Start content -->
+
+## 2.1.0-beta.10
+
+Tue, 11 Mar 2025 08:30:59 GMT
+
+### Changes
+
+- plugin-mongo: add cleanup implementation for alwaysReindex flag (jadejajaipal5@gmail.com)
 
 ## 2.1.0-beta.1
 

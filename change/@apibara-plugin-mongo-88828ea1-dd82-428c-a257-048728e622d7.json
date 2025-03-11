@@ -1,7 +1,0 @@
-{
-  "type": "prerelease",
-  "comment": "plugin-mongo: add cleanup implementation for alwaysReindex flag",
-  "packageName": "@apibara/plugin-mongo",
-  "email": "jadejajaipal5@gmail.com",
-  "dependentChangeType": "patch"
-}
