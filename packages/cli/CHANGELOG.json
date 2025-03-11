@@ -2,6 +2,21 @@
   "name": "apibara",
   "entries": [
     {
+      "date": "Tue, 11 Mar 2025 08:18:43 GMT",
+      "version": "2.1.0-beta.9",
+      "tag": "apibara_v2.1.0-beta.9",
+      "comments": {
+        "prerelease": [
+          {
+            "author": "jadejajaipal5@gmail.com",
+            "package": "apibara",
+            "commit": "32e33f3f3e8128ef05632c42647c324f47ef8e9e",
+            "comment": "cli: refactor and replace rollup with rolldown"
+          }
+        ]
+      }
+    },
+    {
       "date": "Mon, 10 Mar 2025 10:36:18 GMT",
       "version": "2.1.0-beta.8",
       "tag": "apibara_v2.1.0-beta.8",
