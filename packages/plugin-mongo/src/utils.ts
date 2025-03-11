@@ -1,8 +1,8 @@
 import type { ClientSession, MongoClient } from "mongodb";
 
 export class MongoStorageError extends Error {
-  constructor(message: string) {
-    super(message);
+  constructor(message: string, options?: ErrorOptions) {
+    super(message, options);
     this.name = "MongoStorageError";
   }
 }

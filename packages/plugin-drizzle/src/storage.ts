@@ -316,3 +316,45 @@ export async function finalize<
     });
   }
 }
+
+export async function cleanupStorage<
+  TQueryResult extends PgQueryResultHKT,
+  TFullSchema extends Record<string, unknown> = Record<string, never>,
+  TSchema extends
+    TablesRelationalConfig = ExtractTablesWithRelations<TFullSchema>,
+>(
+  tx: PgTransaction<TQueryResult, TFullSchema, TSchema>,
+  tables: string[],
+  indexerId: string,
+) {
+  try {
+    for (const table of tables) {
+      await tx.execute(
+        sql.raw(
+          `DROP TRIGGER IF EXISTS ${getReorgTriggerName(table, indexerId)} ON ${table};`,
+        ),
+      );
+    }
+
+    await tx.execute(
+      sql.raw(`
+        DELETE FROM __reorg_rollback
+        WHERE indexer_id = '${indexerId}'
+      `),
+    );
+
+    for (const table of tables) {
+      try {
+        await tx.execute(sql.raw(`TRUNCATE TABLE ${table} CASCADE;`));
+      } catch (error) {
+        throw new DrizzleStorageError(`Failed to truncate table ${table}`, {
+          cause: error,
+        });
+      }
+    }
+  } catch (error) {
+    throw new DrizzleStorageError("Failed to clean up storage", {
+      cause: error,
+    });
+  }
+}

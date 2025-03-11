@@ -1,5 +1,6 @@
 import { type Cursor, normalizeCursor } from "@apibara/protocol";
 import type { ClientSession, Db } from "mongodb";
+import { MongoStorageError } from "./utils";
 
 export type CheckpointSchema = {
   id: string;
@@ -160,4 +161,28 @@ export async function finalizeState(props: {
     },
     { session },
   );
+}
+
+export async function resetPersistence(props: {
+  db: Db;
+  session: ClientSession;
+  indexerId: string;
+}) {
+  const { db, session, indexerId } = props;
+
+  try {
+    // Delete all checkpoints for this indexer
+    await db
+      .collection<CheckpointSchema>(checkpointCollectionName)
+      .deleteMany({ id: indexerId }, { session });
+
+    // Delete all filters for this indexer
+    await db
+      .collection<FilterSchema>(filterCollectionName)
+      .deleteMany({ id: indexerId }, { session });
+  } catch (error) {
+    throw new MongoStorageError("Failed to reset persistence state", {
+      cause: error,
+    });
+  }
 }

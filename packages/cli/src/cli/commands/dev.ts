@@ -26,9 +26,19 @@ export default defineCommand({
       type: "string",
       description: "Preset to use",
     },
+    alwaysReindex: {
+      type: "boolean",
+      default: false,
+      description:
+        "Reindex the indexers from the starting block on every restart (default: false)",
+    },
   },
   async run({ args }) {
     const rootDir = resolve((args.dir || args._dir || ".") as string);
+
+    if (args.alwaysReindex) {
+      process.env.APIBARA_ALWAYS_REINDEX = "true";
+    }
 
     let apibara: Apibara;
     let childProcess: ChildProcess | undefined;

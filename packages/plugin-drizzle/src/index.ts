@@ -22,8 +22,10 @@ import {
   initializePersistentState,
   invalidateState,
   persistState,
+  resetPersistence,
 } from "./persistence";
 import {
+  cleanupStorage,
   finalize,
   initializeReorgRollbackTable,
   invalidate,
@@ -125,6 +127,7 @@ export function drizzleStorage<
   return defineIndexerPlugin<TFilter, TBlock>((indexer) => {
     let tableNames: string[] = [];
     let indexerId = "";
+    const alwaysReindex = process.env["APIBARA_ALWAYS_REINDEX"] === "true";
 
     try {
       tableNames = Object.values((schema as TSchema) ?? db._.schema ?? {}).map(
@@ -148,6 +151,21 @@ export function drizzleStorage<
         internalContext;
 
       indexerId = generateIndexerId(indexerFileName, identifier);
+
+      if (alwaysReindex) {
+        logger.warn(
+          `Reindexing: Deleting all data from tables - ${tableNames.join(", ")}`,
+        );
+        await withTransaction(db, async (tx) => {
+          await cleanupStorage(tx, tableNames, indexerId);
+
+          if (enablePersistence) {
+            await resetPersistence({ tx, indexerId });
+          }
+
+          logger.success("Tables have been cleaned up for reindexing");
+        });
+      }
 
       let retries = 0;
 
