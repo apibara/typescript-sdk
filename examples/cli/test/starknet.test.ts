@@ -11,7 +11,11 @@ const connectionString = "memory://starknet";
 
 describe("Starknet USDC Transfers indexer", () => {
   it("should work", async () => {
-    const indexer = createIndexer({ connectionString });
+    const indexer = createIndexer({
+      connectionString,
+      evm: { startingBlock: 10_000_000n },
+      starknet: { startingBlock: 800_000n },
+    });
 
     const testResult = await vcr.run("starknet-usdc-transfers", indexer, {
       fromBlock: 800_000n,

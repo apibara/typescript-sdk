@@ -9,8 +9,10 @@ import type {
   RolldownOptions,
   RolldownPluginOption,
 } from "rolldown";
+import { serialize } from "../utils/helper";
 import { appConfig } from "./plugins/config";
 import { indexers } from "./plugins/indexers";
+
 const runtimeDependencies = [
   "better-sqlite3",
   "@electric-sql/pglite",
@@ -92,18 +94,15 @@ export function getRolldownConfig(apibara: Apibara): RolldownOptions {
 
 function getSerializedRuntimeConfig(apibara: Apibara) {
   try {
-    return JSON.stringify(
-      {
-        runtimeConfig: apibara.options.runtimeConfig,
-        preset: apibara.options.preset,
-        presets: apibara.options.presets,
-      },
-      null,
-      2,
-    );
+    return serialize({
+      runtimeConfig: apibara.options.runtimeConfig,
+      preset: apibara.options.preset,
+      presets: apibara.options.presets,
+    });
   } catch (error) {
     throw new Error(
-      "Failed to serialize runtime config, please only use serializable values for runtime config",
+      "Failed to serialize runtime config. Please ensure all values in your runtime configuration are JSON serializable. BigInt values are supported, but functions, symbols, etc. are not. Check your configuration for non-serializable values.",
+      { cause: error },
     );
   }
 }

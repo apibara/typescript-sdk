@@ -1,4 +1,5 @@
 import type { ApibaraOptions } from "apibara/types";
+import { serialize } from "../../../utils/helper";
 
 export async function resolveRuntimeConfigOptions(options: ApibaraOptions) {
   const { preset, presets } = options;
@@ -20,5 +21,5 @@ export async function resolveRuntimeConfigOptions(options: ApibaraOptions) {
     };
     runtimeConfig = { ...runtimeConfig, ...presetValue.runtimeConfig };
   }
-  process.env.APIBARA_RUNTIME_CONFIG = JSON.stringify(runtimeConfig);
+  process.env.APIBARA_RUNTIME_CONFIG = serialize(runtimeConfig);
 }

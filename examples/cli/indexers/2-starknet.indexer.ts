@@ -10,7 +10,10 @@ import { hash } from "starknet";
 
 // USDC Transfers on Starknet
 export default function (runtimeConfig: ApibaraRuntimeConfig) {
-  const { connectionString } = runtimeConfig;
+  const {
+    connectionString,
+    starknet: { startingBlock },
+  } = runtimeConfig;
 
   const database = drizzle({
     schema: {
@@ -22,7 +25,7 @@ export default function (runtimeConfig: ApibaraRuntimeConfig) {
   return defineIndexer(StarknetStream)({
     streamUrl: "https://starknet.preview.apibara.org",
     finality: "accepted",
-    startingBlock: 10_30_000n,
+    startingBlock,
     plugins: [
       drizzleStorage({
         db: database,
