@@ -91,6 +91,7 @@
   "dependencies": {
     "@apibara/indexer": "workspace:*",
     "@apibara/protocol": "workspace:*",
+    "@rollup/plugin-replace": "^6.0.2",
     "@rollup/plugin-virtual": "^3.0.2",
     "c12": "^1.11.1",
     "chokidar": "^3.6.0",

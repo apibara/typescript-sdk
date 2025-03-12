@@ -242,6 +242,9 @@ importers:
       '@apibara/protocol':
         specifier: workspace:*
         version: link:../protocol
+      '@rollup/plugin-replace':
+        specifier: ^6.0.2
+        version: 6.0.2(rollup@4.34.8)
       '@rollup/plugin-virtual':
         specifier: ^3.0.2
         version: 3.0.2(rollup@4.34.8)
@@ -1494,6 +1497,15 @@ packages:
 
   '@rollup/plugin-replace@5.0.5':
     resolution: {integrity: sha512-rYO4fOi8lMaTg/z5Jb+hKnrHHVn8j2lwkqwyS4kTRhKyWOLf2wST2sWXr4WzWiTcoHTp2sTjqUbqIj2E39slKQ==}
+    engines: {node: '>=14.0.0'}
+    peerDependencies:
+      rollup: ^1.20.0||^2.0.0||^3.0.0||^4.0.0
+    peerDependenciesMeta:
+      rollup:
+        optional: true
+
+  '@rollup/plugin-replace@6.0.2':
+    resolution: {integrity: sha512-7QaYCf8bqF04dOy7w/eHmJeNExxTYwvKAmlSAH/EaWWUzbT0h5sbF6bktFoX/0F/0qwng5/dWFMyf3gzaM8DsQ==}
     engines: {node: '>=14.0.0'}
     peerDependencies:
       rollup: ^1.20.0||^2.0.0||^3.0.0||^4.0.0
@@ -4434,6 +4446,13 @@ snapshots:
       magic-string: 0.30.12
     optionalDependencies:
       rollup: 3.29.4
+
+  '@rollup/plugin-replace@6.0.2(rollup@4.34.8)':
+    dependencies:
+      '@rollup/pluginutils': 5.1.0(rollup@4.34.8)
+      magic-string: 0.30.12
+    optionalDependencies:
+      rollup: 4.34.8
 
   '@rollup/plugin-typescript@11.1.6(rollup@4.34.8)(tslib@2.6.3)(typescript@5.6.2)':
     dependencies:

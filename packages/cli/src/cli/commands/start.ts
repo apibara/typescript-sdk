@@ -28,6 +28,7 @@ export default defineCommand({
 
     const apibara = await createApibara({
       rootDir,
+      preset,
     });
 
     apibara.logger.start(
