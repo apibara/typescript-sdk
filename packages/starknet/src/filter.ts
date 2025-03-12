@@ -106,6 +106,7 @@ export type TransactionStatusFilter = typeof TransactionStatusFilter.Type;
  * @prop includeReceipt Include the transaction receipt.
  * @prop includeMessages Include the messages that were sent to L1 in the same transaction.
  * @prop includeSiblings Include the sibling events of the matched events.
+ * @prop includeTransactionTrace Include the trace of the transaction that emitted the event.
  */
 export const EventFilter = Schema.Struct({
   id: Schema.optional(Schema.Number),
@@ -117,6 +118,7 @@ export const EventFilter = Schema.Struct({
   includeReceipt: Schema.optional(Schema.Boolean),
   includeMessages: Schema.optional(Schema.Boolean),
   includeSiblings: Schema.optional(Schema.Boolean),
+  includeTransactionTrace: Schema.optional(Schema.Boolean),
 });
 
 export type EventFilter = typeof EventFilter.Type;
@@ -129,6 +131,7 @@ export type EventFilter = typeof EventFilter.Type;
  * @prop includeTransaction Include the transaction that sent the message.
  * @prop includeReceipt Include the transaction receipt.
  * @prop includeEvents Include events from the same transaction.
+ * @prop includeTransactionTrace Include the trace of the transaction that sent the message.
  */
 export const MessageToL1Filter = Schema.Struct({
   id: Schema.optional(Schema.Number),
@@ -138,6 +141,7 @@ export const MessageToL1Filter = Schema.Struct({
   includeTransaction: Schema.optional(Schema.Boolean),
   includeReceipt: Schema.optional(Schema.Boolean),
   includeEvents: Schema.optional(Schema.Boolean),
+  includeTransactionTrace: Schema.optional(Schema.Boolean),
 });
 
 export type MessageToL1Filter = typeof MessageToL1Filter.Type;
@@ -227,6 +231,7 @@ export type DeployAccountV3TransactionFilter =
  * @prop includeReceipt Include the transaction receipt.
  * @prop includeEvents Include events from the same transaction.
  * @prop includeMessages Include messages sent in the transaction.
+ * @prop includeTrace Include the transaction's trace.
  */
 export const TransactionFilter = Schema.Struct({
   id: Schema.optional(Schema.Number),
@@ -234,6 +239,7 @@ export const TransactionFilter = Schema.Struct({
   includeReceipt: Schema.optional(Schema.Boolean),
   includeMessages: Schema.optional(Schema.Boolean),
   includeEvents: Schema.optional(Schema.Boolean),
+  includeTrace: Schema.optional(Schema.Boolean),
   transactionType: Schema.optional(
     Schema.Union(
       InvokeTransactionV0Filter,

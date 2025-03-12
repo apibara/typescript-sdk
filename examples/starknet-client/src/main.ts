@@ -1,6 +1,11 @@
 import assert from "node:assert";
 import { createClient } from "@apibara/protocol";
-import { type Abi, Filter, StarknetStream } from "@apibara/starknet";
+import {
+  type Abi,
+  Filter,
+  type FunctionInvocation,
+  StarknetStream,
+} from "@apibara/starknet";
 import { defineCommand, runMain } from "citty";
 import consola from "consola";
 
@@ -54,19 +59,15 @@ const command = defineCommand({
     console.log(response);
 
     const filter = Filter.make({
-      transactions: [{ includeReceipt: true }],
-      messages: [{}],
-      events: [{}],
-      storageDiffs: [{}],
-      contractChanges: [{}],
-      nonceUpdates: [{}],
+      transactions: [{ includeReceipt: true, includeTrace: true }],
+      // events: [{ includeTransactionTrace: true }]
     });
 
     const request = StarknetStream.Request.make({
       filter: [filter],
       finality: "pending",
       startingCursor: {
-        orderKey: 1_083_705n,
+        orderKey: 1_222_901n,
       },
     });
 
@@ -75,26 +76,29 @@ const command = defineCommand({
     })) {
       switch (message._tag) {
         case "data": {
-          consola.info("Data", message.data.endCursor?.orderKey);
+          consola.info("Data", message.data.finality);
 
-          let events = 0;
           for (const block of message.data.data) {
             assert(block !== null);
-            events += block.events.length ?? 0;
+            const { events, messages, transactions, receipts, traces } = block;
+
             consola.info(
-              `Block n=${block.header?.blockNumber} h=${block.header?.blockHash}`,
+              `Block n=${block.header?.blockNumber} h=${block.header?.blockHash} ev=${events.length} msg=${messages.length} tx=${transactions.length} rx=${receipts.length} tr=${traces.length}`,
             );
 
-            for (const event of block.events) {
-              // const { args, transactionHash } = decodeEvent({
-              //   abi,
-              //   eventName: "Transfer",
-              //   event,
-              // });
-              // consola.info(
-              //   `${prettyAddress(args.from)} -> ${prettyAddress(args.to)} ${formatUnits(args.value, 6)} ${colors.gray(transactionHash ?? "")}`,
-              // );
-            }
+            // for (const trace of block.traces) {
+            //   console.log("TRACE START");
+            //   if (trace.traceRoot._tag === "invoke") {
+            //     const exe = trace.traceRoot.invoke.executeInvocation;
+            //     if (exe._tag === "success") {
+            //       printTrace(exe.success);
+            //     } else {
+            //       console.log("TRACE REVERTED", exe.reverted);
+            //     }
+            //   } else {
+            //     console.log("TRACE OTHER", trace.traceRoot);
+            //   }
+            // }
           }
 
           break;
@@ -122,3 +126,13 @@ function prettyAddress(address: string) {
 }
 
 runMain(command);
+
+function printTrace(trace: FunctionInvocation, type = "root", ident = 0) {
+  const space = "  ".repeat(ident);
+  console.log(
+    `${space}${type} ${trace.contractAddress} ${trace.entryPointSelector}()`,
+  );
+  for (const c of trace.calls) {
+    printTrace(c, c.callType, ident + 1);
+  }
+}

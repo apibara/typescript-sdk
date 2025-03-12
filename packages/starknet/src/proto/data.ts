@@ -224,6 +224,51 @@ export function dataAvailabilityModeToJSON(object: DataAvailabilityMode): string
   }
 }
 
+export enum CallType {
+  UNSPECIFIED = 0,
+  LIBRARY_CALL = 1,
+  CALL = 2,
+  DELEGATE = 3,
+  UNRECOGNIZED = -1,
+}
+
+export function callTypeFromJSON(object: any): CallType {
+  switch (object) {
+    case 0:
+    case "CALL_TYPE_UNSPECIFIED":
+      return CallType.UNSPECIFIED;
+    case 1:
+    case "CALL_TYPE_LIBRARY_CALL":
+      return CallType.LIBRARY_CALL;
+    case 2:
+    case "CALL_TYPE_CALL":
+      return CallType.CALL;
+    case 3:
+    case "CALL_TYPE_DELEGATE":
+      return CallType.DELEGATE;
+    case -1:
+    case "UNRECOGNIZED":
+    default:
+      return CallType.UNRECOGNIZED;
+  }
+}
+
+export function callTypeToJSON(object: CallType): string {
+  switch (object) {
+    case CallType.UNSPECIFIED:
+      return "CALL_TYPE_UNSPECIFIED";
+    case CallType.LIBRARY_CALL:
+      return "CALL_TYPE_LIBRARY_CALL";
+    case CallType.CALL:
+      return "CALL_TYPE_CALL";
+    case CallType.DELEGATE:
+      return "CALL_TYPE_DELEGATE";
+    case CallType.UNRECOGNIZED:
+    default:
+      return "UNRECOGNIZED";
+  }
+}
+
 /** Requested data, grouped by block. */
 export interface Block {
   /** The header. */
@@ -255,7 +300,11 @@ export interface Block {
     | readonly ContractChange[]
     | undefined;
   /** List of nonce updates. */
-  readonly nonceUpdates?: readonly NonceUpdate[] | undefined;
+  readonly nonceUpdates?:
+    | readonly NonceUpdate[]
+    | undefined;
+  /** List of transaction traces. */
+  readonly traces?: readonly Trace[] | undefined;
 }
 
 /** Block header. */
@@ -745,6 +794,63 @@ export interface NonceUpdate {
   readonly nonce?: FieldElement | undefined;
 }
 
+export interface Trace {
+  readonly filterIds?:
+    | readonly number[]
+    | undefined;
+  /** Transaction hash. */
+  readonly transactionHash?: FieldElement | undefined;
+  readonly traceRoot?:
+    | { readonly $case: "invoke"; readonly invoke: InvokeTransactionTrace }
+    | { readonly $case: "declare"; readonly declare: DeclareTransactionTrace }
+    | { readonly $case: "deployAccount"; readonly deployAccount: DeployAccountTransactionTrace }
+    | { readonly $case: "l1Handler"; readonly l1Handler: L1HandlerTransactionTrace }
+    | undefined;
+}
+
+export interface InvokeTransactionTrace {
+  readonly validateInvocation?: FunctionInvocation | undefined;
+  readonly executeInvocation?: { readonly $case: "success"; readonly success: FunctionInvocation } | {
+    readonly $case: "reverted";
+    readonly reverted: ExecutionReverted;
+  } | undefined;
+  readonly feeTransferInvocation?: FunctionInvocation | undefined;
+}
+
+export interface DeclareTransactionTrace {
+  readonly validateInvocation?: FunctionInvocation | undefined;
+  readonly feeTransferInvocation?: FunctionInvocation | undefined;
+}
+
+export interface DeployAccountTransactionTrace {
+  readonly validateInvocation?: FunctionInvocation | undefined;
+  readonly constructorInvocation?: FunctionInvocation | undefined;
+  readonly feeTransferInvocation?: FunctionInvocation | undefined;
+}
+
+export interface L1HandlerTransactionTrace {
+  readonly functionInvocation?: FunctionInvocation | undefined;
+}
+
+export interface FunctionInvocation {
+  readonly contractAddress?: FieldElement | undefined;
+  readonly entryPointSelector?: FieldElement | undefined;
+  readonly calldata?: readonly FieldElement[] | undefined;
+  readonly callerAddress?: FieldElement | undefined;
+  readonly classHash?: FieldElement | undefined;
+  readonly callType?: CallType | undefined;
+  readonly result?: readonly FieldElement[] | undefined;
+  readonly calls?: readonly FunctionInvocation[] | undefined;
+  readonly events?: readonly number[] | undefined;
+  readonly messages?: readonly number[] | undefined;
+}
+
+export interface FunctionCall {
+  readonly contractAddress?: FieldElement | undefined;
+  readonly entryPointSelector?: FieldElement | undefined;
+  readonly calldata?: readonly FieldElement[] | undefined;
+}
+
 function createBaseBlock(): Block {
   return {
     header: undefined,
@@ -755,6 +861,7 @@ function createBaseBlock(): Block {
     storageDiffs: [],
     contractChanges: [],
     nonceUpdates: [],
+    traces: [],
   };
 }
 
@@ -796,6 +903,11 @@ export const Block = {
     if (message.nonceUpdates !== undefined && message.nonceUpdates.length !== 0) {
       for (const v of message.nonceUpdates) {
         NonceUpdate.encode(v!, writer.uint32(66).fork()).ldelim();
+      }
+    }
+    if (message.traces !== undefined && message.traces.length !== 0) {
+      for (const v of message.traces) {
+        Trace.encode(v!, writer.uint32(74).fork()).ldelim();
       }
     }
     return writer;
@@ -864,6 +976,13 @@ export const Block = {
 
           message.nonceUpdates!.push(NonceUpdate.decode(reader, reader.uint32()));
           continue;
+        case 9:
+          if (tag !== 74) {
+            break;
+          }
+
+          message.traces!.push(Trace.decode(reader, reader.uint32()));
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -895,6 +1014,7 @@ export const Block = {
       nonceUpdates: globalThis.Array.isArray(object?.nonceUpdates)
         ? object.nonceUpdates.map((e: any) => NonceUpdate.fromJSON(e))
         : [],
+      traces: globalThis.Array.isArray(object?.traces) ? object.traces.map((e: any) => Trace.fromJSON(e)) : [],
     };
   },
 
@@ -924,6 +1044,9 @@ export const Block = {
     if (message.nonceUpdates?.length) {
       obj.nonceUpdates = message.nonceUpdates.map((e) => NonceUpdate.toJSON(e));
     }
+    if (message.traces?.length) {
+      obj.traces = message.traces.map((e) => Trace.toJSON(e));
+    }
     return obj;
   },
 
@@ -942,6 +1065,7 @@ export const Block = {
     message.storageDiffs = object.storageDiffs?.map((e) => StorageDiff.fromPartial(e)) || [];
     message.contractChanges = object.contractChanges?.map((e) => ContractChange.fromPartial(e)) || [];
     message.nonceUpdates = object.nonceUpdates?.map((e) => NonceUpdate.fromPartial(e)) || [];
+    message.traces = object.traces?.map((e) => Trace.fromPartial(e)) || [];
     return message;
   },
 };
@@ -6065,6 +6189,941 @@ export const NonceUpdate = {
     message.nonce = (object.nonce !== undefined && object.nonce !== null)
       ? FieldElement.fromPartial(object.nonce)
       : undefined;
+    return message;
+  },
+};
+
+function createBaseTrace(): Trace {
+  return { filterIds: [], transactionHash: undefined, traceRoot: undefined };
+}
+
+export const Trace = {
+  encode(message: Trace, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.filterIds !== undefined && message.filterIds.length !== 0) {
+      writer.uint32(10).fork();
+      for (const v of message.filterIds) {
+        writer.uint32(v);
+      }
+      writer.ldelim();
+    }
+    if (message.transactionHash !== undefined) {
+      FieldElement.encode(message.transactionHash, writer.uint32(18).fork()).ldelim();
+    }
+    switch (message.traceRoot?.$case) {
+      case "invoke":
+        InvokeTransactionTrace.encode(message.traceRoot.invoke, writer.uint32(26).fork()).ldelim();
+        break;
+      case "declare":
+        DeclareTransactionTrace.encode(message.traceRoot.declare, writer.uint32(34).fork()).ldelim();
+        break;
+      case "deployAccount":
+        DeployAccountTransactionTrace.encode(message.traceRoot.deployAccount, writer.uint32(42).fork()).ldelim();
+        break;
+      case "l1Handler":
+        L1HandlerTransactionTrace.encode(message.traceRoot.l1Handler, writer.uint32(50).fork()).ldelim();
+        break;
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): Trace {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseTrace() as any;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag === 8) {
+            message.filterIds!.push(reader.uint32());
+
+            continue;
+          }
+
+          if (tag === 10) {
+            const end2 = reader.uint32() + reader.pos;
+            while (reader.pos < end2) {
+              message.filterIds!.push(reader.uint32());
+            }
+
+            continue;
+          }
+
+          break;
+        case 2:
+          if (tag !== 18) {
+            break;
+          }
+
+          message.transactionHash = FieldElement.decode(reader, reader.uint32());
+          continue;
+        case 3:
+          if (tag !== 26) {
+            break;
+          }
+
+          message.traceRoot = { $case: "invoke", invoke: InvokeTransactionTrace.decode(reader, reader.uint32()) };
+          continue;
+        case 4:
+          if (tag !== 34) {
+            break;
+          }
+
+          message.traceRoot = { $case: "declare", declare: DeclareTransactionTrace.decode(reader, reader.uint32()) };
+          continue;
+        case 5:
+          if (tag !== 42) {
+            break;
+          }
+
+          message.traceRoot = {
+            $case: "deployAccount",
+            deployAccount: DeployAccountTransactionTrace.decode(reader, reader.uint32()),
+          };
+          continue;
+        case 6:
+          if (tag !== 50) {
+            break;
+          }
+
+          message.traceRoot = {
+            $case: "l1Handler",
+            l1Handler: L1HandlerTransactionTrace.decode(reader, reader.uint32()),
+          };
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): Trace {
+    return {
+      filterIds: globalThis.Array.isArray(object?.filterIds)
+        ? object.filterIds.map((e: any) => globalThis.Number(e))
+        : [],
+      transactionHash: isSet(object.transactionHash) ? FieldElement.fromJSON(object.transactionHash) : undefined,
+      traceRoot: isSet(object.invoke)
+        ? { $case: "invoke", invoke: InvokeTransactionTrace.fromJSON(object.invoke) }
+        : isSet(object.declare)
+        ? { $case: "declare", declare: DeclareTransactionTrace.fromJSON(object.declare) }
+        : isSet(object.deployAccount)
+        ? { $case: "deployAccount", deployAccount: DeployAccountTransactionTrace.fromJSON(object.deployAccount) }
+        : isSet(object.l1Handler)
+        ? { $case: "l1Handler", l1Handler: L1HandlerTransactionTrace.fromJSON(object.l1Handler) }
+        : undefined,
+    };
+  },
+
+  toJSON(message: Trace): unknown {
+    const obj: any = {};
+    if (message.filterIds?.length) {
+      obj.filterIds = message.filterIds.map((e) => Math.round(e));
+    }
+    if (message.transactionHash !== undefined) {
+      obj.transactionHash = FieldElement.toJSON(message.transactionHash);
+    }
+    if (message.traceRoot?.$case === "invoke") {
+      obj.invoke = InvokeTransactionTrace.toJSON(message.traceRoot.invoke);
+    }
+    if (message.traceRoot?.$case === "declare") {
+      obj.declare = DeclareTransactionTrace.toJSON(message.traceRoot.declare);
+    }
+    if (message.traceRoot?.$case === "deployAccount") {
+      obj.deployAccount = DeployAccountTransactionTrace.toJSON(message.traceRoot.deployAccount);
+    }
+    if (message.traceRoot?.$case === "l1Handler") {
+      obj.l1Handler = L1HandlerTransactionTrace.toJSON(message.traceRoot.l1Handler);
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<Trace>): Trace {
+    return Trace.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<Trace>): Trace {
+    const message = createBaseTrace() as any;
+    message.filterIds = object.filterIds?.map((e) => e) || [];
+    message.transactionHash = (object.transactionHash !== undefined && object.transactionHash !== null)
+      ? FieldElement.fromPartial(object.transactionHash)
+      : undefined;
+    if (
+      object.traceRoot?.$case === "invoke" &&
+      object.traceRoot?.invoke !== undefined &&
+      object.traceRoot?.invoke !== null
+    ) {
+      message.traceRoot = { $case: "invoke", invoke: InvokeTransactionTrace.fromPartial(object.traceRoot.invoke) };
+    }
+    if (
+      object.traceRoot?.$case === "declare" &&
+      object.traceRoot?.declare !== undefined &&
+      object.traceRoot?.declare !== null
+    ) {
+      message.traceRoot = { $case: "declare", declare: DeclareTransactionTrace.fromPartial(object.traceRoot.declare) };
+    }
+    if (
+      object.traceRoot?.$case === "deployAccount" &&
+      object.traceRoot?.deployAccount !== undefined &&
+      object.traceRoot?.deployAccount !== null
+    ) {
+      message.traceRoot = {
+        $case: "deployAccount",
+        deployAccount: DeployAccountTransactionTrace.fromPartial(object.traceRoot.deployAccount),
+      };
+    }
+    if (
+      object.traceRoot?.$case === "l1Handler" &&
+      object.traceRoot?.l1Handler !== undefined &&
+      object.traceRoot?.l1Handler !== null
+    ) {
+      message.traceRoot = {
+        $case: "l1Handler",
+        l1Handler: L1HandlerTransactionTrace.fromPartial(object.traceRoot.l1Handler),
+      };
+    }
+    return message;
+  },
+};
+
+function createBaseInvokeTransactionTrace(): InvokeTransactionTrace {
+  return { validateInvocation: undefined, executeInvocation: undefined, feeTransferInvocation: undefined };
+}
+
+export const InvokeTransactionTrace = {
+  encode(message: InvokeTransactionTrace, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.validateInvocation !== undefined) {
+      FunctionInvocation.encode(message.validateInvocation, writer.uint32(10).fork()).ldelim();
+    }
+    switch (message.executeInvocation?.$case) {
+      case "success":
+        FunctionInvocation.encode(message.executeInvocation.success, writer.uint32(18).fork()).ldelim();
+        break;
+      case "reverted":
+        ExecutionReverted.encode(message.executeInvocation.reverted, writer.uint32(26).fork()).ldelim();
+        break;
+    }
+    if (message.feeTransferInvocation !== undefined) {
+      FunctionInvocation.encode(message.feeTransferInvocation, writer.uint32(34).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): InvokeTransactionTrace {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseInvokeTransactionTrace() as any;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.validateInvocation = FunctionInvocation.decode(reader, reader.uint32());
+          continue;
+        case 2:
+          if (tag !== 18) {
+            break;
+          }
+
+          message.executeInvocation = { $case: "success", success: FunctionInvocation.decode(reader, reader.uint32()) };
+          continue;
+        case 3:
+          if (tag !== 26) {
+            break;
+          }
+
+          message.executeInvocation = {
+            $case: "reverted",
+            reverted: ExecutionReverted.decode(reader, reader.uint32()),
+          };
+          continue;
+        case 4:
+          if (tag !== 34) {
+            break;
+          }
+
+          message.feeTransferInvocation = FunctionInvocation.decode(reader, reader.uint32());
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): InvokeTransactionTrace {
+    return {
+      validateInvocation: isSet(object.validateInvocation)
+        ? FunctionInvocation.fromJSON(object.validateInvocation)
+        : undefined,
+      executeInvocation: isSet(object.success)
+        ? { $case: "success", success: FunctionInvocation.fromJSON(object.success) }
+        : isSet(object.reverted)
+        ? { $case: "reverted", reverted: ExecutionReverted.fromJSON(object.reverted) }
+        : undefined,
+      feeTransferInvocation: isSet(object.feeTransferInvocation)
+        ? FunctionInvocation.fromJSON(object.feeTransferInvocation)
+        : undefined,
+    };
+  },
+
+  toJSON(message: InvokeTransactionTrace): unknown {
+    const obj: any = {};
+    if (message.validateInvocation !== undefined) {
+      obj.validateInvocation = FunctionInvocation.toJSON(message.validateInvocation);
+    }
+    if (message.executeInvocation?.$case === "success") {
+      obj.success = FunctionInvocation.toJSON(message.executeInvocation.success);
+    }
+    if (message.executeInvocation?.$case === "reverted") {
+      obj.reverted = ExecutionReverted.toJSON(message.executeInvocation.reverted);
+    }
+    if (message.feeTransferInvocation !== undefined) {
+      obj.feeTransferInvocation = FunctionInvocation.toJSON(message.feeTransferInvocation);
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<InvokeTransactionTrace>): InvokeTransactionTrace {
+    return InvokeTransactionTrace.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<InvokeTransactionTrace>): InvokeTransactionTrace {
+    const message = createBaseInvokeTransactionTrace() as any;
+    message.validateInvocation = (object.validateInvocation !== undefined && object.validateInvocation !== null)
+      ? FunctionInvocation.fromPartial(object.validateInvocation)
+      : undefined;
+    if (
+      object.executeInvocation?.$case === "success" &&
+      object.executeInvocation?.success !== undefined &&
+      object.executeInvocation?.success !== null
+    ) {
+      message.executeInvocation = {
+        $case: "success",
+        success: FunctionInvocation.fromPartial(object.executeInvocation.success),
+      };
+    }
+    if (
+      object.executeInvocation?.$case === "reverted" &&
+      object.executeInvocation?.reverted !== undefined &&
+      object.executeInvocation?.reverted !== null
+    ) {
+      message.executeInvocation = {
+        $case: "reverted",
+        reverted: ExecutionReverted.fromPartial(object.executeInvocation.reverted),
+      };
+    }
+    message.feeTransferInvocation =
+      (object.feeTransferInvocation !== undefined && object.feeTransferInvocation !== null)
+        ? FunctionInvocation.fromPartial(object.feeTransferInvocation)
+        : undefined;
+    return message;
+  },
+};
+
+function createBaseDeclareTransactionTrace(): DeclareTransactionTrace {
+  return { validateInvocation: undefined, feeTransferInvocation: undefined };
+}
+
+export const DeclareTransactionTrace = {
+  encode(message: DeclareTransactionTrace, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.validateInvocation !== undefined) {
+      FunctionInvocation.encode(message.validateInvocation, writer.uint32(10).fork()).ldelim();
+    }
+    if (message.feeTransferInvocation !== undefined) {
+      FunctionInvocation.encode(message.feeTransferInvocation, writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): DeclareTransactionTrace {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseDeclareTransactionTrace() as any;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.validateInvocation = FunctionInvocation.decode(reader, reader.uint32());
+          continue;
+        case 2:
+          if (tag !== 18) {
+            break;
+          }
+
+          message.feeTransferInvocation = FunctionInvocation.decode(reader, reader.uint32());
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): DeclareTransactionTrace {
+    return {
+      validateInvocation: isSet(object.validateInvocation)
+        ? FunctionInvocation.fromJSON(object.validateInvocation)
+        : undefined,
+      feeTransferInvocation: isSet(object.feeTransferInvocation)
+        ? FunctionInvocation.fromJSON(object.feeTransferInvocation)
+        : undefined,
+    };
+  },
+
+  toJSON(message: DeclareTransactionTrace): unknown {
+    const obj: any = {};
+    if (message.validateInvocation !== undefined) {
+      obj.validateInvocation = FunctionInvocation.toJSON(message.validateInvocation);
+    }
+    if (message.feeTransferInvocation !== undefined) {
+      obj.feeTransferInvocation = FunctionInvocation.toJSON(message.feeTransferInvocation);
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<DeclareTransactionTrace>): DeclareTransactionTrace {
+    return DeclareTransactionTrace.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<DeclareTransactionTrace>): DeclareTransactionTrace {
+    const message = createBaseDeclareTransactionTrace() as any;
+    message.validateInvocation = (object.validateInvocation !== undefined && object.validateInvocation !== null)
+      ? FunctionInvocation.fromPartial(object.validateInvocation)
+      : undefined;
+    message.feeTransferInvocation =
+      (object.feeTransferInvocation !== undefined && object.feeTransferInvocation !== null)
+        ? FunctionInvocation.fromPartial(object.feeTransferInvocation)
+        : undefined;
+    return message;
+  },
+};
+
+function createBaseDeployAccountTransactionTrace(): DeployAccountTransactionTrace {
+  return { validateInvocation: undefined, constructorInvocation: undefined, feeTransferInvocation: undefined };
+}
+
+export const DeployAccountTransactionTrace = {
+  encode(message: DeployAccountTransactionTrace, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.validateInvocation !== undefined) {
+      FunctionInvocation.encode(message.validateInvocation, writer.uint32(10).fork()).ldelim();
+    }
+    if (message.constructorInvocation !== undefined) {
+      FunctionInvocation.encode(message.constructorInvocation, writer.uint32(18).fork()).ldelim();
+    }
+    if (message.feeTransferInvocation !== undefined) {
+      FunctionInvocation.encode(message.feeTransferInvocation, writer.uint32(26).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): DeployAccountTransactionTrace {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseDeployAccountTransactionTrace() as any;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.validateInvocation = FunctionInvocation.decode(reader, reader.uint32());
+          continue;
+        case 2:
+          if (tag !== 18) {
+            break;
+          }
+
+          message.constructorInvocation = FunctionInvocation.decode(reader, reader.uint32());
+          continue;
+        case 3:
+          if (tag !== 26) {
+            break;
+          }
+
+          message.feeTransferInvocation = FunctionInvocation.decode(reader, reader.uint32());
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): DeployAccountTransactionTrace {
+    return {
+      validateInvocation: isSet(object.validateInvocation)
+        ? FunctionInvocation.fromJSON(object.validateInvocation)
+        : undefined,
+      constructorInvocation: isSet(object.constructorInvocation)
+        ? FunctionInvocation.fromJSON(object.constructorInvocation)
+        : undefined,
+      feeTransferInvocation: isSet(object.feeTransferInvocation)
+        ? FunctionInvocation.fromJSON(object.feeTransferInvocation)
+        : undefined,
+    };
+  },
+
+  toJSON(message: DeployAccountTransactionTrace): unknown {
+    const obj: any = {};
+    if (message.validateInvocation !== undefined) {
+      obj.validateInvocation = FunctionInvocation.toJSON(message.validateInvocation);
+    }
+    if (message.constructorInvocation !== undefined) {
+      obj.constructorInvocation = FunctionInvocation.toJSON(message.constructorInvocation);
+    }
+    if (message.feeTransferInvocation !== undefined) {
+      obj.feeTransferInvocation = FunctionInvocation.toJSON(message.feeTransferInvocation);
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<DeployAccountTransactionTrace>): DeployAccountTransactionTrace {
+    return DeployAccountTransactionTrace.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<DeployAccountTransactionTrace>): DeployAccountTransactionTrace {
+    const message = createBaseDeployAccountTransactionTrace() as any;
+    message.validateInvocation = (object.validateInvocation !== undefined && object.validateInvocation !== null)
+      ? FunctionInvocation.fromPartial(object.validateInvocation)
+      : undefined;
+    message.constructorInvocation =
+      (object.constructorInvocation !== undefined && object.constructorInvocation !== null)
+        ? FunctionInvocation.fromPartial(object.constructorInvocation)
+        : undefined;
+    message.feeTransferInvocation =
+      (object.feeTransferInvocation !== undefined && object.feeTransferInvocation !== null)
+        ? FunctionInvocation.fromPartial(object.feeTransferInvocation)
+        : undefined;
+    return message;
+  },
+};
+
+function createBaseL1HandlerTransactionTrace(): L1HandlerTransactionTrace {
+  return { functionInvocation: undefined };
+}
+
+export const L1HandlerTransactionTrace = {
+  encode(message: L1HandlerTransactionTrace, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.functionInvocation !== undefined) {
+      FunctionInvocation.encode(message.functionInvocation, writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): L1HandlerTransactionTrace {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseL1HandlerTransactionTrace() as any;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 2:
+          if (tag !== 18) {
+            break;
+          }
+
+          message.functionInvocation = FunctionInvocation.decode(reader, reader.uint32());
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): L1HandlerTransactionTrace {
+    return {
+      functionInvocation: isSet(object.functionInvocation)
+        ? FunctionInvocation.fromJSON(object.functionInvocation)
+        : undefined,
+    };
+  },
+
+  toJSON(message: L1HandlerTransactionTrace): unknown {
+    const obj: any = {};
+    if (message.functionInvocation !== undefined) {
+      obj.functionInvocation = FunctionInvocation.toJSON(message.functionInvocation);
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<L1HandlerTransactionTrace>): L1HandlerTransactionTrace {
+    return L1HandlerTransactionTrace.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<L1HandlerTransactionTrace>): L1HandlerTransactionTrace {
+    const message = createBaseL1HandlerTransactionTrace() as any;
+    message.functionInvocation = (object.functionInvocation !== undefined && object.functionInvocation !== null)
+      ? FunctionInvocation.fromPartial(object.functionInvocation)
+      : undefined;
+    return message;
+  },
+};
+
+function createBaseFunctionInvocation(): FunctionInvocation {
+  return {
+    contractAddress: undefined,
+    entryPointSelector: undefined,
+    calldata: [],
+    callerAddress: undefined,
+    classHash: undefined,
+    callType: 0,
+    result: [],
+    calls: [],
+    events: [],
+    messages: [],
+  };
+}
+
+export const FunctionInvocation = {
+  encode(message: FunctionInvocation, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.contractAddress !== undefined) {
+      FieldElement.encode(message.contractAddress, writer.uint32(10).fork()).ldelim();
+    }
+    if (message.entryPointSelector !== undefined) {
+      FieldElement.encode(message.entryPointSelector, writer.uint32(18).fork()).ldelim();
+    }
+    if (message.calldata !== undefined && message.calldata.length !== 0) {
+      for (const v of message.calldata) {
+        FieldElement.encode(v!, writer.uint32(26).fork()).ldelim();
+      }
+    }
+    if (message.callerAddress !== undefined) {
+      FieldElement.encode(message.callerAddress, writer.uint32(34).fork()).ldelim();
+    }
+    if (message.classHash !== undefined) {
+      FieldElement.encode(message.classHash, writer.uint32(42).fork()).ldelim();
+    }
+    if (message.callType !== undefined && message.callType !== 0) {
+      writer.uint32(48).int32(message.callType);
+    }
+    if (message.result !== undefined && message.result.length !== 0) {
+      for (const v of message.result) {
+        FieldElement.encode(v!, writer.uint32(58).fork()).ldelim();
+      }
+    }
+    if (message.calls !== undefined && message.calls.length !== 0) {
+      for (const v of message.calls) {
+        FunctionInvocation.encode(v!, writer.uint32(66).fork()).ldelim();
+      }
+    }
+    if (message.events !== undefined && message.events.length !== 0) {
+      writer.uint32(74).fork();
+      for (const v of message.events) {
+        writer.uint32(v);
+      }
+      writer.ldelim();
+    }
+    if (message.messages !== undefined && message.messages.length !== 0) {
+      writer.uint32(82).fork();
+      for (const v of message.messages) {
+        writer.uint32(v);
+      }
+      writer.ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): FunctionInvocation {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseFunctionInvocation() as any;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.contractAddress = FieldElement.decode(reader, reader.uint32());
+          continue;
+        case 2:
+          if (tag !== 18) {
+            break;
+          }
+
+          message.entryPointSelector = FieldElement.decode(reader, reader.uint32());
+          continue;
+        case 3:
+          if (tag !== 26) {
+            break;
+          }
+
+          message.calldata!.push(FieldElement.decode(reader, reader.uint32()));
+          continue;
+        case 4:
+          if (tag !== 34) {
+            break;
+          }
+
+          message.callerAddress = FieldElement.decode(reader, reader.uint32());
+          continue;
+        case 5:
+          if (tag !== 42) {
+            break;
+          }
+
+          message.classHash = FieldElement.decode(reader, reader.uint32());
+          continue;
+        case 6:
+          if (tag !== 48) {
+            break;
+          }
+
+          message.callType = reader.int32() as any;
+          continue;
+        case 7:
+          if (tag !== 58) {
+            break;
+          }
+
+          message.result!.push(FieldElement.decode(reader, reader.uint32()));
+          continue;
+        case 8:
+          if (tag !== 66) {
+            break;
+          }
+
+          message.calls!.push(FunctionInvocation.decode(reader, reader.uint32()));
+          continue;
+        case 9:
+          if (tag === 72) {
+            message.events!.push(reader.uint32());
+
+            continue;
+          }
+
+          if (tag === 74) {
+            const end2 = reader.uint32() + reader.pos;
+            while (reader.pos < end2) {
+              message.events!.push(reader.uint32());
+            }
+
+            continue;
+          }
+
+          break;
+        case 10:
+          if (tag === 80) {
+            message.messages!.push(reader.uint32());
+
+            continue;
+          }
+
+          if (tag === 82) {
+            const end2 = reader.uint32() + reader.pos;
+            while (reader.pos < end2) {
+              message.messages!.push(reader.uint32());
+            }
+
+            continue;
+          }
+
+          break;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): FunctionInvocation {
+    return {
+      contractAddress: isSet(object.contractAddress) ? FieldElement.fromJSON(object.contractAddress) : undefined,
+      entryPointSelector: isSet(object.entryPointSelector)
+        ? FieldElement.fromJSON(object.entryPointSelector)
+        : undefined,
+      calldata: globalThis.Array.isArray(object?.calldata)
+        ? object.calldata.map((e: any) => FieldElement.fromJSON(e))
+        : [],
+      callerAddress: isSet(object.callerAddress) ? FieldElement.fromJSON(object.callerAddress) : undefined,
+      classHash: isSet(object.classHash) ? FieldElement.fromJSON(object.classHash) : undefined,
+      callType: isSet(object.callType) ? callTypeFromJSON(object.callType) : 0,
+      result: globalThis.Array.isArray(object?.result) ? object.result.map((e: any) => FieldElement.fromJSON(e)) : [],
+      calls: globalThis.Array.isArray(object?.calls)
+        ? object.calls.map((e: any) => FunctionInvocation.fromJSON(e))
+        : [],
+      events: globalThis.Array.isArray(object?.events) ? object.events.map((e: any) => globalThis.Number(e)) : [],
+      messages: globalThis.Array.isArray(object?.messages) ? object.messages.map((e: any) => globalThis.Number(e)) : [],
+    };
+  },
+
+  toJSON(message: FunctionInvocation): unknown {
+    const obj: any = {};
+    if (message.contractAddress !== undefined) {
+      obj.contractAddress = FieldElement.toJSON(message.contractAddress);
+    }
+    if (message.entryPointSelector !== undefined) {
+      obj.entryPointSelector = FieldElement.toJSON(message.entryPointSelector);
+    }
+    if (message.calldata?.length) {
+      obj.calldata = message.calldata.map((e) => FieldElement.toJSON(e));
+    }
+    if (message.callerAddress !== undefined) {
+      obj.callerAddress = FieldElement.toJSON(message.callerAddress);
+    }
+    if (message.classHash !== undefined) {
+      obj.classHash = FieldElement.toJSON(message.classHash);
+    }
+    if (message.callType !== undefined && message.callType !== 0) {
+      obj.callType = callTypeToJSON(message.callType);
+    }
+    if (message.result?.length) {
+      obj.result = message.result.map((e) => FieldElement.toJSON(e));
+    }
+    if (message.calls?.length) {
+      obj.calls = message.calls.map((e) => FunctionInvocation.toJSON(e));
+    }
+    if (message.events?.length) {
+      obj.events = message.events.map((e) => Math.round(e));
+    }
+    if (message.messages?.length) {
+      obj.messages = message.messages.map((e) => Math.round(e));
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<FunctionInvocation>): FunctionInvocation {
+    return FunctionInvocation.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<FunctionInvocation>): FunctionInvocation {
+    const message = createBaseFunctionInvocation() as any;
+    message.contractAddress = (object.contractAddress !== undefined && object.contractAddress !== null)
+      ? FieldElement.fromPartial(object.contractAddress)
+      : undefined;
+    message.entryPointSelector = (object.entryPointSelector !== undefined && object.entryPointSelector !== null)
+      ? FieldElement.fromPartial(object.entryPointSelector)
+      : undefined;
+    message.calldata = object.calldata?.map((e) => FieldElement.fromPartial(e)) || [];
+    message.callerAddress = (object.callerAddress !== undefined && object.callerAddress !== null)
+      ? FieldElement.fromPartial(object.callerAddress)
+      : undefined;
+    message.classHash = (object.classHash !== undefined && object.classHash !== null)
+      ? FieldElement.fromPartial(object.classHash)
+      : undefined;
+    message.callType = object.callType ?? 0;
+    message.result = object.result?.map((e) => FieldElement.fromPartial(e)) || [];
+    message.calls = object.calls?.map((e) => FunctionInvocation.fromPartial(e)) || [];
+    message.events = object.events?.map((e) => e) || [];
+    message.messages = object.messages?.map((e) => e) || [];
+    return message;
+  },
+};
+
+function createBaseFunctionCall(): FunctionCall {
+  return { contractAddress: undefined, entryPointSelector: undefined, calldata: [] };
+}
+
+export const FunctionCall = {
+  encode(message: FunctionCall, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.contractAddress !== undefined) {
+      FieldElement.encode(message.contractAddress, writer.uint32(10).fork()).ldelim();
+    }
+    if (message.entryPointSelector !== undefined) {
+      FieldElement.encode(message.entryPointSelector, writer.uint32(18).fork()).ldelim();
+    }
+    if (message.calldata !== undefined && message.calldata.length !== 0) {
+      for (const v of message.calldata) {
+        FieldElement.encode(v!, writer.uint32(26).fork()).ldelim();
+      }
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): FunctionCall {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseFunctionCall() as any;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.contractAddress = FieldElement.decode(reader, reader.uint32());
+          continue;
+        case 2:
+          if (tag !== 18) {
+            break;
+          }
+
+          message.entryPointSelector = FieldElement.decode(reader, reader.uint32());
+          continue;
+        case 3:
+          if (tag !== 26) {
+            break;
+          }
+
+          message.calldata!.push(FieldElement.decode(reader, reader.uint32()));
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): FunctionCall {
+    return {
+      contractAddress: isSet(object.contractAddress) ? FieldElement.fromJSON(object.contractAddress) : undefined,
+      entryPointSelector: isSet(object.entryPointSelector)
+        ? FieldElement.fromJSON(object.entryPointSelector)
+        : undefined,
+      calldata: globalThis.Array.isArray(object?.calldata)
+        ? object.calldata.map((e: any) => FieldElement.fromJSON(e))
+        : [],
+    };
+  },
+
+  toJSON(message: FunctionCall): unknown {
+    const obj: any = {};
+    if (message.contractAddress !== undefined) {
+      obj.contractAddress = FieldElement.toJSON(message.contractAddress);
+    }
+    if (message.entryPointSelector !== undefined) {
+      obj.entryPointSelector = FieldElement.toJSON(message.entryPointSelector);
+    }
+    if (message.calldata?.length) {
+      obj.calldata = message.calldata.map((e) => FieldElement.toJSON(e));
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<FunctionCall>): FunctionCall {
+    return FunctionCall.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<FunctionCall>): FunctionCall {
+    const message = createBaseFunctionCall() as any;
+    message.contractAddress = (object.contractAddress !== undefined && object.contractAddress !== null)
+      ? FieldElement.fromPartial(object.contractAddress)
+      : undefined;
+    message.entryPointSelector = (object.entryPointSelector !== undefined && object.entryPointSelector !== null)
+      ? FieldElement.fromPartial(object.entryPointSelector)
+      : undefined;
+    message.calldata = object.calldata?.map((e) => FieldElement.fromPartial(e)) || [];
     return message;
   },
 };

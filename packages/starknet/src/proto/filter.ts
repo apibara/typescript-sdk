@@ -189,7 +189,15 @@ export interface EventFilter {
    *
    * Defaults to false.
    */
-  readonly includeSiblings?: boolean | undefined;
+  readonly includeSiblings?:
+    | boolean
+    | undefined;
+  /**
+   * Include the trace of the transaction that emitted the event.
+   *
+   * Defaults to false.
+   */
+  readonly includeTransactionTrace?: boolean | undefined;
 }
 
 export interface Key {
@@ -247,7 +255,15 @@ export interface MessageToL1Filter {
    *
    * Defaults to false.
    */
-  readonly includeSiblings?: boolean | undefined;
+  readonly includeSiblings?:
+    | boolean
+    | undefined;
+  /**
+   * Include the trace of the transaction that sent the message.
+   *
+   * Defaults to false.
+   */
+  readonly includeTransactionTrace?: boolean | undefined;
 }
 
 /** Filter transactions. */
@@ -298,6 +314,12 @@ export interface TransactionFilter {
     | { readonly $case: "deployAccountV1"; readonly deployAccountV1: DeployAccountV1TransactionFilter }
     | { readonly $case: "deployAccountV3"; readonly deployAccountV3: DeployAccountV3TransactionFilter }
     | undefined;
+  /**
+   * Flag to request the transaction's trace.
+   *
+   * Defaults to `false``.
+   */
+  readonly includeTrace?: boolean | undefined;
 }
 
 export interface InvokeTransactionV0Filter {
@@ -557,6 +579,7 @@ function createBaseEventFilter(): EventFilter {
     includeReceipt: undefined,
     includeMessages: undefined,
     includeSiblings: undefined,
+    includeTransactionTrace: undefined,
   };
 }
 
@@ -590,6 +613,9 @@ export const EventFilter = {
     }
     if (message.includeSiblings !== undefined) {
       writer.uint32(72).bool(message.includeSiblings);
+    }
+    if (message.includeTransactionTrace !== undefined) {
+      writer.uint32(80).bool(message.includeTransactionTrace);
     }
     return writer;
   },
@@ -664,6 +690,13 @@ export const EventFilter = {
 
           message.includeSiblings = reader.bool();
           continue;
+        case 10:
+          if (tag !== 80) {
+            break;
+          }
+
+          message.includeTransactionTrace = reader.bool();
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -686,6 +719,9 @@ export const EventFilter = {
       includeReceipt: isSet(object.includeReceipt) ? globalThis.Boolean(object.includeReceipt) : undefined,
       includeMessages: isSet(object.includeMessages) ? globalThis.Boolean(object.includeMessages) : undefined,
       includeSiblings: isSet(object.includeSiblings) ? globalThis.Boolean(object.includeSiblings) : undefined,
+      includeTransactionTrace: isSet(object.includeTransactionTrace)
+        ? globalThis.Boolean(object.includeTransactionTrace)
+        : undefined,
     };
   },
 
@@ -718,6 +754,9 @@ export const EventFilter = {
     if (message.includeSiblings !== undefined) {
       obj.includeSiblings = message.includeSiblings;
     }
+    if (message.includeTransactionTrace !== undefined) {
+      obj.includeTransactionTrace = message.includeTransactionTrace;
+    }
     return obj;
   },
 
@@ -737,6 +776,7 @@ export const EventFilter = {
     message.includeReceipt = object.includeReceipt ?? undefined;
     message.includeMessages = object.includeMessages ?? undefined;
     message.includeSiblings = object.includeSiblings ?? undefined;
+    message.includeTransactionTrace = object.includeTransactionTrace ?? undefined;
     return message;
   },
 };
@@ -810,6 +850,7 @@ function createBaseMessageToL1Filter(): MessageToL1Filter {
     includeReceipt: undefined,
     includeEvents: undefined,
     includeSiblings: undefined,
+    includeTransactionTrace: undefined,
   };
 }
 
@@ -838,6 +879,9 @@ export const MessageToL1Filter = {
     }
     if (message.includeSiblings !== undefined) {
       writer.uint32(64).bool(message.includeSiblings);
+    }
+    if (message.includeTransactionTrace !== undefined) {
+      writer.uint32(72).bool(message.includeTransactionTrace);
     }
     return writer;
   },
@@ -905,6 +949,13 @@ export const MessageToL1Filter = {
 
           message.includeSiblings = reader.bool();
           continue;
+        case 9:
+          if (tag !== 72) {
+            break;
+          }
+
+          message.includeTransactionTrace = reader.bool();
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -926,6 +977,9 @@ export const MessageToL1Filter = {
       includeReceipt: isSet(object.includeReceipt) ? globalThis.Boolean(object.includeReceipt) : undefined,
       includeEvents: isSet(object.includeEvents) ? globalThis.Boolean(object.includeEvents) : undefined,
       includeSiblings: isSet(object.includeSiblings) ? globalThis.Boolean(object.includeSiblings) : undefined,
+      includeTransactionTrace: isSet(object.includeTransactionTrace)
+        ? globalThis.Boolean(object.includeTransactionTrace)
+        : undefined,
     };
   },
 
@@ -955,6 +1009,9 @@ export const MessageToL1Filter = {
     if (message.includeSiblings !== undefined) {
       obj.includeSiblings = message.includeSiblings;
     }
+    if (message.includeTransactionTrace !== undefined) {
+      obj.includeTransactionTrace = message.includeTransactionTrace;
+    }
     return obj;
   },
 
@@ -975,6 +1032,7 @@ export const MessageToL1Filter = {
     message.includeReceipt = object.includeReceipt ?? undefined;
     message.includeEvents = object.includeEvents ?? undefined;
     message.includeSiblings = object.includeSiblings ?? undefined;
+    message.includeTransactionTrace = object.includeTransactionTrace ?? undefined;
     return message;
   },
 };
@@ -987,6 +1045,7 @@ function createBaseTransactionFilter(): TransactionFilter {
     includeEvents: undefined,
     includeMessages: undefined,
     inner: undefined,
+    includeTrace: undefined,
   };
 }
 
@@ -1041,6 +1100,9 @@ export const TransactionFilter = {
       case "deployAccountV3":
         DeployAccountV3TransactionFilter.encode(message.inner.deployAccountV3, writer.uint32(130).fork()).ldelim();
         break;
+    }
+    if (message.includeTrace !== undefined) {
+      writer.uint32(136).bool(message.includeTrace);
     }
     return writer;
   },
@@ -1170,6 +1232,13 @@ export const TransactionFilter = {
             deployAccountV3: DeployAccountV3TransactionFilter.decode(reader, reader.uint32()),
           };
           continue;
+        case 17:
+          if (tag !== 136) {
+            break;
+          }
+
+          message.includeTrace = reader.bool();
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -1217,6 +1286,7 @@ export const TransactionFilter = {
           deployAccountV3: DeployAccountV3TransactionFilter.fromJSON(object.deployAccountV3),
         }
         : undefined,
+      includeTrace: isSet(object.includeTrace) ? globalThis.Boolean(object.includeTrace) : undefined,
     };
   },
 
@@ -1269,6 +1339,9 @@ export const TransactionFilter = {
     }
     if (message.inner?.$case === "deployAccountV3") {
       obj.deployAccountV3 = DeployAccountV3TransactionFilter.toJSON(message.inner.deployAccountV3);
+    }
+    if (message.includeTrace !== undefined) {
+      obj.includeTrace = message.includeTrace;
     }
     return obj;
   },
@@ -1340,6 +1413,7 @@ export const TransactionFilter = {
         deployAccountV3: DeployAccountV3TransactionFilter.fromPartial(object.inner.deployAccountV3),
       };
     }
+    message.includeTrace = object.includeTrace ?? undefined;
     return message;
   },
 };
