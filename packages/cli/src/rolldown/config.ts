@@ -1,5 +1,6 @@
 import { existsSync } from "node:fs";
 import { builtinModules } from "node:module";
+import replace from "@rollup/plugin-replace";
 import type { Apibara } from "apibara/types";
 import defu from "defu";
 import { join } from "pathe";
@@ -10,7 +11,6 @@ import type {
 } from "rolldown";
 import { appConfig } from "./plugins/config";
 import { indexers } from "./plugins/indexers";
-
 const runtimeDependencies = [
   "better-sqlite3",
   "@electric-sql/pglite",
@@ -76,8 +76,34 @@ export function getRolldownConfig(apibara: Apibara): RolldownOptions {
     },
   );
 
+  rolldownConfig.plugins?.push(
+    replace({
+      preventAssignment: true,
+      values: {
+        "process.env.APIBARA_CONFIG": getSerializedRuntimeConfig(apibara),
+      },
+    }) as RolldownPluginOption,
+  );
   rolldownConfig.plugins?.push(indexers(apibara));
   rolldownConfig.plugins?.push(appConfig(apibara));
 
   return rolldownConfig;
+}
+
+function getSerializedRuntimeConfig(apibara: Apibara) {
+  try {
+    return JSON.stringify(
+      {
+        runtimeConfig: apibara.options.runtimeConfig,
+        preset: apibara.options.preset,
+        presets: apibara.options.presets,
+      },
+      null,
+      2,
+    );
+  } catch (error) {
+    throw new Error(
+      "Failed to serialize runtime config, please only use serializable values for runtime config",
+    );
+  }
 }
