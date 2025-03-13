@@ -1,6 +1,7 @@
 import { useIndexerContext } from "@apibara/indexer";
 import { defineIndexerPlugin } from "@apibara/indexer/plugins";
 import { isCursor } from "@apibara/protocol";
+import type { Cursor, DataFinality } from "@apibara/protocol";
 import type { Database as SqliteDatabase } from "better-sqlite3";
 
 import { generateIndexerId } from "@apibara/indexer/internal";
@@ -76,6 +77,7 @@ export function sqliteStorage<TFilter, TBlock>({
 }: SqliteStorageOptions) {
   return defineIndexerPlugin<TFilter, TBlock>((indexer) => {
     let indexerId = "";
+    let prevFinality: DataFinality | undefined;
 
     indexer.hooks.hook("run:before", async () => {
       const { indexerName: indexerFileName, availableIndexers } =
@@ -206,22 +208,39 @@ export function sqliteStorage<TFilter, TBlock>({
 
     indexer.hooks.hook("handler:middleware", ({ use }) => {
       use(async (ctx, next) => {
-        if (!ctx.finality) {
+        const { endCursor, finality, cursor } = ctx as {
+          cursor: Cursor;
+          endCursor: Cursor;
+          finality: DataFinality;
+        };
+
+        if (!finality) {
           throw new SqliteStorageError("finality is undefined");
         }
 
-        if (!ctx.endCursor || !isCursor(ctx.endCursor)) {
+        if (!endCursor || !isCursor(endCursor)) {
           throw new SqliteStorageError(
             "endCursor is undefined or not a cursor",
           );
         }
 
         await withTransaction(database, async (db) => {
+          if (prevFinality === "pending") {
+            // invalidate if previous block's finality was "pending"
+            if (enablePersistState) {
+              invalidateState({ db, cursor, indexerId });
+            }
+
+            if (enableKeyValueStore) {
+              invalidateKV(db, cursor);
+            }
+          }
+
           if (enableKeyValueStore) {
             ctx[KV_PROPERTY] = new KeyValueStore(
               db,
-              ctx.endCursor,
-              ctx.finality,
+              endCursor,
+              finality,
               serializeFn,
               deserializeFn,
             );
@@ -229,13 +248,15 @@ export function sqliteStorage<TFilter, TBlock>({
 
           await next();
 
-          if (enablePersistState) {
-            persistState({ db, endCursor: ctx.endCursor, indexerId });
+          if (enablePersistState && finality !== "pending") {
+            persistState({ db, endCursor, indexerId });
           }
 
           if (enableKeyValueStore) {
             delete ctx[KV_PROPERTY];
           }
+
+          prevFinality = finality;
         });
       });
     });
