@@ -15,7 +15,10 @@ const abi = parseAbi([
 
 // USDC Transfers on Ethereum
 export default function (runtimeConfig: ApibaraRuntimeConfig) {
-  const { connectionString } = runtimeConfig;
+  const {
+    connectionString,
+    evm: { startingBlock },
+  } = runtimeConfig;
 
   const database = drizzle({
     schema: {
@@ -27,7 +30,7 @@ export default function (runtimeConfig: ApibaraRuntimeConfig) {
   return defineIndexer(EvmStream)({
     streamUrl: "https://ethereum.preview.apibara.org",
     finality: "accepted",
-    startingBlock: 215_30_000n,
+    startingBlock,
     filter: {
       logs: [
         {

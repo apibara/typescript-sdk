@@ -56,19 +56,28 @@ export function createIndexer(indexerName: string, preset?: string) {
       ? indexerModule(runtimeConfig)
       : indexerModule;
 
-  let reporter: ConsolaReporter = createLogger({
+  const reporter: ConsolaReporter = createLogger({
     indexer: indexerName,
     preset,
     indexers: availableIndexers,
   });
 
-  if (config.logger) {
-    reporter = config.logger({
-      indexer: indexerName,
-      preset,
-      indexers: availableIndexers,
-    });
-  }
+  // TODO: Add support for custom logger
+  //
+  // Custom logger support is temporarily disabled to prevent bundling issues.
+  // Previously, when using the config object directly, Rollup would bundle everything
+  // referenced in apibara.config, including plugins. Now we serialize only the
+  // essential config properties (runtimeConfig, preset, presets) during build time,
+  // which prevents unwanted bundling but also means we can't access the logger
+  // configuration.
+  //
+  // if (config.logger) {
+  //   reporter = config.logger({
+  //     indexer: indexerName,
+  //     preset,
+  //     indexers: availableIndexers,
+  //   });
+  // }
 
   // Put the in-memory persistence plugin first so that it can be overridden by any user-defined
   // persistence plugin.

@@ -1,5 +1,6 @@
 import { existsSync } from "node:fs";
 import { builtinModules } from "node:module";
+import replace from "@rollup/plugin-replace";
 import type { Apibara } from "apibara/types";
 import defu from "defu";
 import { join } from "pathe";
@@ -8,6 +9,7 @@ import type {
   RolldownOptions,
   RolldownPluginOption,
 } from "rolldown";
+import { serialize } from "../utils/helper";
 import { appConfig } from "./plugins/config";
 import { indexers } from "./plugins/indexers";
 
@@ -76,8 +78,31 @@ export function getRolldownConfig(apibara: Apibara): RolldownOptions {
     },
   );
 
+  rolldownConfig.plugins?.push(
+    replace({
+      preventAssignment: true,
+      values: {
+        "process.env.APIBARA_CONFIG": getSerializedRuntimeConfig(apibara),
+      },
+    }) as RolldownPluginOption,
+  );
   rolldownConfig.plugins?.push(indexers(apibara));
   rolldownConfig.plugins?.push(appConfig(apibara));
 
   return rolldownConfig;
+}
+
+function getSerializedRuntimeConfig(apibara: Apibara) {
+  try {
+    return serialize({
+      runtimeConfig: apibara.options.runtimeConfig,
+      preset: apibara.options.preset,
+      presets: apibara.options.presets,
+    });
+  } catch (error) {
+    throw new Error(
+      "Failed to serialize runtime config. Please ensure all values in your runtime configuration are JSON serializable. BigInt values are supported, but functions, symbols, etc. are not. Check your configuration for non-serializable values.",
+      { cause: error },
+    );
+  }
 }

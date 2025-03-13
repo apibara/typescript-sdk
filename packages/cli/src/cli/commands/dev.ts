@@ -56,6 +56,7 @@ export default defineCommand({
       apibara = await createApibara(
         {
           rootDir,
+          preset: args.preset,
         },
         {
           watch: true,
