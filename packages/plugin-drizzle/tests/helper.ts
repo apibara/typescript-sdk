@@ -6,7 +6,7 @@ import { DrizzleStorageError } from "../src/utils";
 export const testTable = pgTable("test", {
   id: serial("id").primaryKey(),
   blockNumber: integer("block_number").notNull(),
-  key: text("key"),
+  key: text("key").unique(),
   count: integer("count"),
   data: text("data"),
   createdAt: timestamp("created_at"),
@@ -41,7 +41,7 @@ export async function migratePgliteDb(db: PgLiteDb) {
         CREATE TABLE IF NOT EXISTS test (
           id SERIAL PRIMARY KEY,
           block_number INTEGER NOT NULL,
-          key TEXT,
+          key TEXT UNIQUE,
           count INTEGER,
           data TEXT,
           created_at TIMESTAMP

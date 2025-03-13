@@ -292,7 +292,7 @@ export async function run<TFilter, TBlock>(
               let block: TBlock | null;
 
               // when factory mode
-              if (isFactoryMode) {
+              if (isFactoryMode && finality !== "pending") {
                 assert(indexer.options.factory !== undefined);
 
                 const [factoryBlock, mainBlock] = blocks;

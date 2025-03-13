@@ -100,6 +100,19 @@ export function invalidateState(props: {
   );
 }
 
+export type CheckpointRow = {
+  id: string;
+  order_key: number;
+  unique_key: string | null;
+};
+
+export type FilterRow = {
+  id: string;
+  filter: string;
+  from_block: number;
+  to_block: number | null;
+};
+
 const statements = {
   createCheckpointsTable: `
     CREATE TABLE IF NOT EXISTS checkpoints (

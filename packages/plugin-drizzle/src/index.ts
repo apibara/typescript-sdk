@@ -128,6 +128,7 @@ export function drizzleStorage<
     let tableNames: string[] = [];
     let indexerId = "";
     const alwaysReindex = process.env["APIBARA_ALWAYS_REINDEX"] === "true";
+    let prevFinality: DataFinality | undefined;
 
     try {
       tableNames = Object.values((schema as TSchema) ?? db._.schema ?? {}).map(
@@ -299,7 +300,8 @@ export function drizzleStorage<
     indexer.hooks.hook("handler:middleware", async ({ use }) => {
       use(async (context, next) => {
         try {
-          const { endCursor, finality } = context as {
+          const { endCursor, finality, cursor } = context as {
+            cursor: Cursor;
             endCursor: Cursor;
             finality: DataFinality;
           };
@@ -315,6 +317,15 @@ export function drizzleStorage<
               TSchema
             >;
 
+            if (prevFinality === "pending") {
+              // invalidate if previous block's finality was "pending"
+              await invalidate(tx, cursor, idColumn, indexerId);
+
+              if (enablePersistence) {
+                await invalidateState({ tx, cursor, indexerId });
+              }
+            }
+
             if (finality !== "finalized") {
               await registerTriggers(
                 tx,
@@ -328,13 +339,15 @@ export function drizzleStorage<
             await next();
             delete context[DRIZZLE_PROPERTY];
 
-            if (enablePersistence) {
+            if (enablePersistence && finality !== "pending") {
               await persistState({
                 tx,
                 endCursor,
                 indexerId,
               });
             }
+
+            prevFinality = finality;
           });
 
           if (finality !== "finalized") {

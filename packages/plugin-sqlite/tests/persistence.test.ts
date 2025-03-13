@@ -13,6 +13,7 @@ import { describe, expect, it } from "vitest";
 
 import type { Finalize, Invalidate } from "@apibara/protocol";
 import { sqliteStorage } from "../src";
+import type { CheckpointRow } from "../src/persistence";
 
 describe("SQLite persistence", () => {
   it("should store the latest block number", async () => {
@@ -621,6 +622,72 @@ describe("SQLite persistence", () => {
           "from_block": 106,
           "id": "indexer_testing_default",
           "to_block": null,
+        },
+      ]
+    `);
+  });
+
+  it("should handle pending and accepted blocks correctly", async () => {
+    const db = new Database(":memory:");
+
+    // Create a mock client that alternates between pending and accepted blocks
+    const client = new MockClient<MockFilter, MockBlock>((request, options) => {
+      return [
+        // Block 1: Pending
+        {
+          _tag: "data",
+          data: {
+            cursor: { orderKey: 5000000n },
+            endCursor: { orderKey: 5000001n },
+            finality: "pending",
+            data: [{ data: "block1-pending" }],
+            production: "backfill",
+          },
+        },
+        // Block 1: Accepted
+        {
+          _tag: "data",
+          data: {
+            cursor: { orderKey: 5000000n },
+            endCursor: { orderKey: 5000001n },
+            finality: "accepted",
+            data: [{ data: "block1-accepted" }],
+            production: "backfill",
+          },
+        },
+        // Block 2: Pending
+        {
+          _tag: "data",
+          data: {
+            cursor: { orderKey: 5000001n },
+            endCursor: { orderKey: 5000002n },
+            finality: "pending",
+            data: [{ data: "block2-pending" }],
+            production: "backfill",
+          },
+        },
+      ];
+    });
+
+    const indexer = getMockIndexer({
+      override: {
+        plugins: [sqliteStorage({ database: db, persistState: true })],
+      },
+    });
+
+    await run(client, indexer);
+
+    // Check the checkpoints table - should only contain the accepted block
+    const checkpointsResult = db
+      .prepare("SELECT * FROM checkpoints")
+      .all() as CheckpointRow[];
+
+    expect(checkpointsResult).toMatchInlineSnapshot(`
+      [
+        {
+          "id": "indexer_testing_default",
+          "order_key": 5000001,
+          "unique_key": null,
         },
       ]
     `);
