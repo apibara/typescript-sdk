@@ -2,6 +2,21 @@
   "name": "apibara",
   "entries": [
     {
+      "date": "Thu, 13 Mar 2025 02:42:29 GMT",
+      "version": "2.1.0-beta.11",
+      "tag": "apibara_v2.1.0-beta.11",
+      "comments": {
+        "prerelease": [
+          {
+            "author": "jadejajaipal5@gmail.com",
+            "package": "apibara",
+            "commit": "9a267284e78a7324f1e4f196f65b4f9e261ec93e",
+            "comment": "feat: integrate runtime configuration serialization into rolldown"
+          }
+        ]
+      }
+    },
+    {
       "date": "Tue, 11 Mar 2025 08:30:59 GMT",
       "version": "2.1.0-beta.10",
       "tag": "apibara_v2.1.0-beta.10",

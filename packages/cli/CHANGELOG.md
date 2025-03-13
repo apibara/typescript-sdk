@@ -1,8 +1,16 @@
 # Change Log - apibara
 
-<!-- This log was last generated on Tue, 11 Mar 2025 08:30:59 GMT and should not be manually modified. -->
+<!-- This log was last generated on Thu, 13 Mar 2025 02:42:29 GMT and should not be manually modified. -->
 
 <!-- Start content -->
+
+## 2.1.0-beta.11
+
+Thu, 13 Mar 2025 02:42:29 GMT
+
+### Changes
+
+- feat: integrate runtime configuration serialization into rolldown (jadejajaipal5@gmail.com)
 
 ## 2.1.0-beta.10
 
