@@ -304,7 +304,7 @@ export interface Block {
     | readonly NonceUpdate[]
     | undefined;
   /** List of transaction traces. */
-  readonly traces?: readonly Trace[] | undefined;
+  readonly traces?: readonly TransactionTrace[] | undefined;
 }
 
 /** Block header. */
@@ -794,7 +794,7 @@ export interface NonceUpdate {
   readonly nonce?: FieldElement | undefined;
 }
 
-export interface Trace {
+export interface TransactionTrace {
   readonly filterIds?:
     | readonly number[]
     | undefined;
@@ -911,7 +911,7 @@ export const Block = {
     }
     if (message.traces !== undefined && message.traces.length !== 0) {
       for (const v of message.traces) {
-        Trace.encode(v!, writer.uint32(74).fork()).ldelim();
+        TransactionTrace.encode(v!, writer.uint32(74).fork()).ldelim();
       }
     }
     return writer;
@@ -985,7 +985,7 @@ export const Block = {
             break;
           }
 
-          message.traces!.push(Trace.decode(reader, reader.uint32()));
+          message.traces!.push(TransactionTrace.decode(reader, reader.uint32()));
           continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
@@ -1018,7 +1018,9 @@ export const Block = {
       nonceUpdates: globalThis.Array.isArray(object?.nonceUpdates)
         ? object.nonceUpdates.map((e: any) => NonceUpdate.fromJSON(e))
         : [],
-      traces: globalThis.Array.isArray(object?.traces) ? object.traces.map((e: any) => Trace.fromJSON(e)) : [],
+      traces: globalThis.Array.isArray(object?.traces)
+        ? object.traces.map((e: any) => TransactionTrace.fromJSON(e))
+        : [],
     };
   },
 
@@ -1049,7 +1051,7 @@ export const Block = {
       obj.nonceUpdates = message.nonceUpdates.map((e) => NonceUpdate.toJSON(e));
     }
     if (message.traces?.length) {
-      obj.traces = message.traces.map((e) => Trace.toJSON(e));
+      obj.traces = message.traces.map((e) => TransactionTrace.toJSON(e));
     }
     return obj;
   },
@@ -1069,7 +1071,7 @@ export const Block = {
     message.storageDiffs = object.storageDiffs?.map((e) => StorageDiff.fromPartial(e)) || [];
     message.contractChanges = object.contractChanges?.map((e) => ContractChange.fromPartial(e)) || [];
     message.nonceUpdates = object.nonceUpdates?.map((e) => NonceUpdate.fromPartial(e)) || [];
-    message.traces = object.traces?.map((e) => Trace.fromPartial(e)) || [];
+    message.traces = object.traces?.map((e) => TransactionTrace.fromPartial(e)) || [];
     return message;
   },
 };
@@ -6197,12 +6199,12 @@ export const NonceUpdate = {
   },
 };
 
-function createBaseTrace(): Trace {
+function createBaseTransactionTrace(): TransactionTrace {
   return { filterIds: [], transactionIndex: 0, transactionHash: undefined, traceRoot: undefined };
 }
 
-export const Trace = {
-  encode(message: Trace, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+export const TransactionTrace = {
+  encode(message: TransactionTrace, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.filterIds !== undefined && message.filterIds.length !== 0) {
       writer.uint32(10).fork();
       for (const v of message.filterIds) {
@@ -6233,10 +6235,10 @@ export const Trace = {
     return writer;
   },
 
-  decode(input: _m0.Reader | Uint8Array, length?: number): Trace {
+  decode(input: _m0.Reader | Uint8Array, length?: number): TransactionTrace {
     const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseTrace() as any;
+    const message = createBaseTransactionTrace() as any;
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -6314,7 +6316,7 @@ export const Trace = {
     return message;
   },
 
-  fromJSON(object: any): Trace {
+  fromJSON(object: any): TransactionTrace {
     return {
       filterIds: globalThis.Array.isArray(object?.filterIds)
         ? object.filterIds.map((e: any) => globalThis.Number(e))
@@ -6333,7 +6335,7 @@ export const Trace = {
     };
   },
 
-  toJSON(message: Trace): unknown {
+  toJSON(message: TransactionTrace): unknown {
     const obj: any = {};
     if (message.filterIds?.length) {
       obj.filterIds = message.filterIds.map((e) => Math.round(e));
@@ -6359,11 +6361,11 @@ export const Trace = {
     return obj;
   },
 
-  create(base?: DeepPartial<Trace>): Trace {
-    return Trace.fromPartial(base ?? {});
+  create(base?: DeepPartial<TransactionTrace>): TransactionTrace {
+    return TransactionTrace.fromPartial(base ?? {});
   },
-  fromPartial(object: DeepPartial<Trace>): Trace {
-    const message = createBaseTrace() as any;
+  fromPartial(object: DeepPartial<TransactionTrace>): TransactionTrace {
+    const message = createBaseTransactionTrace() as any;
     message.filterIds = object.filterIds?.map((e) => e) || [];
     message.transactionIndex = object.transactionIndex ?? 0;
     message.transactionHash = (object.transactionHash !== undefined && object.transactionHash !== null)

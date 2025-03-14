@@ -113,6 +113,7 @@ export const LogFilter = Schema.Struct({
   transactionStatus: Schema.optional(TransactionStatusFilter),
   includeTransaction: Schema.optional(Schema.Boolean),
   includeReceipt: Schema.optional(Schema.Boolean),
+  includeTransactionTrace: Schema.optional(Schema.Boolean),
 });
 
 export type LogFilter = typeof LogFilter.Type;
@@ -125,6 +126,7 @@ export const TransactionFilter = Schema.Struct({
   transactionStatus: Schema.optional(TransactionStatusFilter),
   includeReceipt: Schema.optional(Schema.Boolean),
   includeLogs: Schema.optional(Schema.Boolean),
+  includeTransactionTrace: Schema.optional(Schema.Boolean),
 });
 
 export type TransactionFilter = typeof TransactionFilter.Type;

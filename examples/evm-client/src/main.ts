@@ -36,18 +36,19 @@ const command = defineCommand({
     console.log(response);
 
     const filter = Filter.make({
-      transactions: [
-        { includeReceipt: true, transactionStatus: "all", includeLogs: true },
+      logs: [
+        {
+          address: "0xBBBBBbbBBb9cC5e90e3b3Af64bdAF62C37EEFFCb",
+          includeTransactionTrace: true,
+        },
       ],
-      withdrawals: [{}],
-      logs: [{}],
     });
 
     const request = EvmStream.Request.make({
       filter: [filter],
       finality: "accepted",
       startingCursor: {
-        orderKey: 6_000_000n,
+        orderKey: 20_000_000n,
       },
     });
 
@@ -61,8 +62,9 @@ const command = defineCommand({
             const transactions = block.transactions ?? [];
             const withdrawals = block.withdrawals ?? [];
             const receipts = block.receipts ?? [];
+            const traces = block.traces ?? [];
             consola.info(
-              `Block ${block.header?.blockNumber} logs=${logs.length} transactions=${transactions.length} withdrawals=${withdrawals.length} receipts=${receipts.length}`,
+              `Block ${block.header?.blockNumber} logs=${logs.length} transactions=${transactions.length} withdrawals=${withdrawals.length} receipts=${receipts.length} traces=${traces.length}`,
             );
           }
           break;

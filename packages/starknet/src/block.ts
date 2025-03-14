@@ -776,7 +776,7 @@ export const L1HandlerTransactionTrace = Schema.Struct({
  * @prop transactionHash The hash of the trace's transaction.
  * @prp traceRoot the trace root entry.
  */
-export const Trace = Schema.Struct({
+export const TransactionTrace = Schema.Struct({
   filterIds: Schema.Array(Schema.Number),
   transactionIndex: Schema.Number,
   transactionHash: FieldElement,
@@ -788,7 +788,7 @@ export const Trace = Schema.Struct({
   ),
 });
 
-export type Trace = typeof Trace.Type;
+export type TransactionTrace = typeof TransactionTrace.Type;
 
 /** A block.
  *
@@ -807,7 +807,7 @@ export const Block = Schema.Struct({
   receipts: Schema.Array(TransactionReceipt),
   events: Schema.Array(Event),
   messages: Schema.Array(MessageToL1),
-  traces: Schema.Array(Trace),
+  traces: Schema.Array(TransactionTrace),
   storageDiffs: Schema.Array(StorageDiff),
   contractChanges: Schema.Array(ContractChange),
   nonceUpdates: Schema.Array(NonceUpdate),

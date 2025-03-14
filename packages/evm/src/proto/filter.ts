@@ -160,7 +160,11 @@ export interface TransactionFilter {
     | boolean
     | undefined;
   /** Flag to request the transaction's logs. Defaults to `false`. */
-  readonly includeLogs?: boolean | undefined;
+  readonly includeLogs?:
+    | boolean
+    | undefined;
+  /** Flag to request the transaction's trace. Defaults to `false`. */
+  readonly includeTransactionTrace?: boolean | undefined;
 }
 
 export interface LogFilter {
@@ -204,7 +208,11 @@ export interface LogFilter {
    *
    * Defaults to false.
    */
-  readonly includeSiblings?: boolean | undefined;
+  readonly includeSiblings?:
+    | boolean
+    | undefined;
+  /** Flag to request the log's trace. Defaults to `false`. */
+  readonly includeTransactionTrace?: boolean | undefined;
 }
 
 /** Topic filter. */
@@ -427,6 +435,7 @@ function createBaseTransactionFilter(): TransactionFilter {
     transactionStatus: undefined,
     includeReceipt: undefined,
     includeLogs: undefined,
+    includeTransactionTrace: undefined,
   };
 }
 
@@ -452,6 +461,9 @@ export const TransactionFilter = {
     }
     if (message.includeLogs !== undefined) {
       writer.uint32(56).bool(message.includeLogs);
+    }
+    if (message.includeTransactionTrace !== undefined) {
+      writer.uint32(64).bool(message.includeTransactionTrace);
     }
     return writer;
   },
@@ -512,6 +524,13 @@ export const TransactionFilter = {
 
           message.includeLogs = reader.bool();
           continue;
+        case 8:
+          if (tag !== 64) {
+            break;
+          }
+
+          message.includeTransactionTrace = reader.bool();
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -532,6 +551,9 @@ export const TransactionFilter = {
         : undefined,
       includeReceipt: isSet(object.includeReceipt) ? globalThis.Boolean(object.includeReceipt) : undefined,
       includeLogs: isSet(object.includeLogs) ? globalThis.Boolean(object.includeLogs) : undefined,
+      includeTransactionTrace: isSet(object.includeTransactionTrace)
+        ? globalThis.Boolean(object.includeTransactionTrace)
+        : undefined,
     };
   },
 
@@ -558,6 +580,9 @@ export const TransactionFilter = {
     if (message.includeLogs !== undefined) {
       obj.includeLogs = message.includeLogs;
     }
+    if (message.includeTransactionTrace !== undefined) {
+      obj.includeTransactionTrace = message.includeTransactionTrace;
+    }
     return obj;
   },
 
@@ -573,6 +598,7 @@ export const TransactionFilter = {
     message.transactionStatus = object.transactionStatus ?? undefined;
     message.includeReceipt = object.includeReceipt ?? undefined;
     message.includeLogs = object.includeLogs ?? undefined;
+    message.includeTransactionTrace = object.includeTransactionTrace ?? undefined;
     return message;
   },
 };
@@ -587,6 +613,7 @@ function createBaseLogFilter(): LogFilter {
     includeTransaction: undefined,
     includeReceipt: undefined,
     includeSiblings: undefined,
+    includeTransactionTrace: undefined,
   };
 }
 
@@ -617,6 +644,9 @@ export const LogFilter = {
     }
     if (message.includeSiblings !== undefined) {
       writer.uint32(64).bool(message.includeSiblings);
+    }
+    if (message.includeTransactionTrace !== undefined) {
+      writer.uint32(72).bool(message.includeTransactionTrace);
     }
     return writer;
   },
@@ -684,6 +714,13 @@ export const LogFilter = {
 
           message.includeSiblings = reader.bool();
           continue;
+        case 9:
+          if (tag !== 72) {
+            break;
+          }
+
+          message.includeTransactionTrace = reader.bool();
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -705,6 +742,9 @@ export const LogFilter = {
       includeTransaction: isSet(object.includeTransaction) ? globalThis.Boolean(object.includeTransaction) : undefined,
       includeReceipt: isSet(object.includeReceipt) ? globalThis.Boolean(object.includeReceipt) : undefined,
       includeSiblings: isSet(object.includeSiblings) ? globalThis.Boolean(object.includeSiblings) : undefined,
+      includeTransactionTrace: isSet(object.includeTransactionTrace)
+        ? globalThis.Boolean(object.includeTransactionTrace)
+        : undefined,
     };
   },
 
@@ -734,6 +774,9 @@ export const LogFilter = {
     if (message.includeSiblings !== undefined) {
       obj.includeSiblings = message.includeSiblings;
     }
+    if (message.includeTransactionTrace !== undefined) {
+      obj.includeTransactionTrace = message.includeTransactionTrace;
+    }
     return obj;
   },
 
@@ -752,6 +795,7 @@ export const LogFilter = {
     message.includeTransaction = object.includeTransaction ?? undefined;
     message.includeReceipt = object.includeReceipt ?? undefined;
     message.includeSiblings = object.includeSiblings ?? undefined;
+    message.includeTransactionTrace = object.includeTransactionTrace ?? undefined;
     return message;
   },
 };
