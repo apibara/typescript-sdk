@@ -778,6 +778,7 @@ export const L1HandlerTransactionTrace = Schema.Struct({
  */
 export const Trace = Schema.Struct({
   filterIds: Schema.Array(Schema.Number),
+  transactionIndex: Schema.Number,
   transactionHash: FieldElement,
   traceRoot: Schema.Union(
     InvokeTransactionTrace,

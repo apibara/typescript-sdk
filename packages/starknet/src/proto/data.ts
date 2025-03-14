@@ -798,6 +798,10 @@ export interface Trace {
   readonly filterIds?:
     | readonly number[]
     | undefined;
+  /** Index of the transaction in the block. */
+  readonly transactionIndex?:
+    | number
+    | undefined;
   /** Transaction hash. */
   readonly transactionHash?: FieldElement | undefined;
   readonly traceRoot?:
@@ -6194,7 +6198,7 @@ export const NonceUpdate = {
 };
 
 function createBaseTrace(): Trace {
-  return { filterIds: [], transactionHash: undefined, traceRoot: undefined };
+  return { filterIds: [], transactionIndex: 0, transactionHash: undefined, traceRoot: undefined };
 }
 
 export const Trace = {
@@ -6206,21 +6210,24 @@ export const Trace = {
       }
       writer.ldelim();
     }
+    if (message.transactionIndex !== undefined && message.transactionIndex !== 0) {
+      writer.uint32(16).uint32(message.transactionIndex);
+    }
     if (message.transactionHash !== undefined) {
-      FieldElement.encode(message.transactionHash, writer.uint32(18).fork()).ldelim();
+      FieldElement.encode(message.transactionHash, writer.uint32(26).fork()).ldelim();
     }
     switch (message.traceRoot?.$case) {
       case "invoke":
-        InvokeTransactionTrace.encode(message.traceRoot.invoke, writer.uint32(26).fork()).ldelim();
+        InvokeTransactionTrace.encode(message.traceRoot.invoke, writer.uint32(34).fork()).ldelim();
         break;
       case "declare":
-        DeclareTransactionTrace.encode(message.traceRoot.declare, writer.uint32(34).fork()).ldelim();
+        DeclareTransactionTrace.encode(message.traceRoot.declare, writer.uint32(42).fork()).ldelim();
         break;
       case "deployAccount":
-        DeployAccountTransactionTrace.encode(message.traceRoot.deployAccount, writer.uint32(42).fork()).ldelim();
+        DeployAccountTransactionTrace.encode(message.traceRoot.deployAccount, writer.uint32(50).fork()).ldelim();
         break;
       case "l1Handler":
-        L1HandlerTransactionTrace.encode(message.traceRoot.l1Handler, writer.uint32(50).fork()).ldelim();
+        L1HandlerTransactionTrace.encode(message.traceRoot.l1Handler, writer.uint32(58).fork()).ldelim();
         break;
     }
     return writer;
@@ -6251,28 +6258,35 @@ export const Trace = {
 
           break;
         case 2:
-          if (tag !== 18) {
+          if (tag !== 16) {
             break;
           }
 
-          message.transactionHash = FieldElement.decode(reader, reader.uint32());
+          message.transactionIndex = reader.uint32();
           continue;
         case 3:
           if (tag !== 26) {
             break;
           }
 
-          message.traceRoot = { $case: "invoke", invoke: InvokeTransactionTrace.decode(reader, reader.uint32()) };
+          message.transactionHash = FieldElement.decode(reader, reader.uint32());
           continue;
         case 4:
           if (tag !== 34) {
             break;
           }
 
-          message.traceRoot = { $case: "declare", declare: DeclareTransactionTrace.decode(reader, reader.uint32()) };
+          message.traceRoot = { $case: "invoke", invoke: InvokeTransactionTrace.decode(reader, reader.uint32()) };
           continue;
         case 5:
           if (tag !== 42) {
+            break;
+          }
+
+          message.traceRoot = { $case: "declare", declare: DeclareTransactionTrace.decode(reader, reader.uint32()) };
+          continue;
+        case 6:
+          if (tag !== 50) {
             break;
           }
 
@@ -6281,8 +6295,8 @@ export const Trace = {
             deployAccount: DeployAccountTransactionTrace.decode(reader, reader.uint32()),
           };
           continue;
-        case 6:
-          if (tag !== 50) {
+        case 7:
+          if (tag !== 58) {
             break;
           }
 
@@ -6305,6 +6319,7 @@ export const Trace = {
       filterIds: globalThis.Array.isArray(object?.filterIds)
         ? object.filterIds.map((e: any) => globalThis.Number(e))
         : [],
+      transactionIndex: isSet(object.transactionIndex) ? globalThis.Number(object.transactionIndex) : 0,
       transactionHash: isSet(object.transactionHash) ? FieldElement.fromJSON(object.transactionHash) : undefined,
       traceRoot: isSet(object.invoke)
         ? { $case: "invoke", invoke: InvokeTransactionTrace.fromJSON(object.invoke) }
@@ -6322,6 +6337,9 @@ export const Trace = {
     const obj: any = {};
     if (message.filterIds?.length) {
       obj.filterIds = message.filterIds.map((e) => Math.round(e));
+    }
+    if (message.transactionIndex !== undefined && message.transactionIndex !== 0) {
+      obj.transactionIndex = Math.round(message.transactionIndex);
     }
     if (message.transactionHash !== undefined) {
       obj.transactionHash = FieldElement.toJSON(message.transactionHash);
@@ -6347,6 +6365,7 @@ export const Trace = {
   fromPartial(object: DeepPartial<Trace>): Trace {
     const message = createBaseTrace() as any;
     message.filterIds = object.filterIds?.map((e) => e) || [];
+    message.transactionIndex = object.transactionIndex ?? 0;
     message.transactionHash = (object.transactionHash !== undefined && object.transactionHash !== null)
       ? FieldElement.fromPartial(object.transactionHash)
       : undefined;
