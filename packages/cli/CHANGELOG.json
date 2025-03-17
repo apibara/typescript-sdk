@@ -2,6 +2,21 @@
   "name": "apibara",
   "entries": [
     {
+      "date": "Mon, 17 Mar 2025 14:45:17 GMT",
+      "version": "2.1.0-beta.13",
+      "tag": "apibara_v2.1.0-beta.13",
+      "comments": {
+        "prerelease": [
+          {
+            "author": "jadejajaipal5@gmail.com",
+            "package": "apibara",
+            "commit": "84b595200c1ba9dc7a162e02c338fc252a263651",
+            "comment": "feat: add instrumentation for side effects"
+          }
+        ]
+      }
+    },
+    {
       "date": "Thu, 13 Mar 2025 02:42:29 GMT",
       "version": "2.1.0-beta.11",
       "tag": "apibara_v2.1.0-beta.11",

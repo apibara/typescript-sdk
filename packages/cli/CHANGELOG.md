@@ -1,8 +1,16 @@
 # Change Log - apibara
 
-<!-- This log was last generated on Thu, 13 Mar 2025 02:42:29 GMT and should not be manually modified. -->
+<!-- This log was last generated on Mon, 17 Mar 2025 14:45:17 GMT and should not be manually modified. -->
 
 <!-- Start content -->
+
+## 2.1.0-beta.13
+
+Mon, 17 Mar 2025 14:45:17 GMT
+
+### Changes
+
+- feat: add instrumentation for side effects (jadejajaipal5@gmail.com)
 
 ## 2.1.0-beta.11
 
