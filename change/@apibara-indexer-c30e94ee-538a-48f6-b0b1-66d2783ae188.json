@@ -1,7 +1,0 @@
-{
-  "type": "prerelease",
-  "comment": "indexer: do not call factory for pending blocks",
-  "packageName": "@apibara/indexer",
-  "email": "jadejajaipal5@gmail.com",
-  "dependentChangeType": "patch"
-}

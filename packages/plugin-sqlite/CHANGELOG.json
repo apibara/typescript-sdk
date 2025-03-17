@@ -2,6 +2,21 @@
   "name": "@apibara/plugin-sqlite",
   "entries": [
     {
+      "date": "Mon, 17 Mar 2025 08:37:20 GMT",
+      "version": "2.1.0-beta.12",
+      "tag": "@apibara/plugin-sqlite_v2.1.0-beta.12",
+      "comments": {
+        "prerelease": [
+          {
+            "author": "jadejajaipal5@gmail.com",
+            "package": "@apibara/plugin-sqlite",
+            "commit": "ba825d38331e12474b0daed900a71cc8015fd4fc",
+            "comment": "plugin-sqlite: handle pending blocks"
+          }
+        ]
+      }
+    },
+    {
       "date": "Sun, 09 Mar 2025 05:58:19 GMT",
       "version": "2.1.0-beta.7",
       "tag": "@apibara/plugin-sqlite_v2.1.0-beta.7",

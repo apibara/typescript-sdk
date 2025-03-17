@@ -2,6 +2,21 @@
   "name": "@apibara/plugin-drizzle",
   "entries": [
     {
+      "date": "Mon, 17 Mar 2025 08:37:20 GMT",
+      "version": "2.1.0-beta.12",
+      "tag": "@apibara/plugin-drizzle_v2.1.0-beta.12",
+      "comments": {
+        "prerelease": [
+          {
+            "author": "jadejajaipal5@gmail.com",
+            "package": "@apibara/plugin-drizzle",
+            "commit": "ba825d38331e12474b0daed900a71cc8015fd4fc",
+            "comment": "plugin-drizzle: handle pending blocks"
+          }
+        ]
+      }
+    },
+    {
       "date": "Tue, 11 Mar 2025 08:30:59 GMT",
       "version": "2.1.0-beta.10",
       "tag": "@apibara/plugin-drizzle_v2.1.0-beta.10",

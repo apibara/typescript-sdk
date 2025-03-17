@@ -1,7 +1,0 @@
-{
-  "type": "prerelease",
-  "comment": "plugin-mongo: handle pending blocks",
-  "packageName": "@apibara/plugin-mongo",
-  "email": "jadejajaipal5@gmail.com",
-  "dependentChangeType": "patch"
-}

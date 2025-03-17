@@ -2,6 +2,21 @@
   "name": "@apibara/indexer",
   "entries": [
     {
+      "date": "Mon, 17 Mar 2025 08:37:20 GMT",
+      "version": "2.1.0-beta.12",
+      "tag": "@apibara/indexer_v2.1.0-beta.12",
+      "comments": {
+        "prerelease": [
+          {
+            "author": "jadejajaipal5@gmail.com",
+            "package": "@apibara/indexer",
+            "commit": "ba825d38331e12474b0daed900a71cc8015fd4fc",
+            "comment": "indexer: do not call factory for pending blocks"
+          }
+        ]
+      }
+    },
+    {
       "date": "Sun, 09 Mar 2025 05:58:19 GMT",
       "version": "2.1.0-beta.7",
       "tag": "@apibara/indexer_v2.1.0-beta.7",
