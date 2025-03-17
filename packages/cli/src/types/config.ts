@@ -15,8 +15,15 @@ export type RegisterFn = () => Promise<void>;
 
 export type LoggerFactoryFn = ({
   indexer,
+  indexers,
   preset,
-}: { indexer: string; indexers: string[]; preset?: string }) => ConsolaReporter;
+}: LoggerFactoryArgs) => ConsolaReporter;
+
+export type LoggerFactoryArgs = {
+  indexer: string;
+  indexers: string[];
+  preset?: string;
+};
 
 /**
  * Apibara Config type (apibara.config)
