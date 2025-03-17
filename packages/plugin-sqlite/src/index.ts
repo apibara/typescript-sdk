@@ -227,10 +227,6 @@ export function sqliteStorage<TFilter, TBlock>({
         await withTransaction(database, async (db) => {
           if (prevFinality === "pending") {
             // invalidate if previous block's finality was "pending"
-            if (enablePersistState) {
-              invalidateState({ db, cursor, indexerId });
-            }
-
             if (enableKeyValueStore) {
               invalidateKV(db, cursor);
             }

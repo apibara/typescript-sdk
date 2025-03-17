@@ -320,10 +320,6 @@ export function drizzleStorage<
             if (prevFinality === "pending") {
               // invalidate if previous block's finality was "pending"
               await invalidate(tx, cursor, idColumn, indexerId);
-
-              if (enablePersistence) {
-                await invalidateState({ tx, cursor, indexerId });
-              }
             }
 
             if (finality !== "finalized") {

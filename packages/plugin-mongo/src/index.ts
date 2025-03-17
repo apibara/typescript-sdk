@@ -208,10 +208,6 @@ export function mongoStorage<TFilter, TBlock>({
           if (prevFinality === "pending") {
             // invalidate if previous block's finality was "pending"
             await invalidate(db, session, cursor, collections);
-
-            if (enablePersistence) {
-              await invalidateState({ db, session, cursor, indexerId });
-            }
           }
 
           await next();
