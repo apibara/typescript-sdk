@@ -4,6 +4,7 @@ import type { DbOptions, MongoClient } from "mongodb";
 
 import { generateIndexerId } from "@apibara/indexer/internal";
 import { useInternalContext } from "@apibara/indexer/internal/plugins";
+import type { Cursor, DataFinality } from "@apibara/protocol";
 import { cleanupStorage, finalize, invalidate } from "./mongo";
 import {
   finalizeState,
@@ -62,6 +63,7 @@ export function mongoStorage<TFilter, TBlock>({
   return defineIndexerPlugin<TFilter, TBlock>((indexer) => {
     let indexerId = "";
     const alwaysReindex = process.env["APIBARA_ALWAYS_REINDEX"] === "true";
+    let prevFinality: DataFinality | undefined;
 
     indexer.hooks.hook("run:before", async () => {
       const { indexerName } = useInternalContext();
@@ -189,7 +191,11 @@ export function mongoStorage<TFilter, TBlock>({
 
     indexer.hooks.hook("handler:middleware", async ({ use }) => {
       use(async (context, next) => {
-        const { endCursor } = context;
+        const { endCursor, finality, cursor } = context as {
+          cursor: Cursor;
+          endCursor: Cursor;
+          finality: DataFinality;
+        };
 
         if (!endCursor) {
           throw new MongoStorageError("end cursor is undefined");
@@ -199,10 +205,16 @@ export function mongoStorage<TFilter, TBlock>({
           const db = client.db(dbName, dbOptions);
           context[MONGO_PROPERTY] = new MongoStorage(db, session, endCursor);
 
+          if (prevFinality === "pending") {
+            // invalidate if previous block's finality was "pending"
+            await invalidate(db, session, cursor, collections);
+          }
+
           await next();
+
           delete context[MONGO_PROPERTY];
 
-          if (enablePersistence) {
+          if (enablePersistence && finality !== "pending") {
             await persistState({
               db,
               endCursor,
@@ -210,6 +222,8 @@ export function mongoStorage<TFilter, TBlock>({
               indexerId,
             });
           }
+
+          prevFinality = finality;
         });
       });
     });

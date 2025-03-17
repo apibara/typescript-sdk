@@ -1018,6 +1018,442 @@ describe("MongoDB Test", () => {
       ]
     `);
   });
+
+  it("should handle pending data correctly", async () => {
+    const { db, client, dbName } = getRandomDatabase();
+
+    // This test simulates the below scenario:
+    // 1. We have a pending block with transactions A, B, C
+    // 2. The final accepted block only contains A, C, D, E (B is missing)
+    // 3. We want to ensure that transaction B is not in the final table
+    const indexer = getMockIndexer({
+      override: {
+        plugins: [mongoStorage({ client, dbName, collections: ["test"] })],
+        async transform({ endCursor, block: { data }, finality }) {
+          const db = useMongoStorage();
+          const collection = db.collection<TestSchema>("test");
+
+          // Parse the data to get transactions
+          // In our mock, data will be a string like "PENDING_A_B_C" or "ACCEPTED_A_B_C" based on below mock stream
+          if (data) {
+            // Extract transaction IDs from the data string
+            const parts = data.split("_");
+            const blockType = parts[0]; // "PENDING" or "ACCEPTED"
+            const txIds = parts.slice(1); // ["A", "B", "C"] or ["A", "C", "D", "E"]
+
+            // For each transaction in the block
+            for (const txId of txIds) {
+              // Insert new transaction
+              await collection.insertOne({
+                blockNumber: Number(endCursor?.orderKey),
+                key: txId,
+                count: txIds.length,
+                data: `${blockType}_${txId}`,
+              });
+            }
+          }
+        },
+      },
+    });
+
+    // Create a custom mock client that simulates:
+    // 1. A pending block with transactions A, B, C
+    // 2. Then the same block number becomes accepted with transactions A, C, D, E (B is missing)
+    const mockClient = new MockClient<MockFilter, MockBlock>(
+      (request, options) => {
+        return [
+          // First a pending block with transactions A, B, C
+          {
+            _tag: "data",
+            data: {
+              cursor: { orderKey: 5000000n },
+              endCursor: { orderKey: 5000001n },
+              finality: "pending",
+              data: [{ data: "PENDING_A_B_C" }],
+              production: "backfill",
+            },
+          },
+          // Then the same block becomes accepted with transactions A, C, D, E (B is missing)
+          {
+            _tag: "data",
+            data: {
+              cursor: { orderKey: 5000000n },
+              endCursor: { orderKey: 5000001n },
+              finality: "accepted",
+              data: [{ data: "ACCEPTED_A_C_D_E" }],
+              production: "backfill",
+            },
+          },
+        ];
+      },
+    );
+
+    await run(mockClient, indexer);
+
+    // Query the database to see what transactions were stored
+    const result = await db.collection("test").find().toArray();
+
+    // Sort by key for consistent test results
+    const sortedResult = result.sort((a, b) =>
+      (a.key || "").localeCompare(b.key || ""),
+    );
+
+    // We expect to see only transactions from the accepted block (A, C, D, E)
+    // with the correct count (4) for each
+    expect(
+      sortedResult.map(({ _id, _cursor, ...r }) => r),
+    ).toMatchInlineSnapshot(`
+      [
+        {
+          "blockNumber": 5000001,
+          "count": 4,
+          "data": "ACCEPTED_A",
+          "key": "A",
+        },
+        {
+          "blockNumber": 5000001,
+          "count": 4,
+          "data": "ACCEPTED_C",
+          "key": "C",
+        },
+        {
+          "blockNumber": 5000001,
+          "count": 4,
+          "data": "ACCEPTED_D",
+          "key": "D",
+        },
+        {
+          "blockNumber": 5000001,
+          "count": 4,
+          "data": "ACCEPTED_E",
+          "key": "E",
+        },
+      ]
+    `);
+
+    // Verify that transaction B is not in the final table
+    const hasTxB = result.some((row) => row.key === "B");
+    expect(hasTxB).toBe(false);
+
+    // Verify that all transactions from the accepted block have count = 4
+    const acceptedTxs = result.filter((row) =>
+      row.data?.startsWith("ACCEPTED_"),
+    );
+    expect(acceptedTxs.length).toBe(4); // A, C, D, E
+    expect(acceptedTxs.every((row) => row.count === 4)).toBe(true);
+  });
+
+  it("should handle multiple pending blocks with updates", async () => {
+    const { db, client, dbName } = getRandomDatabase();
+
+    // This test simulates a more complex scenario:
+    // 1. First a pending block with transactions A, B
+    // 2. The same pending block updated with transactions A, B, C
+    // 3. The same pending block updated again with transactions A, C, D (B removed)
+    // 4. Finally the block becomes accepted with transactions A, C, D, E
+    // We want to ensure that only the final accepted transactions are in the table
+
+    const indexer = getMockIndexer({
+      override: {
+        plugins: [mongoStorage({ client, dbName, collections: ["test"] })],
+        async transform({ endCursor, block: { data }, finality }) {
+          const db = useMongoStorage();
+          const collection = db.collection<TestSchema>("test");
+
+          if (data) {
+            // Extract transaction IDs from the data string
+            const parts = data.split("_");
+            const blockType = parts[0]; // "PENDING" or "ACCEPTED"
+            const txIds = parts.slice(1); // Transaction IDs
+
+            // For each transaction in the block
+            for (const txId of txIds) {
+              // Insert new transaction
+              await collection.insertOne({
+                blockNumber: Number(endCursor?.orderKey),
+                key: txId,
+                count: txIds.length,
+                data: `${blockType}_${txId}`,
+              });
+            }
+          }
+        },
+      },
+    });
+
+    // Create a custom mock client that simulates the scenario
+    const mockClient = new MockClient<MockFilter, MockBlock>(
+      (request, options) => {
+        return [
+          // First pending block with transactions A, B
+          {
+            _tag: "data",
+            data: {
+              cursor: { orderKey: 5000000n },
+              endCursor: { orderKey: 5000001n },
+              finality: "pending",
+              data: [{ data: "PENDING_A_B" }],
+              production: "backfill",
+            },
+          },
+          // Same pending block updated with transactions A, B, C
+          {
+            _tag: "data",
+            data: {
+              cursor: { orderKey: 5000000n },
+              endCursor: { orderKey: 5000001n },
+              finality: "pending",
+              data: [{ data: "PENDING_A_B_C" }],
+              production: "backfill",
+            },
+          },
+          // Same pending block updated again with transactions A, C, D (B removed)
+          {
+            _tag: "data",
+            data: {
+              cursor: { orderKey: 5000000n },
+              endCursor: { orderKey: 5000001n },
+              finality: "pending",
+              data: [{ data: "PENDING_A_C_D" }],
+              production: "backfill",
+            },
+          },
+          // Finally the block becomes accepted with transactions A, C, D, E
+          {
+            _tag: "data",
+            data: {
+              cursor: { orderKey: 5000000n },
+              endCursor: { orderKey: 5000001n },
+              finality: "accepted",
+              data: [{ data: "ACCEPTED_A_C_D_E" }],
+              production: "backfill",
+            },
+          },
+        ];
+      },
+    );
+
+    await run(mockClient, indexer);
+
+    // Query the database to see what transactions were stored
+    const result = await db.collection("test").find().toArray();
+
+    // Sort by key for consistent test results
+    const sortedResult = result.sort((a, b) =>
+      (a.key || "").localeCompare(b.key || ""),
+    );
+
+    // We expect to see only transactions from the accepted block (A, C, D, E)
+    // with the correct count (4) for each
+    expect(
+      sortedResult.map(({ _id, _cursor, ...r }) => r),
+    ).toMatchInlineSnapshot(`
+      [
+        {
+          "blockNumber": 5000001,
+          "count": 4,
+          "data": "ACCEPTED_A",
+          "key": "A",
+        },
+        {
+          "blockNumber": 5000001,
+          "count": 4,
+          "data": "ACCEPTED_C",
+          "key": "C",
+        },
+        {
+          "blockNumber": 5000001,
+          "count": 4,
+          "data": "ACCEPTED_D",
+          "key": "D",
+        },
+        {
+          "blockNumber": 5000001,
+          "count": 4,
+          "data": "ACCEPTED_E",
+          "key": "E",
+        },
+      ]
+    `);
+
+    // Verify that transaction B is not in the final table
+    const hasTxB = result.some((row) => row.key === "B");
+    expect(hasTxB).toBe(false);
+
+    // Verify that all transactions from the accepted block have count = 4
+    const acceptedTxs = result.filter((row) =>
+      row.data?.startsWith("ACCEPTED_"),
+    );
+    expect(acceptedTxs.length).toBe(4); // A, C, D, E
+    expect(acceptedTxs.every((row) => row.count === 4)).toBe(true);
+  });
+
+  it("should not persist state for pending blocks", async () => {
+    const { db, client, dbName } = getRandomDatabase();
+    // This test verifies that state is not persisted for pending blocks
+    // and that the checkpoint only advances for accepted blocks
+
+    const indexer = getMockIndexer({
+      override: {
+        plugins: [
+          mongoStorage({
+            client,
+            dbName,
+            collections: ["test"],
+            persistState: true,
+          }),
+        ],
+        async transform({ endCursor, block: { data }, finality }) {
+          const db = useMongoStorage();
+          const collection = db.collection<TestSchema>("test");
+
+          // Insert a record for each block
+          await collection.insertOne({
+            blockNumber: Number(endCursor?.orderKey),
+            key: `block_${Number(endCursor?.orderKey)}`,
+            count: 1,
+            data: `${finality}_${data}`,
+          });
+        },
+      },
+    });
+
+    // Create a mock client that alternates between pending and accepted blocks
+    const mockClient = new MockClient<MockFilter, MockBlock>(
+      (request, options) => {
+        return [
+          // Block 1: Pending
+          {
+            _tag: "data",
+            data: {
+              cursor: { orderKey: 5000000n },
+              endCursor: { orderKey: 5000001n },
+              finality: "pending",
+              data: [{ data: "block1" }],
+              production: "backfill",
+            },
+          },
+          // Block 1: Accepted
+          {
+            _tag: "data",
+            data: {
+              cursor: { orderKey: 5000000n },
+              endCursor: { orderKey: 5000001n },
+              finality: "accepted",
+              data: [{ data: "block1" }],
+              production: "backfill",
+            },
+          },
+          // Block 2: Pending
+          {
+            _tag: "data",
+            data: {
+              cursor: { orderKey: 5000001n },
+              endCursor: { orderKey: 5000002n },
+              finality: "pending",
+              data: [{ data: "block2" }],
+              production: "backfill",
+            },
+          },
+          // Block 2: Accepted
+          {
+            _tag: "data",
+            data: {
+              cursor: { orderKey: 5000001n },
+              endCursor: { orderKey: 5000002n },
+              finality: "accepted",
+              data: [{ data: "block2" }],
+              production: "backfill",
+            },
+          },
+          // Block 3: Pending
+          {
+            _tag: "data",
+            data: {
+              cursor: { orderKey: 5000002n },
+              endCursor: { orderKey: 5000003n },
+              finality: "pending",
+              data: [{ data: "block3" }],
+              production: "backfill",
+            },
+          },
+        ];
+      },
+    );
+
+    await run(mockClient, indexer);
+
+    // Check the database records
+    const result = await db.collection("test").find().toArray();
+
+    // data is invalidated before each transform if the prev block was pending
+    expect(result.map(({ _id, ...r }) => r)).toMatchInlineSnapshot(`
+      [
+        {
+          "_cursor": {
+            "from": 5000001,
+            "to": null,
+          },
+          "blockNumber": 5000001,
+          "count": 1,
+          "data": "accepted_block1",
+          "key": "block_5000001",
+        },
+        {
+          "_cursor": {
+            "from": 5000002,
+            "to": null,
+          },
+          "blockNumber": 5000002,
+          "count": 1,
+          "data": "accepted_block2",
+          "key": "block_5000002",
+        },
+        {
+          "_cursor": {
+            "from": 5000003,
+            "to": null,
+          },
+          "blockNumber": 5000003,
+          "count": 1,
+          "data": "pending_block3",
+          "key": "block_5000003",
+        },
+      ]
+    `);
+
+    // Check the checkpoints collection
+    const checkpointsResult = await db
+      .collection(checkpointCollectionName)
+      .find()
+      .toArray();
+
+    // should only have non-pending blocks in the checkpoint
+    expect(checkpointsResult.map(({ _id, ...r }) => r)).toMatchInlineSnapshot(`
+      [
+        {
+          "id": "indexer_testing_default",
+          "orderKey": 5000002,
+          "uniqueKey": null,
+        },
+      ]
+    `);
+
+    // The checkpoint should be at block 2, which is the last accepted block
+    expect(checkpointsResult[0].orderKey).toBe(5000002);
+
+    // Verify that the pending blocks are stored correctly
+    const pendingBlocks = result.filter((row) =>
+      row.data?.startsWith("pending_"),
+    );
+    expect(pendingBlocks.length).toBe(1); // Only the last pending block should be present
+
+    // Verify that all accepted blocks are present
+    const acceptedBlocks = result.filter((row) =>
+      row.data?.startsWith("accepted_"),
+    );
+    expect(acceptedBlocks.length).toBe(2); // Both accepted blocks should be present
+  });
 });
 
 function getRandomDatabase() {

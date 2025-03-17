@@ -72,7 +72,7 @@ export function invalidateKV(db: Database, cursor: Cursor) {
   );
 }
 
-type KeyValueRow = {
+export type KeyValueRow = {
   from_block: number;
   to_block: number;
   k: string;
