@@ -12,6 +12,7 @@ import type {
 import { serialize } from "../utils/helper";
 import { appConfig } from "./plugins/config";
 import { indexers } from "./plugins/indexers";
+import { instrumentation } from "./plugins/instrumentation";
 
 const runtimeDependencies = [
   "better-sqlite3",
@@ -86,6 +87,8 @@ export function getRolldownConfig(apibara: Apibara): RolldownOptions {
       },
     }) as RolldownPluginOption,
   );
+
+  rolldownConfig.plugins?.push(instrumentation(apibara));
   rolldownConfig.plugins?.push(indexers(apibara));
   rolldownConfig.plugins?.push(appConfig(apibara));
 

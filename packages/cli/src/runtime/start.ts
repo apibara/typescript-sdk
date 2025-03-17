@@ -2,6 +2,7 @@ import { runWithReconnect } from "@apibara/indexer";
 import { createClient } from "@apibara/protocol";
 import { defineCommand, runMain } from "citty";
 import consola from "consola";
+import { register } from "#apibara-internal-virtual/instrumentation";
 import { createIndexer } from "./internal/app";
 
 const startCommand = defineCommand({
@@ -33,6 +34,12 @@ const startCommand = defineCommand({
       indexerInstance.streamConfig,
       indexerInstance.options.streamUrl,
     );
+
+    if (register) {
+      consola.start("Registering from instrumentation");
+      await register();
+      consola.success("Registered from instrumentation");
+    }
 
     await runWithReconnect(client, indexerInstance);
   },

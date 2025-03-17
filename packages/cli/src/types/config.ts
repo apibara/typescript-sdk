@@ -11,10 +11,19 @@ import type { RolldownOptions } from "rolldown";
 import type { DeepPartial } from "./_utils";
 import type { ApibaraHooks } from "./hooks";
 
-export type LoggerFactory = ({
+export type RegisterFn = () => Promise<void>;
+
+export type LoggerFactoryFn = ({
   indexer,
+  indexers,
   preset,
-}: { indexer: string; indexers: string[]; preset?: string }) => ConsolaReporter;
+}: LoggerFactoryArgs) => ConsolaReporter;
+
+export type LoggerFactoryArgs = {
+  indexer: string;
+  indexers: string[];
+  preset?: string;
+};
 
 /**
  * Apibara Config type (apibara.config)
@@ -30,7 +39,6 @@ export interface ApibaraConfig<
   runtimeConfig?: R;
   presets?: T;
   preset?: keyof T;
-  logger?: LoggerFactory;
 }
 
 export type ApibaraDynamicConfig = Pick<ApibaraConfig, "runtimeConfig">;
@@ -74,9 +82,6 @@ export interface ApibaraOptions<
 
   // Hooks
   hooks: NestedHooks<ApibaraHooks>;
-
-  // Logging
-  logger?: LoggerFactory;
 
   // Rolldown
   rolldownConfig?: Partial<RolldownOptions>;
