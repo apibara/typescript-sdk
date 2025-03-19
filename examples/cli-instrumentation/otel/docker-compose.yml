@@ -4,14 +4,18 @@ services:
     ports:
       - "9090:9090"
     volumes:
-      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./prometheus:/etc/prometheus:ro
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--web.enable-remote-write-receiver"
     networks:
       - monitoring
 
   grafana:
     image: grafana/grafana:latest
     ports:
-      - "3001:3000"
+      - "3000:3000"
     environment:
       - GF_SECURITY_ADMIN_PASSWORD=admin
       - GF_SECURITY_ADMIN_USER=admin
@@ -24,18 +28,18 @@ services:
     depends_on:
       - prometheus
 
-  # Jaeger for distributed tracing
-  jaeger:
-    image: jaegertracing/all-in-one:latest
+  opentelemetry-collector:
+    image: otel/opentelemetry-collector:latest
     ports:
-      - "16686:16686" # Jaeger UI
-      - "14250:14250" # gRPC for tracing
-      - "4317:4317" # OTLP gRPC
-      - "4318:4318" # OTLP HTTP
-    environment:
-      - COLLECTOR_OTLP_ENABLED=true
+      - "4317:4317"
+    volumes:
+      - ./opentelemetry-collector:/etc/opentelemetry-collector
+    command:
+      - "--config=/etc/opentelemetry-collector/config.yml"
     networks:
       - monitoring
+    depends_on:
+      - grafana
 
 networks:
   monitoring:

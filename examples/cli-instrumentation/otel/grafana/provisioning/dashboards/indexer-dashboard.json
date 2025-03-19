@@ -142,8 +142,8 @@
             "uid": "PBFA97CFB590B2093"
           },
           "editorMode": "code",
-          "expr": "reorg_count_total",
-          "legendFormat": "Reorgs",
+          "expr": "reorgs_total",
+          "legendFormat": "__auto",
           "range": true,
           "refId": "A"
         }
@@ -205,8 +205,8 @@
             "uid": "PBFA97CFB590B2093"
           },
           "editorMode": "code",
-          "expr": "processed_block_count_total",
-          "legendFormat": "Processed Blocks",
+          "expr": "processed_blocks_total",
+          "legendFormat": "__auto",
           "range": true,
           "refId": "A"
         }
@@ -223,13 +223,13 @@
     "list": []
   },
   "time": {
-    "from": "now-6h",
+    "from": "now-5m",
     "to": "now"
   },
   "timepicker": {},
   "timezone": "",
   "title": "Indexer Dashboard",
   "uid": "indexer-metrics",
-  "version": 11,
+  "version": 3,
   "weekStart": ""
 }

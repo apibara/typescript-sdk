@@ -3,7 +3,6 @@ import { useLogger } from "@apibara/indexer/plugins";
 import { StarknetStream } from "@apibara/starknet";
 import type { ApibaraRuntimeConfig } from "apibara/types";
 
-// USDC Transfers on Starknet
 export default function (runtimeConfig: ApibaraRuntimeConfig) {
   return defineIndexer(StarknetStream)({
     streamUrl: "https://starknet.preview.apibara.org",
