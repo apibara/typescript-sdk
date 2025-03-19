@@ -28,8 +28,9 @@ import {
   indexerAsyncContext,
   useIndexerContext,
 } from "./context";
-import { tracer } from "./otel";
+import { createIndexerMetrics, createTracer } from "./otel";
 import type { IndexerPlugin } from "./plugins";
+import { useInternalContext } from "./plugins/context";
 
 export type UseMiddlewareFunction = (
   fn: MiddlewareFunction<IndexerContext>,
@@ -216,7 +217,12 @@ export async function run<TFilter, TBlock>(
     const context = useIndexerContext();
     const middleware = await registerMiddleware(indexer);
 
+    const indexerMetrics = createIndexerMetrics();
+    const tracer = createTracer();
+
     await indexer.hooks.callHook("run:before");
+
+    const { indexerName: indexerId } = useInternalContext();
 
     const isFactoryMode = indexer.options.factory !== undefined;
 
@@ -287,6 +293,14 @@ export async function run<TFilter, TBlock>(
             context.cursor = cursor;
             context.endCursor = endCursor;
             context.finality = finality;
+
+            // Record current block number being processed
+            indexerMetrics.currentBlockGauge.record(
+              Number(endCursor?.orderKey),
+              {
+                indexer_id: indexerId,
+              },
+            );
 
             await middleware(context, async () => {
               let block: TBlock | null;
@@ -364,6 +378,11 @@ export async function run<TFilter, TBlock>(
             span.end();
           });
 
+          // Record processed block metric
+          indexerMetrics.processedBlockCounter.add(1, {
+            indexer_id: indexerId,
+          });
+
           context.cursor = undefined;
           context.endCursor = undefined;
           context.finality = undefined;
@@ -372,6 +391,10 @@ export async function run<TFilter, TBlock>(
         }
         case "invalidate": {
           await tracer.startActiveSpan("message invalidate", async (span) => {
+            // Record reorg metric
+            indexerMetrics.reorgCounter.add(1, {
+              indexer_id: indexerId,
+            });
             await indexer.hooks.callHook("message:invalidate", { message });
             span.end();
           });

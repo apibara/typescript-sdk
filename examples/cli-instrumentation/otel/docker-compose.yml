@@ -1,0 +1,49 @@
+services:
+  prometheus:
+    image: prom/prometheus:latest
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus:/etc/prometheus:ro
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--web.enable-remote-write-receiver"
+    networks:
+      - monitoring
+
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning
+      - grafana-storage:/var/lib/grafana
+    networks:
+      - monitoring
+    depends_on:
+      - prometheus
+
+  opentelemetry-collector:
+    image: otel/opentelemetry-collector:latest
+    ports:
+      - "4317:4317"
+    volumes:
+      - ./opentelemetry-collector:/etc/opentelemetry-collector
+    command:
+      - "--config=/etc/opentelemetry-collector/config.yml"
+    networks:
+      - monitoring
+    depends_on:
+      - grafana
+
+networks:
+  monitoring:
+    driver: bridge
+
+volumes:
+  grafana-storage:
