@@ -218,6 +218,7 @@ export async function run<TFilter, TBlock>(
     const middleware = await registerMiddleware(indexer);
 
     const indexerMetrics = createIndexerMetrics();
+    const tracer = createTracer();
 
     await indexer.hooks.callHook("run:before");
 
@@ -282,8 +283,6 @@ export async function run<TFilter, TBlock>(
       }
 
       await indexer.hooks.callHook("message", { message });
-
-      const tracer = createTracer();
 
       switch (message._tag) {
         case "data": {

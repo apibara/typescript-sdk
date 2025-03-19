@@ -9,17 +9,17 @@ export function createIndexerMetrics() {
 
   const currentBlockGauge = meter.createGauge("current_block", {
     description: "Current block number being processed",
-    unit: "block",
+    unit: "{block}",
   });
 
-  const processedBlockCounter = meter.createCounter("processed_block_count", {
+  const processedBlockCounter = meter.createCounter("processed_blocks", {
     description: "Number of blocks processed",
-    unit: "blocks",
+    unit: "{blocks}",
   });
 
-  const reorgCounter = meter.createCounter("reorg_count", {
+  const reorgCounter = meter.createCounter("reorgs", {
     description: "Number of reorgs (invalidate messages) received",
-    unit: "reorgs",
+    unit: "{reorgs}",
   });
 
   return {
