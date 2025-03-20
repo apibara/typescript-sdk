@@ -62,6 +62,8 @@ export const B256 = Schema.transform(B256Proto, _B256, {
   },
 });
 
+export type B256 = typeof B256.Type;
+
 export const b256ToProto = Schema.encodeSync(B256);
 export const b256FromProto = Schema.decodeSync(B256);
 
@@ -92,6 +94,8 @@ export const U256 = Schema.transform(U256Proto, Schema.BigIntFromSelf, {
   },
 });
 
+export type U256 = typeof U256.Type;
+
 export const u256ToProto = Schema.encodeSync(U256);
 export const u256FromProto = Schema.decodeSync(U256);
 
@@ -112,6 +116,8 @@ export const U128 = Schema.transform(U128Proto, Schema.BigIntFromSelf, {
     return { x0, x1 };
   },
 });
+
+export type U128 = typeof U128.Type;
 
 export const u128ToProto = Schema.encodeSync(U128);
 export const u128FromProto = Schema.decodeSync(U128);
