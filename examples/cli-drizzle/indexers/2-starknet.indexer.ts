@@ -11,21 +11,20 @@ import { hash } from "starknet";
 // USDC Transfers on Starknet
 export default function (runtimeConfig: ApibaraRuntimeConfig) {
   const {
-    connectionString,
     starknet: { startingBlock },
   } = runtimeConfig;
 
+  // connectionString defaults to process.env["POSTGRES_CONNECTION_STRING"](postgresql) ?? "memory://" (in memory pglite)
   const database = drizzle({
     schema: {
       starknetUsdcTransfers,
     },
-    connectionString,
   });
 
   return defineIndexer(StarknetStream)({
     streamUrl: "https://starknet.preview.apibara.org",
     finality: "accepted",
-    startingBlock,
+    startingBlock: BigInt(startingBlock),
     plugins: [
       drizzleStorage({
         db: database,

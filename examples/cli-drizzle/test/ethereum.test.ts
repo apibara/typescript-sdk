@@ -7,14 +7,11 @@ import { describe, expect, it } from "vitest";
 
 const vcr = createVcr();
 
-const connectionString = "memory://ethereum";
-
 describe("Ethereum USDC Transfers indexer", () => {
   it("should work", async () => {
     const indexer = createIndexer({
-      connectionString,
-      evm: { startingBlock: 10_000_000n },
-      starknet: { startingBlock: 800_000n },
+      evm: { startingBlock: 10_000_000 },
+      starknet: { startingBlock: 800_000 },
     });
 
     const testResult = await vcr.run("ethereum-usdc-transfers", indexer, {

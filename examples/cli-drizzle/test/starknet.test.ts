@@ -7,14 +7,12 @@ import { starknetUsdcTransfers } from "@/lib/schema";
 import { getTestDatabase } from "@apibara/plugin-drizzle/testing";
 
 const vcr = createVcr();
-const connectionString = "memory://starknet";
 
 describe("Starknet USDC Transfers indexer", () => {
   it("should work", async () => {
     const indexer = createIndexer({
-      connectionString,
-      evm: { startingBlock: 10_000_000n },
-      starknet: { startingBlock: 800_000n },
+      evm: { startingBlock: 10_000_000 },
+      starknet: { startingBlock: 800_000 },
     });
 
     const testResult = await vcr.run("starknet-usdc-transfers", indexer, {
