@@ -1,24 +1,29 @@
 import { type Cursor, normalizeCursor } from "@apibara/protocol";
-import { and, eq, gt, isNull, lt } from "drizzle-orm";
+import { and, eq, gt, isNull, lt, sql } from "drizzle-orm";
 import type {
   ExtractTablesWithRelations,
   TablesRelationalConfig,
 } from "drizzle-orm";
 import type { PgQueryResultHKT, PgTransaction } from "drizzle-orm/pg-core";
-import { integer, pgTable, primaryKey, text } from "drizzle-orm/pg-core";
+import { integer, pgSchema, primaryKey, text } from "drizzle-orm/pg-core";
+import { SCHEMA_NAME } from "./constants";
 import { DrizzleStorageError, deserialize, serialize } from "./utils";
 
-const CHECKPOINTS_TABLE_NAME = "__indexer_checkpoints";
-const FILTERS_TABLE_NAME = "__indexer_filters";
-const SCHEMA_VERSION_TABLE_NAME = "__indexer_schema_version";
+const CHECKPOINTS_TABLE_NAME = "checkpoints";
+const FILTERS_TABLE_NAME = "filters";
+const SCHEMA_VERSION_TABLE_NAME = "schema_version";
 
-export const checkpoints = pgTable(CHECKPOINTS_TABLE_NAME, {
+const schema = pgSchema(SCHEMA_NAME);
+
+/** This table is not used for migrations, its only used for ease of internal operations with drizzle. */
+export const checkpoints = schema.table(CHECKPOINTS_TABLE_NAME, {
   id: text("id").notNull().primaryKey(),
   orderKey: integer("order_key").notNull(),
   uniqueKey: text("unique_key"),
 });
 
-export const filters = pgTable(
+/** This table is not used for migrations, its only used for ease of internal operations with drizzle. */
+export const filters = schema.table(
   FILTERS_TABLE_NAME,
   {
     id: text("id").notNull(),
@@ -33,7 +38,8 @@ export const filters = pgTable(
   ],
 );
 
-export const schemaVersion = pgTable(SCHEMA_VERSION_TABLE_NAME, {
+/** This table is not used for migrations, its only used for ease of internal operations with drizzle. */
+export const schemaVersion = schema.table(SCHEMA_VERSION_TABLE_NAME, {
   k: integer("k").notNull().primaryKey(),
   version: integer("version").notNull(),
 });
@@ -53,13 +59,22 @@ export async function initializePersistentState<
   TSchema extends
     TablesRelationalConfig = ExtractTablesWithRelations<TFullSchema>,
 >(tx: PgTransaction<TQueryResult, TFullSchema, TSchema>) {
+  // Create schema if it doesn't exist
+  await tx.execute(
+    sql.raw(`
+      CREATE SCHEMA IF NOT EXISTS ${SCHEMA_NAME};
+  `),
+  );
+
   // Create schema version table
-  await tx.execute(`
-    CREATE TABLE IF NOT EXISTS ${SCHEMA_VERSION_TABLE_NAME} (
+  await tx.execute(
+    sql.raw(`
+    CREATE TABLE IF NOT EXISTS ${SCHEMA_NAME}.${SCHEMA_VERSION_TABLE_NAME} (
       k INTEGER PRIMARY KEY,
       version INTEGER NOT NULL
     );
-  `);
+  `),
+  );
 
   // Get current schema version
   const versionRows = await tx
@@ -80,23 +95,27 @@ export async function initializePersistentState<
   try {
     if (storedVersion === -1) {
       // First time initialization
-      await tx.execute(`
-        CREATE TABLE IF NOT EXISTS ${CHECKPOINTS_TABLE_NAME} (
+      await tx.execute(
+        sql.raw(`
+        CREATE TABLE IF NOT EXISTS ${SCHEMA_NAME}.${CHECKPOINTS_TABLE_NAME} (
           id TEXT PRIMARY KEY,
           order_key INTEGER NOT NULL,
           unique_key TEXT
         );
-      `);
+      `),
+      );
 
-      await tx.execute(`
-        CREATE TABLE IF NOT EXISTS ${FILTERS_TABLE_NAME} (
+      await tx.execute(
+        sql.raw(`
+        CREATE TABLE IF NOT EXISTS ${SCHEMA_NAME}.${FILTERS_TABLE_NAME} (
           id TEXT NOT NULL,
           filter TEXT NOT NULL,
           from_block INTEGER NOT NULL,
           to_block INTEGER DEFAULT NULL,
           PRIMARY KEY (id, from_block)
         );
-      `);
+      `),
+      );
 
       // Set initial schema version
       await tx.insert(schemaVersion).values({
