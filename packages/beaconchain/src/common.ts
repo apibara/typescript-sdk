@@ -59,6 +59,8 @@ export const ValidatorStatus = Schema.transform(
   },
 );
 
+export type ValidatorStatus = typeof ValidatorStatus.Type;
+
 const _B384 = Schema.TemplateLiteral(Schema.Literal("0x"), Schema.String);
 const B384Proto = Schema.Struct({
   x0: Schema.BigIntFromSelf,

@@ -49,6 +49,8 @@ export const Validator = Schema.Struct({
   withdrawableEpoch: Schema.BigIntFromSelf,
 });
 
+export type Validator = typeof Validator.Type;
+
 export const Blob = Schema.Struct({
   filterIds: Schema.Array(Schema.Number),
   blobIndex: Schema.Number,
@@ -60,6 +62,8 @@ export const Blob = Schema.Struct({
   transactionIndex: Schema.Number,
   transactionHash: B256,
 });
+
+export type Blob = typeof Blob.Type;
 
 export const Signature = Schema.Struct({
   r: Schema.optional(U256),
