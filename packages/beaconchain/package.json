@@ -1,6 +1,6 @@
 {
   "name": "@apibara/beaconchain",
-  "version": "2.1.0-beta.13",
+  "version": "2.1.0-beta.14",
   "type": "module",
   "files": [
     "dist",

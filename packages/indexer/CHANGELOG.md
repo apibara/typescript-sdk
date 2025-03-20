@@ -1,8 +1,16 @@
 # Change Log - @apibara/indexer
 
-<!-- This log was last generated on Mon, 17 Mar 2025 08:37:20 GMT and should not be manually modified. -->
+<!-- This log was last generated on Thu, 20 Mar 2025 16:44:14 GMT and should not be manually modified. -->
 
 <!-- Start content -->
+
+## 2.1.0-beta.14
+
+Thu, 20 Mar 2025 16:44:14 GMT
+
+### Changes
+
+- indexer: solve load issues with tracer and metrics by creating them in runtime (jadejajaipal5@gmail.com)
 
 ## 2.1.0-beta.12
 

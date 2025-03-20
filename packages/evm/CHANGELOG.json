@@ -2,6 +2,21 @@
   "name": "@apibara/evm",
   "entries": [
     {
+      "date": "Thu, 20 Mar 2025 16:44:14 GMT",
+      "version": "2.1.0-beta.14",
+      "tag": "@apibara/evm_v2.1.0-beta.14",
+      "comments": {
+        "prerelease": [
+          {
+            "author": "francesco@ceccon.me",
+            "package": "@apibara/evm",
+            "commit": "e2d3973154a3857fadad80cafc690b39dc370746",
+            "comment": "evm: export missing types"
+          }
+        ]
+      }
+    },
+    {
       "date": "Fri, 21 Feb 2025 19:49:06 GMT",
       "version": "2.1.0-beta.1",
       "tag": "@apibara/evm_v2.1.0-beta.1",

@@ -1,8 +1,16 @@
 # Change Log - @apibara/evm
 
-<!-- This log was last generated on Fri, 21 Feb 2025 19:49:06 GMT and should not be manually modified. -->
+<!-- This log was last generated on Thu, 20 Mar 2025 16:44:14 GMT and should not be manually modified. -->
 
 <!-- Start content -->
+
+## 2.1.0-beta.14
+
+Thu, 20 Mar 2025 16:44:14 GMT
+
+### Changes
+
+- evm: export missing types (francesco@ceccon.me)
 
 ## 2.1.0-beta.1
 

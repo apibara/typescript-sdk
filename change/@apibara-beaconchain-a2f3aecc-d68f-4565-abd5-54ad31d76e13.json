@@ -1,7 +1,0 @@
-{
-  "type": "prerelease",
-  "comment": "beaconchain: export missing types",
-  "packageName": "@apibara/beaconchain",
-  "email": "francesco@ceccon.me",
-  "dependentChangeType": "patch"
-}

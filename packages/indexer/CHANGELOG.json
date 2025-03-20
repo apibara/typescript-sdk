@@ -2,6 +2,21 @@
   "name": "@apibara/indexer",
   "entries": [
     {
+      "date": "Thu, 20 Mar 2025 16:44:14 GMT",
+      "version": "2.1.0-beta.14",
+      "tag": "@apibara/indexer_v2.1.0-beta.14",
+      "comments": {
+        "prerelease": [
+          {
+            "author": "jadejajaipal5@gmail.com",
+            "package": "@apibara/indexer",
+            "commit": "e2d3973154a3857fadad80cafc690b39dc370746",
+            "comment": "indexer: solve load issues with tracer and metrics by creating them in runtime"
+          }
+        ]
+      }
+    },
+    {
       "date": "Mon, 17 Mar 2025 08:37:20 GMT",
       "version": "2.1.0-beta.12",
       "tag": "@apibara/indexer_v2.1.0-beta.12",
