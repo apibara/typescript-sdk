@@ -9,7 +9,6 @@ import type {
   RolldownOptions,
   RolldownPluginOption,
 } from "rolldown";
-import { serialize } from "../utils/helper";
 import { appConfig } from "./plugins/config";
 import { indexers } from "./plugins/indexers";
 import { instrumentation } from "./plugins/instrumentation";
@@ -97,14 +96,14 @@ export function getRolldownConfig(apibara: Apibara): RolldownOptions {
 
 function getSerializedRuntimeConfig(apibara: Apibara) {
   try {
-    return serialize({
+    return JSON.stringify({
       runtimeConfig: apibara.options.runtimeConfig,
       preset: apibara.options.preset,
       presets: apibara.options.presets,
     });
   } catch (error) {
     throw new Error(
-      "Failed to serialize runtime config. Please ensure all values in your runtime configuration are JSON serializable. BigInt values are supported, but functions, symbols, etc. are not. Check your configuration for non-serializable values.",
+      "Failed to serialize runtime config. Please ensure all values in your runtime configuration are JSON serializable.",
       { cause: error },
     );
   }
