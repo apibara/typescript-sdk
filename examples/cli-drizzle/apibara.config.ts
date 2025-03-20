@@ -6,7 +6,7 @@ export default defineConfig({
       startingBlock: 215_30_000n,
     },
     starknet: {
-      startingBlock: 10_30_000n,
+      startingBlock: 12_45_000n,
     },
     connectionString: process.env["POSTGRES_CONNECTION_STRING"] ?? "memory://",
   },
