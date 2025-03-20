@@ -58,7 +58,7 @@ export type PgliteDrizzleOptions = {
   type?: "pglite";
   /**
    * Connection string to use for the database
-   * @default "memory://pglite"
+   * @default process.env["POSTGRES_CONNECTION_STRING"] ?? "memory://pglite"
    */
   connectionString?: string;
   /**
@@ -102,6 +102,9 @@ export type Database<
 
 /**
  * Creates a new Drizzle database instance based on the provided options
+ *
+ * @important connectionString defaults to process.env["POSTGRES_CONNECTION_STRING"], if not set, it defaults to "memory://" (in-memory pglite)
+ *
  * @param options - Configuration options for the database connection
  * @returns A configured Drizzle database instance
  * @throws {Error} If an invalid database type is specified
@@ -119,7 +122,7 @@ export function drizzle<
   },
 ): Database<TOptions, TSchema> {
   const {
-    connectionString = "memory://",
+    connectionString = process.env["POSTGRES_CONNECTION_STRING"] ?? "memory://",
     schema,
     type = "pglite",
     config,
