@@ -13,7 +13,7 @@
     "@apibara/evm": "workspace:*",
     "@apibara/protocol": "workspace:*",
     "citty": "^0.1.6",
-    "consola": "^3.2.3",
+    "consola": "^3.4.2",
     "nice-grpc": "^2.1.8",
     "viem": "^2.12.4"
   },
