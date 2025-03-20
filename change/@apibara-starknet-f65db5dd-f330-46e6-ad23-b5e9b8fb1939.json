@@ -1,0 +1,7 @@
+{
+  "type": "prerelease",
+  "comment": "starknet: export missing types",
+  "packageName": "@apibara/starknet",
+  "email": "francesco@ceccon.me",
+  "dependentChangeType": "patch"
+}

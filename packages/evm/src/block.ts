@@ -20,6 +20,8 @@ export const Bloom = Schema.transform(
   },
 );
 
+export type Bloom = typeof Bloom.Type;
+
 export const TransactionStatus = Schema.transform(
   Schema.Enums(proto.data.TransactionStatus),
   Schema.Literal("unknown", "succeeded", "reverted"),
@@ -78,10 +80,14 @@ export const Withdrawal = Schema.Struct({
   amount: Schema.BigIntFromSelf,
 });
 
+export type Withdrawal = typeof Withdrawal.Type;
+
 export const AccessListItem = Schema.Struct({
   address: Address,
   storageKeys: Schema.Array(B256),
 });
+
+export type AccessListItem = typeof AccessListItem.Type;
 
 export const Signature = Schema.Struct({
   r: U256,
@@ -89,6 +95,8 @@ export const Signature = Schema.Struct({
   v: U256,
   YParity: Schema.optional(Schema.Boolean),
 });
+
+export type Signature = typeof Signature.Type;
 
 export const Transaction = Schema.Struct({
   filterIds: Schema.Array(Schema.Number),
@@ -112,6 +120,8 @@ export const Transaction = Schema.Struct({
   transactionStatus: TransactionStatus,
 });
 
+export type Transaction = typeof Transaction.Type;
+
 export const TransactionReceipt = Schema.Struct({
   filterIds: Schema.Array(Schema.Number),
   transactionIndex: Schema.Number,
@@ -128,6 +138,8 @@ export const TransactionReceipt = Schema.Struct({
   blobGasPrice: Schema.optional(U128),
   transactionStatus: TransactionStatus,
 });
+
+export type TransactionReceipt = typeof TransactionReceipt.Type;
 
 export const Log = Schema.Struct({
   filterIds: Schema.Array(Schema.Number),

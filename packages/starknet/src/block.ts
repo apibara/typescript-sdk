@@ -14,6 +14,8 @@ export const ResourcePrice = Schema.Struct({
   priceInWei: Schema.optional(FieldElement),
 });
 
+export type ResourcePrice = typeof ResourcePrice.Type;
+
 /** How data is posted to L1. */
 export const L1DataAvailabilityMode = Schema.transform(
   Schema.Enums(proto.data.L1DataAvailabilityMode),
@@ -34,6 +36,8 @@ export const L1DataAvailabilityMode = Schema.transform(
     },
   },
 );
+
+export type L1DataAvailabilityMode = typeof L1DataAvailabilityMode.Type;
 
 export const TransactionStatus = Schema.transform(
   Schema.Enums(proto.data.TransactionStatus),
@@ -75,15 +79,21 @@ export const U128 = Schema.transform(
   },
 );
 
+export type U128 = typeof U128.Type;
+
 export const ResourceBounds = Schema.Struct({
   maxAmount: Schema.BigIntFromSelf,
   maxPricePerUnit: U128,
 });
 
+export type ResourceBounds = typeof ResourceBounds.Type;
+
 export const ResourceBoundsMapping = Schema.Struct({
   l1Gas: ResourceBounds,
   l2Gas: ResourceBounds,
 });
+
+export type ResourceBoundsMapping = typeof ResourceBoundsMapping.Type;
 
 export const DataAvailabilityMode = Schema.transform(
   Schema.Enums(proto.data.DataAvailabilityMode),
@@ -104,6 +114,8 @@ export const DataAvailabilityMode = Schema.transform(
     },
   },
 );
+
+export type DataAvailabilityMode = typeof DataAvailabilityMode.Type;
 
 /** Starknet block header.
  *
@@ -160,6 +172,8 @@ export const InvokeTransactionV0 = Schema.Struct({
   }),
 });
 
+export type InvokeTransactionV0 = typeof InvokeTransactionV0.Type;
+
 export const InvokeTransactionV1 = Schema.Struct({
   _tag: tag("invokeV1"),
   invokeV1: Schema.Struct({
@@ -170,6 +184,8 @@ export const InvokeTransactionV1 = Schema.Struct({
     nonce: FieldElement,
   }),
 });
+
+export type InvokeTransactionV1 = typeof InvokeTransactionV1.Type;
 
 export const InvokeTransactionV3 = Schema.Struct({
   _tag: tag("invokeV3"),
@@ -187,6 +203,8 @@ export const InvokeTransactionV3 = Schema.Struct({
   }),
 });
 
+export type InvokeTransactionV3 = typeof InvokeTransactionV3.Type;
+
 export const L1HandlerTransaction = Schema.Struct({
   _tag: tag("l1Handler"),
   l1Handler: Schema.Struct({
@@ -197,6 +215,8 @@ export const L1HandlerTransaction = Schema.Struct({
   }),
 });
 
+export type L1HandlerTransaction = typeof L1HandlerTransaction.Type;
+
 export const DeployTransaction = Schema.Struct({
   _tag: tag("deploy"),
   deploy: Schema.Struct({
@@ -205,6 +225,8 @@ export const DeployTransaction = Schema.Struct({
     classHash: FieldElement,
   }),
 });
+
+export type DeployTransaction = typeof DeployTransaction.Type;
 
 export const DeclareTransactionV0 = Schema.Struct({
   _tag: tag("declareV0"),
@@ -215,6 +237,8 @@ export const DeclareTransactionV0 = Schema.Struct({
     classHash: FieldElement,
   }),
 });
+
+export type DeclareTransactionV0 = typeof DeclareTransactionV0.Type;
 
 export const DeclareTransactionV1 = Schema.Struct({
   _tag: tag("declareV1"),
@@ -227,6 +251,8 @@ export const DeclareTransactionV1 = Schema.Struct({
   }),
 });
 
+export type DeclareTransactionV1 = typeof DeclareTransactionV1.Type;
+
 export const DeclareTransactionV2 = Schema.Struct({
   _tag: tag("declareV2"),
   declareV2: Schema.Struct({
@@ -238,6 +264,8 @@ export const DeclareTransactionV2 = Schema.Struct({
     classHash: FieldElement,
   }),
 });
+
+export type DeclareTransactionV2 = typeof DeclareTransactionV2.Type;
 
 export const DeclareTransactionV3 = Schema.Struct({
   _tag: tag("declareV3"),
@@ -256,6 +284,8 @@ export const DeclareTransactionV3 = Schema.Struct({
   }),
 });
 
+export type DeclareTransactionV3 = typeof DeclareTransactionV3.Type;
+
 export const DeployAccountTransactionV1 = Schema.Struct({
   _tag: tag("deployAccountV1"),
   deployAccountV1: Schema.Struct({
@@ -267,6 +297,8 @@ export const DeployAccountTransactionV1 = Schema.Struct({
     classHash: FieldElement,
   }),
 });
+
+export type DeployAccountTransactionV1 = typeof DeployAccountTransactionV1.Type;
 
 export const DeployAccountTransactionV3 = Schema.Struct({
   _tag: tag("deployAccountV3"),
@@ -283,6 +315,8 @@ export const DeployAccountTransactionV3 = Schema.Struct({
     feeDataAvailabilityMode: DataAvailabilityMode,
   }),
 });
+
+export type DeployAccountTransactionV3 = typeof DeployAccountTransactionV3.Type;
 
 /** A transaction.
  *
@@ -328,10 +362,14 @@ export const PriceUnit = Schema.transform(
   },
 );
 
+export type PriceUnit = typeof PriceUnit.Type;
+
 export const FeePayment = Schema.Struct({
   amount: FieldElement,
   unit: PriceUnit,
 });
+
+export type FeePayment = typeof FeePayment.Type;
 
 export const ComputationResources = Schema.Struct({
   steps: Schema.BigIntFromSelf,
@@ -346,20 +384,28 @@ export const ComputationResources = Schema.Struct({
   segmentArenaBuiltin: Schema.optional(Schema.BigIntFromSelf),
 });
 
+export type ComputationResources = typeof ComputationResources.Type;
+
 export const DataAvailabilityResources = Schema.Struct({
   l1Gas: Schema.BigIntFromSelf,
   l1DataGas: Schema.BigIntFromSelf,
 });
+
+export type DataAvailabilityResources = typeof DataAvailabilityResources.Type;
 
 export const ExecutionResources = Schema.Struct({
   computation: ComputationResources,
   dataAvailability: DataAvailabilityResources,
 });
 
+export type ExecutionResources = typeof ExecutionResources.Type;
+
 export const ExecutionSucceeded = Schema.Struct({
   _tag: tag("succeeded"),
   succeeded: Schema.Struct({}),
 });
+
+export type ExecutionSucceeded = typeof ExecutionSucceeded.Type;
 
 export const ExecutionReverted = Schema.Struct({
   _tag: tag("reverted"),
@@ -367,6 +413,8 @@ export const ExecutionReverted = Schema.Struct({
     reason: Schema.optional(Schema.String),
   }),
 });
+
+export type ExecutionReverted = typeof ExecutionReverted.Type;
 
 /** Common fields for all transaction receipts. */
 export const TransactionReceiptMeta = Schema.Struct({
@@ -377,10 +425,14 @@ export const TransactionReceiptMeta = Schema.Struct({
   executionResult: Schema.Union(ExecutionSucceeded, ExecutionReverted),
 });
 
+export type TransactionReceiptMeta = typeof TransactionReceiptMeta.Type;
+
 export const InvokeTransactionReceipt = Schema.Struct({
   _tag: tag("invoke"),
   invoke: Schema.Struct({}),
 });
+
+export type InvokeTransactionReceipt = typeof InvokeTransactionReceipt.Type;
 
 export const L1HandlerTransactionReceipt = Schema.Struct({
   _tag: tag("l1Handler"),
@@ -389,10 +441,15 @@ export const L1HandlerTransactionReceipt = Schema.Struct({
   }),
 });
 
+export type L1HandlerTransactionReceipt =
+  typeof L1HandlerTransactionReceipt.Type;
+
 export const DeclareTransactionReceipt = Schema.Struct({
   _tag: tag("declare"),
   declare: Schema.Struct({}),
 });
+
+export type DeclareTransactionReceipt = typeof DeclareTransactionReceipt.Type;
 
 export const DeployTransactionReceipt = Schema.Struct({
   _tag: tag("deploy"),
@@ -401,12 +458,17 @@ export const DeployTransactionReceipt = Schema.Struct({
   }),
 });
 
+export type DeployTransactionReceipt = typeof DeployTransactionReceipt.Type;
+
 export const DeployAccountTransactionReceipt = Schema.Struct({
   _tag: tag("deployAccount"),
   deployAccount: Schema.Struct({
     contractAddress: FieldElement,
   }),
 });
+
+export type DeployAccountTransactionReceipt =
+  typeof DeployAccountTransactionReceipt.Type;
 
 /** A transaction receipt.
  *

@@ -147,55 +147,79 @@ export const InvokeTransactionV0Filter = Schema.Struct({
   invokeV0: Schema.Struct({}),
 });
 
+export type InvokeTransactionV0Filter = typeof InvokeTransactionV0Filter.Type;
+
 export const InvokeTransactionV1Filter = Schema.Struct({
   _tag: tag("invokeV1"),
   invokeV1: Schema.Struct({}),
 });
+
+export type InvokeTransactionV1Filter = typeof InvokeTransactionV1Filter.Type;
 
 export const InvokeTransactionV3Filter = Schema.Struct({
   _tag: tag("invokeV3"),
   invokeV3: Schema.Struct({}),
 });
 
+export type InvokeTransactionV3Filter = typeof InvokeTransactionV3Filter.Type;
+
 export const DeployTransactionFilter = Schema.Struct({
   _tag: tag("deploy"),
   deploy: Schema.Struct({}),
 });
+
+export type DeployTransactionFilter = typeof DeployTransactionFilter.Type;
 
 export const DeclareV0TransactionFilter = Schema.Struct({
   _tag: tag("declareV0"),
   declareV0: Schema.Struct({}),
 });
 
+export type DeclareV0TransactionFilter = typeof DeclareV0TransactionFilter.Type;
+
 export const DeclareV1TransactionFilter = Schema.Struct({
   _tag: tag("declareV1"),
   declareV1: Schema.Struct({}),
 });
+
+export type DeclareV1TransactionFilter = typeof DeclareV1TransactionFilter.Type;
 
 export const DeclareV2TransactionFilter = Schema.Struct({
   _tag: tag("declareV2"),
   declareV2: Schema.Struct({}),
 });
 
+export type DeclareV2TransactionFilter = typeof DeclareV2TransactionFilter.Type;
+
 export const DeclareV3TransactionFilter = Schema.Struct({
   _tag: tag("declareV3"),
   declareV3: Schema.Struct({}),
 });
+
+export type DeclareV3TransactionFilter = typeof DeclareV3TransactionFilter.Type;
 
 export const L1HandlerTransactionFilter = Schema.Struct({
   _tag: tag("l1Handler"),
   l1Handler: Schema.Struct({}),
 });
 
+export type L1HandlerTransactionFilter = typeof L1HandlerTransactionFilter.Type;
+
 export const DeployAccountV1TransactionFilter = Schema.Struct({
   _tag: tag("deployAccountV1"),
   deployAccountV1: Schema.Struct({}),
 });
 
+export type DeployAccountV1TransactionFilter =
+  typeof DeployAccountV1TransactionFilter.Type;
+
 export const DeployAccountV3TransactionFilter = Schema.Struct({
   _tag: tag("deployAccountV3"),
   deployAccountV3: Schema.Struct({}),
 });
+
+export type DeployAccountV3TransactionFilter =
+  typeof DeployAccountV3TransactionFilter.Type;
 
 /** Filter transactions.
  *
@@ -275,6 +299,8 @@ export const ContractChangeFilter = Schema.Struct({
   ),
 });
 
+export type ContractChangeFilter = typeof ContractChangeFilter.Type;
+
 /** Filter updates to nonces.
  *
  * @prop contractAddress Filter by contract address.
@@ -283,6 +309,8 @@ export const NonceUpdateFilter = Schema.Struct({
   id: Schema.optional(Schema.Number),
   contractAddress: Schema.optional(FieldElement),
 });
+
+export type NonceUpdateFilter = typeof NonceUpdateFilter.Type;
 
 export const Filter = Schema.Struct({
   header: Schema.optional(HeaderFilter),

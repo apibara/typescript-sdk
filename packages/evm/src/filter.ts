@@ -103,6 +103,8 @@ export const Topic = Schema.transform(
   },
 );
 
+export type Topic = typeof Topic.Type;
+
 export const LogFilter = Schema.Struct({
   id: Schema.optional(Schema.Number),
   address: Schema.optional(Address),
