@@ -1,0 +1,7 @@
+{
+  "type": "prerelease",
+  "comment": "plugin-drizzle: relax peer dependencies version",
+  "packageName": "@apibara/plugin-drizzle",
+  "email": "francesco@ceccon.me",
+  "dependentChangeType": "patch"
+}
