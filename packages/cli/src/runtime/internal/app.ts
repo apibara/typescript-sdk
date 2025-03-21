@@ -8,6 +8,12 @@ import {
   inMemoryPersistence,
   logger,
 } from "@apibara/indexer/plugins";
+import {
+  type CreateClientOptions,
+  Metadata,
+  type StreamConfig,
+  createClient,
+} from "@apibara/protocol";
 import consola from "consola";
 import { config } from "#apibara-internal-virtual/config";
 import { indexers } from "#apibara-internal-virtual/indexers";
@@ -83,4 +89,28 @@ export function createIndexer(indexerName: string, preset?: string) {
   ];
 
   return _createIndexer(definition);
+}
+
+export function createAuthenticatedClient(
+  config: StreamConfig<unknown, unknown>,
+  streamUrl: string,
+  options?: CreateClientOptions,
+) {
+  const dnaToken = process.env.DNA_TOKEN;
+  if (!dnaToken) {
+    consola.warn(
+      "DNA_TOKEN environment variable is not set. Trying to connect without authentication.",
+    );
+  }
+
+  return createClient(config, streamUrl, {
+    ...options,
+    defaultCallOptions: {
+      "*": {
+        metadata: Metadata({
+          Authorization: `Bearer ${dnaToken}`,
+        }),
+      },
+    },
+  });
 }

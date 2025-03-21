@@ -1,7 +1,10 @@
 import { runWithReconnect } from "@apibara/indexer";
-import { createClient } from "@apibara/protocol";
 import { defineCommand, runMain } from "citty";
-import { availableIndexers, createIndexer } from "./internal/app";
+import {
+  availableIndexers,
+  createAuthenticatedClient,
+  createIndexer,
+} from "./internal/app";
 
 const startCommand = defineCommand({
   meta: {
@@ -41,7 +44,7 @@ const startCommand = defineCommand({
           return;
         }
 
-        const client = createClient(
+        const client = createAuthenticatedClient(
           indexerInstance.streamConfig,
           indexerInstance.options.streamUrl,
         );

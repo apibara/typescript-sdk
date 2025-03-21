@@ -1,0 +1,7 @@
+{
+  "type": "prerelease",
+  "comment": "chore: upgrade consola package",
+  "packageName": "@apibara/indexer",
+  "email": "jadejajaipal5@gmail.com",
+  "dependentChangeType": "patch"
+}

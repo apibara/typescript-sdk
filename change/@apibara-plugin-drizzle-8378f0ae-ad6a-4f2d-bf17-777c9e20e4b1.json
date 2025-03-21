@@ -1,0 +1,7 @@
+{
+  "type": "prerelease",
+  "comment": "plugin-drizzle: use seperate schema and default connectionString to env",
+  "packageName": "@apibara/plugin-drizzle",
+  "email": "jadejajaipal5@gmail.com",
+  "dependentChangeType": "patch"
+}

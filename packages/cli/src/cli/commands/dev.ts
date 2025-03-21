@@ -118,12 +118,14 @@ export default defineCommand({
           stdio: "inherit",
         });
 
-        childProcess.on("close", (code) => {
-          if (code !== null) {
-            apibara.logger.log(
-              `Indexers process exited with code ${colors.red(code)}`,
-            );
-          }
+        childProcess.on("close", (code, signal) => {
+          console.log();
+          apibara.logger.log(
+            `Indexers process exited${
+              code !== null ? ` with code ${colors.red(code)}` : ""
+            }`,
+          );
+          process.exit(code ?? 0);
         });
       });
     };
