@@ -2,6 +2,21 @@
   "name": "@apibara/plugin-mongo",
   "entries": [
     {
+      "date": "Fri, 21 Mar 2025 13:15:35 GMT",
+      "version": "2.1.0-beta.16",
+      "tag": "@apibara/plugin-mongo_v2.1.0-beta.16",
+      "comments": {
+        "prerelease": [
+          {
+            "author": "francesco@ceccon.me",
+            "package": "@apibara/plugin-mongo",
+            "commit": "0c31a34411218be75652cb2bb48dbd04bc596760",
+            "comment": "plugin-mongo: fix error on connection and disable retry"
+          }
+        ]
+      }
+    },
+    {
       "date": "Fri, 21 Mar 2025 11:03:55 GMT",
       "version": "2.1.0-beta.15",
       "tag": "@apibara/plugin-mongo_v2.1.0-beta.15",

@@ -1,8 +1,16 @@
 # Change Log - @apibara/plugin-mongo
 
-<!-- This log was last generated on Fri, 21 Mar 2025 11:03:55 GMT and should not be manually modified. -->
+<!-- This log was last generated on Fri, 21 Mar 2025 13:15:35 GMT and should not be manually modified. -->
 
 <!-- Start content -->
+
+## 2.1.0-beta.16
+
+Fri, 21 Mar 2025 13:15:35 GMT
+
+### Changes
+
+- plugin-mongo: fix error on connection and disable retry (francesco@ceccon.me)
 
 ## 2.1.0-beta.15
 
