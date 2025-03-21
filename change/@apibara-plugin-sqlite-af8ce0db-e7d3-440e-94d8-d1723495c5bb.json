@@ -1,0 +1,7 @@
+{
+  "type": "prerelease",
+  "comment": "plugin-drizzle: less strict cursor check",
+  "packageName": "@apibara/plugin-sqlite",
+  "email": "francesco@ceccon.me",
+  "dependentChangeType": "patch"
+}

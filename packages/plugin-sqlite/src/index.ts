@@ -1,6 +1,5 @@
 import { useIndexerContext } from "@apibara/indexer";
 import { defineIndexerPlugin } from "@apibara/indexer/plugins";
-import { isCursor } from "@apibara/protocol";
 import type { Cursor, DataFinality } from "@apibara/protocol";
 import type { Database as SqliteDatabase } from "better-sqlite3";
 
@@ -218,7 +217,7 @@ export function sqliteStorage<TFilter, TBlock>({
           throw new SqliteStorageError("finality is undefined");
         }
 
-        if (!endCursor || !isCursor(endCursor)) {
+        if (!endCursor) {
           throw new SqliteStorageError(
             "endCursor is undefined or not a cursor",
           );

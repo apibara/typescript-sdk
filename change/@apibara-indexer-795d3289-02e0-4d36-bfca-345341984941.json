@@ -1,0 +1,7 @@
+{
+  "type": "prerelease",
+  "comment": "plugin-drizzle: fix state persistence when switching back to backfill",
+  "packageName": "@apibara/indexer",
+  "email": "francesco@ceccon.me",
+  "dependentChangeType": "patch"
+}

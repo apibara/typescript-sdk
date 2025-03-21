@@ -174,7 +174,9 @@ export async function persistState<
           target: checkpoints.id,
           set: {
             orderKey: Number(endCursor.orderKey),
-            uniqueKey: endCursor.uniqueKey,
+            // Explicitly set the unique key to `null` to indicate that it has been deleted
+            // Otherwise drizzle will not update its value.
+            uniqueKey: endCursor.uniqueKey ? endCursor.uniqueKey : null,
           },
         });
 
