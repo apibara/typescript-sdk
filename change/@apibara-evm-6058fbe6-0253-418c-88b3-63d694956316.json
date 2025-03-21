@@ -1,0 +1,7 @@
+{
+  "type": "prerelease",
+  "comment": "evm: add transaction traces",
+  "packageName": "@apibara/evm",
+  "email": "francesco@ceccon.me",
+  "dependentChangeType": "patch"
+}

@@ -53,6 +53,147 @@ export function transactionStatusToJSON(object: TransactionStatus): string {
   }
 }
 
+export enum CallType {
+  UNSPECIFIED = 0,
+  CALL = 1,
+  CALL_CODE = 2,
+  DELEGATE_CALL = 3,
+  STATIC_CALL = 4,
+  AUTH_CALL = 5,
+  UNRECOGNIZED = -1,
+}
+
+export function callTypeFromJSON(object: any): CallType {
+  switch (object) {
+    case 0:
+    case "CALL_TYPE_UNSPECIFIED":
+      return CallType.UNSPECIFIED;
+    case 1:
+    case "CALL_TYPE_CALL":
+      return CallType.CALL;
+    case 2:
+    case "CALL_TYPE_CALL_CODE":
+      return CallType.CALL_CODE;
+    case 3:
+    case "CALL_TYPE_DELEGATE_CALL":
+      return CallType.DELEGATE_CALL;
+    case 4:
+    case "CALL_TYPE_STATIC_CALL":
+      return CallType.STATIC_CALL;
+    case 5:
+    case "CALL_TYPE_AUTH_CALL":
+      return CallType.AUTH_CALL;
+    case -1:
+    case "UNRECOGNIZED":
+    default:
+      return CallType.UNRECOGNIZED;
+  }
+}
+
+export function callTypeToJSON(object: CallType): string {
+  switch (object) {
+    case CallType.UNSPECIFIED:
+      return "CALL_TYPE_UNSPECIFIED";
+    case CallType.CALL:
+      return "CALL_TYPE_CALL";
+    case CallType.CALL_CODE:
+      return "CALL_TYPE_CALL_CODE";
+    case CallType.DELEGATE_CALL:
+      return "CALL_TYPE_DELEGATE_CALL";
+    case CallType.STATIC_CALL:
+      return "CALL_TYPE_STATIC_CALL";
+    case CallType.AUTH_CALL:
+      return "CALL_TYPE_AUTH_CALL";
+    case CallType.UNRECOGNIZED:
+    default:
+      return "UNRECOGNIZED";
+  }
+}
+
+export enum CreationMethod {
+  UNSPECIFIED = 0,
+  CREATE = 1,
+  CREATE2 = 2,
+  EOF_CREATE = 3,
+  UNRECOGNIZED = -1,
+}
+
+export function creationMethodFromJSON(object: any): CreationMethod {
+  switch (object) {
+    case 0:
+    case "CREATION_METHOD_UNSPECIFIED":
+      return CreationMethod.UNSPECIFIED;
+    case 1:
+    case "CREATION_METHOD_CREATE":
+      return CreationMethod.CREATE;
+    case 2:
+    case "CREATION_METHOD_CREATE2":
+      return CreationMethod.CREATE2;
+    case 3:
+    case "CREATION_METHOD_EOF_CREATE":
+      return CreationMethod.EOF_CREATE;
+    case -1:
+    case "UNRECOGNIZED":
+    default:
+      return CreationMethod.UNRECOGNIZED;
+  }
+}
+
+export function creationMethodToJSON(object: CreationMethod): string {
+  switch (object) {
+    case CreationMethod.UNSPECIFIED:
+      return "CREATION_METHOD_UNSPECIFIED";
+    case CreationMethod.CREATE:
+      return "CREATION_METHOD_CREATE";
+    case CreationMethod.CREATE2:
+      return "CREATION_METHOD_CREATE2";
+    case CreationMethod.EOF_CREATE:
+      return "CREATION_METHOD_EOF_CREATE";
+    case CreationMethod.UNRECOGNIZED:
+    default:
+      return "UNRECOGNIZED";
+  }
+}
+
+export enum RewardType {
+  UNSPECIFIED = 0,
+  BLOCK = 1,
+  UNCLE = 2,
+  UNRECOGNIZED = -1,
+}
+
+export function rewardTypeFromJSON(object: any): RewardType {
+  switch (object) {
+    case 0:
+    case "REWARD_TYPE_UNSPECIFIED":
+      return RewardType.UNSPECIFIED;
+    case 1:
+    case "REWARD_TYPE_BLOCK":
+      return RewardType.BLOCK;
+    case 2:
+    case "REWARD_TYPE_UNCLE":
+      return RewardType.UNCLE;
+    case -1:
+    case "UNRECOGNIZED":
+    default:
+      return RewardType.UNRECOGNIZED;
+  }
+}
+
+export function rewardTypeToJSON(object: RewardType): string {
+  switch (object) {
+    case RewardType.UNSPECIFIED:
+      return "REWARD_TYPE_UNSPECIFIED";
+    case RewardType.BLOCK:
+      return "REWARD_TYPE_BLOCK";
+    case RewardType.UNCLE:
+      return "REWARD_TYPE_UNCLE";
+    case RewardType.UNRECOGNIZED:
+    default:
+      return "UNRECOGNIZED";
+  }
+}
+
 /** Requested data, grouped by block. */
 export interface Block {
   /** The header. */
@@ -72,7 +213,11 @@ export interface Block {
     | readonly TransactionReceipt[]
     | undefined;
   /** List of logs. */
-  readonly logs?: readonly Log[] | undefined;
+  readonly logs?:
+    | readonly Log[]
+    | undefined;
+  /** List of transaction traces. */
+  readonly traces?: readonly TransactionTrace[] | undefined;
 }
 
 /** Block header. */
@@ -384,8 +529,139 @@ export interface AccessListItem {
   readonly storageKeys?: readonly B256[] | undefined;
 }
 
+export interface TransactionTrace {
+  readonly filterIds?:
+    | readonly number[]
+    | undefined;
+  /** Index of the transaction in the block. */
+  readonly transactionIndex?:
+    | number
+    | undefined;
+  /** Transaction hash. */
+  readonly transactionHash?:
+    | B256
+    | undefined;
+  /** Traces. */
+  readonly traces?: readonly Trace[] | undefined;
+}
+
+export interface Trace {
+  readonly action?:
+    | { readonly $case: "call"; readonly call: CallAction }
+    | { readonly $case: "create"; readonly create: CreateAction }
+    | { readonly $case: "selfDestruct"; readonly selfDestruct: SelfDestructAction }
+    | { readonly $case: "reward"; readonly reward: RewardAction }
+    | undefined;
+  /** Error message if the transaction failed. */
+  readonly error?: string | undefined;
+  readonly output?:
+    | { readonly $case: "callOutput"; readonly callOutput: CallOutput }
+    | { readonly $case: "createOutput"; readonly createOutput: CreateOutput }
+    | undefined;
+  /** Number of sub traces. */
+  readonly subtraces?:
+    | number
+    | undefined;
+  /** The identifier of this trace in the trace tree. */
+  readonly traceAddress?: readonly number[] | undefined;
+}
+
+export interface CallAction {
+  /** Address of the sending account. */
+  readonly fromAddress?:
+    | Address
+    | undefined;
+  /** Call type. */
+  readonly type?:
+    | CallType
+    | undefined;
+  /** The gas available to execute the call. */
+  readonly gas?:
+    | bigint
+    | undefined;
+  /** Input data provided by the call. */
+  readonly input?:
+    | Uint8Array
+    | undefined;
+  /** Target of the destination address. */
+  readonly toAddress?:
+    | Address
+    | undefined;
+  /** Value transferred to the destination account. */
+  readonly value?: U256 | undefined;
+}
+
+export interface CreateAction {
+  /** Address of the sending account. */
+  readonly fromAddress?:
+    | Address
+    | undefined;
+  /** The gas available to execute the call. */
+  readonly gas?:
+    | bigint
+    | undefined;
+  /** Input data provided by the call. */
+  readonly init?:
+    | Uint8Array
+    | undefined;
+  /** Value transferred to the ne account. */
+  readonly value?:
+    | U256
+    | undefined;
+  /** Contract creation method. */
+  readonly creationMethod?: CreationMethod | undefined;
+}
+
+export interface SelfDestructAction {
+  /** The destroyed address. */
+  readonly address?:
+    | Address
+    | undefined;
+  /** Balance of the destroyed account before destruct. */
+  readonly balance?:
+    | U256
+    | undefined;
+  /** The heir address. */
+  readonly refundAddress?: Address | undefined;
+}
+
+export interface RewardAction {
+  /** The author's address. */
+  readonly author?:
+    | Address
+    | undefined;
+  /** Reward type. */
+  readonly type?:
+    | RewardType
+    | undefined;
+  /** The reward's value. */
+  readonly value?: U256 | undefined;
+}
+
+export interface CallOutput {
+  /** Gas used. */
+  readonly gasUsed?:
+    | bigint
+    | undefined;
+  /** Output data. */
+  readonly output?: Uint8Array | undefined;
+}
+
+export interface CreateOutput {
+  /** Contract address. */
+  readonly address?:
+    | Address
+    | undefined;
+  /** Code */
+  readonly code?:
+    | Uint8Array
+    | undefined;
+  /** Gas used. */
+  readonly gasUsed?: bigint | undefined;
+}
+
 function createBaseBlock(): Block {
-  return { header: undefined, withdrawals: [], transactions: [], receipts: [], logs: [] };
+  return { header: undefined, withdrawals: [], transactions: [], receipts: [], logs: [], traces: [] };
 }
 
 export const Block = {
@@ -411,6 +687,11 @@ export const Block = {
     if (message.logs !== undefined && message.logs.length !== 0) {
       for (const v of message.logs) {
         Log.encode(v!, writer.uint32(42).fork()).ldelim();
+      }
+    }
+    if (message.traces !== undefined && message.traces.length !== 0) {
+      for (const v of message.traces) {
+        TransactionTrace.encode(v!, writer.uint32(50).fork()).ldelim();
       }
     }
     return writer;
@@ -458,6 +739,13 @@ export const Block = {
 
           message.logs!.push(Log.decode(reader, reader.uint32()));
           continue;
+        case 6:
+          if (tag !== 50) {
+            break;
+          }
+
+          message.traces!.push(TransactionTrace.decode(reader, reader.uint32()));
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -480,6 +768,9 @@ export const Block = {
         ? object.receipts.map((e: any) => TransactionReceipt.fromJSON(e))
         : [],
       logs: globalThis.Array.isArray(object?.logs) ? object.logs.map((e: any) => Log.fromJSON(e)) : [],
+      traces: globalThis.Array.isArray(object?.traces)
+        ? object.traces.map((e: any) => TransactionTrace.fromJSON(e))
+        : [],
     };
   },
 
@@ -500,6 +791,9 @@ export const Block = {
     if (message.logs?.length) {
       obj.logs = message.logs.map((e) => Log.toJSON(e));
     }
+    if (message.traces?.length) {
+      obj.traces = message.traces.map((e) => TransactionTrace.toJSON(e));
+    }
     return obj;
   },
 
@@ -515,6 +809,7 @@ export const Block = {
     message.transactions = object.transactions?.map((e) => Transaction.fromPartial(e)) || [];
     message.receipts = object.receipts?.map((e) => TransactionReceipt.fromPartial(e)) || [];
     message.logs = object.logs?.map((e) => Log.fromPartial(e)) || [];
+    message.traces = object.traces?.map((e) => TransactionTrace.fromPartial(e)) || [];
     return message;
   },
 };
@@ -2215,6 +2510,993 @@ export const AccessListItem = {
       ? Address.fromPartial(object.address)
       : undefined;
     message.storageKeys = object.storageKeys?.map((e) => B256.fromPartial(e)) || [];
+    return message;
+  },
+};
+
+function createBaseTransactionTrace(): TransactionTrace {
+  return { filterIds: [], transactionIndex: 0, transactionHash: undefined, traces: [] };
+}
+
+export const TransactionTrace = {
+  encode(message: TransactionTrace, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.filterIds !== undefined && message.filterIds.length !== 0) {
+      writer.uint32(10).fork();
+      for (const v of message.filterIds) {
+        writer.uint32(v);
+      }
+      writer.ldelim();
+    }
+    if (message.transactionIndex !== undefined && message.transactionIndex !== 0) {
+      writer.uint32(16).uint32(message.transactionIndex);
+    }
+    if (message.transactionHash !== undefined) {
+      B256.encode(message.transactionHash, writer.uint32(26).fork()).ldelim();
+    }
+    if (message.traces !== undefined && message.traces.length !== 0) {
+      for (const v of message.traces) {
+        Trace.encode(v!, writer.uint32(34).fork()).ldelim();
+      }
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): TransactionTrace {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseTransactionTrace() as any;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag === 8) {
+            message.filterIds!.push(reader.uint32());
+
+            continue;
+          }
+
+          if (tag === 10) {
+            const end2 = reader.uint32() + reader.pos;
+            while (reader.pos < end2) {
+              message.filterIds!.push(reader.uint32());
+            }
+
+            continue;
+          }
+
+          break;
+        case 2:
+          if (tag !== 16) {
+            break;
+          }
+
+          message.transactionIndex = reader.uint32();
+          continue;
+        case 3:
+          if (tag !== 26) {
+            break;
+          }
+
+          message.transactionHash = B256.decode(reader, reader.uint32());
+          continue;
+        case 4:
+          if (tag !== 34) {
+            break;
+          }
+
+          message.traces!.push(Trace.decode(reader, reader.uint32()));
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): TransactionTrace {
+    return {
+      filterIds: globalThis.Array.isArray(object?.filterIds)
+        ? object.filterIds.map((e: any) => globalThis.Number(e))
+        : [],
+      transactionIndex: isSet(object.transactionIndex) ? globalThis.Number(object.transactionIndex) : 0,
+      transactionHash: isSet(object.transactionHash) ? B256.fromJSON(object.transactionHash) : undefined,
+      traces: globalThis.Array.isArray(object?.traces) ? object.traces.map((e: any) => Trace.fromJSON(e)) : [],
+    };
+  },
+
+  toJSON(message: TransactionTrace): unknown {
+    const obj: any = {};
+    if (message.filterIds?.length) {
+      obj.filterIds = message.filterIds.map((e) => Math.round(e));
+    }
+    if (message.transactionIndex !== undefined && message.transactionIndex !== 0) {
+      obj.transactionIndex = Math.round(message.transactionIndex);
+    }
+    if (message.transactionHash !== undefined) {
+      obj.transactionHash = B256.toJSON(message.transactionHash);
+    }
+    if (message.traces?.length) {
+      obj.traces = message.traces.map((e) => Trace.toJSON(e));
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<TransactionTrace>): TransactionTrace {
+    return TransactionTrace.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<TransactionTrace>): TransactionTrace {
+    const message = createBaseTransactionTrace() as any;
+    message.filterIds = object.filterIds?.map((e) => e) || [];
+    message.transactionIndex = object.transactionIndex ?? 0;
+    message.transactionHash = (object.transactionHash !== undefined && object.transactionHash !== null)
+      ? B256.fromPartial(object.transactionHash)
+      : undefined;
+    message.traces = object.traces?.map((e) => Trace.fromPartial(e)) || [];
+    return message;
+  },
+};
+
+function createBaseTrace(): Trace {
+  return { action: undefined, error: undefined, output: undefined, subtraces: 0, traceAddress: [] };
+}
+
+export const Trace = {
+  encode(message: Trace, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    switch (message.action?.$case) {
+      case "call":
+        CallAction.encode(message.action.call, writer.uint32(10).fork()).ldelim();
+        break;
+      case "create":
+        CreateAction.encode(message.action.create, writer.uint32(18).fork()).ldelim();
+        break;
+      case "selfDestruct":
+        SelfDestructAction.encode(message.action.selfDestruct, writer.uint32(26).fork()).ldelim();
+        break;
+      case "reward":
+        RewardAction.encode(message.action.reward, writer.uint32(34).fork()).ldelim();
+        break;
+    }
+    if (message.error !== undefined) {
+      writer.uint32(42).string(message.error);
+    }
+    switch (message.output?.$case) {
+      case "callOutput":
+        CallOutput.encode(message.output.callOutput, writer.uint32(50).fork()).ldelim();
+        break;
+      case "createOutput":
+        CreateOutput.encode(message.output.createOutput, writer.uint32(58).fork()).ldelim();
+        break;
+    }
+    if (message.subtraces !== undefined && message.subtraces !== 0) {
+      writer.uint32(64).uint32(message.subtraces);
+    }
+    if (message.traceAddress !== undefined && message.traceAddress.length !== 0) {
+      writer.uint32(74).fork();
+      for (const v of message.traceAddress) {
+        writer.uint32(v);
+      }
+      writer.ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): Trace {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseTrace() as any;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.action = { $case: "call", call: CallAction.decode(reader, reader.uint32()) };
+          continue;
+        case 2:
+          if (tag !== 18) {
+            break;
+          }
+
+          message.action = { $case: "create", create: CreateAction.decode(reader, reader.uint32()) };
+          continue;
+        case 3:
+          if (tag !== 26) {
+            break;
+          }
+
+          message.action = { $case: "selfDestruct", selfDestruct: SelfDestructAction.decode(reader, reader.uint32()) };
+          continue;
+        case 4:
+          if (tag !== 34) {
+            break;
+          }
+
+          message.action = { $case: "reward", reward: RewardAction.decode(reader, reader.uint32()) };
+          continue;
+        case 5:
+          if (tag !== 42) {
+            break;
+          }
+
+          message.error = reader.string();
+          continue;
+        case 6:
+          if (tag !== 50) {
+            break;
+          }
+
+          message.output = { $case: "callOutput", callOutput: CallOutput.decode(reader, reader.uint32()) };
+          continue;
+        case 7:
+          if (tag !== 58) {
+            break;
+          }
+
+          message.output = { $case: "createOutput", createOutput: CreateOutput.decode(reader, reader.uint32()) };
+          continue;
+        case 8:
+          if (tag !== 64) {
+            break;
+          }
+
+          message.subtraces = reader.uint32();
+          continue;
+        case 9:
+          if (tag === 72) {
+            message.traceAddress!.push(reader.uint32());
+
+            continue;
+          }
+
+          if (tag === 74) {
+            const end2 = reader.uint32() + reader.pos;
+            while (reader.pos < end2) {
+              message.traceAddress!.push(reader.uint32());
+            }
+
+            continue;
+          }
+
+          break;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): Trace {
+    return {
+      action: isSet(object.call)
+        ? { $case: "call", call: CallAction.fromJSON(object.call) }
+        : isSet(object.create)
+        ? { $case: "create", create: CreateAction.fromJSON(object.create) }
+        : isSet(object.selfDestruct)
+        ? { $case: "selfDestruct", selfDestruct: SelfDestructAction.fromJSON(object.selfDestruct) }
+        : isSet(object.reward)
+        ? { $case: "reward", reward: RewardAction.fromJSON(object.reward) }
+        : undefined,
+      error: isSet(object.error) ? globalThis.String(object.error) : undefined,
+      output: isSet(object.callOutput)
+        ? { $case: "callOutput", callOutput: CallOutput.fromJSON(object.callOutput) }
+        : isSet(object.createOutput)
+        ? { $case: "createOutput", createOutput: CreateOutput.fromJSON(object.createOutput) }
+        : undefined,
+      subtraces: isSet(object.subtraces) ? globalThis.Number(object.subtraces) : 0,
+      traceAddress: globalThis.Array.isArray(object?.traceAddress)
+        ? object.traceAddress.map((e: any) => globalThis.Number(e))
+        : [],
+    };
+  },
+
+  toJSON(message: Trace): unknown {
+    const obj: any = {};
+    if (message.action?.$case === "call") {
+      obj.call = CallAction.toJSON(message.action.call);
+    }
+    if (message.action?.$case === "create") {
+      obj.create = CreateAction.toJSON(message.action.create);
+    }
+    if (message.action?.$case === "selfDestruct") {
+      obj.selfDestruct = SelfDestructAction.toJSON(message.action.selfDestruct);
+    }
+    if (message.action?.$case === "reward") {
+      obj.reward = RewardAction.toJSON(message.action.reward);
+    }
+    if (message.error !== undefined) {
+      obj.error = message.error;
+    }
+    if (message.output?.$case === "callOutput") {
+      obj.callOutput = CallOutput.toJSON(message.output.callOutput);
+    }
+    if (message.output?.$case === "createOutput") {
+      obj.createOutput = CreateOutput.toJSON(message.output.createOutput);
+    }
+    if (message.subtraces !== undefined && message.subtraces !== 0) {
+      obj.subtraces = Math.round(message.subtraces);
+    }
+    if (message.traceAddress?.length) {
+      obj.traceAddress = message.traceAddress.map((e) => Math.round(e));
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<Trace>): Trace {
+    return Trace.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<Trace>): Trace {
+    const message = createBaseTrace() as any;
+    if (object.action?.$case === "call" && object.action?.call !== undefined && object.action?.call !== null) {
+      message.action = { $case: "call", call: CallAction.fromPartial(object.action.call) };
+    }
+    if (object.action?.$case === "create" && object.action?.create !== undefined && object.action?.create !== null) {
+      message.action = { $case: "create", create: CreateAction.fromPartial(object.action.create) };
+    }
+    if (
+      object.action?.$case === "selfDestruct" &&
+      object.action?.selfDestruct !== undefined &&
+      object.action?.selfDestruct !== null
+    ) {
+      message.action = {
+        $case: "selfDestruct",
+        selfDestruct: SelfDestructAction.fromPartial(object.action.selfDestruct),
+      };
+    }
+    if (object.action?.$case === "reward" && object.action?.reward !== undefined && object.action?.reward !== null) {
+      message.action = { $case: "reward", reward: RewardAction.fromPartial(object.action.reward) };
+    }
+    message.error = object.error ?? undefined;
+    if (
+      object.output?.$case === "callOutput" &&
+      object.output?.callOutput !== undefined &&
+      object.output?.callOutput !== null
+    ) {
+      message.output = { $case: "callOutput", callOutput: CallOutput.fromPartial(object.output.callOutput) };
+    }
+    if (
+      object.output?.$case === "createOutput" &&
+      object.output?.createOutput !== undefined &&
+      object.output?.createOutput !== null
+    ) {
+      message.output = { $case: "createOutput", createOutput: CreateOutput.fromPartial(object.output.createOutput) };
+    }
+    message.subtraces = object.subtraces ?? 0;
+    message.traceAddress = object.traceAddress?.map((e) => e) || [];
+    return message;
+  },
+};
+
+function createBaseCallAction(): CallAction {
+  return {
+    fromAddress: undefined,
+    type: 0,
+    gas: BigInt("0"),
+    input: new Uint8Array(0),
+    toAddress: undefined,
+    value: undefined,
+  };
+}
+
+export const CallAction = {
+  encode(message: CallAction, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.fromAddress !== undefined) {
+      Address.encode(message.fromAddress, writer.uint32(10).fork()).ldelim();
+    }
+    if (message.type !== undefined && message.type !== 0) {
+      writer.uint32(16).int32(message.type);
+    }
+    if (message.gas !== undefined && message.gas !== BigInt("0")) {
+      if (BigInt.asUintN(64, message.gas) !== message.gas) {
+        throw new globalThis.Error("value provided for field message.gas of type uint64 too large");
+      }
+      writer.uint32(24).uint64(message.gas.toString());
+    }
+    if (message.input !== undefined && message.input.length !== 0) {
+      writer.uint32(34).bytes(message.input);
+    }
+    if (message.toAddress !== undefined) {
+      Address.encode(message.toAddress, writer.uint32(42).fork()).ldelim();
+    }
+    if (message.value !== undefined) {
+      U256.encode(message.value, writer.uint32(50).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): CallAction {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseCallAction() as any;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.fromAddress = Address.decode(reader, reader.uint32());
+          continue;
+        case 2:
+          if (tag !== 16) {
+            break;
+          }
+
+          message.type = reader.int32() as any;
+          continue;
+        case 3:
+          if (tag !== 24) {
+            break;
+          }
+
+          message.gas = longToBigint(reader.uint64() as Long);
+          continue;
+        case 4:
+          if (tag !== 34) {
+            break;
+          }
+
+          message.input = reader.bytes();
+          continue;
+        case 5:
+          if (tag !== 42) {
+            break;
+          }
+
+          message.toAddress = Address.decode(reader, reader.uint32());
+          continue;
+        case 6:
+          if (tag !== 50) {
+            break;
+          }
+
+          message.value = U256.decode(reader, reader.uint32());
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): CallAction {
+    return {
+      fromAddress: isSet(object.fromAddress) ? Address.fromJSON(object.fromAddress) : undefined,
+      type: isSet(object.type) ? callTypeFromJSON(object.type) : 0,
+      gas: isSet(object.gas) ? BigInt(object.gas) : BigInt("0"),
+      input: isSet(object.input) ? bytesFromBase64(object.input) : new Uint8Array(0),
+      toAddress: isSet(object.toAddress) ? Address.fromJSON(object.toAddress) : undefined,
+      value: isSet(object.value) ? U256.fromJSON(object.value) : undefined,
+    };
+  },
+
+  toJSON(message: CallAction): unknown {
+    const obj: any = {};
+    if (message.fromAddress !== undefined) {
+      obj.fromAddress = Address.toJSON(message.fromAddress);
+    }
+    if (message.type !== undefined && message.type !== 0) {
+      obj.type = callTypeToJSON(message.type);
+    }
+    if (message.gas !== undefined && message.gas !== BigInt("0")) {
+      obj.gas = message.gas.toString();
+    }
+    if (message.input !== undefined && message.input.length !== 0) {
+      obj.input = base64FromBytes(message.input);
+    }
+    if (message.toAddress !== undefined) {
+      obj.toAddress = Address.toJSON(message.toAddress);
+    }
+    if (message.value !== undefined) {
+      obj.value = U256.toJSON(message.value);
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<CallAction>): CallAction {
+    return CallAction.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<CallAction>): CallAction {
+    const message = createBaseCallAction() as any;
+    message.fromAddress = (object.fromAddress !== undefined && object.fromAddress !== null)
+      ? Address.fromPartial(object.fromAddress)
+      : undefined;
+    message.type = object.type ?? 0;
+    message.gas = object.gas ?? BigInt("0");
+    message.input = object.input ?? new Uint8Array(0);
+    message.toAddress = (object.toAddress !== undefined && object.toAddress !== null)
+      ? Address.fromPartial(object.toAddress)
+      : undefined;
+    message.value = (object.value !== undefined && object.value !== null) ? U256.fromPartial(object.value) : undefined;
+    return message;
+  },
+};
+
+function createBaseCreateAction(): CreateAction {
+  return { fromAddress: undefined, gas: BigInt("0"), init: new Uint8Array(0), value: undefined, creationMethod: 0 };
+}
+
+export const CreateAction = {
+  encode(message: CreateAction, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.fromAddress !== undefined) {
+      Address.encode(message.fromAddress, writer.uint32(10).fork()).ldelim();
+    }
+    if (message.gas !== undefined && message.gas !== BigInt("0")) {
+      if (BigInt.asUintN(64, message.gas) !== message.gas) {
+        throw new globalThis.Error("value provided for field message.gas of type uint64 too large");
+      }
+      writer.uint32(16).uint64(message.gas.toString());
+    }
+    if (message.init !== undefined && message.init.length !== 0) {
+      writer.uint32(26).bytes(message.init);
+    }
+    if (message.value !== undefined) {
+      U256.encode(message.value, writer.uint32(34).fork()).ldelim();
+    }
+    if (message.creationMethod !== undefined && message.creationMethod !== 0) {
+      writer.uint32(40).int32(message.creationMethod);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): CreateAction {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseCreateAction() as any;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.fromAddress = Address.decode(reader, reader.uint32());
+          continue;
+        case 2:
+          if (tag !== 16) {
+            break;
+          }
+
+          message.gas = longToBigint(reader.uint64() as Long);
+          continue;
+        case 3:
+          if (tag !== 26) {
+            break;
+          }
+
+          message.init = reader.bytes();
+          continue;
+        case 4:
+          if (tag !== 34) {
+            break;
+          }
+
+          message.value = U256.decode(reader, reader.uint32());
+          continue;
+        case 5:
+          if (tag !== 40) {
+            break;
+          }
+
+          message.creationMethod = reader.int32() as any;
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): CreateAction {
+    return {
+      fromAddress: isSet(object.fromAddress) ? Address.fromJSON(object.fromAddress) : undefined,
+      gas: isSet(object.gas) ? BigInt(object.gas) : BigInt("0"),
+      init: isSet(object.init) ? bytesFromBase64(object.init) : new Uint8Array(0),
+      value: isSet(object.value) ? U256.fromJSON(object.value) : undefined,
+      creationMethod: isSet(object.creationMethod) ? creationMethodFromJSON(object.creationMethod) : 0,
+    };
+  },
+
+  toJSON(message: CreateAction): unknown {
+    const obj: any = {};
+    if (message.fromAddress !== undefined) {
+      obj.fromAddress = Address.toJSON(message.fromAddress);
+    }
+    if (message.gas !== undefined && message.gas !== BigInt("0")) {
+      obj.gas = message.gas.toString();
+    }
+    if (message.init !== undefined && message.init.length !== 0) {
+      obj.init = base64FromBytes(message.init);
+    }
+    if (message.value !== undefined) {
+      obj.value = U256.toJSON(message.value);
+    }
+    if (message.creationMethod !== undefined && message.creationMethod !== 0) {
+      obj.creationMethod = creationMethodToJSON(message.creationMethod);
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<CreateAction>): CreateAction {
+    return CreateAction.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<CreateAction>): CreateAction {
+    const message = createBaseCreateAction() as any;
+    message.fromAddress = (object.fromAddress !== undefined && object.fromAddress !== null)
+      ? Address.fromPartial(object.fromAddress)
+      : undefined;
+    message.gas = object.gas ?? BigInt("0");
+    message.init = object.init ?? new Uint8Array(0);
+    message.value = (object.value !== undefined && object.value !== null) ? U256.fromPartial(object.value) : undefined;
+    message.creationMethod = object.creationMethod ?? 0;
+    return message;
+  },
+};
+
+function createBaseSelfDestructAction(): SelfDestructAction {
+  return { address: undefined, balance: undefined, refundAddress: undefined };
+}
+
+export const SelfDestructAction = {
+  encode(message: SelfDestructAction, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.address !== undefined) {
+      Address.encode(message.address, writer.uint32(10).fork()).ldelim();
+    }
+    if (message.balance !== undefined) {
+      U256.encode(message.balance, writer.uint32(18).fork()).ldelim();
+    }
+    if (message.refundAddress !== undefined) {
+      Address.encode(message.refundAddress, writer.uint32(26).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): SelfDestructAction {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseSelfDestructAction() as any;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.address = Address.decode(reader, reader.uint32());
+          continue;
+        case 2:
+          if (tag !== 18) {
+            break;
+          }
+
+          message.balance = U256.decode(reader, reader.uint32());
+          continue;
+        case 3:
+          if (tag !== 26) {
+            break;
+          }
+
+          message.refundAddress = Address.decode(reader, reader.uint32());
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): SelfDestructAction {
+    return {
+      address: isSet(object.address) ? Address.fromJSON(object.address) : undefined,
+      balance: isSet(object.balance) ? U256.fromJSON(object.balance) : undefined,
+      refundAddress: isSet(object.refundAddress) ? Address.fromJSON(object.refundAddress) : undefined,
+    };
+  },
+
+  toJSON(message: SelfDestructAction): unknown {
+    const obj: any = {};
+    if (message.address !== undefined) {
+      obj.address = Address.toJSON(message.address);
+    }
+    if (message.balance !== undefined) {
+      obj.balance = U256.toJSON(message.balance);
+    }
+    if (message.refundAddress !== undefined) {
+      obj.refundAddress = Address.toJSON(message.refundAddress);
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<SelfDestructAction>): SelfDestructAction {
+    return SelfDestructAction.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<SelfDestructAction>): SelfDestructAction {
+    const message = createBaseSelfDestructAction() as any;
+    message.address = (object.address !== undefined && object.address !== null)
+      ? Address.fromPartial(object.address)
+      : undefined;
+    message.balance = (object.balance !== undefined && object.balance !== null)
+      ? U256.fromPartial(object.balance)
+      : undefined;
+    message.refundAddress = (object.refundAddress !== undefined && object.refundAddress !== null)
+      ? Address.fromPartial(object.refundAddress)
+      : undefined;
+    return message;
+  },
+};
+
+function createBaseRewardAction(): RewardAction {
+  return { author: undefined, type: 0, value: undefined };
+}
+
+export const RewardAction = {
+  encode(message: RewardAction, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.author !== undefined) {
+      Address.encode(message.author, writer.uint32(10).fork()).ldelim();
+    }
+    if (message.type !== undefined && message.type !== 0) {
+      writer.uint32(16).int32(message.type);
+    }
+    if (message.value !== undefined) {
+      U256.encode(message.value, writer.uint32(26).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): RewardAction {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseRewardAction() as any;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.author = Address.decode(reader, reader.uint32());
+          continue;
+        case 2:
+          if (tag !== 16) {
+            break;
+          }
+
+          message.type = reader.int32() as any;
+          continue;
+        case 3:
+          if (tag !== 26) {
+            break;
+          }
+
+          message.value = U256.decode(reader, reader.uint32());
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): RewardAction {
+    return {
+      author: isSet(object.author) ? Address.fromJSON(object.author) : undefined,
+      type: isSet(object.type) ? rewardTypeFromJSON(object.type) : 0,
+      value: isSet(object.value) ? U256.fromJSON(object.value) : undefined,
+    };
+  },
+
+  toJSON(message: RewardAction): unknown {
+    const obj: any = {};
+    if (message.author !== undefined) {
+      obj.author = Address.toJSON(message.author);
+    }
+    if (message.type !== undefined && message.type !== 0) {
+      obj.type = rewardTypeToJSON(message.type);
+    }
+    if (message.value !== undefined) {
+      obj.value = U256.toJSON(message.value);
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<RewardAction>): RewardAction {
+    return RewardAction.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<RewardAction>): RewardAction {
+    const message = createBaseRewardAction() as any;
+    message.author = (object.author !== undefined && object.author !== null)
+      ? Address.fromPartial(object.author)
+      : undefined;
+    message.type = object.type ?? 0;
+    message.value = (object.value !== undefined && object.value !== null) ? U256.fromPartial(object.value) : undefined;
+    return message;
+  },
+};
+
+function createBaseCallOutput(): CallOutput {
+  return { gasUsed: BigInt("0"), output: new Uint8Array(0) };
+}
+
+export const CallOutput = {
+  encode(message: CallOutput, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.gasUsed !== undefined && message.gasUsed !== BigInt("0")) {
+      if (BigInt.asUintN(64, message.gasUsed) !== message.gasUsed) {
+        throw new globalThis.Error("value provided for field message.gasUsed of type uint64 too large");
+      }
+      writer.uint32(8).uint64(message.gasUsed.toString());
+    }
+    if (message.output !== undefined && message.output.length !== 0) {
+      writer.uint32(18).bytes(message.output);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): CallOutput {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseCallOutput() as any;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 8) {
+            break;
+          }
+
+          message.gasUsed = longToBigint(reader.uint64() as Long);
+          continue;
+        case 2:
+          if (tag !== 18) {
+            break;
+          }
+
+          message.output = reader.bytes();
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): CallOutput {
+    return {
+      gasUsed: isSet(object.gasUsed) ? BigInt(object.gasUsed) : BigInt("0"),
+      output: isSet(object.output) ? bytesFromBase64(object.output) : new Uint8Array(0),
+    };
+  },
+
+  toJSON(message: CallOutput): unknown {
+    const obj: any = {};
+    if (message.gasUsed !== undefined && message.gasUsed !== BigInt("0")) {
+      obj.gasUsed = message.gasUsed.toString();
+    }
+    if (message.output !== undefined && message.output.length !== 0) {
+      obj.output = base64FromBytes(message.output);
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<CallOutput>): CallOutput {
+    return CallOutput.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<CallOutput>): CallOutput {
+    const message = createBaseCallOutput() as any;
+    message.gasUsed = object.gasUsed ?? BigInt("0");
+    message.output = object.output ?? new Uint8Array(0);
+    return message;
+  },
+};
+
+function createBaseCreateOutput(): CreateOutput {
+  return { address: undefined, code: new Uint8Array(0), gasUsed: BigInt("0") };
+}
+
+export const CreateOutput = {
+  encode(message: CreateOutput, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.address !== undefined) {
+      Address.encode(message.address, writer.uint32(10).fork()).ldelim();
+    }
+    if (message.code !== undefined && message.code.length !== 0) {
+      writer.uint32(18).bytes(message.code);
+    }
+    if (message.gasUsed !== undefined && message.gasUsed !== BigInt("0")) {
+      if (BigInt.asUintN(64, message.gasUsed) !== message.gasUsed) {
+        throw new globalThis.Error("value provided for field message.gasUsed of type uint64 too large");
+      }
+      writer.uint32(24).uint64(message.gasUsed.toString());
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): CreateOutput {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseCreateOutput() as any;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.address = Address.decode(reader, reader.uint32());
+          continue;
+        case 2:
+          if (tag !== 18) {
+            break;
+          }
+
+          message.code = reader.bytes();
+          continue;
+        case 3:
+          if (tag !== 24) {
+            break;
+          }
+
+          message.gasUsed = longToBigint(reader.uint64() as Long);
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): CreateOutput {
+    return {
+      address: isSet(object.address) ? Address.fromJSON(object.address) : undefined,
+      code: isSet(object.code) ? bytesFromBase64(object.code) : new Uint8Array(0),
+      gasUsed: isSet(object.gasUsed) ? BigInt(object.gasUsed) : BigInt("0"),
+    };
+  },
+
+  toJSON(message: CreateOutput): unknown {
+    const obj: any = {};
+    if (message.address !== undefined) {
+      obj.address = Address.toJSON(message.address);
+    }
+    if (message.code !== undefined && message.code.length !== 0) {
+      obj.code = base64FromBytes(message.code);
+    }
+    if (message.gasUsed !== undefined && message.gasUsed !== BigInt("0")) {
+      obj.gasUsed = message.gasUsed.toString();
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<CreateOutput>): CreateOutput {
+    return CreateOutput.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<CreateOutput>): CreateOutput {
+    const message = createBaseCreateOutput() as any;
+    message.address = (object.address !== undefined && object.address !== null)
+      ? Address.fromPartial(object.address)
+      : undefined;
+    message.code = object.code ?? new Uint8Array(0);
+    message.gasUsed = object.gasUsed ?? BigInt("0");
     return message;
   },
 };

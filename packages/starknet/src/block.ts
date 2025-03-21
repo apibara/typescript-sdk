@@ -634,6 +634,162 @@ export const NonceUpdate = Schema.Struct({
 
 export type NonceUpdate = typeof NonceUpdate.Type;
 
+/** Trace call type. */
+export const CallType = Schema.transform(
+  Schema.Enums(proto.data.CallType),
+  Schema.Literal("libraryCall", "call", "delegate", "unknown"),
+  {
+    decode(value) {
+      const enumMap = {
+        [proto.data.CallType.LIBRARY_CALL]: "libraryCall",
+        [proto.data.CallType.CALL]: "call",
+        [proto.data.CallType.DELEGATE]: "delegate",
+        [proto.data.CallType.UNSPECIFIED]: "unknown",
+        [proto.data.CallType.UNRECOGNIZED]: "unknown",
+      } as const;
+
+      return enumMap[value] ?? "unknown";
+    },
+    encode(value) {
+      throw new Error("encode: not implemented");
+    },
+  },
+);
+
+/** A function invocation.
+ *
+ * @prop contractAddress The contract address.
+ * @prop entryPointSelector The entry point selector.
+ * @prop calldata The calldata.
+ * @prop callerAddress The caller address.
+ * @prop classHash The class hash.
+ * @prop callType The call type.
+ * @prop result The function invocation result.
+ * @prop calls The nested function invocations.
+ * @prop events The events index in the current transaction.
+ * @prop messages The messages index in the current transaction.
+ */
+export class FunctionInvocation extends Schema.Class<FunctionInvocation>(
+  "FunctionInvocation",
+)({
+  contractAddress: FieldElement,
+  entryPointSelector: FieldElement,
+  calldata: Schema.Array(FieldElement),
+  callerAddress: FieldElement,
+  classHash: FieldElement,
+  callType: CallType,
+  result: Schema.Array(FieldElement),
+  calls: Schema.suspend(
+    // biome-ignore lint/suspicious/noExplicitAny: not possible otherwise
+    (): Schema.Schema<any> => Schema.Array(FunctionInvocation),
+  ),
+  events: Schema.Array(Schema.Number),
+  messages: Schema.Array(Schema.Number),
+}) {}
+
+/** A successful invocation of the __execute__ call.
+ *
+ * @prop success The call.
+ */
+export const ExecuteInvocationSuccess = Schema.Struct({
+  _tag: tag("success"),
+  success: FunctionInvocation,
+});
+
+/** A failed invocation of the __execute__ call.
+ *
+ * @prop reason The reason for the failure.
+ */
+export const ExecuteInvocationReverted = Schema.Struct({
+  _tag: tag("reverted"),
+  reverted: Schema.Struct({
+    reason: Schema.optional(Schema.String),
+  }),
+});
+
+/** Trace for invoke transactions.
+ *
+ * @prop validateInvocation The __validate__ call.
+ * @prop executeInvocation The __execute__ call.
+ * @prop feeTransferInvocation The __fee_transfer__ call.
+ */
+export const InvokeTransactionTrace = Schema.Struct({
+  _tag: tag("invoke"),
+  invoke: Schema.Struct({
+    validateInvocation: Schema.optional(FunctionInvocation),
+    executeInvocation: Schema.Union(
+      ExecuteInvocationReverted,
+      ExecuteInvocationSuccess,
+    ),
+    feeTransferInvocation: Schema.optional(FunctionInvocation),
+  }),
+});
+
+export type InvokeTransactionTrace = typeof InvokeTransactionTrace.Type;
+
+/** Trace for declare transactions.
+ *
+ * @prop validateInvocation The __validate__ call.
+ * @prop feeTransferInvocation The __fee_transfer__ call.
+ */
+export const DeclareTransactionTrace = Schema.Struct({
+  _tag: tag("declare"),
+  declare: Schema.Struct({
+    validateInvocation: Schema.optional(FunctionInvocation),
+    feeTransferInvocation: Schema.optional(FunctionInvocation),
+  }),
+});
+
+export type DeclareTransactionTrace = typeof DeclareTransactionTrace.Type;
+
+/** Trace for deploy account transactions.
+ *
+ * @prop validateInvocation The __validate__ call.
+ * @prop constructorInvocation The __constructor__ call.
+ * @prop feeTransferInvocation The __fee_transfer__ call.
+ */
+export const DeployAccountTransactionTrace = Schema.Struct({
+  _tag: tag("deployAccount"),
+  deployAccount: Schema.Struct({
+    validateInvocation: Schema.optional(FunctionInvocation),
+    constructorInvocation: Schema.optional(FunctionInvocation),
+    feeTransferInvocation: Schema.optional(FunctionInvocation),
+  }),
+});
+
+export type DeployAccountTransactionTrace =
+  typeof DeployAccountTransactionTrace.Type;
+
+/** Trace for L1 handler transactions.
+ *
+ * @prop functionInvocation The L1 handler function invocation.
+ */
+export const L1HandlerTransactionTrace = Schema.Struct({
+  _tag: tag("l1Handler"),
+  l1Handler: Schema.Struct({
+    functionInvocation: Schema.optional(FunctionInvocation),
+  }),
+});
+
+/** A transaction trace.
+ *
+ * @prop transactionHash The hash of the trace's transaction.
+ * @prp traceRoot the trace root entry.
+ */
+export const TransactionTrace = Schema.Struct({
+  filterIds: Schema.Array(Schema.Number),
+  transactionIndex: Schema.Number,
+  transactionHash: FieldElement,
+  traceRoot: Schema.Union(
+    InvokeTransactionTrace,
+    DeclareTransactionTrace,
+    DeployAccountTransactionTrace,
+    L1HandlerTransactionTrace,
+  ),
+});
+
+export type TransactionTrace = typeof TransactionTrace.Type;
+
 /** A block.
  *
  * @prop header The block header.
@@ -641,6 +797,7 @@ export type NonceUpdate = typeof NonceUpdate.Type;
  * @prop receipts The receipts of the transactions.
  * @prop events The events emitted by the transactions.
  * @prop messages The messages sent to L1 by the transactions.
+ * @prop traces The transaction traces.
  * @prop storageDiffs The changes to the storage.
  * @prop contractChanges The changes to contracts and classes.
  */
@@ -650,6 +807,7 @@ export const Block = Schema.Struct({
   receipts: Schema.Array(TransactionReceipt),
   events: Schema.Array(Event),
   messages: Schema.Array(MessageToL1),
+  traces: Schema.Array(TransactionTrace),
   storageDiffs: Schema.Array(StorageDiff),
   contractChanges: Schema.Array(ContractChange),
   nonceUpdates: Schema.Array(NonceUpdate),
