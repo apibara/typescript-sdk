@@ -28,7 +28,7 @@ jobs:
       - name: Install dependencies
         run: pnpm install --strict-peer-dependencies=false --no-frozen-lockfile
       - name: Run build
-        run: pnpm build --filter=!./examples/cli-drizzle --filter=!./examples/cli-instrumentation --filter=!./examples/cli-js
+        run: pnpm build
       - name: Set git credentials
         run: |
           git config user.name "Capy Bot"

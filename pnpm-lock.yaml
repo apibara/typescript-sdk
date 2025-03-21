@@ -181,6 +181,34 @@ importers:
         specifier: ^5.6.2
         version: 5.6.2
 
+  examples/cli-mongodb:
+    dependencies:
+      '@apibara/indexer':
+        specifier: workspace:*
+        version: link:../../packages/indexer
+      '@apibara/plugin-mongo':
+        specifier: workspace:*
+        version: link:../../packages/plugin-mongo
+      '@apibara/protocol':
+        specifier: workspace:*
+        version: link:../../packages/protocol
+      '@apibara/starknet':
+        specifier: workspace:*
+        version: link:../../packages/starknet
+      apibara:
+        specifier: workspace:*
+        version: link:../../packages/cli
+      mongodb:
+        specifier: ^6.12.0
+        version: 6.12.0
+    devDependencies:
+      '@types/node':
+        specifier: ^20.5.2
+        version: 20.14.0
+      typescript:
+        specifier: ^5.6.2
+        version: 5.6.2
+
   examples/evm-client:
     dependencies:
       '@apibara/evm':
