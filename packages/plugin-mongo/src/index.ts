@@ -70,13 +70,16 @@ export function mongoStorage<TFilter, TBlock>({
       indexerId = generateIndexerId(indexerName, identifier);
       const logger = useLogger();
 
-      if (alwaysReindex) {
-        logger.warn(
-          `Reindexing: Deleting all data from collections - ${collections.join(", ")}`,
-        );
+      await withTransaction(client, async (session) => {
+        const db = client.db(dbName, dbOptions);
+        if (enablePersistence) {
+          await initializePersistentState(db, session);
+        }
 
-        await withTransaction(client, async (session) => {
-          const db = client.db(dbName, dbOptions);
+        if (alwaysReindex) {
+          logger.warn(
+            `Reindexing: Deleting all data from collections - ${collections.join(", ")}`,
+          );
 
           await cleanupStorage(db, session, collections);
 
@@ -85,13 +88,6 @@ export function mongoStorage<TFilter, TBlock>({
           }
 
           logger.success("All data has been cleaned up for reindexing");
-        });
-      }
-
-      await withTransaction(client, async (session) => {
-        const db = client.db(dbName, dbOptions);
-        if (enablePersistence) {
-          await initializePersistentState(db, session);
         }
       });
     });
