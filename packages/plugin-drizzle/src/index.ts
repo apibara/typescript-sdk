@@ -153,25 +153,11 @@ export function drizzleStorage<
 
       indexerId = generateIndexerId(indexerFileName, identifier);
 
-      if (alwaysReindex) {
-        logger.warn(
-          `Reindexing: Deleting all data from tables - ${tableNames.join(", ")}`,
-        );
-        await withTransaction(db, async (tx) => {
-          await cleanupStorage(tx, tableNames, indexerId);
-
-          if (enablePersistence) {
-            await resetPersistence({ tx, indexerId });
-          }
-
-          logger.success("Tables have been cleaned up for reindexing");
-        });
-      }
-
       let retries = 0;
 
       // incase the migrations are already applied, we don't want to run them again
       let migrationsApplied = false;
+      let cleanupApplied = false;
 
       while (retries <= MAX_RETRIES) {
         try {
@@ -185,6 +171,22 @@ export function drizzleStorage<
             await initializeReorgRollbackTable(tx, indexerId);
             if (enablePersistence) {
               await initializePersistentState(tx);
+            }
+
+            if (alwaysReindex && !cleanupApplied) {
+              logger.warn(
+                `Reindexing: Deleting all data from tables - ${tableNames.join(", ")}`,
+              );
+
+              await cleanupStorage(tx, tableNames, indexerId);
+
+              if (enablePersistence) {
+                await resetPersistence({ tx, indexerId });
+              }
+
+              cleanupApplied = true;
+
+              logger.success("Tables have been cleaned up for reindexing");
             }
           });
           break;
