@@ -22,13 +22,8 @@ export async function initializePersistentState(
   db: Db,
   session: ClientSession,
 ) {
-  const checkpoint = await db.createCollection<CheckpointSchema>(
-    checkpointCollectionName,
-    { session },
-  );
-  const filter = await db.createCollection<FilterSchema>(filterCollectionName, {
-    session,
-  });
+  const checkpoint = db.collection<CheckpointSchema>(checkpointCollectionName);
+  const filter = db.collection<FilterSchema>(filterCollectionName);
 
   await checkpoint.createIndex({ id: 1 }, { session });
   await filter.createIndex({ id: 1, fromBlock: 1 }, { session });

@@ -12,8 +12,13 @@ export async function withTransaction<T>(
   cb: (session: ClientSession) => Promise<T>,
 ) {
   return await client.withSession(async (session) => {
-    return await session.withTransaction(async (session) => {
-      return await cb(session);
-    });
+    return await session.withTransaction(
+      async (session) => {
+        return await cb(session);
+      },
+      {
+        retryWrites: false,
+      },
+    );
   });
 }

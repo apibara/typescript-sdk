@@ -1,5 +1,5 @@
 {
-  "name": "example-cli-js",
+  "name": "example-cli-mongodb",
   "private": true,
   "version": "0.0.0",
   "description": "",
@@ -17,9 +17,10 @@
   },
   "dependencies": {
     "@apibara/indexer": "workspace:*",
+    "@apibara/plugin-mongo": "workspace:*",
     "@apibara/protocol": "workspace:*",
     "@apibara/starknet": "workspace:*",
     "apibara": "workspace:*",
-    "starknet": "^6.11.0"
+    "mongodb": "^6.12.0"
   }
 }

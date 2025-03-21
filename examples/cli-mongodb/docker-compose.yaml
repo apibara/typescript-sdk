@@ -1,0 +1,20 @@
+services:
+  mongo:
+    image: bitnami/mongodb:8.0
+    ports:
+      - 27017:27017
+    environment:
+      MONGODB_PORT_NUMBER: "27017"
+      MONGODB_ROOT_USER: mongo
+      MONGODB_ROOT_PASSWORD: mongo
+      MONGODB_REPLICA_SET_MODE: primary
+      MONGODB_REPLICA_SET_NAME: rs0
+      MONGODB_REPLICA_SET_KEY: mongomongo
+      MONGODB_ADVERTISE_IP: true
+    volumes:
+      - "mongo_data:/data/db"
+      - "mongo_config:/data/configdb"
+
+volumes:
+  mongo_data:
+  mongo_config:
