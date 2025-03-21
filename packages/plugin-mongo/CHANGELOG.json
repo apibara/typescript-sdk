@@ -2,6 +2,21 @@
   "name": "@apibara/plugin-mongo",
   "entries": [
     {
+      "date": "Fri, 21 Mar 2025 15:56:23 GMT",
+      "version": "2.1.0-beta.18",
+      "tag": "@apibara/plugin-mongo_v2.1.0-beta.18",
+      "comments": {
+        "prerelease": [
+          {
+            "author": "francesco@ceccon.me",
+            "package": "@apibara/plugin-mongo",
+            "commit": "f6caa4725ba8dc9cca11975ecea0d215a4de2ae4",
+            "comment": "plugin-mongo: explicitly set uniqueKey to null if undefined"
+          }
+        ]
+      }
+    },
+    {
       "date": "Fri, 21 Mar 2025 13:15:35 GMT",
       "version": "2.1.0-beta.16",
       "tag": "@apibara/plugin-mongo_v2.1.0-beta.16",

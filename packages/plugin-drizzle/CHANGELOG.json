@@ -2,6 +2,21 @@
   "name": "@apibara/plugin-drizzle",
   "entries": [
     {
+      "date": "Fri, 21 Mar 2025 15:56:23 GMT",
+      "version": "2.1.0-beta.18",
+      "tag": "@apibara/plugin-drizzle_v2.1.0-beta.18",
+      "comments": {
+        "prerelease": [
+          {
+            "author": "francesco@ceccon.me",
+            "package": "@apibara/plugin-drizzle",
+            "commit": "f6caa4725ba8dc9cca11975ecea0d215a4de2ae4",
+            "comment": "plugin-drizzle: fix state persistence when switching back to backfill"
+          }
+        ]
+      }
+    },
+    {
       "date": "Fri, 21 Mar 2025 13:44:19 GMT",
       "version": "2.1.0-beta.17",
       "tag": "@apibara/plugin-drizzle_v2.1.0-beta.17",

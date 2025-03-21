@@ -1,8 +1,16 @@
 # Change Log - @apibara/plugin-mongo
 
-<!-- This log was last generated on Fri, 21 Mar 2025 13:15:35 GMT and should not be manually modified. -->
+<!-- This log was last generated on Fri, 21 Mar 2025 15:56:23 GMT and should not be manually modified. -->
 
 <!-- Start content -->
+
+## 2.1.0-beta.18
+
+Fri, 21 Mar 2025 15:56:23 GMT
+
+### Changes
+
+- plugin-mongo: explicitly set uniqueKey to null if undefined (francesco@ceccon.me)
 
 ## 2.1.0-beta.16
 

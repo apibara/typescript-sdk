@@ -1,8 +1,16 @@
 # Change Log - @apibara/indexer
 
-<!-- This log was last generated on Fri, 21 Mar 2025 11:03:55 GMT and should not be manually modified. -->
+<!-- This log was last generated on Fri, 21 Mar 2025 15:56:23 GMT and should not be manually modified. -->
 
 <!-- Start content -->
+
+## 2.1.0-beta.18
+
+Fri, 21 Mar 2025 15:56:23 GMT
+
+### Changes
+
+- plugin-drizzle: fix state persistence when switching back to backfill (francesco@ceccon.me)
 
 ## 2.1.0-beta.15
 

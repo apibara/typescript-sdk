@@ -1,8 +1,16 @@
 # Change Log - @apibara/plugin-sqlite
 
-<!-- This log was last generated on Mon, 17 Mar 2025 08:37:20 GMT and should not be manually modified. -->
+<!-- This log was last generated on Fri, 21 Mar 2025 15:56:23 GMT and should not be manually modified. -->
 
 <!-- Start content -->
+
+## 2.1.0-beta.18
+
+Fri, 21 Mar 2025 15:56:23 GMT
+
+### Changes
+
+- plugin-drizzle: less strict cursor check (francesco@ceccon.me)
 
 ## 2.1.0-beta.12
 
