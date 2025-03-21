@@ -1,0 +1,7 @@
+{
+  "type": "prerelease",
+  "comment": "plugin-mongo: fix error on connection and disable retry",
+  "packageName": "@apibara/plugin-mongo",
+  "email": "francesco@ceccon.me",
+  "dependentChangeType": "patch"
+}
