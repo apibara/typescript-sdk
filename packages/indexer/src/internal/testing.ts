@@ -19,6 +19,8 @@ export type MockMessagesOptions = {
     finalizeToIndex: number;
     finalizeTriggerIndex: number;
   };
+  uniqueKey?: boolean;
+  baseBlockNumber?: bigint;
 };
 
 export function generateMockMessages(
@@ -29,22 +31,36 @@ export function generateMockMessages(
   const finalizeAt = options?.finalize;
   const messages: MockStreamResponse[] = [];
 
+  const baseBlockNumber = options?.baseBlockNumber ?? BigInt(5_000_000);
+
   for (let i = 0; i < count; i++) {
+    const currentBlockNumber = baseBlockNumber + BigInt(i);
+    const uniqueKey = uniqueKeyFromOrderKey(currentBlockNumber);
     if (invalidateAt && i === invalidateAt.invalidateTriggerIndex) {
+      const invalidateToBlock =
+        baseBlockNumber + BigInt(invalidateAt.invalidateFromIndex);
       messages.push({
         _tag: "invalidate",
         invalidate: {
           cursor: {
-            orderKey: BigInt(5_000_000 + invalidateAt.invalidateFromIndex),
+            orderKey: invalidateToBlock,
+            uniqueKey: options?.uniqueKey
+              ? uniqueKeyFromOrderKey(invalidateToBlock)
+              : undefined,
           },
         },
       } as Invalidate);
     } else if (finalizeAt && i === finalizeAt.finalizeTriggerIndex) {
+      const fianlizedToBlock =
+        baseBlockNumber + BigInt(finalizeAt.finalizeToIndex);
       messages.push({
         _tag: "finalize",
         finalize: {
           cursor: {
-            orderKey: BigInt(5_000_000 + finalizeAt.finalizeToIndex),
+            orderKey: fianlizedToBlock,
+            uniqueKey: options?.uniqueKey
+              ? uniqueKeyFromOrderKey(fianlizedToBlock)
+              : undefined,
           },
         },
       } as Finalize);
@@ -52,10 +68,13 @@ export function generateMockMessages(
       messages.push({
         _tag: "data",
         data: {
-          cursor: { orderKey: BigInt(5_000_000 + i - 1) },
+          cursor: { orderKey: currentBlockNumber - 1n },
           finality: "accepted",
-          data: [{ data: `${5_000_000 + i}` }],
-          endCursor: { orderKey: BigInt(5_000_000 + i) },
+          data: [{ data: `${baseBlockNumber + BigInt(i)}` }],
+          endCursor: {
+            orderKey: currentBlockNumber,
+            uniqueKey: options?.uniqueKey ? uniqueKey : undefined,
+          },
           production: "backfill",
         },
       });
@@ -63,6 +82,10 @@ export function generateMockMessages(
   }
 
   return messages;
+}
+
+function uniqueKeyFromOrderKey(orderKey: bigint): `0x${string}` {
+  return `0xff00${orderKey.toString()}`;
 }
 
 type MockIndexerParams = {
