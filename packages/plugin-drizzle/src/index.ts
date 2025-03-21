@@ -120,7 +120,7 @@ export function drizzleStorage<
   db,
   persistState: enablePersistence = true,
   indexerName: identifier = "default",
-  schema,
+  schema: _schema,
   idColumn = "id",
   migrate: migrateOptions,
 }: DrizzleStorageOptions<TQueryResult, TFullSchema, TSchema>) {
@@ -129,15 +129,29 @@ export function drizzleStorage<
     let indexerId = "";
     const alwaysReindex = process.env["APIBARA_ALWAYS_REINDEX"] === "true";
     let prevFinality: DataFinality | undefined;
+    const schema: TSchema = (_schema as TSchema) ?? db._.schema ?? {};
 
     try {
-      tableNames = Object.values((schema as TSchema) ?? db._.schema ?? {}).map(
-        (table) => table.dbName,
-      );
+      tableNames = Object.values(schema).map((table) => table.dbName);
     } catch (error) {
       throw new DrizzleStorageError("Failed to get table names from schema", {
         cause: error,
       });
+    }
+
+    // Check if idColumn exists in all the tables in schema
+    for (const table of Object.values(schema)) {
+      const columns = table.columns;
+      const columnExists = Object.values(columns).some(
+        (column) => column.name === idColumn,
+      );
+
+      if (!columnExists) {
+        throw new DrizzleStorageError(
+          `Column \`"${idColumn}"\` does not exist in table \`"${table.dbName}"\`. ` +
+            `Make sure all tables have the column \`"${idColumn}"\` or provide a custom \`idColumn\` property in the options of \`drizzleStorage\`.`,
+        );
+      }
     }
 
     indexer.hooks.hook("run:before", async () => {
