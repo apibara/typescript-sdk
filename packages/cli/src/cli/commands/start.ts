@@ -67,7 +67,6 @@ export default defineCommand({
           code !== null ? ` with code ${colors.red(code)}` : ""
         }`,
       );
-      process.exit(code ?? 0);
     });
   },
 });
