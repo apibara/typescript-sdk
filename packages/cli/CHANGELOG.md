@@ -1,8 +1,16 @@
 # Change Log - apibara
 
-<!-- This log was last generated on Mon, 17 Mar 2025 14:45:17 GMT and should not be manually modified. -->
+<!-- This log was last generated on Fri, 21 Mar 2025 11:03:55 GMT and should not be manually modified. -->
 
 <!-- Start content -->
+
+## 2.1.0-beta.15
+
+Fri, 21 Mar 2025 11:03:55 GMT
+
+### Changes
+
+- cli: add createAuthenticatedClient and improve runtimeConfig (jadejajaipal5@gmail.com)
 
 ## 2.1.0-beta.13
 

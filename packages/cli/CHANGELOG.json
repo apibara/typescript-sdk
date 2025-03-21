@@ -2,6 +2,21 @@
   "name": "apibara",
   "entries": [
     {
+      "date": "Fri, 21 Mar 2025 11:03:55 GMT",
+      "version": "2.1.0-beta.15",
+      "tag": "apibara_v2.1.0-beta.15",
+      "comments": {
+        "prerelease": [
+          {
+            "author": "jadejajaipal5@gmail.com",
+            "package": "apibara",
+            "commit": "7834780b8a32bed724cceb24b0b1a207b9eccd91",
+            "comment": "cli: add createAuthenticatedClient and improve runtimeConfig"
+          }
+        ]
+      }
+    },
+    {
       "date": "Mon, 17 Mar 2025 14:45:17 GMT",
       "version": "2.1.0-beta.13",
       "tag": "apibara_v2.1.0-beta.13",

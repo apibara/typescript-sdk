@@ -2,6 +2,21 @@
   "name": "@apibara/plugin-drizzle",
   "entries": [
     {
+      "date": "Fri, 21 Mar 2025 11:03:55 GMT",
+      "version": "2.1.0-beta.15",
+      "tag": "@apibara/plugin-drizzle_v2.1.0-beta.15",
+      "comments": {
+        "prerelease": [
+          {
+            "author": "jadejajaipal5@gmail.com",
+            "package": "@apibara/plugin-drizzle",
+            "commit": "7834780b8a32bed724cceb24b0b1a207b9eccd91",
+            "comment": "plugin-drizzle: use seperate schema and default connectionString to env"
+          }
+        ]
+      }
+    },
+    {
       "date": "Mon, 17 Mar 2025 08:37:20 GMT",
       "version": "2.1.0-beta.12",
       "tag": "@apibara/plugin-drizzle_v2.1.0-beta.12",

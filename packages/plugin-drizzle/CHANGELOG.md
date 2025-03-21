@@ -1,8 +1,16 @@
 # Change Log - @apibara/plugin-drizzle
 
-<!-- This log was last generated on Mon, 17 Mar 2025 08:37:20 GMT and should not be manually modified. -->
+<!-- This log was last generated on Fri, 21 Mar 2025 11:03:55 GMT and should not be manually modified. -->
 
 <!-- Start content -->
+
+## 2.1.0-beta.15
+
+Fri, 21 Mar 2025 11:03:55 GMT
+
+### Changes
+
+- plugin-drizzle: use seperate schema and default connectionString to env (jadejajaipal5@gmail.com)
 
 ## 2.1.0-beta.12
 

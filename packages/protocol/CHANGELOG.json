@@ -2,6 +2,21 @@
   "name": "@apibara/protocol",
   "entries": [
     {
+      "date": "Fri, 21 Mar 2025 11:03:55 GMT",
+      "version": "2.1.0-beta.15",
+      "tag": "@apibara/protocol_v2.1.0-beta.15",
+      "comments": {
+        "prerelease": [
+          {
+            "author": "jadejajaipal5@gmail.com",
+            "package": "@apibara/protocol",
+            "commit": "7834780b8a32bed724cceb24b0b1a207b9eccd91",
+            "comment": "protocol: export nice-grpc MetaData class"
+          }
+        ]
+      }
+    },
+    {
       "date": "Fri, 21 Feb 2025 19:49:06 GMT",
       "version": "2.1.0-beta.1",
       "tag": "@apibara/protocol_v2.1.0-beta.1",
