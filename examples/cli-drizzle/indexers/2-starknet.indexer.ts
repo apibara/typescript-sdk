@@ -28,7 +28,9 @@ export default function (runtimeConfig: ApibaraRuntimeConfig) {
     plugins: [
       drizzleStorage({
         db: database,
-        idColumn: "_id",
+        idColumn: {
+          "*": "_id",
+        },
         persistState: true,
         indexerName: "starknet-usdc-transfers",
         migrate: {

@@ -1,5 +1,6 @@
 import { addIndexer } from "apibara/create";
 import { defineCommand } from "citty";
+import { checkForUnknownArgs } from "../common";
 
 export default defineCommand({
   meta: {
@@ -35,7 +36,9 @@ export default defineCommand({
         "Root directory - apibara project root where apibara.config is located | default: current working directory",
     },
   },
-  async run({ args }) {
+  async run({ args, cmd }) {
+    await checkForUnknownArgs(args, cmd);
+
     const { indexerId, chain, network, storage, dnaUrl, dir } = args;
 
     await addIndexer({

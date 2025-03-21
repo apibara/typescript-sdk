@@ -1,5 +1,6 @@
 import { initializeProject } from "apibara/create";
 import { defineCommand } from "citty";
+import { checkForUnknownArgs } from "../common";
 
 export default defineCommand({
   meta: {
@@ -14,23 +15,27 @@ export default defineCommand({
     },
     language: {
       type: "string",
-      description: "Language to use: typescript, ts or javascript, js",
+      description:
+        "Language to use: typescript, ts or javascript, js | default: `ts`",
       default: "ts",
       alias: "l",
     },
-    noIndexer: {
+    "create-indexer": {
       type: "boolean",
-      description: "Do not create an indexer after initialization",
-      default: false,
+      name: "create-indexer",
+      default: true,
+      description: "TODO",
     },
   },
-  async run({ args }) {
-    const { dir: targetDir, noIndexer, language } = args;
+  async run({ args, cmd }) {
+    await checkForUnknownArgs(args, cmd);
+
+    const { dir: targetDir, "create-indexer": createIndexer, language } = args;
 
     await initializeProject({
       argTargetDir: targetDir,
       argLanguage: language,
-      argNoCreateIndexer: noIndexer,
+      argNoCreateIndexer: !createIndexer,
     });
   },
 });

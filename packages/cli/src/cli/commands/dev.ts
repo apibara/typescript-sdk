@@ -5,7 +5,7 @@ import type { Apibara } from "apibara/types";
 import { defineCommand } from "citty";
 import { colors } from "consola/utils";
 import { join, resolve } from "pathe";
-import { commonArgs } from "../common";
+import { checkForUnknownArgs, commonArgs } from "../common";
 
 // Hot module reloading key regex
 // for only runtimeConfig.* keys
@@ -26,17 +26,19 @@ export default defineCommand({
       type: "string",
       description: "Preset to use",
     },
-    alwaysReindex: {
+    "always-reindex": {
       type: "boolean",
       default: false,
       description:
-        "Reindex the indexers from the starting block on every restart (default: false)",
+        "Reindex the indexers from the starting block on every restart | default: `false`",
     },
   },
-  async run({ args }) {
+  async run({ args, data, cmd, rawArgs }) {
+    await checkForUnknownArgs(args, cmd);
+
     const rootDir = resolve((args.dir || args._dir || ".") as string);
 
-    if (args.alwaysReindex) {
+    if (args["always-reindex"]) {
       process.env.APIBARA_ALWAYS_REINDEX = "true";
     }
 
@@ -125,7 +127,6 @@ export default defineCommand({
               code !== null ? ` with code ${colors.red(code)}` : ""
             }`,
           );
-          process.exit(code ?? 0);
         });
       });
     };

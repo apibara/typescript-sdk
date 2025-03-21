@@ -48,3 +48,22 @@ export function serialize<T>(obj: T): string {
 export function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
+
+export interface IdColumnMap extends Record<string, string> {
+  /**
+   * Wildcard mapping for all tables.
+   */
+  "*": string;
+}
+
+export const getIdColumnForTable = (
+  tableName: string,
+  idColumn: IdColumnMap,
+): string => {
+  // If there's a specific mapping for this table, use it
+  if (idColumn[tableName]) {
+    return idColumn[tableName];
+  }
+  // Default fallback
+  return idColumn["*"];
+};

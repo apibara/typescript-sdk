@@ -1,0 +1,7 @@
+{
+  "type": "prerelease",
+  "comment": "plugin-mongo: move cleanup part after initialization",
+  "packageName": "@apibara/plugin-mongo",
+  "email": "jadejajaipal5@gmail.com",
+  "dependentChangeType": "patch"
+}

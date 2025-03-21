@@ -100,6 +100,16 @@ export function invalidateState(props: {
   );
 }
 
+export function resetPersistence(props: {
+  db: Database;
+  indexerId: string;
+}) {
+  const { db, indexerId } = props;
+  assertInTransaction(db);
+  db.prepare<[string]>(statements.resetCheckpoint).run(indexerId);
+  db.prepare<[string]>(statements.resetFilter).run(indexerId);
+}
+
 export type CheckpointRow = {
   id: string;
   order_key: number;
@@ -168,4 +178,10 @@ const statements = {
     UPDATE filters
     SET to_block = NULL
     WHERE id = ? AND to_block > ?`,
+  resetCheckpoint: `
+    DELETE FROM checkpoints
+    WHERE id = ?`,
+  resetFilter: `
+    DELETE FROM filters
+    WHERE id = ?`,
 };
