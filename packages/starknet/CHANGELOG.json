@@ -2,6 +2,21 @@
   "name": "@apibara/starknet",
   "entries": [
     {
+      "date": "Fri, 21 Mar 2025 20:02:55 GMT",
+      "version": "2.1.0-beta.19",
+      "tag": "@apibara/starknet_v2.1.0-beta.19",
+      "comments": {
+        "prerelease": [
+          {
+            "author": "francesco@ceccon.me",
+            "package": "@apibara/starknet",
+            "commit": "ae9282c0f22ba5c45991012370828753e1e7ceae",
+            "comment": "starknet: add support for transaction traces"
+          }
+        ]
+      }
+    },
+    {
       "date": "Thu, 20 Mar 2025 16:44:14 GMT",
       "version": "2.1.0-beta.14",
       "tag": "@apibara/starknet_v2.1.0-beta.14",

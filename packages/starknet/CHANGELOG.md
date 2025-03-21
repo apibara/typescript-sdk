@@ -1,8 +1,16 @@
 # Change Log - @apibara/starknet
 
-<!-- This log was last generated on Thu, 20 Mar 2025 16:44:14 GMT and should not be manually modified. -->
+<!-- This log was last generated on Fri, 21 Mar 2025 20:02:55 GMT and should not be manually modified. -->
 
 <!-- Start content -->
+
+## 2.1.0-beta.19
+
+Fri, 21 Mar 2025 20:02:55 GMT
+
+### Changes
+
+- starknet: add support for transaction traces (francesco@ceccon.me)
 
 ## 2.1.0-beta.14
 

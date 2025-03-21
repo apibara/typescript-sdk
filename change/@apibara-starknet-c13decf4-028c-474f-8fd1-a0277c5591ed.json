@@ -1,7 +1,0 @@
-{
-  "type": "prerelease",
-  "comment": "starknet: add support for transaction traces",
-  "packageName": "@apibara/starknet",
-  "email": "francesco@ceccon.me",
-  "dependentChangeType": "patch"
-}
