@@ -1,8 +1,16 @@
 # Change Log - @apibara/plugin-drizzle
 
-<!-- This log was last generated on Fri, 21 Mar 2025 11:03:55 GMT and should not be manually modified. -->
+<!-- This log was last generated on Fri, 21 Mar 2025 13:44:19 GMT and should not be manually modified. -->
 
 <!-- Start content -->
+
+## 2.1.0-beta.17
+
+Fri, 21 Mar 2025 13:44:19 GMT
+
+### Changes
+
+- plugin-drizzle: relax peer dependencies version (francesco@ceccon.me)
 
 ## 2.1.0-beta.15
 
