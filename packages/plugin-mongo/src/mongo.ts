@@ -60,7 +60,9 @@ export async function cleanupStorage(
       // Delete all documents in the collection
       await db.collection(collection).deleteMany({}, { session });
     } catch (error) {
-      throw new Error(`Failed to clean up collection ${collection}: ${error}`);
+      throw new Error(`Failed to clean up collection ${collection}`, {
+        cause: error,
+      });
     }
   }
 }

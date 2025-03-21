@@ -8,33 +8,31 @@ import {
   inMemoryPersistence,
   logger,
 } from "@apibara/indexer/plugins";
+import {
+  type CreateClientOptions,
+  Metadata,
+  type StreamConfig,
+  createClient,
+} from "@apibara/protocol";
 import consola from "consola";
 import { config } from "#apibara-internal-virtual/config";
 import { indexers } from "#apibara-internal-virtual/indexers";
 import { logger as instrumentationLogger } from "#apibara-internal-virtual/instrumentation";
+import { getProcessedRuntimeConfig } from "./helper";
 import { createLogger } from "./logger";
 
 export const availableIndexers = indexers.map((i) => i.name);
 
 export function createIndexer(indexerName: string, preset?: string) {
-  let runtimeConfig: Record<string, unknown> = { ...config.runtimeConfig };
+  // Get merged runtime config from preset and process.env.APIBARA_RUNTIME_CONFIG and defaults.
+  const runtimeConfig = getProcessedRuntimeConfig({
+    preset,
+    presets: config.presets,
+    runtimeConfig: config.runtimeConfig,
+  });
 
-  if (preset) {
-    if (config.presets === undefined) {
-      throw new Error(
-        `Specified preset "${preset}" but no presets were defined`,
-      );
-    }
-
-    if (config.presets[preset] === undefined) {
-      throw new Error(`Specified preset "${preset}" but it was not defined`);
-    }
-
-    const presetValue = config.presets[preset] as {
-      runtimeConfig: Record<string, unknown>;
-    };
-    runtimeConfig = { ...runtimeConfig, ...presetValue.runtimeConfig };
-  }
+  // Set the runtime config in the environment so that it can be used by the useRuntimeConfig hook.
+  process.env.APIBARA_RUNTIME_CONFIG_HOOK_DATA = JSON.stringify(runtimeConfig);
 
   const indexerDefinition = indexers.find((i) => i.name === indexerName);
 
@@ -91,4 +89,28 @@ export function createIndexer(indexerName: string, preset?: string) {
   ];
 
   return _createIndexer(definition);
+}
+
+export function createAuthenticatedClient(
+  config: StreamConfig<unknown, unknown>,
+  streamUrl: string,
+  options?: CreateClientOptions,
+) {
+  const dnaToken = process.env.DNA_TOKEN;
+  if (!dnaToken) {
+    consola.warn(
+      "DNA_TOKEN environment variable is not set. Trying to connect without authentication.",
+    );
+  }
+
+  return createClient(config, streamUrl, {
+    ...options,
+    defaultCallOptions: {
+      "*": {
+        metadata: Metadata({
+          Authorization: `Bearer ${dnaToken}`,
+        }),
+      },
+    },
+  });
 }

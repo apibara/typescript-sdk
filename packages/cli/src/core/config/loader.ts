@@ -7,14 +7,8 @@ import { loadConfig, watchConfig } from "c12";
 import { klona } from "klona/full";
 import { ApibaraDefaults } from "./defaults";
 import { resolvePathOptions } from "./resolvers/paths.resolver";
-import { presetResolver } from "./resolvers/preset.resolver";
-import { resolveRuntimeConfigOptions } from "./resolvers/runtime-config.resolver";
 
-const configResolvers = [
-  resolvePathOptions,
-  resolveRuntimeConfigOptions,
-  presetResolver,
-] as const;
+const configResolvers = [resolvePathOptions] as const;
 
 export async function loadOptions(
   configOverrides: ApibaraConfig = {},
@@ -22,9 +16,21 @@ export async function loadOptions(
   dev = false,
 ): Promise<ApibaraOptions> {
   const options = await _loadUserConfig(configOverrides, opts, dev);
+
+  // Check if the runtimeConfig is serializable
+  try {
+    JSON.stringify(options.runtimeConfig);
+  } catch (error) {
+    throw new Error(
+      "Non-serializable runtimeConfig. Please ensure the config is serializable.",
+      { cause: error },
+    );
+  }
+
   for (const resolver of configResolvers) {
     await resolver(options);
   }
+
   return options;
 }
 

@@ -1,6 +1,7 @@
 import { spawn } from "node:child_process";
 import { createApibara } from "apibara/core";
 import { defineCommand } from "citty";
+import { colors } from "consola/utils";
 import fse from "fs-extra";
 import { resolve } from "pathe";
 import { commonArgs } from "../common";
@@ -55,8 +56,18 @@ export default defineCommand({
       ...(preset ? ["--preset", preset] : []),
     ];
 
-    spawn("node", childArgs, {
+    const childProcess = spawn("node", childArgs, {
       stdio: "inherit",
+    });
+
+    childProcess.on("close", (code, signal) => {
+      console.log();
+      apibara.logger.log(
+        `Indexers process exited${
+          code !== null ? ` with code ${colors.red(code)}` : ""
+        }`,
+      );
+      process.exit(code ?? 0);
     });
   },
 });

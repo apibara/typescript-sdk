@@ -16,21 +16,20 @@ const abi = parseAbi([
 // USDC Transfers on Ethereum
 export default function (runtimeConfig: ApibaraRuntimeConfig) {
   const {
-    connectionString,
     evm: { startingBlock },
   } = runtimeConfig;
 
+  // connectionString defaults to process.env["POSTGRES_CONNECTION_STRING"](postgresql) ?? "memory://" (in memory pglite)
   const database = drizzle({
     schema: {
       ethereumUsdcTransfers,
     },
-    connectionString,
   });
 
   return defineIndexer(EvmStream)({
     streamUrl: "https://ethereum.preview.apibara.org",
     finality: "accepted",
-    startingBlock,
+    startingBlock: BigInt(startingBlock),
     filter: {
       logs: [
         {

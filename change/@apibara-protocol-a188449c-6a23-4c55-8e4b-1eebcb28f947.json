@@ -1,0 +1,7 @@
+{
+  "type": "prerelease",
+  "comment": "protocol: export nice-grpc MetaData class",
+  "packageName": "@apibara/protocol",
+  "email": "jadejajaipal5@gmail.com",
+  "dependentChangeType": "patch"
+}
