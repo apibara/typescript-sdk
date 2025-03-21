@@ -44,7 +44,7 @@ export async function persistState<TFilter>(props: {
       {
         $set: {
           orderKey: Number(endCursor.orderKey),
-          uniqueKey: endCursor.uniqueKey,
+          uniqueKey: endCursor.uniqueKey ? endCursor.uniqueKey : null,
         },
       },
       { upsert: true, session },
