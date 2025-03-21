@@ -1,0 +1,7 @@
+{
+  "type": "prerelease",
+  "comment": "plugin-mongo: explicitly set uniqueKey to null if undefined",
+  "packageName": "@apibara/plugin-mongo",
+  "email": "francesco@ceccon.me",
+  "dependentChangeType": "patch"
+}
