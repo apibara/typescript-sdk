@@ -1,0 +1,7 @@
+{
+  "type": "prerelease",
+  "comment": "plugin-mongo: propagate error",
+  "packageName": "@apibara/plugin-mongo",
+  "email": "jadejajaipal5@gmail.com",
+  "dependentChangeType": "patch"
+}

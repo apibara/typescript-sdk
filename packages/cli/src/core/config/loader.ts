@@ -23,6 +23,7 @@ export async function loadOptions(
   } catch (error) {
     throw new Error(
       "Non-serializable runtimeConfig. Please ensure the config is serializable.",
+      { cause: error },
     );
   }
 
