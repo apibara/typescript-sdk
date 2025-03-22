@@ -17,7 +17,18 @@ export const checkForUnknownArgs = async <T extends ArgsDef = ArgsDef>(
   args: ParsedArgs<T>,
   cmd: CommandDef<T>,
 ) => {
-  const definedArgs = Object.keys(cmd.args ?? {});
+  // Create a list of defined args including both the main arg names and their aliases
+  const definedArgs: string[] = [];
+  if (cmd.args) {
+    for (const [argName, argDef] of Object.entries(cmd.args)) {
+      definedArgs.push(argName);
+      // Add alias to definedArgs if it exists
+      if (argDef.alias) {
+        definedArgs.push(argDef.alias);
+      }
+    }
+  }
+
   const providedArgs = Object.keys(args).filter((arg) => arg !== "_");
   const wrongArgs = providedArgs.filter((arg) => !definedArgs.includes(arg));
 
