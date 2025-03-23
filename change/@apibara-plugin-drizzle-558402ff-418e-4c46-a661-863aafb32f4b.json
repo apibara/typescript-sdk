@@ -1,0 +1,7 @@
+{
+  "type": "prerelease",
+  "comment": "plugin-drizzle: detect more postgres connection strings",
+  "packageName": "@apibara/plugin-drizzle",
+  "email": "francesco@ceccon.me",
+  "dependentChangeType": "patch"
+}
