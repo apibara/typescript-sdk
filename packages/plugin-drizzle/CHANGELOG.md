@@ -1,8 +1,16 @@
 # Change Log - @apibara/plugin-drizzle
 
-<!-- This log was last generated on Fri, 21 Mar 2025 15:56:23 GMT and should not be manually modified. -->
+<!-- This log was last generated on Sun, 23 Mar 2025 19:11:18 GMT and should not be manually modified. -->
 
 <!-- Start content -->
+
+## 2.1.0-beta.20
+
+Sun, 23 Mar 2025 19:11:18 GMT
+
+### Changes
+
+- plugin-drizzle: detect more postgres connection strings (francesco@ceccon.me)
 
 ## 2.1.0-beta.18
 

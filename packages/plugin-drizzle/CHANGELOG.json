@@ -2,6 +2,21 @@
   "name": "@apibara/plugin-drizzle",
   "entries": [
     {
+      "date": "Sun, 23 Mar 2025 19:11:18 GMT",
+      "version": "2.1.0-beta.20",
+      "tag": "@apibara/plugin-drizzle_v2.1.0-beta.20",
+      "comments": {
+        "prerelease": [
+          {
+            "author": "francesco@ceccon.me",
+            "package": "@apibara/plugin-drizzle",
+            "commit": "d31d68068ff1f3563fe8ee989f340120135512d9",
+            "comment": "plugin-drizzle: detect more postgres connection strings"
+          }
+        ]
+      }
+    },
+    {
       "date": "Fri, 21 Mar 2025 15:56:23 GMT",
       "version": "2.1.0-beta.18",
       "tag": "@apibara/plugin-drizzle_v2.1.0-beta.18",
