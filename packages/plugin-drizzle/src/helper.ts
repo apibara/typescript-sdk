@@ -129,7 +129,10 @@ export function drizzle<
     poolConfig,
   } = options ?? {};
 
-  if (connectionString.startsWith("postgres://") || type === "node-postgres") {
+  if (
+    isPostgresConnectionString(connectionString) ||
+    type === "node-postgres"
+  ) {
     const pool = new pg.Pool({
       connectionString,
       ...(poolConfig || {}),
@@ -192,4 +195,8 @@ export async function migrate<TSchema extends Record<string, unknown>>(
       },
     );
   }
+}
+
+function isPostgresConnectionString(conn: string) {
+  return conn.startsWith("postgres://") || conn.startsWith("postgresql://");
 }
