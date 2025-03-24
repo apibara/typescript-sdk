@@ -52,36 +52,42 @@ describe("SQLite key-value store", () => {
       [
         {
           "from_block": 5000000,
+          "id": "indexer_testing_default",
           "k": "data-5000000",
           "to_block": 5000001,
           "v": ""5000000"",
         },
         {
           "from_block": 5000000,
+          "id": "indexer_testing_default",
           "k": "latest",
           "to_block": 5000001,
           "v": "5000000",
         },
         {
           "from_block": 5000001,
+          "id": "indexer_testing_default",
           "k": "data-5000001",
           "to_block": 5000002,
           "v": ""5000001"",
         },
         {
           "from_block": 5000001,
+          "id": "indexer_testing_default",
           "k": "latest",
           "to_block": 5000002,
           "v": "5000001",
         },
         {
           "from_block": 5000002,
+          "id": "indexer_testing_default",
           "k": "data-5000002",
           "to_block": null,
           "v": ""5000002"",
         },
         {
           "from_block": 5000002,
+          "id": "indexer_testing_default",
           "k": "latest",
           "to_block": null,
           "v": "5000002",
@@ -267,18 +273,21 @@ describe("SQLite key-value store", () => {
       [
         {
           "from_block": 103,
+          "id": "indexer_testing_default",
           "k": "data-103B",
           "to_block": null,
           "v": ""103B"",
         },
         {
           "from_block": 104,
+          "id": "indexer_testing_default",
           "k": "data-104B",
           "to_block": null,
           "v": ""104B"",
         },
         {
           "from_block": 105,
+          "id": "indexer_testing_default",
           "k": "data-105B",
           "to_block": null,
           "v": ""105B"",
@@ -449,24 +458,28 @@ describe("SQLite key-value store", () => {
       [
         {
           "from_block": 103,
+          "id": "indexer_testing_default",
           "k": "data-103",
           "to_block": null,
           "v": ""103B"",
         },
         {
           "from_block": 104,
+          "id": "indexer_testing_default",
           "k": "data-104",
           "to_block": null,
           "v": ""104B"",
         },
         {
           "from_block": 106,
+          "id": "indexer_testing_default",
           "k": "data-106",
           "to_block": null,
           "v": ""106BC"",
         },
         {
           "from_block": 107,
+          "id": "indexer_testing_default",
           "k": "data-107",
           "to_block": null,
           "v": ""107BC"",
@@ -550,12 +563,14 @@ describe("SQLite key-value store", () => {
       [
         {
           "from_block": 5000001,
+          "id": "indexer_testing_default",
           "k": "block-5000001",
           "to_block": null,
           "v": ""accepted-block1"",
         },
         {
           "from_block": 5000002,
+          "id": "indexer_testing_default",
           "k": "block-5000002",
           "to_block": null,
           "v": ""pending-block2"",

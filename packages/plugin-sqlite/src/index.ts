@@ -1,5 +1,5 @@
 import { useIndexerContext } from "@apibara/indexer";
-import { defineIndexerPlugin } from "@apibara/indexer/plugins";
+import { defineIndexerPlugin, useLogger } from "@apibara/indexer/plugins";
 import type { Cursor, DataFinality } from "@apibara/protocol";
 import type { Database as SqliteDatabase } from "better-sqlite3";
 
@@ -7,6 +7,7 @@ import { generateIndexerId } from "@apibara/indexer/internal";
 import { useInternalContext } from "@apibara/indexer/internal/plugins";
 import {
   KeyValueStore,
+  cleanupKV,
   finalizeKV,
   initializeKeyValueStore,
   invalidateKV,
@@ -17,6 +18,7 @@ import {
   initializePersistentState,
   invalidateState,
   persistState,
+  resetPersistence,
 } from "./persistence";
 import {
   type DeserializeFn,
@@ -77,14 +79,19 @@ export function sqliteStorage<TFilter, TBlock>({
   return defineIndexerPlugin<TFilter, TBlock>((indexer) => {
     let indexerId = "";
     let prevFinality: DataFinality | undefined;
+    const alwaysReindex = process.env["APIBARA_ALWAYS_REINDEX"] === "true";
 
     indexer.hooks.hook("run:before", async () => {
       const { indexerName: indexerFileName, availableIndexers } =
         useInternalContext();
 
+      const logger = useLogger();
+
       indexerId = generateIndexerId(indexerFileName, identifier);
 
       let retries = 0;
+
+      let cleanupApplied = false;
 
       while (retries <= MAX_RETRIES) {
         try {
@@ -95,6 +102,22 @@ export function sqliteStorage<TFilter, TBlock>({
 
             if (enableKeyValueStore) {
               initializeKeyValueStore(db);
+            }
+
+            if (alwaysReindex && !cleanupApplied) {
+              if (enableKeyValueStore) {
+                logger.warn("Reindexing: Cleaning up key-value store");
+                cleanupKV(db, indexerId);
+              }
+
+              if (enablePersistState) {
+                logger.warn("Reindexing: Resetting persistence state");
+                resetPersistence({ db, indexerId });
+              }
+
+              cleanupApplied = true;
+
+              logger.success("All data has been cleaned up for reindexing");
             }
           });
           break;
@@ -145,7 +168,7 @@ export function sqliteStorage<TFilter, TBlock>({
         }
 
         if (enableKeyValueStore) {
-          invalidateKV(db, cursor);
+          invalidateKV(db, cursor, indexerId);
         }
       });
     });
@@ -182,7 +205,7 @@ export function sqliteStorage<TFilter, TBlock>({
         }
 
         if (enableKeyValueStore) {
-          finalizeKV(db, cursor);
+          finalizeKV(db, cursor, indexerId);
         }
       });
     });
@@ -200,7 +223,7 @@ export function sqliteStorage<TFilter, TBlock>({
         }
 
         if (enableKeyValueStore) {
-          invalidateKV(db, cursor);
+          invalidateKV(db, cursor, indexerId);
         }
       });
     });
@@ -227,7 +250,7 @@ export function sqliteStorage<TFilter, TBlock>({
           if (prevFinality === "pending") {
             // invalidate if previous block's finality was "pending"
             if (enableKeyValueStore) {
-              invalidateKV(db, cursor);
+              invalidateKV(db, cursor, indexerId);
             }
           }
 
@@ -238,6 +261,7 @@ export function sqliteStorage<TFilter, TBlock>({
               finality,
               serializeFn,
               deserializeFn,
+              indexerId,
             );
           }
 

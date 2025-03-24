@@ -79,7 +79,7 @@ export const packageVersions = {
   "@apibara/plugin-sqlite": "next",
   // Postgres Dependencies
   "@electric-sql/pglite": "^0.2.17",
-  "drizzle-orm": "^0.37.0",
+  "drizzle-orm": "^0.40.1",
   pg: "^8.13.1",
   "@types/pg": "^8.11.10",
   "drizzle-kit": "^0.29.0",

@@ -1,0 +1,7 @@
+{
+  "type": "prerelease",
+  "comment": "plugin-drizzle: add idColumn map support with validation and fix cleanup errors",
+  "packageName": "@apibara/plugin-drizzle",
+  "email": "jadejajaipal5@gmail.com",
+  "dependentChangeType": "patch"
+}

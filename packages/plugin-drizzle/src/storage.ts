@@ -16,7 +16,11 @@ import {
   text,
 } from "drizzle-orm/pg-core";
 import { SCHEMA_NAME } from "./constants";
-import { DrizzleStorageError } from "./utils";
+import {
+  DrizzleStorageError,
+  type IdColumnMap,
+  getIdColumnForTable,
+} from "./utils";
 
 const ROLLBACK_TABLE_NAME = "reorg_rollback";
 
@@ -125,11 +129,14 @@ export async function registerTriggers<
   tx: PgTransaction<TQueryResult, TFullSchema, TSchema>,
   tables: string[],
   endCursor: Cursor,
-  idColumn: string,
+  idColumnMap: IdColumnMap,
   indexerId: string,
 ) {
   try {
     for (const table of tables) {
+      // Determine the column ID for this specific table
+      const tableIdColumn = getIdColumnForTable(table, idColumnMap);
+
       await tx.execute(
         sql.raw(
           `DROP TRIGGER IF EXISTS ${getReorgTriggerName(table, indexerId)} ON ${table};`,
@@ -140,7 +147,7 @@ export async function registerTriggers<
           CREATE CONSTRAINT TRIGGER ${getReorgTriggerName(table, indexerId)}
           AFTER INSERT OR UPDATE OR DELETE ON ${table}
           DEFERRABLE INITIALLY DEFERRED
-          FOR EACH ROW EXECUTE FUNCTION ${SCHEMA_NAME}.reorg_checkpoint('${idColumn}', ${`${Number(endCursor.orderKey)}`}, '${indexerId}');
+          FOR EACH ROW EXECUTE FUNCTION ${SCHEMA_NAME}.reorg_checkpoint('${tableIdColumn}', ${Number(endCursor.orderKey)}, '${indexerId}');
         `),
       );
     }
@@ -184,7 +191,7 @@ export async function invalidate<
 >(
   tx: PgTransaction<TQueryResult, TFullSchema, TSchema>,
   cursor: Cursor,
-  idColumn: string,
+  idColumnMap: IdColumnMap,
   indexerId: string,
 ) {
   // Get and delete operations after cursor in one query, ordered by newest first
@@ -208,6 +215,9 @@ export async function invalidate<
 
   // Process each operation in reverse order
   for (const op of result) {
+    // Determine the column ID for this specific table
+    const tableIdColumn = getIdColumnForTable(op.table_name, idColumnMap);
+
     switch (op.op) {
       case "I":
         try {
@@ -218,7 +228,7 @@ export async function invalidate<
           await tx.execute(
             sql.raw(`
                 DELETE FROM ${op.table_name}
-                WHERE ${idColumn} = '${op.row_id}'
+                WHERE ${tableIdColumn} = '${op.row_id}'
               `),
           );
         } catch (error) {
@@ -271,7 +281,9 @@ export async function invalidate<
               ? JSON.parse(op.row_value)
               : op.row_value;
 
-          const nonIdKeys = Object.keys(rowValue).filter((k) => k !== idColumn);
+          const nonIdKeys = Object.keys(rowValue).filter(
+            (k) => k !== tableIdColumn,
+          );
 
           const fields = nonIdKeys.map((c) => `${c} = prev.${c}`).join(", ");
 
@@ -281,7 +293,7 @@ export async function invalidate<
               FROM (
                 SELECT * FROM json_populate_record(null::${op.table_name}, '${JSON.stringify(op.row_value)}'::json)
               ) as prev
-              WHERE ${op.table_name}.${idColumn} = '${op.row_id}'
+              WHERE ${op.table_name}.${tableIdColumn} = '${op.row_id}'
               `);
 
           await tx.execute(query);

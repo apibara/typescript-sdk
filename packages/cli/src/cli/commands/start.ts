@@ -4,7 +4,7 @@ import { defineCommand } from "citty";
 import { colors } from "consola/utils";
 import fse from "fs-extra";
 import { resolve } from "pathe";
-import { commonArgs } from "../common";
+import { checkForUnknownArgs, commonArgs } from "../common";
 
 export default defineCommand({
   meta: {
@@ -23,9 +23,11 @@ export default defineCommand({
       description: "The preset to use",
     },
   },
-  async run({ args }) {
+  async run({ args, cmd }) {
     const { indexer, preset } = args;
     const rootDir = resolve((args.dir || args._dir || ".") as string);
+
+    await checkForUnknownArgs(args, cmd);
 
     const apibara = await createApibara({
       rootDir,
@@ -67,7 +69,6 @@ export default defineCommand({
           code !== null ? ` with code ${colors.red(code)}` : ""
         }`,
       );
-      process.exit(code ?? 0);
     });
   },
 });

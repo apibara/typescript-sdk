@@ -32,9 +32,17 @@ import {
   registerTriggers,
   removeTriggers,
 } from "./storage";
-import { DrizzleStorageError, sleep, withTransaction } from "./utils";
+import {
+  DrizzleStorageError,
+  type IdColumnMap,
+  getIdColumnForTable,
+  sleep,
+  withTransaction,
+} from "./utils";
 
 export * from "./helper";
+
+export type { IdColumnMap };
 
 const MAX_RETRIES = 5;
 
@@ -89,9 +97,32 @@ export interface DrizzleStorageOptions<
    */
   schema?: Record<string, unknown>;
   /**
-   * The column to use as the id. Defaults to 'id'.
+   * The column to use as the primary identifier for each table.
+   *
+   * This identifier is used for tracking changes during reorgs and rollbacks.
+   *
+   * Can be specified in two ways:
+   *
+   * 1. As a single string that applies to all tables:
+   * ```ts
+   * idColumn: "_id" // Uses "_id" column for all tables
+   * ```
+   *
+   * 2. As an object mapping table names to their ID columns:
+   * ```ts
+   * idColumn: {
+   *   transfers: "transaction_hash",    // Use "transaction_hash" for transfers table
+   *   blocks: "block_number",           // Use "block_number" for blocks table
+   *   "*": "_id"                        // Use "_id" for all other tables | defaults to "id"
+   * }
+   * ```
+   *
+   * The special "*" key acts as a fallback for any tables not explicitly mapped.
+   *
+   * @default "id"
+   * @type {string | Partial<IdColumnMap>}
    */
-  idColumn?: string;
+  idColumn?: string | Partial<IdColumnMap>;
   /**
    * The options for the database migration. When provided, the database will automatically run migrations before the indexer runs.
    */
@@ -120,8 +151,8 @@ export function drizzleStorage<
   db,
   persistState: enablePersistence = true,
   indexerName: identifier = "default",
-  schema,
-  idColumn = "id",
+  schema: _schema,
+  idColumn,
   migrate: migrateOptions,
 }: DrizzleStorageOptions<TQueryResult, TFullSchema, TSchema>) {
   return defineIndexerPlugin<TFilter, TBlock>((indexer) => {
@@ -129,15 +160,35 @@ export function drizzleStorage<
     let indexerId = "";
     const alwaysReindex = process.env["APIBARA_ALWAYS_REINDEX"] === "true";
     let prevFinality: DataFinality | undefined;
+    const schema: TSchema = (_schema as TSchema) ?? db._.schema ?? {};
+    const idColumnMap: IdColumnMap = {
+      "*": typeof idColumn === "string" ? idColumn : "id",
+      ...(typeof idColumn === "object" ? idColumn : {}),
+    };
 
     try {
-      tableNames = Object.values((schema as TSchema) ?? db._.schema ?? {}).map(
-        (table) => table.dbName,
-      );
+      tableNames = Object.values(schema).map((table) => table.dbName);
     } catch (error) {
       throw new DrizzleStorageError("Failed to get table names from schema", {
         cause: error,
       });
+    }
+
+    // Check if specified idColumn exists in all the tables in schema
+    for (const table of Object.values(schema)) {
+      const columns = table.columns;
+      const tableIdColumn = getIdColumnForTable(table.dbName, idColumnMap);
+
+      const columnExists = Object.values(columns).some(
+        (column) => column.name === tableIdColumn,
+      );
+
+      if (!columnExists) {
+        throw new DrizzleStorageError(
+          `Column \`"${tableIdColumn}"\` does not exist in table \`"${table.dbName}"\`. ` +
+            "Make sure the table has the specified column or provide a valid `idColumn` mapping to `drizzleStorage`.",
+        );
+      }
     }
 
     indexer.hooks.hook("run:before", async () => {
@@ -153,25 +204,11 @@ export function drizzleStorage<
 
       indexerId = generateIndexerId(indexerFileName, identifier);
 
-      if (alwaysReindex) {
-        logger.warn(
-          `Reindexing: Deleting all data from tables - ${tableNames.join(", ")}`,
-        );
-        await withTransaction(db, async (tx) => {
-          await cleanupStorage(tx, tableNames, indexerId);
-
-          if (enablePersistence) {
-            await resetPersistence({ tx, indexerId });
-          }
-
-          logger.success("Tables have been cleaned up for reindexing");
-        });
-      }
-
       let retries = 0;
 
       // incase the migrations are already applied, we don't want to run them again
       let migrationsApplied = false;
+      let cleanupApplied = false;
 
       while (retries <= MAX_RETRIES) {
         try {
@@ -185,6 +222,22 @@ export function drizzleStorage<
             await initializeReorgRollbackTable(tx, indexerId);
             if (enablePersistence) {
               await initializePersistentState(tx);
+            }
+
+            if (alwaysReindex && !cleanupApplied) {
+              logger.warn(
+                `Reindexing: Deleting all data from tables - ${tableNames.join(", ")}`,
+              );
+
+              await cleanupStorage(tx, tableNames, indexerId);
+
+              if (enablePersistence) {
+                await resetPersistence({ tx, indexerId });
+              }
+
+              cleanupApplied = true;
+
+              logger.success("Tables have been cleaned up for reindexing");
             }
           });
           break;
@@ -239,7 +292,8 @@ export function drizzleStorage<
       }
 
       await withTransaction(db, async (tx) => {
-        await invalidate(tx, cursor, idColumn, indexerId);
+        // Use the appropriate idColumn for each table when calling invalidate
+        await invalidate(tx, cursor, idColumnMap, indexerId);
 
         if (enablePersistence) {
           await invalidateState({ tx, cursor, indexerId });
@@ -289,7 +343,8 @@ export function drizzleStorage<
       }
 
       await withTransaction(db, async (tx) => {
-        await invalidate(tx, cursor, idColumn, indexerId);
+        // Use the appropriate idColumn for each table when calling invalidate
+        await invalidate(tx, cursor, idColumnMap, indexerId);
 
         if (enablePersistence) {
           await invalidateState({ tx, cursor, indexerId });
@@ -319,7 +374,7 @@ export function drizzleStorage<
 
             if (prevFinality === "pending") {
               // invalidate if previous block's finality was "pending"
-              await invalidate(tx, cursor, idColumn, indexerId);
+              await invalidate(tx, cursor, idColumnMap, indexerId);
             }
 
             if (finality !== "finalized") {
@@ -327,7 +382,7 @@ export function drizzleStorage<
                 tx,
                 tableNames,
                 endCursor,
-                idColumn,
+                idColumnMap,
                 indexerId,
               );
             }
