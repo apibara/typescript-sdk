@@ -121,23 +121,7 @@ export function drizzle<
     poolConfig,
   } = options ?? {};
 
-  if (
-    isPostgresConnectionString(connectionString) ||
-    type === "node-postgres"
-  ) {
-    const { Pool } = require("pg");
-    const { drizzle: drizzleNode } = require("drizzle-orm/node-postgres");
-    const pool = new Pool({
-      connectionString,
-      ...(poolConfig || {}),
-    });
-    return drizzleNode(pool, { schema, ...(config || {}) }) as Database<
-      TOptions,
-      TSchema
-    >;
-  }
-
-  if (type === "pglite") {
+  if (isPgliteConnectionString(connectionString) && type === "pglite") {
     const { drizzle: drizzlePGLite } = require("drizzle-orm/pglite");
 
     return drizzlePGLite({
@@ -149,7 +133,16 @@ export function drizzle<
     }) as Database<TOptions, TSchema>;
   }
 
-  throw new Error("Invalid database type");
+  const { Pool } = require("pg");
+  const { drizzle: drizzleNode } = require("drizzle-orm/node-postgres");
+  const pool = new Pool({
+    connectionString,
+    ...(poolConfig || {}),
+  });
+  return drizzleNode(pool, { schema, ...(config || {}) }) as Database<
+    TOptions,
+    TSchema
+  >;
 }
 
 /**
@@ -197,8 +190,12 @@ export async function migrate<TSchema extends Record<string, unknown>>(
   }
 }
 
-function isPostgresConnectionString(conn: string) {
-  return conn.startsWith("postgres://") || conn.startsWith("postgresql://");
+function isPgliteConnectionString(conn: string) {
+  return (
+    conn.startsWith("memory://") ||
+    conn.startsWith("file://") ||
+    conn.startsWith("idb://")
+  );
 }
 
 function isDrizzleKind(value: unknown, entityKindValue: string) {
