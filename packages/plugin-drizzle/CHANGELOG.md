@@ -1,8 +1,16 @@
 # Change Log - @apibara/plugin-drizzle
 
-<!-- This log was last generated on Sun, 23 Mar 2025 19:11:18 GMT and should not be manually modified. -->
+<!-- This log was last generated on Mon, 24 Mar 2025 15:58:22 GMT and should not be manually modified. -->
 
 <!-- Start content -->
+
+## 2.1.0-beta.21
+
+Mon, 24 Mar 2025 15:58:22 GMT
+
+### Changes
+
+- plugin-drizzle: add idColumn map support with validation and fix cleanup errors (jadejajaipal5@gmail.com)
 
 ## 2.1.0-beta.20
 

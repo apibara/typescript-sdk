@@ -1,7 +1,0 @@
-{
-  "type": "prerelease",
-  "comment": "cli: fix dev reload, change flag names, args validation, bump drizzle-orm version in template",
-  "packageName": "apibara",
-  "email": "jadejajaipal5@gmail.com",
-  "dependentChangeType": "patch"
-}

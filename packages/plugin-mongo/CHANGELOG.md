@@ -1,8 +1,16 @@
 # Change Log - @apibara/plugin-mongo
 
-<!-- This log was last generated on Fri, 21 Mar 2025 15:56:23 GMT and should not be manually modified. -->
+<!-- This log was last generated on Mon, 24 Mar 2025 15:58:22 GMT and should not be manually modified. -->
 
 <!-- Start content -->
+
+## 2.1.0-beta.21
+
+Mon, 24 Mar 2025 15:58:22 GMT
+
+### Changes
+
+- plugin-mongo: move cleanup part after initialization (jadejajaipal5@gmail.com)
 
 ## 2.1.0-beta.18
 

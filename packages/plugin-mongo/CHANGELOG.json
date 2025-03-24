@@ -2,6 +2,21 @@
   "name": "@apibara/plugin-mongo",
   "entries": [
     {
+      "date": "Mon, 24 Mar 2025 15:58:22 GMT",
+      "version": "2.1.0-beta.21",
+      "tag": "@apibara/plugin-mongo_v2.1.0-beta.21",
+      "comments": {
+        "prerelease": [
+          {
+            "author": "jadejajaipal5@gmail.com",
+            "package": "@apibara/plugin-mongo",
+            "commit": "75b7f0e954ae42dcee61f6d8718f0a1f1ab9c25b",
+            "comment": "plugin-mongo: move cleanup part after initialization"
+          }
+        ]
+      }
+    },
+    {
       "date": "Fri, 21 Mar 2025 15:56:23 GMT",
       "version": "2.1.0-beta.18",
       "tag": "@apibara/plugin-mongo_v2.1.0-beta.18",

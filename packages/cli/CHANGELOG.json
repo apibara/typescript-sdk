@@ -2,6 +2,21 @@
   "name": "apibara",
   "entries": [
     {
+      "date": "Mon, 24 Mar 2025 15:58:22 GMT",
+      "version": "2.1.0-beta.21",
+      "tag": "apibara_v2.1.0-beta.21",
+      "comments": {
+        "prerelease": [
+          {
+            "author": "jadejajaipal5@gmail.com",
+            "package": "apibara",
+            "commit": "75b7f0e954ae42dcee61f6d8718f0a1f1ab9c25b",
+            "comment": "cli: fix dev reload, change flag names, args validation, bump drizzle-orm version in template"
+          }
+        ]
+      }
+    },
+    {
       "date": "Fri, 21 Mar 2025 11:03:55 GMT",
       "version": "2.1.0-beta.15",
       "tag": "apibara_v2.1.0-beta.15",

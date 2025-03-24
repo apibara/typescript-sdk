@@ -2,6 +2,21 @@
   "name": "@apibara/plugin-drizzle",
   "entries": [
     {
+      "date": "Mon, 24 Mar 2025 15:58:22 GMT",
+      "version": "2.1.0-beta.21",
+      "tag": "@apibara/plugin-drizzle_v2.1.0-beta.21",
+      "comments": {
+        "prerelease": [
+          {
+            "author": "jadejajaipal5@gmail.com",
+            "package": "@apibara/plugin-drizzle",
+            "commit": "75b7f0e954ae42dcee61f6d8718f0a1f1ab9c25b",
+            "comment": "plugin-drizzle: add idColumn map support with validation and fix cleanup errors"
+          }
+        ]
+      }
+    },
+    {
       "date": "Sun, 23 Mar 2025 19:11:18 GMT",
       "version": "2.1.0-beta.20",
       "tag": "@apibara/plugin-drizzle_v2.1.0-beta.20",

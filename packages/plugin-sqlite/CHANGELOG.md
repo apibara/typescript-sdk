@@ -1,8 +1,16 @@
 # Change Log - @apibara/plugin-sqlite
 
-<!-- This log was last generated on Fri, 21 Mar 2025 15:56:23 GMT and should not be manually modified. -->
+<!-- This log was last generated on Mon, 24 Mar 2025 15:58:22 GMT and should not be manually modified. -->
 
 <!-- Start content -->
+
+## 2.1.0-beta.21
+
+Mon, 24 Mar 2025 15:58:22 GMT
+
+### Changes
+
+- add cleanup logic and add indexerId relation to KV Store (jadejajaipal5@gmail.com)
 
 ## 2.1.0-beta.18
 
