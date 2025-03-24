@@ -5,6 +5,7 @@ import type { Apibara } from "apibara/types";
 import { defineCommand } from "citty";
 import { colors } from "consola/utils";
 import { join, resolve } from "pathe";
+import { blueBright, gray } from "../../create/colors";
 import { checkForUnknownArgs, commonArgs } from "../common";
 
 // Hot module reloading key regex
@@ -41,6 +42,12 @@ export default defineCommand({
     if (args["always-reindex"]) {
       process.env.APIBARA_ALWAYS_REINDEX = "true";
     }
+
+    const selectedIndexers =
+      args.indexers
+        ?.split(",")
+        .map((i) => i.trim())
+        .sort() || [];
 
     let apibara: Apibara;
     let childProcess: ChildProcess | undefined;
@@ -107,6 +114,15 @@ export default defineCommand({
           childProcess = undefined;
         } else {
           apibara.logger.info("Starting indexers");
+
+          const indexersText = apibara.indexers
+            .map((i) =>
+              selectedIndexers.includes(i.name) || selectedIndexers.length === 0
+                ? blueBright(i.name)
+                : gray(i.name),
+            )
+            .join(", ");
+          apibara.logger.info("Indexers:", indexersText);
         }
 
         const childArgs = [
@@ -115,6 +131,16 @@ export default defineCommand({
           ...(args.indexers ? ["--indexers", args.indexers] : []),
           ...(args.preset ? ["--preset", args.preset] : []),
         ];
+
+        if (selectedIndexers.length === 0) {
+          for (const indexer of apibara.indexers) {
+            apibara.logger.info(`Indexer ${blueBright(indexer.name)} started`);
+          }
+        } else {
+          for (const indexer of selectedIndexers) {
+            apibara.logger.info(`Indexer ${blueBright(indexer)} started`);
+          }
+        }
 
         childProcess = spawn("node", childArgs, {
           stdio: "inherit",
