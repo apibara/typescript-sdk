@@ -89,12 +89,11 @@ ${storage === "postgres" ? `import * as schema from "../lib/schema";` : ""}
 
 export default function (runtimeConfig${language === "typescript" ? ": ApibaraRuntimeConfig" : ""}) {
   const indexerId = "${indexerId}";
-  const { startingBlock, streamUrl${storage === "postgres" ? ", postgresConnectionString" : ""} } = runtimeConfig[indexerId];
+  const { startingBlock, streamUrl } = runtimeConfig[indexerId];
   ${
     storage === "postgres"
       ? `const db = drizzle({
     schema,
-    connectionString: postgresConnectionString,
   });`
       : ""
   }
@@ -225,12 +224,8 @@ export async function updateApibaraConfigFile({
 
   const runtimeConfigString = `{
   startingBlock: 0,
-  streamUrl: "${dnaUrl ?? getDnaUrl(chain, network)}"${
-    storage === "postgres"
-      ? `,
-  postgresConnectionString: process.env["POSTGRES_CONNECTION_STRING"] ?? "memory://${indexerId}"`
-      : ""
-  }}`;
+  streamUrl: "${dnaUrl ?? getDnaUrl(chain, network)}"  
+}`;
 
   const project = new Project();
   const sourceFile = project.addSourceFileAtPath(pathToConfig);
