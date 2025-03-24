@@ -186,7 +186,7 @@ export function drizzleStorage<
       if (!columnExists) {
         throw new DrizzleStorageError(
           `Column \`"${tableIdColumn}"\` does not exist in table \`"${table.dbName}"\`. ` +
-            "Make sure the table has the specified column or provide a valid `idColumn` mapping in the options of `drizzleStorage`.",
+            "Make sure the table has the specified column or provide a valid `idColumn` mapping to `drizzleStorage`.",
         );
       }
     }
