@@ -32,8 +32,17 @@
     "test:ci": "vitest run"
   },
   "peerDependencies": {
+    "@electric-sql/pglite": ">=0.2.0",
     "drizzle-orm": "<1",
     "pg": ">=8"
+  },
+  "peerDependenciesMeta": {
+    "@electric-sql/pglite": {
+      "optional": true
+    },
+    "pg": {
+      "optional": true
+    }
   },
   "devDependencies": {
     "@electric-sql/pglite": "^0.2.17",

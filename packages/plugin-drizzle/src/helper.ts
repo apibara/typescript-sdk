@@ -1,18 +1,10 @@
-import { PGlite, type PGliteOptions } from "@electric-sql/pglite";
+import type { PGlite, PGliteOptions } from "@electric-sql/pglite";
 import type { DrizzleConfig } from "drizzle-orm";
+import { entityKind } from "drizzle-orm";
 import type { MigrationConfig } from "drizzle-orm/migrator";
-import {
-  type NodePgDatabase as OriginalNodePgDatabase,
-  drizzle as drizzleNode,
-} from "drizzle-orm/node-postgres";
-import { migrate as migrateNode } from "drizzle-orm/node-postgres/migrator";
-import {} from "drizzle-orm/pg-core";
-import {
-  type PgliteDatabase as OriginalPgliteDatabase,
-  drizzle as drizzlePGLite,
-} from "drizzle-orm/pglite";
-import { migrate as migratePGLite } from "drizzle-orm/pglite/migrator";
-import pg from "pg";
+import type { NodePgDatabase as OriginalNodePgDatabase } from "drizzle-orm/node-postgres";
+import type { PgliteDatabase as OriginalPgliteDatabase } from "drizzle-orm/pglite";
+import type pg from "pg";
 import { DrizzleStorageError } from "./utils";
 
 /**
@@ -133,7 +125,9 @@ export function drizzle<
     isPostgresConnectionString(connectionString) ||
     type === "node-postgres"
   ) {
-    const pool = new pg.Pool({
+    const { Pool } = require("pg");
+    const { drizzle: drizzleNode } = require("drizzle-orm/node-postgres");
+    const pool = new Pool({
       connectionString,
       ...(poolConfig || {}),
     });
@@ -144,6 +138,8 @@ export function drizzle<
   }
 
   if (type === "pglite") {
+    const { drizzle: drizzlePGLite } = require("drizzle-orm/pglite");
+
     return drizzlePGLite({
       schema: schema as TSchema,
       connection: {
@@ -179,12 +175,16 @@ export async function migrate<TSchema extends Record<string, unknown>>(
   db: PgliteDatabase<TSchema> | NodePgDatabase<TSchema>,
   options: MigrateOptions,
 ) {
-  const isPglite = !!("$client" in db && db.$client instanceof PGlite);
+  const isPglite = isDrizzleKind(db, "PgliteDatabase");
 
   try {
     if (isPglite) {
+      const { migrate: migratePGLite } = require("drizzle-orm/pglite/migrator");
       await migratePGLite(db as PgliteDatabase<TSchema>, options);
     } else {
+      const {
+        migrate: migrateNode,
+      } = require("drizzle-orm/node-postgres/migrator");
       await migrateNode(db as NodePgDatabase<TSchema>, options);
     }
   } catch (error) {
@@ -199,4 +199,24 @@ export async function migrate<TSchema extends Record<string, unknown>>(
 
 function isPostgresConnectionString(conn: string) {
   return conn.startsWith("postgres://") || conn.startsWith("postgresql://");
+}
+
+function isDrizzleKind(value: unknown, entityKindValue: string) {
+  if (!value || typeof value !== "object") {
+    return false;
+  }
+  // https://github.com/drizzle-team/drizzle-orm/blob/f39f885779800982e90dd3c89aba6df3217a6fd2/drizzle-orm/src/entity.ts#L29-L41
+  let cls = Object.getPrototypeOf(value).constructor;
+  if (cls) {
+    // Traverse the prototype chain to find the entityKind
+    while (cls) {
+      // https://github.com/drizzle-team/drizzle-orm/blob/f39f885779800982e90dd3c89aba6df3217a6fd2/drizzle-orm/src/pglite/driver.ts#L41
+      if (entityKind in cls && cls[entityKind] === entityKindValue) {
+        return true;
+      }
+      cls = Object.getPrototypeOf(cls);
+    }
+  }
+
+  return false;
 }
