@@ -43,11 +43,12 @@ export default defineCommand({
       process.env.APIBARA_ALWAYS_REINDEX = "true";
     }
 
-    const selectedIndexers =
+    const selectedIndexers = new Set(
       args.indexers
         ?.split(",")
         .map((i) => i.trim())
-        .sort() || [];
+        .sort() ?? [],
+    );
 
     let apibara: Apibara;
     let childProcess: ChildProcess | undefined;
@@ -117,7 +118,7 @@ export default defineCommand({
 
           const indexersText = apibara.indexers
             .map((i) =>
-              selectedIndexers.includes(i.name) || selectedIndexers.length === 0
+              selectedIndexers.has(i.name) || selectedIndexers.size === 0
                 ? blueBright(i.name)
                 : gray(i.name),
             )
@@ -131,16 +132,6 @@ export default defineCommand({
           ...(args.indexers ? ["--indexers", args.indexers] : []),
           ...(args.preset ? ["--preset", args.preset] : []),
         ];
-
-        if (selectedIndexers.length === 0) {
-          for (const indexer of apibara.indexers) {
-            apibara.logger.info(`Indexer ${blueBright(indexer.name)} started`);
-          }
-        } else {
-          for (const indexer of selectedIndexers) {
-            apibara.logger.info(`Indexer ${blueBright(indexer)} started`);
-          }
-        }
 
         childProcess = spawn("node", childArgs, {
           stdio: "inherit",
