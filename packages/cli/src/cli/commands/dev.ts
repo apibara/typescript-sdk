@@ -5,6 +5,7 @@ import type { Apibara } from "apibara/types";
 import { defineCommand } from "citty";
 import { colors } from "consola/utils";
 import { join, resolve } from "pathe";
+import { blueBright, gray } from "../../create/colors";
 import { checkForUnknownArgs, commonArgs } from "../common";
 
 // Hot module reloading key regex
@@ -41,6 +42,13 @@ export default defineCommand({
     if (args["always-reindex"]) {
       process.env.APIBARA_ALWAYS_REINDEX = "true";
     }
+
+    const selectedIndexers = new Set(
+      args.indexers
+        ?.split(",")
+        .map((i) => i.trim())
+        .sort() ?? [],
+    );
 
     let apibara: Apibara;
     let childProcess: ChildProcess | undefined;
@@ -107,6 +115,15 @@ export default defineCommand({
           childProcess = undefined;
         } else {
           apibara.logger.info("Starting indexers");
+
+          const indexersText = apibara.indexers
+            .map((i) =>
+              selectedIndexers.has(i.name) || selectedIndexers.size === 0
+                ? blueBright(i.name)
+                : gray(i.name),
+            )
+            .join(", ");
+          apibara.logger.info("Indexers:", indexersText);
         }
 
         const childArgs = [

@@ -88,7 +88,10 @@ export function createIndexer(indexerName: string, preset?: string) {
     ...(definition.plugins ?? []),
   ];
 
-  return _createIndexer(definition);
+  return {
+    indexer: _createIndexer(definition),
+    logger: consola.create({ reporters: [reporter] }),
+  };
 }
 
 export function createAuthenticatedClient(

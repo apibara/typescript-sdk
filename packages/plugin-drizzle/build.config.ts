@@ -8,5 +8,4 @@ export default defineBuildConfig({
   rollup: {
     emitCJS: true,
   },
-  externals: ["@electric-sql/pglite"],
 });
