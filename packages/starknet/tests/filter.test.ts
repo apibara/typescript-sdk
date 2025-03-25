@@ -10,7 +10,7 @@ import {
   StorageDiffFilter,
   TransactionFilter,
   mergeFilter,
-} from "./filter";
+} from "../src/filter";
 
 describe("HeaderFilter", () => {
   const encode = Schema.encodeSync(HeaderFilter);
