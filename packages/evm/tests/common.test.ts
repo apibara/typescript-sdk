@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import { Schema } from "@effect/schema";
 import { pad } from "viem";
 
-import { Address, B256, U128, U256 } from "./common";
+import { Address, B256, U128, U256 } from "../src/common";
 
 describe("Address", () => {
   const encode = Schema.encodeSync(Address);
