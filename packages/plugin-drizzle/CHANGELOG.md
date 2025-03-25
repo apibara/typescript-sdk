@@ -1,8 +1,16 @@
 # Change Log - @apibara/plugin-drizzle
 
-<!-- This log was last generated on Mon, 24 Mar 2025 15:58:22 GMT and should not be manually modified. -->
+<!-- This log was last generated on Tue, 25 Mar 2025 13:41:11 GMT and should not be manually modified. -->
 
 <!-- Start content -->
+
+## 2.1.0-beta.22
+
+Tue, 25 Mar 2025 13:41:11 GMT
+
+### Changes
+
+- plugin-drizzle: add lazy imports and make pg default db in drizzle helper (jadejajaipal5@gmail.com)
 
 ## 2.1.0-beta.21
 

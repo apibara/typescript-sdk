@@ -2,6 +2,21 @@
   "name": "apibara",
   "entries": [
     {
+      "date": "Tue, 25 Mar 2025 13:41:11 GMT",
+      "version": "2.1.0-beta.22",
+      "tag": "apibara_v2.1.0-beta.22",
+      "comments": {
+        "prerelease": [
+          {
+            "author": "jadejajaipal5@gmail.com",
+            "package": "apibara",
+            "commit": "9eeb140ee9ad0ad8d68aa7a28b2600e0b77c0bdf",
+            "comment": "cli: improve dev output and update template"
+          }
+        ]
+      }
+    },
+    {
       "date": "Mon, 24 Mar 2025 15:58:22 GMT",
       "version": "2.1.0-beta.21",
       "tag": "apibara_v2.1.0-beta.21",

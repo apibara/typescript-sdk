@@ -1,7 +1,0 @@
-{
-  "type": "prerelease",
-  "comment": "cli: improve dev output and update template",
-  "packageName": "apibara",
-  "email": "jadejajaipal5@gmail.com",
-  "dependentChangeType": "patch"
-}

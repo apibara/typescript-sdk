@@ -1,8 +1,16 @@
 # Change Log - apibara
 
-<!-- This log was last generated on Mon, 24 Mar 2025 15:58:22 GMT and should not be manually modified. -->
+<!-- This log was last generated on Tue, 25 Mar 2025 13:41:11 GMT and should not be manually modified. -->
 
 <!-- Start content -->
+
+## 2.1.0-beta.22
+
+Tue, 25 Mar 2025 13:41:11 GMT
+
+### Changes
+
+- cli: improve dev output and update template (jadejajaipal5@gmail.com)
 
 ## 2.1.0-beta.21
 

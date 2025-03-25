@@ -1,7 +1,0 @@
-{
-  "type": "prerelease",
-  "comment": "plugin-drizzle: add lazy imports and make pg default db in drizzle helper",
-  "packageName": "@apibara/plugin-drizzle",
-  "email": "jadejajaipal5@gmail.com",
-  "dependentChangeType": "patch"
-}
