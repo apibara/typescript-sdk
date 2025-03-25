@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import { Schema } from "@effect/schema";
 import { pad } from "viem";
 
-import { B384 } from "./common";
+import { B384 } from "../src/common";
 
 describe("B384", () => {
   const encode = Schema.encodeSync(B384);
