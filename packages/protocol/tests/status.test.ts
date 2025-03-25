@@ -6,7 +6,7 @@ import {
   statusRequestToProto,
   statusResponseFromProto,
   statusResponseToProto,
-} from "./status";
+} from "../src/status";
 
 describe("StatusRequest", () => {
   describe("proto", () => {

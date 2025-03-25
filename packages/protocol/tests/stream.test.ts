@@ -8,7 +8,7 @@ import {
   StreamDataRequest,
   StreamDataResponse,
   SystemMessage,
-} from "./stream";
+} from "../src/stream";
 
 const InnerData = Schema.Struct({
   value: Schema.String,

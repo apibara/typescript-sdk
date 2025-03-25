@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { createCursor, cursorFromProto, cursorToProto } from "./common";
+import { createCursor, cursorFromProto, cursorToProto } from "../src/common";
 
 describe("Cursor", () => {
   describe("proto", () => {

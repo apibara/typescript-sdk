@@ -1,7 +1,7 @@
 import { Schema } from "@effect/schema";
 import { test } from "vitest";
 
-import { Data } from "./stream";
+import { Data } from "../src/stream";
 
 const Inner = Schema.Struct({
   data: Schema.String,

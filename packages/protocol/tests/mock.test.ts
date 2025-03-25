@@ -1,7 +1,11 @@
 import { Schema } from "@effect/schema";
 import { describe, expect, it } from "vitest";
 
-import { type MockBlock, MockBlockFromBytes, MockStream } from "./mock";
+import {
+  type MockBlock,
+  MockBlockFromBytes,
+  MockStream,
+} from "../src/testing/mock";
 
 describe("MockBlock", () => {
   const encode = Schema.encodeSync(MockBlockFromBytes);
