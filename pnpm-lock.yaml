@@ -626,9 +626,6 @@ importers:
       '@apibara/protocol':
         specifier: workspace:*
         version: link:../protocol
-      '@effect/schema':
-        specifier: ^0.67.15
-        version: 0.67.15(effect@3.2.6)
       '@scure/starknet':
         specifier: ^1.1.0
         version: 1.1.0
