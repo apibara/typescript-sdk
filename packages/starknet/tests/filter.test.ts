@@ -1,4 +1,3 @@
-import { Schema } from "@effect/schema";
 import { describe, expect, it } from "vitest";
 
 import {
@@ -13,8 +12,8 @@ import {
 } from "../src/filter";
 
 describe("HeaderFilter", () => {
-  const encode = Schema.encodeSync(HeaderFilter);
-  const decode = Schema.decodeSync(HeaderFilter);
+  const encode = HeaderFilter.encode;
+  const decode = HeaderFilter.decode;
 
   it("should encode and decode", () => {
     const always = "always";
@@ -26,8 +25,8 @@ describe("HeaderFilter", () => {
 });
 
 describe("Key", () => {
-  const encode = Schema.encodeSync(Key);
-  const decode = Schema.decodeSync(Key);
+  const encode = Key.encode;
+  const decode = Key.decode;
 
   it("should encode null values", () => {
     const proto = encode(null);
@@ -60,8 +59,8 @@ describe("Key", () => {
 });
 
 describe("EventFilter", () => {
-  const encode = Schema.encodeSync(EventFilter);
-  const decode = Schema.decodeSync(EventFilter);
+  const encode = EventFilter.encode;
+  const decode = EventFilter.decode;
 
   it("should encode and decode default values", () => {
     const proto = encode({});
@@ -148,8 +147,8 @@ describe("EventFilter", () => {
 });
 
 describe("TransactionFilter", () => {
-  const encode = Schema.encodeSync(TransactionFilter);
-  const decode = Schema.decodeSync(TransactionFilter);
+  const encode = TransactionFilter.encode;
+  const decode = TransactionFilter.decode;
 
   it("should encode and decode default values", () => {
     const proto = encode({});
@@ -472,8 +471,8 @@ describe("TransactionFilter", () => {
 });
 
 describe("StorageDiffFilter", () => {
-  const encode = Schema.encodeSync(StorageDiffFilter);
-  const decode = Schema.decodeSync(StorageDiffFilter);
+  const encode = StorageDiffFilter.encode;
+  const decode = StorageDiffFilter.decode;
 
   it("should encode and decode storage diffs", () => {
     const proto = encode({
@@ -500,8 +499,8 @@ describe("StorageDiffFilter", () => {
 });
 
 describe("ContractChangeFilter", () => {
-  const encode = Schema.encodeSync(ContractChangeFilter);
-  const decode = Schema.decodeSync(ContractChangeFilter);
+  const encode = ContractChangeFilter.encode;
+  const decode = ContractChangeFilter.decode;
 
   it("should encode and decode declared class changes", () => {
     const proto = encode({
@@ -583,8 +582,8 @@ describe("ContractChangeFilter", () => {
 });
 
 describe("NonceUpdateFilter", () => {
-  const encode = Schema.encodeSync(NonceUpdateFilter);
-  const decode = Schema.decodeSync(NonceUpdateFilter);
+  const encode = NonceUpdateFilter.encode;
+  const decode = NonceUpdateFilter.decode;
 
   it("should encode and decode nonce updates", () => {
     const proto = encode({
