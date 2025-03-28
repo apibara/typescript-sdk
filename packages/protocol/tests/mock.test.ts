@@ -1,4 +1,3 @@
-import { Schema } from "@effect/schema";
 import { describe, expect, it } from "vitest";
 
 import {
@@ -8,25 +7,22 @@ import {
 } from "../src/testing/mock";
 
 describe("MockBlock", () => {
-  const encode = Schema.encodeSync(MockBlockFromBytes);
-  const decode = Schema.decodeSync(MockBlockFromBytes);
-
   it("can be encoded and decoded", () => {
     const block = { data: "hello" } satisfies MockBlock;
 
-    const proto = encode(block);
-    const back = decode(proto);
+    const proto = MockBlockFromBytes.encode(block);
+    const back = MockBlockFromBytes.decode(proto);
 
     expect(back).toEqual(block);
   });
 
   it("encodes null as empty data", () => {
-    const proto = encode(null);
+    const proto = MockBlockFromBytes.encode(null);
     expect(proto).toEqual(new Uint8Array());
   });
 
   it("decodes empty data as null", () => {
-    const block = decode(new Uint8Array());
+    const block = MockBlockFromBytes.decode(new Uint8Array());
     expect(block).toBe(null);
   });
 });

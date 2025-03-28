@@ -1,59 +1,48 @@
 import { describe, expect, it } from "vitest";
 
-import { Schema } from "@effect/schema";
-
 import {
-  Heartbeat,
-  Invalidate,
-  StreamDataRequest,
-  StreamDataResponse,
-  SystemMessage,
-} from "../src/stream";
+  type Codec,
+  type CodecType,
+  MessageCodec,
+  StringCodec,
+} from "../src/codec";
+import { StreamDataRequest, StreamDataResponse } from "../src/stream";
 
-const InnerData = Schema.Struct({
-  value: Schema.String,
+const InnerData = MessageCodec({
+  value: StringCodec,
 });
 
-const TestData = Schema.transform(
-  Schema.Uint8ArrayFromSelf,
-  Schema.NullOr(InnerData),
-  {
-    decode(bytes) {
-      const value = new TextDecoder().decode(bytes);
-      return { value };
-    },
-    encode(value) {
-      if (value === null) {
-        return new Uint8Array();
-      }
-      return new TextEncoder().encode(value.value);
-    },
+type InnerData = CodecType<typeof InnerData>;
+
+const TestData: Codec<InnerData | null, Uint8Array> = {
+  decode(bytes) {
+    const value = new TextDecoder().decode(bytes);
+    return { value };
   },
-);
+  encode(value) {
+    if (value === null) {
+      return new Uint8Array();
+    }
+    return new TextEncoder().encode(value.value);
+  },
+};
 
 const TestStreamDataRequest = StreamDataRequest(TestData);
-
-const encodeTestRequest = Schema.encodeSync(TestStreamDataRequest);
-const decodeTestRequest = Schema.decodeSync(TestStreamDataRequest);
-
 const TestStreamDataResponse = StreamDataResponse(TestData);
 
-type TestStreamDataResponse = typeof TestStreamDataResponse.Type;
-
-const encodeTestResponse = Schema.encodeSync(TestStreamDataResponse);
-const decodeTestResponse = Schema.decodeSync(TestStreamDataResponse);
+type TestStreamDataResponse = CodecType<typeof TestStreamDataResponse>;
+type TestStreamDataRequest = CodecType<typeof TestStreamDataRequest>;
 
 describe("StreamDataRequest", () => {
   it("encodes and decodes", () => {
-    const request = TestStreamDataRequest.make({
+    const request: TestStreamDataRequest = {
       finality: "accepted",
       startingCursor: {
         orderKey: 5_000_000n,
       },
       filter: [{ value: "hello" }, { value: "world" }],
-    });
-
-    const proto = encodeTestRequest(request);
+    };
+    const proto = TestStreamDataRequest.encode(request);
     expect(proto).toMatchInlineSnapshot(`
       {
         "filter": [
@@ -79,15 +68,12 @@ describe("StreamDataRequest", () => {
         },
       }
     `);
-    const back = decodeTestRequest(proto);
-    expect(request).toEqual(back);
+    const back = TestStreamDataRequest.decode(proto);
+    expect(back).toEqual(request);
   });
 });
 
 describe("StreamDataResponse", () => {
-  const encode = encodeTestResponse;
-  const decode = decodeTestResponse;
-
   describe(".data", () => {
     it("encodes and decodes", () => {
       const message: TestStreamDataResponse = {
@@ -103,7 +89,7 @@ describe("StreamDataResponse", () => {
         },
       } as const;
 
-      const proto = encode(message);
+      const proto = TestStreamDataResponse.encode(message);
       expect(proto).toMatchInlineSnapshot(`
         {
           "$case": "data",
@@ -139,14 +125,14 @@ describe("StreamDataResponse", () => {
           },
         }
       `);
-      const back = decode(proto);
+      const back = TestStreamDataResponse.decode(proto);
       expect(back).toEqual(message);
     });
   });
 
   describe(".invalidate", () => {
     it("encodes and decodes", () => {
-      const invalidate = Invalidate.make({
+      const invalidate: TestStreamDataResponse = {
         _tag: "invalidate",
         invalidate: {
           cursor: {
@@ -154,9 +140,9 @@ describe("StreamDataResponse", () => {
             uniqueKey: "0x1234567890",
           },
         },
-      });
+      };
 
-      const proto = encode(invalidate);
+      const proto = TestStreamDataResponse.encode(invalidate);
       expect(proto).toMatchInlineSnapshot(`
         {
           "$case": "invalidate",
@@ -174,31 +160,32 @@ describe("StreamDataResponse", () => {
           },
         }
       `);
-      const back = decode(proto);
+      const back = TestStreamDataResponse.decode(proto);
       expect(back).toEqual(invalidate);
     });
   });
 
   describe(".heartbeat", () => {
     it("encodes and decodes", () => {
-      const heartbeat = Heartbeat.make({
+      const heartbeat: TestStreamDataResponse = {
         _tag: "heartbeat",
-      });
+      };
 
-      const proto = encode(heartbeat);
+      const proto = TestStreamDataResponse.encode(heartbeat);
       expect(proto).toMatchInlineSnapshot(`
         {
           "$case": "heartbeat",
+          "heartbeat": undefined,
         }
       `);
-      const back = decode(proto);
+      const back = TestStreamDataResponse.decode(proto);
       expect(back).toEqual(heartbeat);
     });
   });
 
   describe(".systemMessage", () => {
     it("encodes and decodes stdout", () => {
-      const message = SystemMessage.make({
+      const message: TestStreamDataResponse = {
         _tag: "systemMessage",
         systemMessage: {
           output: {
@@ -206,9 +193,9 @@ describe("StreamDataResponse", () => {
             stdout: "hello",
           },
         },
-      });
+      };
 
-      const proto = encode(message);
+      const proto = TestStreamDataResponse.encode(message);
       expect(proto).toMatchInlineSnapshot(`
         {
           "$case": "systemMessage",
@@ -220,12 +207,12 @@ describe("StreamDataResponse", () => {
           },
         }
       `);
-      const back = decode(proto);
+      const back = TestStreamDataResponse.decode(proto);
       expect(back).toEqual(message);
     });
 
     it("encodes and decodes stderr", () => {
-      const message = SystemMessage.make({
+      const message: TestStreamDataResponse = {
         _tag: "systemMessage",
         systemMessage: {
           output: {
@@ -233,9 +220,9 @@ describe("StreamDataResponse", () => {
             stderr: "hello",
           },
         },
-      });
+      };
 
-      const proto = encode(message);
+      const proto = TestStreamDataResponse.encode(message);
       expect(proto).toMatchInlineSnapshot(`
         {
           "$case": "systemMessage",
@@ -247,7 +234,7 @@ describe("StreamDataResponse", () => {
           },
         }
       `);
-      const back = decode(proto);
+      const back = TestStreamDataResponse.decode(proto);
       expect(back).toEqual(message);
     });
   });

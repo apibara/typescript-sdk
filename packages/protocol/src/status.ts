@@ -1,24 +1,23 @@
-import { Schema } from "@effect/schema";
-
+import { type CodecType, MessageCodec, OptionalCodec } from "./codec";
 import { Cursor } from "./common";
 
 /** The request to the `status` endpoint. */
-export const StatusRequest = Schema.Struct({});
+export const StatusRequest = MessageCodec({});
 
-export type StatusRequest = typeof StatusRequest.Type;
+export type StatusRequest = CodecType<typeof StatusRequest>;
 
-export const statusRequestToProto = Schema.encodeSync(StatusRequest);
-export const statusRequestFromProto = Schema.decodeSync(StatusRequest);
+export const statusRequestToProto = StatusRequest.encode;
+export const statusRequestFromProto = StatusRequest.decode;
 
 /** The response from the `status` endpoint. */
-export const StatusResponse = Schema.Struct({
-  currentHead: Schema.optional(Cursor),
-  lastIngested: Schema.optional(Cursor),
-  finalized: Schema.optional(Cursor),
-  starting: Schema.optional(Cursor),
+export const StatusResponse = MessageCodec({
+  currentHead: OptionalCodec(Cursor),
+  lastIngested: OptionalCodec(Cursor),
+  finalized: OptionalCodec(Cursor),
+  starting: OptionalCodec(Cursor),
 });
 
-export type StatusResponse = typeof StatusResponse.Type;
+export type StatusResponse = CodecType<typeof StatusResponse>;
 
-export const statusResponseToProto = Schema.encodeSync(StatusResponse);
-export const statusResponseFromProto = Schema.decodeSync(StatusResponse);
+export const statusResponseToProto = StatusResponse.encode;
+export const statusResponseFromProto = StatusResponse.decode;

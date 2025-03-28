@@ -1,5 +1,4 @@
-import type { Schema } from "@effect/schema";
-
+import type { Codec } from "./codec";
 import { StreamDataRequest, StreamDataResponse } from "./stream";
 
 /** Configure a DNA stream. */
@@ -8,8 +7,8 @@ export class StreamConfig<TFilter, TBlock> {
   private response;
 
   constructor(
-    private filter: Schema.Schema<TFilter, Uint8Array, never>,
-    private block: Schema.Schema<TBlock | null, Uint8Array, never>,
+    private filter: Codec<TFilter, Uint8Array>,
+    private block: Codec<TBlock | null, Uint8Array>,
     public mergeFilter: (a: TFilter, b: TFilter) => TFilter,
   ) {
     this.request = StreamDataRequest(this.filter);

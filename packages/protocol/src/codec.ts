@@ -399,6 +399,30 @@ export const StringCodec: Codec<string, string> = {
 };
 
 /*
+
+ █████  █████                █████             ██████   ███                          █████
+░░███  ░░███                ░░███             ███░░███ ░░░                          ░░███ 
+ ░███   ░███  ████████    ███████   ██████   ░███ ░░░  ████  ████████    ██████   ███████ 
+ ░███   ░███ ░░███░░███  ███░░███  ███░░███ ███████   ░░███ ░░███░░███  ███░░███ ███░░███ 
+ ░███   ░███  ░███ ░███ ░███ ░███ ░███████ ░░░███░     ░███  ░███ ░███ ░███████ ░███ ░███ 
+ ░███   ░███  ░███ ░███ ░███ ░███ ░███░░░    ░███      ░███  ░███ ░███ ░███░░░  ░███ ░███ 
+ ░░████████   ████ █████░░████████░░██████   █████     █████ ████ █████░░██████ ░░████████
+  ░░░░░░░░   ░░░░ ░░░░░  ░░░░░░░░  ░░░░░░   ░░░░░     ░░░░░ ░░░░ ░░░░░  ░░░░░░   ░░░░░░░░ 
+                                          
+*/
+
+export type UndefinedCodec = CodecType<typeof UndefinedCodec>;
+
+export const UndefinedCodec: Codec<undefined, undefined> = {
+  encode(app) {
+    return undefined;
+  },
+  decode(proto) {
+    return undefined;
+  },
+};
+
+/*
  █████        ███   █████                                 ████ 
 ░░███        ░░░   ░░███                                 ░░███ 
  ░███        ████  ███████    ██████  ████████   ██████   ░███ 
@@ -490,14 +514,15 @@ export const LiteralUnionCodec = <const L extends readonly Literal[]>(
 
 // Maps variant keys to their corresponding decoded types, adding a tag field
 // For example: { _tag: "declareV1", declareV1: { data: string } }
+// if the variant is undefined type, it will be just the tag - { _tag: "heartbeat" }
 type AppVariantMap<TTag extends TPropertyKey, TVariants extends TProperties> = {
   [K in keyof TVariants]: {
     [P in TTag]: K;
-  } & {
-    [P in K & TPropertyKey]: CodecType<TVariants[K]>;
-  };
+  } & (CodecType<TVariants[K]> extends UndefinedCodec
+    ? // biome-ignore lint/complexity/noBannedTypes: had to return empty object to satisfy type
+      {}
+    : { [P in K & TPropertyKey]: CodecType<TVariants[K]> });
 };
-
 type VariantCodecType<
   TTag extends TPropertyKey,
   TVariants extends TProperties,
