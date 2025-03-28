@@ -5,7 +5,6 @@
     "declarationDir": "dist",
     "noEmit": false,
     "rootDir": ".",
-    "exactOptionalPropertyTypes": true,
     "types": ["node"]
   }
 }
