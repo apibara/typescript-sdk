@@ -15,7 +15,7 @@ import {
   parseU64,
   parseU128,
   parseU256,
-} from "./parser";
+} from "../src/parser";
 
 describe("Primitive types parser", () => {
   it("can parse a bool", () => {

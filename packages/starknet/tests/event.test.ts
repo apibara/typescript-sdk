@@ -2,7 +2,6 @@ import { describe, expect, it } from "vitest";
 
 import type { Event } from "../src/block";
 import { decodeEvent } from "../src/event";
-
 import { chainlinkAbi } from "./fixtures/chainlink-abi";
 import { ekuboAbi } from "./fixtures/ekubo-abi";
 
@@ -38,6 +37,11 @@ describe("decodeEvent", () => {
           "0x0",
           "0x0",
         ],
+        eventIndex: 1893,
+        transactionIndex: 318,
+        transactionStatus: "succeeded",
+        eventIndexInTransaction: 6,
+        filterIds: [0],
       } as const satisfies Event;
 
       const decoded = decodeEvent({
@@ -79,6 +83,11 @@ describe("decodeEvent", () => {
           "0x0",
           "0x0",
         ],
+        eventIndex: 1893,
+        transactionIndex: 318,
+        transactionStatus: "succeeded",
+        eventIndexInTransaction: 6,
+        filterIds: [0],
       } as const satisfies Event;
 
       const decoded = decodeEvent({
@@ -122,6 +131,11 @@ describe("decodeEvent", () => {
         "0x0",
         "0x0",
       ],
+      eventIndex: 1893,
+      transactionIndex: 318,
+      transactionStatus: "succeeded",
+      eventIndexInTransaction: 6,
+      filterIds: [0],
     } as const satisfies Event;
 
     const decoded = decodeEvent({
@@ -189,11 +203,18 @@ describe("decodeEvent", () => {
           "0x0",
           "0x0",
         ],
+        "eventIndex": 1893,
+        "eventIndexInTransaction": 6,
         "eventName": "ekubo::core::Core::PositionUpdated",
+        "filterIds": [
+          0,
+        ],
         "keys": [
           "0x3a7adca3546c213ce791fabf3b04090c163e419c808c9830fb343a4a395946e",
         ],
         "transactionHash": "0x008691c1fa0f5c650b3492396dc1c22423c04e9a8843a12eaab03799d0a45cd0",
+        "transactionIndex": 318,
+        "transactionStatus": "succeeded",
       }
     `);
   });
@@ -232,6 +253,11 @@ describe("decodeEvent", () => {
         "0x1ee0005",
         "0x0",
       ],
+      eventIndex: 0,
+      transactionIndex: 0,
+      transactionStatus: "unknown",
+      eventIndexInTransaction: 0,
+      filterIds: [],
     } as const satisfies Event;
 
     const decoded = decodeEvent({
@@ -288,13 +314,18 @@ describe("decodeEvent", () => {
           "0x1ee0005",
           "0x0",
         ],
+        "eventIndex": 0,
+        "eventIndexInTransaction": 0,
         "eventName": "chainlink::ocr2::aggregator::Aggregator::NewTransmission",
+        "filterIds": [],
         "keys": [
           "0x19e22f866f4c5aead2809bf160d2b29e921e335d899979732101c6f3c38ff81",
           "0x2b012",
           "0x1a4edc870eb8da3b73ab70d5dffc5c0a14a6ab1ad612845add04200582bffa4",
         ],
         "transactionHash": "0x07021da0c8e9319d1144b0d56ed0bd86e46b15459cbb65c4dc0a05c8e274521d",
+        "transactionIndex": 0,
+        "transactionStatus": "unknown",
       }
     `);
   });

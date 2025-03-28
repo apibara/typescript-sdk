@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { type MiddlewareFunction, type NextFunction, compose } from "./compose";
+import {
+  type MiddlewareFunction,
+  type NextFunction,
+  compose,
+} from "../src/compose";
 
 type C = {
   bag: Record<string, unknown>;

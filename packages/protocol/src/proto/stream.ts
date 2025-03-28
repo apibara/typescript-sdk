@@ -112,13 +112,15 @@ export interface Cursor {
    *
    * This is usually the block or slot number.
    */
-  readonly orderKey: bigint;
+  readonly orderKey?:
+    | bigint
+    | undefined;
   /**
    * Key used to discriminate branches in the stream.
    *
    * This is usually the hash of the block.
    */
-  readonly uniqueKey: Uint8Array;
+  readonly uniqueKey?: Uint8Array | undefined;
 }
 
 /** Request for the `Status` method. */
@@ -163,7 +165,9 @@ export interface StreamDataRequest {
     | DataFinality
     | undefined;
   /** Filters used to generate data. */
-  readonly filter: readonly Uint8Array[];
+  readonly filter?:
+    | readonly Uint8Array[]
+    | undefined;
   /**
    * Heartbeat interval.
    *
@@ -195,7 +199,7 @@ export interface Invalidate {
     | Cursor
     | undefined;
   /** List of blocks that were removed from the chain. */
-  readonly removed: readonly Cursor[];
+  readonly removed?: readonly Cursor[] | undefined;
 }
 
 /** Move the finalized block forward. */
@@ -227,15 +231,19 @@ export interface Data {
     | Cursor
     | undefined;
   /** The finality status of the block. */
-  readonly finality: DataFinality;
+  readonly finality?:
+    | DataFinality
+    | undefined;
   /**
    * The block data.
    *
    * This message contains chain-specific data serialized using protobuf.
    */
-  readonly data: readonly Uint8Array[];
+  readonly data?:
+    | readonly Uint8Array[]
+    | undefined;
   /** The production mode of the block. */
-  readonly production: DataProduction;
+  readonly production?: DataProduction | undefined;
 }
 
 /** Sent to clients to check if stream is still connected. */
@@ -256,13 +264,13 @@ function createBaseCursor(): Cursor {
 
 export const Cursor = {
   encode(message: Cursor, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.orderKey !== BigInt("0")) {
+    if (message.orderKey !== undefined && message.orderKey !== BigInt("0")) {
       if (BigInt.asUintN(64, message.orderKey) !== message.orderKey) {
         throw new globalThis.Error("value provided for field message.orderKey of type uint64 too large");
       }
       writer.uint32(8).uint64(message.orderKey.toString());
     }
-    if (message.uniqueKey.length !== 0) {
+    if (message.uniqueKey !== undefined && message.uniqueKey.length !== 0) {
       writer.uint32(18).bytes(message.uniqueKey);
     }
     return writer;
@@ -307,10 +315,10 @@ export const Cursor = {
 
   toJSON(message: Cursor): unknown {
     const obj: any = {};
-    if (message.orderKey !== BigInt("0")) {
+    if (message.orderKey !== undefined && message.orderKey !== BigInt("0")) {
       obj.orderKey = message.orderKey.toString();
     }
-    if (message.uniqueKey.length !== 0) {
+    if (message.uniqueKey !== undefined && message.uniqueKey.length !== 0) {
       obj.uniqueKey = base64FromBytes(message.uniqueKey);
     }
     return obj;
@@ -494,8 +502,10 @@ export const StreamDataRequest = {
     if (message.finality !== undefined) {
       writer.uint32(16).int32(message.finality);
     }
-    for (const v of message.filter) {
-      writer.uint32(26).bytes(v!);
+    if (message.filter !== undefined && message.filter.length !== 0) {
+      for (const v of message.filter) {
+        writer.uint32(26).bytes(v!);
+      }
     }
     if (message.heartbeatInterval !== undefined) {
       Duration.encode(message.heartbeatInterval, writer.uint32(34).fork()).ldelim();
@@ -529,7 +539,7 @@ export const StreamDataRequest = {
             break;
           }
 
-          message.filter.push(reader.bytes());
+          message.filter!.push(reader.bytes());
           continue;
         case 4:
           if (tag !== 34) {
@@ -755,8 +765,10 @@ export const Invalidate = {
     if (message.cursor !== undefined) {
       Cursor.encode(message.cursor, writer.uint32(10).fork()).ldelim();
     }
-    for (const v of message.removed) {
-      Cursor.encode(v!, writer.uint32(18).fork()).ldelim();
+    if (message.removed !== undefined && message.removed.length !== 0) {
+      for (const v of message.removed) {
+        Cursor.encode(v!, writer.uint32(18).fork()).ldelim();
+      }
     }
     return writer;
   },
@@ -780,7 +792,7 @@ export const Invalidate = {
             break;
           }
 
-          message.removed.push(Cursor.decode(reader, reader.uint32()));
+          message.removed!.push(Cursor.decode(reader, reader.uint32()));
           continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
@@ -893,13 +905,15 @@ export const Data = {
     if (message.endCursor !== undefined) {
       Cursor.encode(message.endCursor, writer.uint32(18).fork()).ldelim();
     }
-    if (message.finality !== 0) {
+    if (message.finality !== undefined && message.finality !== 0) {
       writer.uint32(24).int32(message.finality);
     }
-    for (const v of message.data) {
-      writer.uint32(34).bytes(v!);
+    if (message.data !== undefined && message.data.length !== 0) {
+      for (const v of message.data) {
+        writer.uint32(34).bytes(v!);
+      }
     }
-    if (message.production !== 0) {
+    if (message.production !== undefined && message.production !== 0) {
       writer.uint32(40).int32(message.production);
     }
     return writer;
@@ -938,7 +952,7 @@ export const Data = {
             break;
           }
 
-          message.data.push(reader.bytes());
+          message.data!.push(reader.bytes());
           continue;
         case 5:
           if (tag !== 40) {
@@ -974,13 +988,13 @@ export const Data = {
     if (message.endCursor !== undefined) {
       obj.endCursor = Cursor.toJSON(message.endCursor);
     }
-    if (message.finality !== 0) {
+    if (message.finality !== undefined && message.finality !== 0) {
       obj.finality = dataFinalityToJSON(message.finality);
     }
     if (message.data?.length) {
       obj.data = message.data.map((e) => base64FromBytes(e));
     }
-    if (message.production !== 0) {
+    if (message.production !== undefined && message.production !== 0) {
       obj.production = dataProductionToJSON(message.production);
     }
     return obj;

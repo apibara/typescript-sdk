@@ -8,7 +8,7 @@ import {
   filterFromProto,
   filterToProto,
   mergeFilter,
-} from "./filter";
+} from "../src/filter";
 
 const abi = parseAbi([
   "event Transfer(address indexed from, address indexed to, uint256 value)",

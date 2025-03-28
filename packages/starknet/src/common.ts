@@ -1,29 +1,9 @@
-import { Schema } from "@effect/schema";
+import type { Codec, CodecType } from "@apibara/protocol/codec";
+import type * as proto from "./proto";
 
-const _FieldElement = Schema.TemplateLiteral(
-  Schema.Literal("0x"),
-  Schema.String,
-);
-
-/** Wire representation of `FieldElement`. */
-export const FieldElementProto = Schema.Struct({
-  x0: Schema.BigIntFromSelf,
-  x1: Schema.BigIntFromSelf,
-  x2: Schema.BigIntFromSelf,
-  x3: Schema.BigIntFromSelf,
-});
-
-/** Field element. */
-export const FieldElement = Schema.transform(FieldElementProto, _FieldElement, {
-  decode(value) {
-    const x0 = value.x0.toString(16).padStart(16, "0");
-    const x1 = value.x1.toString(16).padStart(16, "0");
-    const x2 = value.x2.toString(16).padStart(16, "0");
-    const x3 = value.x3.toString(16).padStart(16, "0");
-    return `0x${x0}${x1}${x2}${x3}` as `0x${string}`;
-  },
-  encode(value) {
-    const bn = BigInt(value);
+export const FieldElement: Codec<`0x${string}`, proto.common.FieldElement> = {
+  encode(x) {
+    const bn = BigInt(x);
     const hex = bn.toString(16).padStart(64, "0");
     const s = hex.length;
     const x3 = BigInt(`0x${hex.slice(s - 16, s)}`);
@@ -32,9 +12,16 @@ export const FieldElement = Schema.transform(FieldElementProto, _FieldElement, {
     const x0 = BigInt(`0x${hex.slice(s - 64, s - 48)}`);
     return { x0, x1, x2, x3 };
   },
-});
+  decode(p) {
+    const x0 = p.x0?.toString(16).padStart(16, "0");
+    const x1 = p.x1?.toString(16).padStart(16, "0");
+    const x2 = p.x2?.toString(16).padStart(16, "0");
+    const x3 = p.x3?.toString(16).padStart(16, "0");
+    return `0x${x0}${x1}${x2}${x3}` as `0x${string}`;
+  },
+};
 
-export type FieldElement = Schema.Schema.Type<typeof FieldElement>;
+export type FieldElement = CodecType<typeof FieldElement>;
 
-export const feltToProto = Schema.encodeSync(FieldElement);
-export const feltFromProto = Schema.decodeSync(FieldElement);
+export const feltToProto = FieldElement.encode;
+export const feltFromProto = FieldElement.decode;

@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
-import type { MockBlock } from "../proto/testing";
-import { MockClient } from "./client";
-import type { MockFilter } from "./mock";
+import type { MockBlock } from "../src/proto/testing";
+import { MockClient } from "../src/testing/client";
+import type { MockFilter } from "../src/testing/mock";
 
 describe("MockClient", () => {
   it("returns a stream of messages", async () => {

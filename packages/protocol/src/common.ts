@@ -1,71 +1,100 @@
-import { Schema } from "@effect/schema";
-import { Option } from "effect";
 import { hexToBytes, toHex } from "viem";
 
+import type { Codec, CodecProto, CodecType } from "./codec";
 import * as proto from "./proto";
 
 /** Bytes encoded as a 0x-prefixed hex string. */
-export const Bytes = Schema.TemplateLiteral(
-  Schema.Literal("0x"),
-  Schema.String,
-);
+export type Bytes = `0x${string}`;
 
-export type Bytes = typeof Bytes.Type;
-
-export const BytesFromUint8Array = Schema.requiredToOptional(
-  Schema.Uint8ArrayFromSelf,
-  Bytes,
-  {
-    decode(value) {
-      if (value.length === 0) {
-        return Option.none();
-      }
-      return Option.some(toHex(value));
-    },
-    encode(value) {
-      return value.pipe(
-        Option.map(hexToBytes),
-        Option.getOrElse(() => new Uint8Array(0)),
-      );
-    },
+export const BytesFromUint8Array: Codec<
+  `0x${string}` | undefined,
+  Uint8Array | undefined
+> = {
+  decode(value) {
+    if (!value || value?.length === 0) {
+      return undefined;
+    }
+    return toHex(value);
   },
-);
+  encode(value) {
+    if (value === undefined) {
+      return new Uint8Array(0);
+    }
+    return hexToBytes(value);
+  },
+};
+
+type _CursorApp = {
+  orderKey: bigint;
+  uniqueKey?: Bytes | undefined;
+};
+
+type _CursorProto = proto.stream.Cursor;
 
 /** Represent a position in the stream. */
-export const _Cursor = Schema.Struct({
-  /** The block number. */
-  orderKey: Schema.BigIntFromSelf,
-  /** The block hash, if any. */
-  uniqueKey: BytesFromUint8Array,
-});
-
+export const Cursor: Codec<_CursorApp, _CursorProto> = {
+  decode(value) {
+    const { orderKey, uniqueKey } = value;
+    if (orderKey === undefined) {
+      throw new Error("Cursor | orderKey is undefined");
+    }
+    return {
+      orderKey,
+      uniqueKey: BytesFromUint8Array.decode(uniqueKey),
+    };
+  },
+  encode(value) {
+    const { orderKey, uniqueKey } = value;
+    return {
+      orderKey,
+      uniqueKey: BytesFromUint8Array.encode(uniqueKey),
+    };
+  },
+};
 /** The Cursor protobuf representation. */
-export interface CursorProto extends Schema.Schema.Encoded<typeof _Cursor> {}
-export interface Cursor extends Schema.Schema.Type<typeof _Cursor> {}
-export const Cursor: Schema.Schema<Cursor, CursorProto> = _Cursor;
+export type CursorProto = CodecProto<typeof Cursor>;
+export type Cursor = CodecType<typeof Cursor>;
 export const createCursor = (props: Cursor) => props;
 
-export const cursorToProto = Schema.encodeSync(Cursor);
-export const cursorFromProto = Schema.decodeSync(Cursor);
+export const cursorToProto = Cursor.encode;
+export const cursorFromProto = Cursor.decode;
 
-export const CursorFromBytes = Schema.transform(
-  Schema.Uint8ArrayFromSelf,
-  Cursor,
-  {
-    decode(value) {
-      return proto.stream.Cursor.decode(value);
-    },
-    encode(value) {
-      return proto.stream.Cursor.encode(value).finish();
-    },
+export const CursorFromBytes: Codec<Cursor, Uint8Array> = {
+  encode(value) {
+    const { orderKey, uniqueKey } = value;
+    return proto.stream.Cursor.encode({
+      orderKey,
+      uniqueKey: BytesFromUint8Array.encode(uniqueKey),
+    }).finish();
   },
-);
+  decode(value) {
+    const { orderKey, uniqueKey } = proto.stream.Cursor.decode(value);
+    if (orderKey === undefined) {
+      throw new Error("Cursor | orderKey is undefined");
+    }
+    return {
+      orderKey,
+      uniqueKey: BytesFromUint8Array.decode(uniqueKey),
+    };
+  },
+};
 
-export const cursorToBytes = Schema.encodeSync(CursorFromBytes);
-export const cursorFromBytes = Schema.decodeSync(CursorFromBytes);
+export const cursorToBytes = CursorFromBytes.encode;
+export const cursorFromBytes = CursorFromBytes.decode;
 
 export function isCursor(value: unknown): value is Cursor {
-  return Schema.is(Cursor)(value);
+  if (typeof value !== "object" || value === null) {
+    return false;
+  }
+
+  const { orderKey, uniqueKey } = value as Cursor;
+
+  return (
+    typeof orderKey === "bigint" &&
+    (uniqueKey === null ||
+      uniqueKey === undefined ||
+      (typeof uniqueKey === "string" && uniqueKey.startsWith("0x")))
+  );
 }
 
 /** Normalize a cursor.

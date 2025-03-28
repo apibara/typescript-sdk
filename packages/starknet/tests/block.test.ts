@@ -1,11 +1,10 @@
-import { Schema } from "@effect/schema";
 import { describe, expect, it } from "vitest";
 
 import { BlockFromBytes } from "../src/block";
 
 import { largeBlock } from "./fixtures";
 
-const decode = Schema.decodeSync(BlockFromBytes);
+const decode = BlockFromBytes.decode;
 
 describe("BlockFromBytes", () => {
   it("decode", () => {

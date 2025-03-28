@@ -5,14 +5,14 @@ import {
   type MockFilter,
 } from "@apibara/protocol/testing";
 import { describe, expect, it } from "vitest";
-import { type IndexerContext, useMessageMetadataContext } from "./context";
-import { run } from "./indexer";
+import { type IndexerContext, useMessageMetadataContext } from "../src/context";
+import { run } from "../src/indexer";
 import {
   generateMockMessages,
   getMockIndexer,
   mockSink,
   useMockSink,
-} from "./internal/testing";
+} from "../src/internal/testing";
 
 async function transform<TData>({
   block: { data },

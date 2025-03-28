@@ -1,4 +1,3 @@
-import { Schema } from "@effect/schema";
 import {
   type ChannelCredentials,
   type ChannelOptions,
@@ -11,6 +10,7 @@ import {
 import * as proto from "./proto";
 
 import assert from "node:assert";
+import type { Codec } from "./codec";
 import type { Cursor } from "./common";
 import type { StreamConfig } from "./config";
 import {
@@ -95,7 +95,7 @@ export class GrpcClient<TFilter, TBlock> implements Client<TFilter, TBlock> {
     private config: StreamConfig<TFilter, TBlock>,
     private client: proto.stream.DnaStreamClient,
   ) {
-    this.encodeRequest = Schema.encodeSync(config.Request);
+    this.encodeRequest = config.Request.encode;
   }
 
   async status(request?: StatusRequest, options?: ClientCallOptions) {
@@ -115,14 +115,14 @@ export class GrpcClient<TFilter, TBlock> implements Client<TFilter, TBlock> {
 export class StreamDataIterable<TBlock> {
   constructor(
     private it: AsyncIterable<proto.stream.StreamDataResponse>,
-    private schema: Schema.Schema<TBlock | null, Uint8Array, never>,
+    private schema: Codec<TBlock | null, Uint8Array>,
     private options?: StreamDataOptions,
   ) {}
 
   [Symbol.asyncIterator](): AsyncIterator<StreamDataResponse<TBlock>> {
     const inner = this.it[Symbol.asyncIterator]();
     const schema = StreamDataResponse(this.schema);
-    const decoder = Schema.decodeSync(schema);
+    const decoder = schema.decode;
     const { endingCursor, timeout = DEFAULT_TIMEOUT_MS } = this.options ?? {};
     let shouldStop = false;
 

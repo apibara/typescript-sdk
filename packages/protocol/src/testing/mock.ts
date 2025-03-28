@@ -1,53 +1,49 @@
-import { Schema } from "@effect/schema";
+import {
+  type Codec,
+  type CodecType,
+  MessageCodec,
+  OptionalCodec,
+  StringCodec,
+} from "../codec";
 import { StreamConfig } from "../config";
 import * as proto from "../proto";
 import { StreamDataResponse } from "../stream";
 
-export const MockFilter = Schema.Struct({
-  filter: Schema.optional(Schema.String),
+export const MockFilter = MessageCodec({
+  filter: OptionalCodec(StringCodec),
 });
 
-export type MockFilter = typeof MockFilter.Type;
+export type MockFilter = CodecType<typeof MockFilter>;
 
-export const MockFilterFromBytes = Schema.transform(
-  Schema.Uint8ArrayFromSelf,
-  MockFilter,
-  {
-    strict: false,
-    decode(value) {
-      return proto.testing.MockFilter.decode(value);
-    },
-    encode(value) {
-      return proto.testing.MockFilter.encode(value).finish();
-    },
+export const MockFilterFromBytes: Codec<MockFilter, Uint8Array> = {
+  decode(value) {
+    return proto.testing.MockFilter.decode(value);
   },
-);
+  encode(value) {
+    return proto.testing.MockFilter.encode(value).finish();
+  },
+};
 
-const MockBlock = Schema.Struct({
-  data: Schema.optional(Schema.String),
+const MockBlock = MessageCodec({
+  data: OptionalCodec(StringCodec),
 });
 
-export type MockBlock = typeof MockBlock.Type;
+export type MockBlock = CodecType<typeof MockBlock>;
 
-export const MockBlockFromBytes = Schema.transform(
-  Schema.Uint8ArrayFromSelf,
-  Schema.NullOr(MockBlock),
-  {
-    strict: false,
-    decode(value) {
-      if (value.length === 0) {
-        return null;
-      }
-      return proto.testing.MockBlock.decode(value);
-    },
-    encode(value) {
-      if (value === null) {
-        return new Uint8Array();
-      }
-      return proto.testing.MockBlock.encode(value).finish();
-    },
+export const MockBlockFromBytes: Codec<MockBlock | null, Uint8Array> = {
+  decode(value) {
+    if (value.length === 0) {
+      return null;
+    }
+    return proto.testing.MockBlock.decode(value);
   },
-);
+  encode(value) {
+    if (value === null) {
+      return new Uint8Array();
+    }
+    return proto.testing.MockBlock.encode(value).finish();
+  },
+};
 
 /** For testing, simply concatenate the values of `.filter` */
 function mergeMockFilter(a: MockFilter, b: MockFilter): MockFilter {
@@ -68,4 +64,5 @@ export const MockStream = new StreamConfig(
 );
 
 export const MockStreamResponse = StreamDataResponse(MockBlockFromBytes);
-export type MockStreamResponse = typeof MockStreamResponse.Type;
+
+export type MockStreamResponse = CodecType<typeof MockStreamResponse>;

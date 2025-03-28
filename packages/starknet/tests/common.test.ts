@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import { pad } from "viem";
 
-import { feltFromProto, feltToProto } from "./common";
+import { feltFromProto, feltToProto } from "../src/common";
 
 describe("FieldElement", () => {
   it("should convert to and from proto", () => {

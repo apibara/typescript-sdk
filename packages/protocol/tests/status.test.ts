@@ -1,12 +1,12 @@
 import { describe, expect, it } from "vitest";
 
 import {
-  StatusResponse,
+  type StatusResponse,
   statusRequestFromProto,
   statusRequestToProto,
   statusResponseFromProto,
   statusResponseToProto,
-} from "./status";
+} from "../src/status";
 
 describe("StatusRequest", () => {
   describe("proto", () => {
@@ -22,14 +22,14 @@ describe("StatusRequest", () => {
 describe("StatusResponse", () => {
   describe("proto", () => {
     it("should encode and decode", () => {
-      const response = StatusResponse.make({
+      const response: StatusResponse = {
         currentHead: {
           orderKey: 123n,
         },
         lastIngested: {
           orderKey: 123n,
         },
-      });
+      };
 
       const proto = statusResponseToProto(response);
       expect(proto).toMatchInlineSnapshot(`

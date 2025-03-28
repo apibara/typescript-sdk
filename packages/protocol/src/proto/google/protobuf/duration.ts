@@ -76,7 +76,9 @@ export interface Duration {
    * to +315,576,000,000 inclusive. Note: these bounds are computed from:
    * 60 sec/min * 60 min/hr * 24 hr/day * 365.25 days/year * 10000 years
    */
-  readonly seconds: bigint;
+  readonly seconds?:
+    | bigint
+    | undefined;
   /**
    * Signed fractions of a second at nanosecond resolution of the span
    * of time. Durations less than one second are represented with a 0
@@ -85,7 +87,7 @@ export interface Duration {
    * of the same sign as the `seconds` field. Must be from -999,999,999
    * to +999,999,999 inclusive.
    */
-  readonly nanos: number;
+  readonly nanos?: number | undefined;
 }
 
 function createBaseDuration(): Duration {
@@ -94,13 +96,13 @@ function createBaseDuration(): Duration {
 
 export const Duration = {
   encode(message: Duration, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.seconds !== BigInt("0")) {
+    if (message.seconds !== undefined && message.seconds !== BigInt("0")) {
       if (BigInt.asIntN(64, message.seconds) !== message.seconds) {
         throw new globalThis.Error("value provided for field message.seconds of type int64 too large");
       }
       writer.uint32(8).int64(message.seconds.toString());
     }
-    if (message.nanos !== 0) {
+    if (message.nanos !== undefined && message.nanos !== 0) {
       writer.uint32(16).int32(message.nanos);
     }
     return writer;
@@ -145,10 +147,10 @@ export const Duration = {
 
   toJSON(message: Duration): unknown {
     const obj: any = {};
-    if (message.seconds !== BigInt("0")) {
+    if (message.seconds !== undefined && message.seconds !== BigInt("0")) {
       obj.seconds = message.seconds.toString();
     }
-    if (message.nanos !== 0) {
+    if (message.nanos !== undefined && message.nanos !== 0) {
       obj.nanos = Math.round(message.nanos);
     }
     return obj;
