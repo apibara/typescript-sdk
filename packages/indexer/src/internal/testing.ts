@@ -48,8 +48,8 @@ export function generateMockMessages(
               ? uniqueKeyFromOrderKey(invalidateToBlock)
               : undefined,
           },
-        },
-      } as Invalidate);
+        } as Invalidate,
+      });
     } else if (finalizeAt && i === finalizeAt.finalizeTriggerIndex) {
       const fianlizedToBlock =
         baseBlockNumber + BigInt(finalizeAt.finalizeToIndex);
@@ -62,8 +62,8 @@ export function generateMockMessages(
               ? uniqueKeyFromOrderKey(fianlizedToBlock)
               : undefined,
           },
-        },
-      } as Finalize);
+        } as Finalize,
+      });
     } else {
       messages.push({
         _tag: "data",
