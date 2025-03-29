@@ -148,6 +148,36 @@ export function ArrayCodec<T extends Codec<TApp, TProto>, TApp, TProto>(
 }
 
 /*
+ ██████   ██████             █████              █████     ████             █████████               █████                  
+░░██████ ██████             ░░███              ░░███     ░░███            ███░░░░░███             ░░███                   
+ ░███░█████░███  █████ ████ ███████    ██████   ░███████  ░███   ██████  ███     ░░░   ██████   ███████   ██████   ██████ 
+ ░███░░███ ░███ ░░███ ░███ ░░░███░    ░░░░░███  ░███░░███ ░███  ███░░███░███          ███░░███ ███░░███  ███░░███ ███░░███
+ ░███ ░░░  ░███  ░███ ░███   ░███      ███████  ░███ ░███ ░███ ░███████ ░███         ░███ ░███░███ ░███ ░███████ ░███ ░░░ 
+ ░███      ░███  ░███ ░███   ░███ ███ ███░░███  ░███ ░███ ░███ ░███░░░  ░░███     ███░███ ░███░███ ░███ ░███░░░  ░███  ███
+ █████     █████ ░░████████  ░░█████ ░░████████ ████████  █████░░██████  ░░█████████ ░░██████ ░░████████░░██████ ░░██████ 
+░░░░░     ░░░░░   ░░░░░░░░    ░░░░░   ░░░░░░░░ ░░░░░░░░  ░░░░░  ░░░░░░    ░░░░░░░░░   ░░░░░░   ░░░░░░░░  ░░░░░░   ░░░░░░  
+*/
+export type MutableArrayCodec<
+  T extends Codec<TApp, TProto>,
+  TApp,
+  TProto,
+> = T extends Codec<infer TApp, infer TProto> ? Codec<TApp[], TProto[]> : never;
+
+export function MutableArrayCodec<T extends Codec<TApp, TProto>, TApp, TProto>(
+  t: T,
+): MutableArrayCodec<T, TApp, TProto> {
+  return {
+    encode(app) {
+      return app.map(t.encode) as TProto[];
+    },
+    decode(proto) {
+      if (proto === undefined) return [];
+      return proto.map(t.decode) as TApp[];
+    },
+  } as MutableArrayCodec<T, TApp, TProto>;
+}
+
+/*
     ███████               █████     ███                                ████ 
   ███░░░░░███            ░░███     ░░░                                ░░███ 
  ███     ░░███ ████████  ███████   ████   ██████  ████████    ██████   ░███ 

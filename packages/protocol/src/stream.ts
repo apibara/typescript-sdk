@@ -4,6 +4,7 @@ import {
   type Codec,
   type CodecType,
   MessageCodec,
+  MutableArrayCodec,
   NumberCodec,
   OneOfCodec,
   OptionalCodec,
@@ -86,7 +87,7 @@ export const StreamDataRequest = <TA>(filter: Codec<TA, Uint8Array>) =>
   MessageCodec({
     finality: OptionalCodec(DataFinality),
     startingCursor: OptionalCodec(Cursor),
-    filter: ArrayCodec(filter),
+    filter: MutableArrayCodec(filter),
     heartbeatInterval: OptionalCodec(DurationCodec),
   });
 
