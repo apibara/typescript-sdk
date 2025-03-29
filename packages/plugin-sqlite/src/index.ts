@@ -193,7 +193,7 @@ export function sqliteStorage<TFilter, TBlock>({
     });
 
     indexer.hooks.hook("message:finalize", async ({ message }) => {
-      const { cursor } = message.finalize;
+      const { cursor } = message;
 
       if (!cursor) {
         throw new SqliteStorageError("finalized cursor is undefined");
@@ -211,7 +211,7 @@ export function sqliteStorage<TFilter, TBlock>({
     });
 
     indexer.hooks.hook("message:invalidate", async ({ message }) => {
-      const { cursor } = message.invalidate;
+      const { cursor } = message;
 
       if (!cursor) {
         throw new SqliteStorageError("invalidate cursor is undefined");

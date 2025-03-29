@@ -399,8 +399,8 @@ describe("SQLite persistence", () => {
               cursor: {
                 orderKey: 105n,
               },
-            },
-          } as Invalidate,
+            } as Invalidate,
+          },
         ];
       }
 
@@ -573,8 +573,8 @@ describe("SQLite persistence", () => {
               cursor: {
                 orderKey: 107n,
               },
-            },
-          } as Finalize,
+            } as Finalize,
+          },
         ];
       }
 
