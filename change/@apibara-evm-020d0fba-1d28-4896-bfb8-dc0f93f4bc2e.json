@@ -1,0 +1,7 @@
+{
+  "type": "prerelease",
+  "comment": "evm: add requests hash header",
+  "packageName": "@apibara/evm",
+  "email": "francesco@ceccon.me",
+  "dependentChangeType": "patch"
+}
