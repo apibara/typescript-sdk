@@ -1,8 +1,16 @@
 # Change Log - @apibara/evm
 
-<!-- This log was last generated on Fri, 21 Mar 2025 20:02:55 GMT and should not be manually modified. -->
+<!-- This log was last generated on Sun, 30 Mar 2025 18:37:10 GMT and should not be manually modified. -->
 
 <!-- Start content -->
+
+## 2.1.0-beta.23
+
+Sun, 30 Mar 2025 18:37:10 GMT
+
+### Changes
+
+- evm: add requests hash header (francesco@ceccon.me)
 
 ## 2.1.0-beta.19
 

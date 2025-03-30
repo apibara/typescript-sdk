@@ -2,6 +2,21 @@
   "name": "@apibara/evm",
   "entries": [
     {
+      "date": "Sun, 30 Mar 2025 18:37:10 GMT",
+      "version": "2.1.0-beta.23",
+      "tag": "@apibara/evm_v2.1.0-beta.23",
+      "comments": {
+        "prerelease": [
+          {
+            "author": "francesco@ceccon.me",
+            "package": "@apibara/evm",
+            "commit": "b340aa7418f82245815603340618999a5018ce2f",
+            "comment": "evm: add requests hash header"
+          }
+        ]
+      }
+    },
+    {
       "date": "Fri, 21 Mar 2025 20:02:55 GMT",
       "version": "2.1.0-beta.19",
       "tag": "@apibara/evm_v2.1.0-beta.19",
