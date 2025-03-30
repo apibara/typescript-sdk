@@ -48,7 +48,7 @@ const command = defineCommand({
       filter: [filter],
       finality: "accepted",
       startingCursor: {
-        orderKey: 20_000_000n,
+        orderKey: 8_010_000n,
       },
     });
 

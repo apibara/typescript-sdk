@@ -307,7 +307,14 @@ export interface BlockHeader {
     | U128
     | undefined;
   /** Parent beacon block root. */
-  readonly parentBeaconBlockRoot?: B256 | undefined;
+  readonly parentBeaconBlockRoot?:
+    | B256
+    | undefined;
+  /**
+   * The Keccak 256-bit hash of the an RLP encoded list with each EIP-7685
+   * request in the block body.
+   */
+  readonly requestsHash?: B256 | undefined;
 }
 
 /** A validator's withdrawal from the consensus layer. */
@@ -838,6 +845,7 @@ function createBaseBlockHeader(): BlockHeader {
     blobGasUsed: undefined,
     excessBlobGas: undefined,
     parentBeaconBlockRoot: undefined,
+    requestsHash: undefined,
   };
 }
 
@@ -914,6 +922,9 @@ export const BlockHeader = {
     }
     if (message.parentBeaconBlockRoot !== undefined) {
       B256.encode(message.parentBeaconBlockRoot, writer.uint32(178).fork()).ldelim();
+    }
+    if (message.requestsHash !== undefined) {
+      B256.encode(message.requestsHash, writer.uint32(186).fork()).ldelim();
     }
     return writer;
   },
@@ -1079,6 +1090,13 @@ export const BlockHeader = {
 
           message.parentBeaconBlockRoot = B256.decode(reader, reader.uint32());
           continue;
+        case 23:
+          if (tag !== 186) {
+            break;
+          }
+
+          message.requestsHash = B256.decode(reader, reader.uint32());
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -1114,6 +1132,7 @@ export const BlockHeader = {
       parentBeaconBlockRoot: isSet(object.parentBeaconBlockRoot)
         ? B256.fromJSON(object.parentBeaconBlockRoot)
         : undefined,
+      requestsHash: isSet(object.requestsHash) ? B256.fromJSON(object.requestsHash) : undefined,
     };
   },
 
@@ -1185,6 +1204,9 @@ export const BlockHeader = {
     if (message.parentBeaconBlockRoot !== undefined) {
       obj.parentBeaconBlockRoot = B256.toJSON(message.parentBeaconBlockRoot);
     }
+    if (message.requestsHash !== undefined) {
+      obj.requestsHash = B256.toJSON(message.requestsHash);
+    }
     return obj;
   },
 
@@ -1252,6 +1274,9 @@ export const BlockHeader = {
       (object.parentBeaconBlockRoot !== undefined && object.parentBeaconBlockRoot !== null)
         ? B256.fromPartial(object.parentBeaconBlockRoot)
         : undefined;
+    message.requestsHash = (object.requestsHash !== undefined && object.requestsHash !== null)
+      ? B256.fromPartial(object.requestsHash)
+      : undefined;
     return message;
   },
 };

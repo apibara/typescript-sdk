@@ -68,6 +68,7 @@ export const BlockHeader = Schema.Struct({
   blobGasUsed: Schema.optional(U128),
   excessBlobGas: Schema.optional(U128),
   parentBeaconBlockRoot: Schema.optional(B256),
+  requestsHash: Schema.optional(B256),
 });
 
 export type BlockHeader = typeof BlockHeader.Type;
@@ -93,7 +94,7 @@ export type AccessListItem = typeof AccessListItem.Type;
 export const Signature = Schema.Struct({
   r: U256,
   s: U256,
-  v: U256,
+  v: Schema.optional(U256),
   YParity: Schema.optional(Schema.Boolean),
 });
 
