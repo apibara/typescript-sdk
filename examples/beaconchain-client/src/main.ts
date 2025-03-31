@@ -1,8 +1,11 @@
 import assert from "node:assert";
-import { BeaconChainStream, Filter } from "@apibara/beaconchain";
+import { BeaconChainStream, type Filter } from "@apibara/beaconchain";
 import { createClient } from "@apibara/protocol";
+import type { CodecType } from "@apibara/protocol/codec";
 import { defineCommand, runMain } from "citty";
 import consola from "consola";
+
+type Request = CodecType<typeof BeaconChainStream.Request>;
 
 const command = defineCommand({
   meta: {
@@ -37,21 +40,21 @@ const command = defineCommand({
     const response = await client.status();
     console.log(response);
 
-    const filter = Filter.make({
+    const filter: Filter = {
       validators: [{}],
       transactions: [{}],
       blobs: [{}],
-    });
+    };
 
     const startBlock = 5_931_000;
     const stopAtBlock = Number(args.stopAtBlock);
-    const request = BeaconChainStream.Request.make({
+    const request: Request = {
       filter: [filter],
       finality: "accepted",
       startingCursor: {
         orderKey: BigInt(startBlock),
       },
-    });
+    };
 
     for await (const message of client.streamData(request)) {
       switch (message._tag) {
