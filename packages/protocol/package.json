@@ -47,8 +47,6 @@
     "vitest": "^1.6.0"
   },
   "dependencies": {
-    "@effect/schema": "^0.67.15",
-    "effect": "^3.2.6",
     "long": "^5.2.3",
     "nice-grpc": "^2.1.8",
     "nice-grpc-common": "^2.0.2",
