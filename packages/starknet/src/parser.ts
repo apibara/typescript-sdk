@@ -77,7 +77,7 @@ export function parseU256(data: readonly FieldElement[], offset: number) {
 export function parseAsHex(data: readonly FieldElement[], offset: number) {
   assertInBounds(data, offset);
   return {
-    out: String(data[offset]),
+    out: data[offset],
     offset: offset + 1,
   };
 }
@@ -96,7 +96,7 @@ export function parseFelt252(data: readonly FieldElement[], offset: number) {
   };
 }
 
-export function parseEmpty(data: readonly FieldElement[], offset: number) {
+export function parseEmpty(_data: readonly FieldElement[], offset: number) {
   return { out: null, offset };
 }
 
@@ -132,13 +132,13 @@ export function parseOption<T>(type: Parser<T>) {
   };
 }
 
-export function parseStruct<T extends { [key: string]: unknown }>(
+export function parseStruct<T extends Record<string, unknown>>(
   parsers: { [K in keyof T]: { index: number; parser: Parser<T[K]> } },
-) {
+): Parser<{ [K in keyof T]: T[K] }> {
   const sortedParsers = Object.entries(parsers).sort(
     (a, b) => a[1].index - b[1].index,
   );
-  return (data: readonly FieldElement[], startingOffset: number) => {
+  const parser = (data: readonly FieldElement[], startingOffset: number) => {
     let offset = startingOffset;
     const out: Record<string, unknown> = {};
     for (const [key, { parser }] of sortedParsers) {
@@ -148,6 +148,7 @@ export function parseStruct<T extends { [key: string]: unknown }>(
     }
     return { out, offset };
   };
+  return parser as Parser<{ [K in keyof T]: T[K] }>;
 }
 
 export function parseTuple<T extends Parser<unknown>[]>(
