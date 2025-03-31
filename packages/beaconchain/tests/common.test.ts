@@ -1,13 +1,11 @@
-import { describe, expect, it } from "vitest";
-
-import { Schema } from "@effect/schema";
 import { pad } from "viem";
+import { describe, expect, it } from "vitest";
 
 import { B384 } from "../src/common";
 
 describe("B384", () => {
-  const encode = Schema.encodeSync(B384);
-  const decode = Schema.decodeSync(B384);
+  const encode = B384.encode;
+  const decode = B384.decode;
 
   it("should convert from and to proto", () => {
     const value =
