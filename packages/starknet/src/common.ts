@@ -13,10 +13,10 @@ export const FieldElement: Codec<`0x${string}`, proto.common.FieldElement> = {
     return { x0, x1, x2, x3 };
   },
   decode(p) {
-    const x0 = p.x0?.toString(16).padStart(16, "0");
-    const x1 = p.x1?.toString(16).padStart(16, "0");
-    const x2 = p.x2?.toString(16).padStart(16, "0");
-    const x3 = p.x3?.toString(16).padStart(16, "0");
+    const x0 = (p.x0 ?? 0n).toString(16).padStart(16, "0");
+    const x1 = (p.x1 ?? 0n).toString(16).padStart(16, "0");
+    const x2 = (p.x2 ?? 0n).toString(16).padStart(16, "0");
+    const x3 = (p.x3 ?? 0n).toString(16).padStart(16, "0");
     return `0x${x0}${x1}${x2}${x3}` as `0x${string}`;
   },
 };

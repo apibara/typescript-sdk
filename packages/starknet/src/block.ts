@@ -105,8 +105,8 @@ export const U128: Codec<bigint, proto.data.Uint128> = {
     return { x0: BigInt(`0x${low}`), x1: BigInt(`0x${high}`) };
   },
   decode(p) {
-    const low = p.x0?.toString(16).padStart(16, "0");
-    const high = p.x1?.toString(16).padStart(16, "0");
+    const low = (p.x0 ?? 0n).toString(16).padStart(16, "0");
+    const high = (p.x1 ?? 0n).toString(16).padStart(16, "0");
     return BigInt(`0x${low}${high}`);
   },
 };
