@@ -171,13 +171,7 @@ export const Log = MessageCodec({
 export type Log = CodecType<typeof Log>;
 
 export const CallType: Codec<
-  | "unknown"
-  | "call"
-  | "delegateCall"
-  | "callCode"
-  | "delegateCall"
-  | "staticCall"
-  | "authCall",
+  "unknown" | "call" | "delegateCall" | "callCode" | "staticCall" | "authCall",
   proto.data.CallType
 > = {
   encode(x) {
@@ -228,8 +222,8 @@ export const CreationMethod: Codec<
       [proto.data.CreationMethod.CREATE]: "create",
       [proto.data.CreationMethod.CREATE2]: "create2",
       [proto.data.CreationMethod.EOF_CREATE]: "eofCreate",
-      [proto.data.CallType.UNSPECIFIED]: "unknown",
-      [proto.data.CallType.UNRECOGNIZED]: "unknown",
+      [proto.data.CreationMethod.UNSPECIFIED]: "unknown",
+      [proto.data.CreationMethod.UNRECOGNIZED]: "unknown",
     } as const;
 
     return enumMap[p] ?? "unknown";
