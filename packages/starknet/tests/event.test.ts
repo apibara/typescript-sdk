@@ -37,11 +37,11 @@ describe("decodeEvent", () => {
           "0x0",
           "0x0",
         ],
-        eventIndex: 1893,
-        transactionIndex: 318,
+        filterIds: [],
+        eventIndex: 0,
+        eventIndexInTransaction: 0,
+        transactionIndex: 0,
         transactionStatus: "succeeded",
-        eventIndexInTransaction: 6,
-        filterIds: [0],
       } as const satisfies Event;
 
       const decoded = decodeEvent({
@@ -83,11 +83,11 @@ describe("decodeEvent", () => {
           "0x0",
           "0x0",
         ],
-        eventIndex: 1893,
-        transactionIndex: 318,
+        filterIds: [],
+        eventIndex: 0,
+        eventIndexInTransaction: 0,
+        transactionIndex: 0,
         transactionStatus: "succeeded",
-        eventIndexInTransaction: 6,
-        filterIds: [0],
       } as const satisfies Event;
 
       const decoded = decodeEvent({
@@ -131,11 +131,11 @@ describe("decodeEvent", () => {
         "0x0",
         "0x0",
       ],
-      eventIndex: 1893,
-      transactionIndex: 318,
+      filterIds: [],
+      eventIndex: 0,
+      eventIndexInTransaction: 0,
+      transactionIndex: 0,
       transactionStatus: "succeeded",
-      eventIndexInTransaction: 6,
-      filterIds: [0],
     } as const satisfies Event;
 
     const decoded = decodeEvent({
@@ -253,11 +253,11 @@ describe("decodeEvent", () => {
         "0x1ee0005",
         "0x0",
       ],
-      eventIndex: 0,
-      transactionIndex: 0,
-      transactionStatus: "unknown",
-      eventIndexInTransaction: 0,
       filterIds: [],
+      eventIndex: 0,
+      eventIndexInTransaction: 0,
+      transactionIndex: 0,
+      transactionStatus: "succeeded",
     } as const satisfies Event;
 
     const decoded = decodeEvent({
