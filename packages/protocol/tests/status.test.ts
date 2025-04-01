@@ -1,19 +1,13 @@
 import { describe, expect, it } from "vitest";
 
-import {
-  type StatusResponse,
-  statusRequestFromProto,
-  statusRequestToProto,
-  statusResponseFromProto,
-  statusResponseToProto,
-} from "../src/status";
+import { StatusRequest, StatusResponse } from "../src/status";
 
 describe("StatusRequest", () => {
   describe("proto", () => {
     it("should encode and decode", () => {
-      const proto = statusRequestToProto({});
+      const proto = StatusRequest.encode({});
       expect(proto).toMatchInlineSnapshot("{}");
-      const back = statusRequestFromProto(proto);
+      const back = StatusRequest.decode(proto);
       expect(back).toEqual({});
     });
   });
@@ -31,7 +25,7 @@ describe("StatusResponse", () => {
         },
       };
 
-      const proto = statusResponseToProto(response);
+      const proto = StatusResponse.encode(response);
       expect(proto).toMatchInlineSnapshot(`
         {
           "currentHead": {
@@ -44,7 +38,7 @@ describe("StatusResponse", () => {
           },
         }
       `);
-      const back = statusResponseFromProto(proto);
+      const back = StatusResponse.decode(proto);
       expect(back).toEqual(response);
     });
   });

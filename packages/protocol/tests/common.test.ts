@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { createCursor, cursorFromProto, cursorToProto } from "../src/common";
+import { Cursor, createCursor } from "../src/common";
 
 describe("Cursor", () => {
   describe("proto", () => {
@@ -9,7 +9,7 @@ describe("Cursor", () => {
         uniqueKey: "0xcafecafe",
       });
 
-      const proto = cursorToProto(cursor);
+      const proto = Cursor.encode(cursor);
       expect(proto).toMatchInlineSnapshot(`
         {
           "orderKey": 123n,
@@ -21,7 +21,7 @@ describe("Cursor", () => {
           ],
         }
       `);
-      const back = cursorFromProto(proto);
+      const back = Cursor.decode(proto);
       expect(back).toEqual(cursor);
     });
 
@@ -30,14 +30,14 @@ describe("Cursor", () => {
         orderKey: 123n,
       });
 
-      const proto = cursorToProto(cursor);
+      const proto = Cursor.encode(cursor);
       expect(proto).toMatchInlineSnapshot(`
         {
           "orderKey": 123n,
           "uniqueKey": Uint8Array [],
         }
       `);
-      const back = cursorFromProto(proto);
+      const back = Cursor.decode(proto);
       expect(back).toEqual(cursor);
     });
   });
@@ -49,8 +49,8 @@ describe("Cursor", () => {
         uniqueKey: "0xcafecafe",
       });
 
-      const proto = cursorToProto(cursor);
-      const back = cursorFromProto(proto);
+      const proto = Cursor.encode(cursor);
+      const back = Cursor.decode(proto);
       expect(back).toEqual(cursor);
     });
 
@@ -59,8 +59,8 @@ describe("Cursor", () => {
         orderKey: 123n,
       });
 
-      const proto = cursorToProto(cursor);
-      const back = cursorFromProto(proto);
+      const proto = Cursor.encode(cursor);
+      const back = Cursor.decode(proto);
       expect(back).toEqual(cursor);
     });
   });

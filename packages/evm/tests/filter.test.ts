@@ -1,12 +1,6 @@
 import { encodeEventTopics, pad, parseAbi } from "viem";
 import { describe, expect, it } from "vitest";
-import {
-  type Filter,
-  LogFilter,
-  filterFromProto,
-  filterToProto,
-  mergeFilter,
-} from "../src/filter";
+import { Filter, LogFilter, mergeFilter } from "../src/filter";
 
 const abi = parseAbi([
   "event Transfer(address indexed from, address indexed to, uint256 value)",
@@ -16,8 +10,8 @@ describe("Filter", () => {
   it("all filters are optional", () => {
     const filter: Filter = {};
 
-    const proto = filterToProto(filter);
-    const back = filterFromProto(proto);
+    const proto = Filter.encode(filter);
+    const back = Filter.decode(proto);
     expect(back).toEqual(filter);
   });
 
@@ -38,8 +32,8 @@ describe("Filter", () => {
 
     expect(filter.logs).toHaveLength(1);
 
-    const proto = filterToProto(filter);
-    const back = filterFromProto(proto);
+    const proto = Filter.encode(filter);
+    const back = Filter.decode(proto);
 
     expect(back).toBeDefined();
     expect(back.logs).toHaveLength(1);

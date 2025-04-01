@@ -6,9 +6,6 @@ export const StatusRequest = MessageCodec({});
 
 export type StatusRequest = CodecType<typeof StatusRequest>;
 
-export const statusRequestToProto = StatusRequest.encode;
-export const statusRequestFromProto = StatusRequest.decode;
-
 /** The response from the `status` endpoint. */
 export const StatusResponse = MessageCodec({
   currentHead: OptionalCodec(Cursor),
@@ -18,6 +15,3 @@ export const StatusResponse = MessageCodec({
 });
 
 export type StatusResponse = CodecType<typeof StatusResponse>;
-
-export const statusResponseToProto = StatusResponse.encode;
-export const statusResponseFromProto = StatusResponse.decode;

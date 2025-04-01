@@ -35,11 +35,8 @@ type _CursorProto = proto.stream.Cursor;
 export const Cursor: Codec<_CursorApp, _CursorProto> = {
   decode(value) {
     const { orderKey, uniqueKey } = value;
-    if (orderKey === undefined) {
-      throw new Error("Cursor | orderKey is undefined");
-    }
     return {
-      orderKey,
+      orderKey: orderKey ?? 0n,
       uniqueKey: BytesFromUint8Array.decode(uniqueKey),
     };
   },
@@ -56,9 +53,6 @@ export type CursorProto = CodecProto<typeof Cursor>;
 export type Cursor = CodecType<typeof Cursor>;
 export const createCursor = (props: Cursor) => props;
 
-export const cursorToProto = Cursor.encode;
-export const cursorFromProto = Cursor.decode;
-
 export const CursorFromBytes: Codec<Cursor, Uint8Array> = {
   encode(value) {
     const { orderKey, uniqueKey } = value;
@@ -69,18 +63,12 @@ export const CursorFromBytes: Codec<Cursor, Uint8Array> = {
   },
   decode(value) {
     const { orderKey, uniqueKey } = proto.stream.Cursor.decode(value);
-    if (orderKey === undefined) {
-      throw new Error("Cursor | orderKey is undefined");
-    }
     return {
-      orderKey,
+      orderKey: orderKey ?? 0n,
       uniqueKey: BytesFromUint8Array.decode(uniqueKey),
     };
   },
 };
-
-export const cursorToBytes = CursorFromBytes.encode;
-export const cursorFromBytes = CursorFromBytes.decode;
 
 export function isCursor(value: unknown): value is Cursor {
   if (typeof value !== "object" || value === null) {

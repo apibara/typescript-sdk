@@ -13,12 +13,7 @@ import assert from "node:assert";
 import type { Codec } from "./codec";
 import type { Cursor } from "./common";
 import type { StreamConfig } from "./config";
-import {
-  type StatusRequest,
-  type StatusResponse,
-  statusRequestToProto,
-  statusResponseFromProto,
-} from "./status";
+import { StatusRequest, StatusResponse } from "./status";
 import { type StreamDataRequest, StreamDataResponse } from "./stream";
 
 export { ClientError, Status, Metadata } from "nice-grpc";
@@ -100,10 +95,10 @@ export class GrpcClient<TFilter, TBlock> implements Client<TFilter, TBlock> {
 
   async status(request?: StatusRequest, options?: ClientCallOptions) {
     const response = await this.client.status(
-      statusRequestToProto(request ?? {}),
+      StatusRequest.encode(request ?? {}),
       options,
     );
-    return statusResponseFromProto(response);
+    return StatusResponse.decode(response);
   }
 
   streamData(request: StreamDataRequest<TFilter>, options?: StreamDataOptions) {

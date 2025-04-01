@@ -1,24 +1,26 @@
 import type { Codec, CodecType } from "@apibara/protocol/codec";
-import { hexToBytes, pad } from "viem";
 import * as proto from "./proto";
 
 const MAX_U64 = 0xffffffffffffffffn;
+const MAX_U32 = 0xffffffffn;
 
 /** An Ethereum address. */
 export const Address: Codec<`0x${string}`, proto.common.Address> = {
   encode(x) {
-    const bytes = hexToBytes(pad(x, { size: 20, dir: "left" }));
-    const dv = new DataView(bytes.buffer);
-    const x0 = dv.getBigUint64(0);
-    const x1 = dv.getBigUint64(8);
-    const x2 = dv.getUint32(16);
-    return { x0, x1, x2 };
+    const bn = BigInt(x);
+    // Ethereum address is 20 bytes (160 bits)
+    // Splitting into two 64-bit chunks and one 32-bit chunk
+    const x2 = bn & MAX_U32;
+    const x1 = (bn >> 32n) & MAX_U64;
+    const x0 = (bn >> 96n) & MAX_U64;
+    return { x0, x1, x2: Number(x2) };
   },
   decode(p) {
-    const x0 = (p.x0 ?? 0n).toString(16).padStart(16, "0");
-    const x1 = (p.x1 ?? 0n).toString(16).padStart(16, "0");
-    const x2 = (p.x2 ?? 0n).toString(16).padStart(8, "0");
-    return `0x${x0}${x1}${x2}` as `0x${string}`;
+    const x0 = p.x0 ?? 0n;
+    const x1 = p.x1 ?? 0n;
+    const x2 = BigInt(p.x2 ?? 0);
+    const bn = x2 + (x1 << 32n) + (x0 << 96n);
+    return `0x${bn.toString(16).padStart(40, "0")}` as `0x${string}`;
   },
 };
 
@@ -27,35 +29,11 @@ export type Address = CodecType<typeof Address>;
 /** Data with length 256 bits. */
 export const B256: Codec<`0x${string}`, proto.common.B256> = {
   encode(x) {
-    const bytes = hexToBytes(pad(x, { size: 32, dir: "left" }));
-    const dv = new DataView(bytes.buffer);
-    const x0 = dv.getBigUint64(0);
-    const x1 = dv.getBigUint64(8);
-    const x2 = dv.getBigUint64(16);
-    const x3 = dv.getBigUint64(24);
-    return { x0, x1, x2, x3 };
-  },
-  decode(p) {
-    const x0 = (p.x0 ?? 0n).toString(16).padStart(16, "0");
-    const x1 = (p.x1 ?? 0n).toString(16).padStart(16, "0");
-    const x2 = (p.x2 ?? 0n).toString(16).padStart(16, "0");
-    const x3 = (p.x3 ?? 0n).toString(16).padStart(16, "0");
-    return `0x${x0}${x1}${x2}${x3}` as `0x${string}`;
-  },
-};
-
-export type B256 = CodecType<typeof B256>;
-
-export const b256ToProto = B256.encode;
-export const b256FromProto = B256.decode;
-
-/** Data with length 256 bits. */
-export const U256: Codec<bigint, proto.common.U256> = {
-  encode(x) {
-    const x0 = (x >> (8n * 24n)) & MAX_U64;
-    const x1 = (x >> (8n * 16n)) & MAX_U64;
-    const x2 = (x >> (8n * 8n)) & MAX_U64;
-    const x3 = x & MAX_U64;
+    const bn = BigInt(x);
+    const x3 = bn & MAX_U64;
+    const x2 = (bn >> 64n) & MAX_U64;
+    const x1 = (bn >> 128n) & MAX_U64;
+    const x0 = (bn >> 192n) & MAX_U64;
     return { x0, x1, x2, x3 };
   },
   decode(p) {
@@ -63,33 +41,81 @@ export const U256: Codec<bigint, proto.common.U256> = {
     const x1 = p.x1 ?? 0n;
     const x2 = p.x2 ?? 0n;
     const x3 = p.x3 ?? 0n;
-    return (x0 << (8n * 24n)) + (x1 << (8n * 16n)) + (x2 << (8n * 8n)) + x3;
+    const bn = x3 + (x2 << 64n) + (x1 << 128n) + (x0 << 192n);
+    return `0x${bn.toString(16).padStart(64, "0")}` as `0x${string}`;
+  },
+};
+
+export type B256 = CodecType<typeof B256>;
+
+/** Data with length 256 bits. */
+export const U256: Codec<bigint, proto.common.U256> = {
+  encode(x) {
+    const bn = BigInt(x);
+    const x3 = bn & MAX_U64;
+    const x2 = (bn >> 64n) & MAX_U64;
+    const x1 = (bn >> 128n) & MAX_U64;
+    const x0 = (bn >> 192n) & MAX_U64;
+    return { x0, x1, x2, x3 };
+  },
+  decode(p) {
+    const x0 = p.x0 ?? 0n;
+    const x1 = p.x1 ?? 0n;
+    const x2 = p.x2 ?? 0n;
+    const x3 = p.x3 ?? 0n;
+    return x3 + (x2 << 64n) + (x1 << 128n) + (x0 << 192n);
   },
 };
 
 export type U256 = CodecType<typeof U256>;
 
-export const u256ToProto = U256.encode;
-export const u256FromProto = U256.decode;
-
 /** Data with length 128 bits. */
 export const U128: Codec<bigint, proto.common.U128> = {
   encode(x) {
-    const x0 = (x >> (8n * 8n)) & MAX_U64;
     const x1 = x & MAX_U64;
+    const x0 = (x >> 64n) & MAX_U64;
     return { x0, x1 };
   },
   decode(p) {
     const x0 = p.x0 ?? 0n;
     const x1 = p.x1 ?? 0n;
-    return (x0 << (8n * 8n)) + x1;
+    return x1 + (x0 << 64n);
   },
 };
 
 export type U128 = CodecType<typeof U128>;
 
-export const u128ToProto = U128.encode;
-export const u128FromProto = U128.decode;
+export const B384: Codec<`0x${string}`, proto.common.B384> = {
+  encode(x) {
+    const bn = BigInt(x);
+    const x5 = bn & MAX_U64;
+    const x4 = (bn >> 64n) & MAX_U64;
+    const x3 = (bn >> 128n) & MAX_U64;
+    const x2 = (bn >> 192n) & MAX_U64;
+    const x1 = (bn >> 256n) & MAX_U64;
+    const x0 = (bn >> 320n) & MAX_U64;
+    return { x0, x1, x2, x3, x4, x5 };
+  },
+  decode(p) {
+    const x0 = p.x0 ?? 0n;
+    const x1 = p.x1 ?? 0n;
+    const x2 = p.x2 ?? 0n;
+    const x3 = p.x3 ?? 0n;
+    const x4 = p.x4 ?? 0n;
+    const x5 = p.x5 ?? 0n;
+    const bn =
+      x5 +
+      (x4 << 64n) +
+      (x3 << 128n) +
+      (x2 << 192n) +
+      (x1 << 256n) +
+      (x0 << 320n);
+
+    return `0x${bn.toString(16).padStart(96, "0")}` as `0x${string}`;
+  },
+};
+
+export type B384 = CodecType<typeof B384>;
 
 export const ValidatorStatus: Codec<
   | "pending_initialized"
@@ -141,28 +167,3 @@ export const ValidatorStatus: Codec<
 };
 
 export type ValidatorStatus = CodecType<typeof ValidatorStatus>;
-
-export const B384: Codec<`0x${string}`, proto.common.B384> = {
-  encode(x) {
-    const bytes = hexToBytes(pad(x, { size: 48, dir: "left" }));
-    const dv = new DataView(bytes.buffer);
-    const x0 = dv.getBigUint64(0);
-    const x1 = dv.getBigUint64(8);
-    const x2 = dv.getBigUint64(16);
-    const x3 = dv.getBigUint64(24);
-    const x4 = dv.getBigUint64(32);
-    const x5 = dv.getBigUint64(40);
-    return { x0, x1, x2, x3, x4, x5 };
-  },
-  decode(p) {
-    const x0 = (p.x0 ?? 0n).toString(16).padStart(16, "0");
-    const x1 = (p.x1 ?? 0n).toString(16).padStart(16, "0");
-    const x2 = (p.x2 ?? 0n).toString(16).padStart(16, "0");
-    const x3 = (p.x3 ?? 0n).toString(16).padStart(16, "0");
-    const x4 = (p.x4 ?? 0n).toString(16).padStart(16, "0");
-    const x5 = (p.x5 ?? 0n).toString(16).padStart(16, "0");
-    return `0x${x0}${x1}${x2}${x3}${x4}${x5}` as `0x${string}`;
-  },
-};
-
-export type B384 = CodecType<typeof B384>;

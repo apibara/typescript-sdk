@@ -101,9 +101,6 @@ export const Filter = MessageCodec({
 
 export type Filter = CodecType<typeof Filter>;
 
-export const filterToProto = Filter.encode;
-export const filterFromProto = Filter.decode;
-
 export const FilterFromBytes: Codec<Filter, Uint8Array> = {
   encode(value) {
     const filter = Filter.encode(value);
@@ -114,9 +111,6 @@ export const FilterFromBytes: Codec<Filter, Uint8Array> = {
     return Filter.decode(filter);
   },
 };
-
-export const filterToBytes = FilterFromBytes.encode;
-export const filterFromBytes = FilterFromBytes.decode;
 
 export function mergeFilter(a: Filter, b: Filter): Filter {
   const header = mergeHeaderFilter(a.header, b.header);
