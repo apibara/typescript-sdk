@@ -1,8 +1,16 @@
 # Change Log - @apibara/protocol
 
-<!-- This log was last generated on Fri, 21 Mar 2025 11:03:55 GMT and should not be manually modified. -->
+<!-- This log was last generated on Wed, 02 Apr 2025 09:06:14 GMT and should not be manually modified. -->
 
 <!-- Start content -->
+
+## 2.1.0-beta.24
+
+Wed, 02 Apr 2025 09:06:14 GMT
+
+### Changes
+
+- protocol: add inhouse parser `codec` to replace `@effect/schema` (jadejajaipal5@gmail.com)
 
 ## 2.1.0-beta.15
 

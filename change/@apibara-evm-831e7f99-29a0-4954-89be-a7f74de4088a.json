@@ -1,7 +1,0 @@
-{
-  "type": "prerelease",
-  "comment": "evm: replace `@effect/schema` with `Codec`",
-  "packageName": "@apibara/evm",
-  "email": "jadejajaipal5@gmail.com",
-  "dependentChangeType": "patch"
-}

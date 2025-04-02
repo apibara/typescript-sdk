@@ -1,8 +1,16 @@
 # Change Log - @apibara/indexer
 
-<!-- This log was last generated on Fri, 21 Mar 2025 15:56:23 GMT and should not be manually modified. -->
+<!-- This log was last generated on Wed, 02 Apr 2025 09:06:14 GMT and should not be manually modified. -->
 
 <!-- Start content -->
+
+## 2.1.0-beta.24
+
+Wed, 02 Apr 2025 09:06:14 GMT
+
+### Changes
+
+- indexer: fix new types for different messages (jadejajaipal5@gmail.com)
 
 ## 2.1.0-beta.18
 

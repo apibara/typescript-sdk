@@ -2,6 +2,21 @@
   "name": "@apibara/plugin-sqlite",
   "entries": [
     {
+      "date": "Wed, 02 Apr 2025 09:06:14 GMT",
+      "version": "2.1.0-beta.24",
+      "tag": "@apibara/plugin-sqlite_v2.1.0-beta.24",
+      "comments": {
+        "prerelease": [
+          {
+            "author": "jadejajaipal5@gmail.com",
+            "package": "@apibara/plugin-sqlite",
+            "commit": "bc2ba81837ed536d1480a5ddf43403bbf2d2a4d1",
+            "comment": "plugins: fix message types"
+          }
+        ]
+      }
+    },
+    {
       "date": "Mon, 24 Mar 2025 15:58:22 GMT",
       "version": "2.1.0-beta.21",
       "tag": "@apibara/plugin-sqlite_v2.1.0-beta.21",

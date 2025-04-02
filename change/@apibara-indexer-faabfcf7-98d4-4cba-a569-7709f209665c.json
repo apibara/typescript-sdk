@@ -1,7 +1,0 @@
-{
-  "type": "prerelease",
-  "comment": "indexer: fix new types for different messages",
-  "packageName": "@apibara/indexer",
-  "email": "jadejajaipal5@gmail.com",
-  "dependentChangeType": "patch"
-}
