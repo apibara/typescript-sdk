@@ -4,7 +4,6 @@ import {
   type Cursor,
   type DataFinality,
   type Finalize,
-  type Heartbeat,
   type Invalidate,
   Status,
   type StreamConfig,
@@ -60,7 +59,7 @@ export interface IndexerHooks<TFilter, TBlock> {
   message: ({ message }: { message: StreamDataResponse<TBlock> }) => void;
   "message:invalidate": ({ message }: { message: Invalidate }) => void;
   "message:finalize": ({ message }: { message: Finalize }) => void;
-  "message:heartbeat": ({ message }: { message: Heartbeat }) => void;
+  "message:heartbeat": () => void;
   "message:systemMessage": ({ message }: { message: SystemMessage }) => void;
 }
 
@@ -241,13 +240,13 @@ export async function run<TFilter, TBlock>(
     }
 
     // if factory mode we add a empty filter at the end of the filter array.
-    const request = indexer.streamConfig.Request.make({
+    const request = {
       filter: isFactoryMode
         ? [indexer.options.filter, {} as TFilter]
         : [indexer.options.filter],
       finality: indexer.options.finality,
       startingCursor,
-    });
+    } as StreamDataRequest<TFilter>;
 
     const options: StreamDataOptions = {};
 
@@ -329,11 +328,11 @@ export async function run<TFilter, TBlock>(
                     );
 
                     // create request with new filters
-                    const request = indexer.streamConfig.Request.make({
+                    const request = {
                       filter: [indexer.options.filter, mainFilter],
                       finality: indexer.options.finality,
                       startingCursor: cursor,
-                    });
+                    } as StreamDataRequest<TFilter>;
 
                     await indexer.hooks.callHook("connect:factory", {
                       request,
@@ -395,21 +394,25 @@ export async function run<TFilter, TBlock>(
             indexerMetrics.reorgCounter.add(1, {
               indexer_id: indexerId,
             });
-            await indexer.hooks.callHook("message:invalidate", { message });
+            await indexer.hooks.callHook("message:invalidate", {
+              message: message.invalidate,
+            });
             span.end();
           });
           break;
         }
         case "finalize": {
           await tracer.startActiveSpan("message finalize", async (span) => {
-            await indexer.hooks.callHook("message:finalize", { message });
+            await indexer.hooks.callHook("message:finalize", {
+              message: message.finalize,
+            });
             span.end();
           });
           break;
         }
         case "heartbeat": {
           await tracer.startActiveSpan("message heartbeat", async (span) => {
-            await indexer.hooks.callHook("message:heartbeat", { message });
+            await indexer.hooks.callHook("message:heartbeat");
             span.end();
           });
           break;
@@ -432,7 +435,7 @@ export async function run<TFilter, TBlock>(
               }
 
               await indexer.hooks.callHook("message:systemMessage", {
-                message,
+                message: message.systemMessage,
               });
               span.end();
             },

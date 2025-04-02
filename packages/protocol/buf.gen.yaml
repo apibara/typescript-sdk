@@ -6,7 +6,7 @@ plugins:
       - outputServices=nice-grpc
       - outputServices=generic-definitions
       - useExactTypes=false
-      - useOptionals=messages
+      - useOptionals=all
       - useReadonlyTypes=true
       - forceLong=bigint
       - esModuleInterop=true

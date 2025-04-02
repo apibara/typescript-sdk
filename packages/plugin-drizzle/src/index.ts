@@ -320,7 +320,7 @@ export function drizzleStorage<
     });
 
     indexer.hooks.hook("message:finalize", async ({ message }) => {
-      const { cursor } = message.finalize;
+      const { cursor } = message;
 
       if (!cursor) {
         throw new DrizzleStorageError("Finalized Cursor is undefined");
@@ -336,7 +336,7 @@ export function drizzleStorage<
     });
 
     indexer.hooks.hook("message:invalidate", async ({ message }) => {
-      const { cursor } = message.invalidate;
+      const { cursor } = message;
 
       if (!cursor) {
         throw new DrizzleStorageError("Invalidate Cursor is undefined");

@@ -757,8 +757,8 @@ describe("MongoDB Test", () => {
                 cursor: {
                   orderKey: 105n,
                 },
-              },
-            } as Invalidate,
+              } as Invalidate,
+            },
           ];
         }
 
@@ -949,8 +949,8 @@ describe("MongoDB Test", () => {
                 cursor: {
                   orderKey: 107n,
                 },
-              },
-            } as Finalize,
+              } as Finalize,
+            },
           ];
         }
 

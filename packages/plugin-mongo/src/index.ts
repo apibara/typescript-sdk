@@ -152,7 +152,7 @@ export function mongoStorage<TFilter, TBlock>({
     });
 
     indexer.hooks.hook("message:finalize", async ({ message }) => {
-      const { cursor } = message.finalize;
+      const { cursor } = message;
 
       if (!cursor) {
         throw new MongoStorageError("finalized cursor is undefined");
@@ -169,7 +169,7 @@ export function mongoStorage<TFilter, TBlock>({
     });
 
     indexer.hooks.hook("message:invalidate", async ({ message }) => {
-      const { cursor } = message.invalidate;
+      const { cursor } = message;
 
       if (!cursor) {
         throw new MongoStorageError("invalidate cursor is undefined");

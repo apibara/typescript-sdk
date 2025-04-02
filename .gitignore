@@ -7,3 +7,4 @@ bun.lockb
 .persistence
 .env
 playground/
+.DS_Store

@@ -1,8 +1,9 @@
 import assert from "node:assert";
 import { createClient } from "@apibara/protocol";
+import type { CodecType } from "@apibara/protocol/codec";
 import {
   type Abi,
-  Filter,
+  type Filter,
   type FunctionInvocation,
   StarknetStream,
 } from "@apibara/starknet";
@@ -34,6 +35,8 @@ const abi = [
   },
 ] as const satisfies Abi;
 
+type Request = CodecType<typeof StarknetStream.Request>;
+
 const command = defineCommand({
   meta: {
     name: "example-evm-client",
@@ -58,18 +61,18 @@ const command = defineCommand({
     const response = await client.status();
     console.log(response);
 
-    const filter = Filter.make({
+    const filter: Filter = {
       transactions: [{ includeReceipt: true, includeTrace: true }],
       // events: [{ includeTransactionTrace: true }]
-    });
+    };
 
-    const request = StarknetStream.Request.make({
+    const request: Request = {
       filter: [filter],
       finality: "pending",
       startingCursor: {
         orderKey: 1_222_901n,
       },
-    });
+    };
 
     for await (const message of client.streamData(request, {
       timeout: 40_000,

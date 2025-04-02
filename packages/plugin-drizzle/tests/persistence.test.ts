@@ -428,8 +428,8 @@ describe("Drizzle persistence", () => {
                 cursor: {
                   orderKey: 105n,
                 },
-              },
-            } as Invalidate,
+              } as Invalidate,
+            },
           ];
         }
 
@@ -604,8 +604,8 @@ describe("Drizzle persistence", () => {
                 cursor: {
                   orderKey: 107n,
                 },
-              },
-            } as Finalize,
+              } as Finalize,
+            },
           ];
         }
 

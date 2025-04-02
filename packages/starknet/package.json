@@ -43,7 +43,6 @@
   },
   "dependencies": {
     "@apibara/protocol": "workspace:*",
-    "@effect/schema": "^0.67.15",
     "@scure/starknet": "^1.1.0",
     "abi-wan-kanabi": "^2.2.4",
     "effect": "^3.2.6",

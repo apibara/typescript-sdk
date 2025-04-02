@@ -270,9 +270,6 @@ importers:
 
   packages/beaconchain:
     dependencies:
-      '@apibara/evm':
-        specifier: workspace:*
-        version: link:../evm
       '@apibara/protocol':
         specifier: workspace:*
         version: link:../protocol
@@ -419,12 +416,6 @@ importers:
       '@apibara/protocol':
         specifier: workspace:*
         version: link:../protocol
-      '@effect/schema':
-        specifier: ^0.67.15
-        version: 0.67.15(effect@3.2.6)
-      effect:
-        specifier: ^3.2.6
-        version: 3.2.6
       long:
         specifier: ^5.2.1
         version: 5.2.3
@@ -583,12 +574,6 @@ importers:
 
   packages/protocol:
     dependencies:
-      '@effect/schema':
-        specifier: ^0.67.15
-        version: 0.67.15(effect@3.2.6)
-      effect:
-        specifier: ^3.2.6
-        version: 3.2.6
       long:
         specifier: ^5.2.3
         version: 5.2.3
@@ -626,9 +611,6 @@ importers:
       '@apibara/protocol':
         specifier: workspace:*
         version: link:../protocol
-      '@effect/schema':
-        specifier: ^0.67.15
-        version: 0.67.15(effect@3.2.6)
       '@scure/starknet':
         specifier: ^1.1.0
         version: 1.1.0

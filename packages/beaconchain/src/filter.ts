@@ -1,5 +1,12 @@
-import { Schema } from "@effect/schema";
-
+import {
+  ArrayCodec,
+  BooleanCodec,
+  type Codec,
+  type CodecType,
+  MessageCodec,
+  NumberCodec,
+  OptionalCodec,
+} from "@apibara/protocol/codec";
 import { Address, ValidatorStatus } from "./common";
 import * as proto from "./proto";
 
@@ -9,37 +16,36 @@ import * as proto from "./proto";
  * - `on_data`: receive headers only if any other filter matches.
  * - `on_data_or_on_new_block`: receive headers only if any other filter matches and for "live" blocks.
  */
-export const HeaderFilter = Schema.transform(
-  Schema.Enums(proto.filter.HeaderFilter),
-  Schema.Literal("always", "on_data", "on_data_or_on_new_block", "unknown"),
-  {
-    decode(value) {
-      const enumMap = {
-        [proto.filter.HeaderFilter.ALWAYS]: "always",
-        [proto.filter.HeaderFilter.ON_DATA]: "on_data",
-        [proto.filter.HeaderFilter.ON_DATA_OR_ON_NEW_BLOCK]:
-          "on_data_or_on_new_block",
-        [proto.filter.HeaderFilter.UNSPECIFIED]: "unknown",
-        [proto.filter.HeaderFilter.UNRECOGNIZED]: "unknown",
-      } as const;
-      return enumMap[value] ?? "unknown";
-    },
-    encode(value) {
-      switch (value) {
-        case "always":
-          return proto.filter.HeaderFilter.ALWAYS;
-        case "on_data":
-          return proto.filter.HeaderFilter.ON_DATA;
-        case "on_data_or_on_new_block":
-          return proto.filter.HeaderFilter.ON_DATA_OR_ON_NEW_BLOCK;
-        default:
-          return proto.filter.HeaderFilter.UNSPECIFIED;
-      }
-    },
+export const HeaderFilter: Codec<
+  "always" | "on_data" | "on_data_or_on_new_block" | "unknown",
+  proto.filter.HeaderFilter
+> = {
+  encode(x) {
+    switch (x) {
+      case "always":
+        return proto.filter.HeaderFilter.ALWAYS;
+      case "on_data":
+        return proto.filter.HeaderFilter.ON_DATA;
+      case "on_data_or_on_new_block":
+        return proto.filter.HeaderFilter.ON_DATA_OR_ON_NEW_BLOCK;
+      default:
+        return proto.filter.HeaderFilter.UNSPECIFIED;
+    }
   },
-);
+  decode(p) {
+    const enumMap = {
+      [proto.filter.HeaderFilter.ALWAYS]: "always",
+      [proto.filter.HeaderFilter.ON_DATA]: "on_data",
+      [proto.filter.HeaderFilter.ON_DATA_OR_ON_NEW_BLOCK]:
+        "on_data_or_on_new_block",
+      [proto.filter.HeaderFilter.UNSPECIFIED]: "unknown",
+      [proto.filter.HeaderFilter.UNRECOGNIZED]: "unknown",
+    } as const;
+    return enumMap[p] ?? "unknown";
+  },
+};
 
-export type HeaderFilter = typeof HeaderFilter.Type;
+export type HeaderFilter = CodecType<typeof HeaderFilter>;
 
 /** Filter transactions.
  *
@@ -47,73 +53,64 @@ export type HeaderFilter = typeof HeaderFilter.Type;
  * @prop to Filter transactions by the target address.
  * @prop includeBlob Include any blob posted by the transaction..
  */
-export const TransactionFilter = Schema.Struct({
-  id: Schema.optional(Schema.Number),
-  from: Schema.optional(Address),
-  to: Schema.optional(Address),
-  create: Schema.optional(Schema.Boolean),
-  includeBlob: Schema.optional(Schema.Boolean),
+export const TransactionFilter = MessageCodec({
+  id: OptionalCodec(NumberCodec),
+  from: OptionalCodec(Address),
+  to: OptionalCodec(Address),
+  create: OptionalCodec(BooleanCodec),
+  includeBlob: OptionalCodec(BooleanCodec),
 });
 
-export type TransactionFilter = typeof TransactionFilter.Type;
+export type TransactionFilter = CodecType<typeof TransactionFilter>;
 
 /** Filter validators.
  *
  * @prop validatorIndex Filter validators by their index.
  * @prop status Filter validators by their status.
  */
-export const ValidatorFilter = Schema.Struct({
-  id: Schema.optional(Schema.Number),
-  validatorIndex: Schema.optional(Schema.Number),
-  status: Schema.optional(ValidatorStatus),
+export const ValidatorFilter = MessageCodec({
+  id: OptionalCodec(NumberCodec),
+  validatorIndex: OptionalCodec(NumberCodec),
+  status: OptionalCodec(ValidatorStatus),
 });
 
-export type ValidatorFilter = typeof ValidatorFilter.Type;
+export type ValidatorFilter = CodecType<typeof ValidatorFilter>;
 
 /** Filter blobs.
  *
  * @prop includeTransaction Include the transaction that posted the blob.
  */
-export const BlobFilter = Schema.Struct({
-  id: Schema.optional(Schema.Number),
-  includeTransaction: Schema.optional(Schema.Boolean),
+export const BlobFilter = MessageCodec({
+  id: OptionalCodec(NumberCodec),
+  includeTransaction: OptionalCodec(BooleanCodec),
 });
 
-export type BlobFilter = typeof BlobFilter.Type;
+export type BlobFilter = CodecType<typeof BlobFilter>;
 
 /** Filter block data.
  *
  * @prop header Change how block headers are returned.
  * @prop validators Filter validators.
  */
-export const Filter = Schema.Struct({
-  header: Schema.optional(HeaderFilter),
-  transactions: Schema.optional(Schema.Array(TransactionFilter)),
-  validators: Schema.optional(Schema.Array(ValidatorFilter)),
-  blobs: Schema.optional(Schema.Array(BlobFilter)),
+export const Filter = MessageCodec({
+  header: OptionalCodec(HeaderFilter),
+  transactions: OptionalCodec(ArrayCodec(TransactionFilter)),
+  validators: OptionalCodec(ArrayCodec(ValidatorFilter)),
+  blobs: OptionalCodec(ArrayCodec(BlobFilter)),
 });
 
-export type Filter = typeof Filter.Type;
+export type Filter = CodecType<typeof Filter>;
 
-export const filterToProto = Schema.encodeSync(Filter);
-export const filterFromProto = Schema.decodeSync(Filter);
-
-export const FilterFromBytes = Schema.transform(
-  Schema.Uint8ArrayFromSelf,
-  Filter,
-  {
-    strict: false,
-    decode(value) {
-      return proto.filter.Filter.decode(value);
-    },
-    encode(value) {
-      return proto.filter.Filter.encode(value).finish();
-    },
+export const FilterFromBytes: Codec<Filter, Uint8Array> = {
+  encode(value) {
+    const filter = Filter.encode(value);
+    return proto.filter.Filter.encode(filter).finish();
   },
-);
-
-export const filterToBytes = Schema.encodeSync(FilterFromBytes);
-export const filterFromBytes = Schema.decodeSync(FilterFromBytes);
+  decode(value) {
+    const filter = proto.filter.Filter.decode(value);
+    return Filter.decode(filter);
+  },
+};
 
 export function mergeFilter(a: Filter, b: Filter): Filter {
   const header = mergeHeaderFilter(a.header, b.header);

@@ -235,8 +235,8 @@ describe("SQLite key-value store", () => {
               cursor: {
                 orderKey: 105n,
               },
-            },
-          } as Invalidate,
+            } as Invalidate,
+          },
         ];
       }
 
@@ -416,8 +416,8 @@ describe("SQLite key-value store", () => {
               cursor: {
                 orderKey: 107n,
               },
-            },
-          } as Finalize,
+            } as Finalize,
+          },
         ];
       }
 

@@ -1,6 +1,7 @@
 import assert from "node:assert";
-import { EvmStream, Filter } from "@apibara/evm";
+import { EvmStream, type Filter } from "@apibara/evm";
 import { createClient } from "@apibara/protocol";
+import type { CodecType } from "@apibara/protocol/codec";
 import { defineCommand, runMain } from "citty";
 import consola from "consola";
 import { parseAbi } from "viem";
@@ -9,7 +10,7 @@ const abi = parseAbi([
   "event Transfer(address indexed from, address indexed to, uint256 value)",
 ]);
 
-type Request = typeof EvmStream.Request.Type;
+type Request = CodecType<typeof EvmStream.Request>;
 
 const command = defineCommand({
   meta: {
@@ -35,22 +36,21 @@ const command = defineCommand({
     const response = await client.status();
     console.log(response);
 
-    const filter = Filter.make({
+    const filter: Filter = {
       logs: [
         {
           address: "0xBBBBBbbBBb9cC5e90e3b3Af64bdAF62C37EEFFCb",
           includeTransactionTrace: true,
         },
       ],
-    });
-
-    const request = EvmStream.Request.make({
+    };
+    const request: Request = {
       filter: [filter],
       finality: "accepted",
       startingCursor: {
         orderKey: 8_010_000n,
       },
-    });
+    };
 
     for await (const message of client.streamData(request)) {
       switch (message._tag) {

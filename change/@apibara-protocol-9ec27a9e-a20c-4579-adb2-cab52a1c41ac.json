@@ -1,0 +1,7 @@
+{
+  "type": "prerelease",
+  "comment": "protocol: add inhouse parser `codec` to replace `@effect/schema`",
+  "packageName": "@apibara/protocol",
+  "email": "jadejajaipal5@gmail.com",
+  "dependentChangeType": "patch"
+}

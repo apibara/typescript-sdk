@@ -35,7 +35,6 @@
     "vitest": "^1.6.0"
   },
   "dependencies": {
-    "@apibara/evm": "workspace:*",
     "@apibara/protocol": "workspace:*",
     "@effect/schema": "^0.67.15",
     "effect": "^3.2.6",
