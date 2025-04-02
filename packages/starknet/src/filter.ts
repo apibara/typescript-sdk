@@ -306,14 +306,6 @@ export const Filter = MessageCodec({
 
 export type Filter = Readonly<CodecType<typeof Filter>>;
 
-export function filterToProto(filter: Filter) {
-  return Filter.encode(filter);
-}
-
-export function filterFromProto(protoFilter: ReturnType<typeof filterToProto>) {
-  return Filter.decode(protoFilter);
-}
-
 export const FilterFromBytes: Codec<Filter, Uint8Array> = {
   encode(x) {
     const filter = Filter.encode(x);
@@ -324,14 +316,6 @@ export const FilterFromBytes: Codec<Filter, Uint8Array> = {
     return Filter.decode(filter);
   },
 };
-
-export function filterToBytes(filter: Filter) {
-  return FilterFromBytes.encode(filter);
-}
-
-export function filterFromBytes(bytes: Uint8Array) {
-  return FilterFromBytes.decode(bytes);
-}
 
 export function mergeFilter(a: Filter, b: Filter): Filter {
   const header = mergeHeaderFilter(a.header, b.header);

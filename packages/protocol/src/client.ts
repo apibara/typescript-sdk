@@ -110,7 +110,7 @@ export class GrpcClient<TFilter, TBlock> implements Client<TFilter, TBlock> {
 export class StreamDataIterable<TBlock> {
   constructor(
     private it: AsyncIterable<proto.stream.StreamDataResponse>,
-    private schema: Codec<TBlock | null, Uint8Array>,
+    private schema: Codec<TBlock, Uint8Array>,
     private options?: StreamDataOptions,
   ) {}
 

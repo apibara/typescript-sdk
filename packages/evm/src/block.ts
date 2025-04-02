@@ -18,7 +18,7 @@ import { Address, B256, U128, U256 } from "./common";
 import * as proto from "./proto";
 
 export const Bloom: Codec<
-  Address | undefined,
+  `0x${string}` | undefined,
   { value?: Uint8Array | undefined }
 > = {
   encode(x) {
