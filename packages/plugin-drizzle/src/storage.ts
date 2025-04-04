@@ -89,21 +89,22 @@ export async function initializeReorgRollbackTable<
       CREATE OR REPLACE FUNCTION ${SCHEMA_NAME}.reorg_checkpoint()
       RETURNS TRIGGER AS $$
       DECLARE
-        id_col TEXT := TG_ARGV[0]::TEXT;
-        order_key INTEGER := TG_ARGV[1]::INTEGER;
-        indexer_id TEXT := TG_ARGV[2]::TEXT;
+        table_name TEXT := TG_ARGV[0]::TEXT;
+        id_col TEXT := TG_ARGV[1]::TEXT;
+        order_key INTEGER := TG_ARGV[2]::INTEGER;
+        indexer_id TEXT := TG_ARGV[3]::TEXT;
         new_id_value TEXT := row_to_json(NEW.*)->>id_col;
         old_id_value TEXT := row_to_json(OLD.*)->>id_col;
       BEGIN
         IF (TG_OP = 'DELETE') THEN
           INSERT INTO ${SCHEMA_NAME}.${ROLLBACK_TABLE_NAME}(op, table_name, cursor, row_id, row_value, indexer_id)
-            SELECT 'D', TG_TABLE_NAME, order_key, old_id_value, row_to_json(OLD.*), indexer_id;
+            SELECT 'D', table_name, order_key, old_id_value, row_to_json(OLD.*), indexer_id;
         ELSIF (TG_OP = 'UPDATE') THEN
           INSERT INTO ${SCHEMA_NAME}.${ROLLBACK_TABLE_NAME}(op, table_name, cursor, row_id, row_value, indexer_id)
-            SELECT 'U', TG_TABLE_NAME, order_key, new_id_value, row_to_json(OLD.*), indexer_id;
+            SELECT 'U', table_name, order_key, new_id_value, row_to_json(OLD.*), indexer_id;
         ELSIF (TG_OP = 'INSERT') THEN
           INSERT INTO ${SCHEMA_NAME}.${ROLLBACK_TABLE_NAME}(op, table_name, cursor, row_id, row_value, indexer_id)
-            SELECT 'I', TG_TABLE_NAME, order_key, new_id_value, null, indexer_id;
+            SELECT 'I', table_name, order_key, new_id_value, null, indexer_id;
         END IF;
         RETURN NULL;
       END;
@@ -147,7 +148,7 @@ export async function registerTriggers<
           CREATE CONSTRAINT TRIGGER ${getReorgTriggerName(table, indexerId)}
           AFTER INSERT OR UPDATE OR DELETE ON ${table}
           DEFERRABLE INITIALLY DEFERRED
-          FOR EACH ROW EXECUTE FUNCTION ${SCHEMA_NAME}.reorg_checkpoint('${tableIdColumn}', ${Number(endCursor.orderKey)}, '${indexerId}');
+          FOR EACH ROW EXECUTE FUNCTION ${SCHEMA_NAME}.reorg_checkpoint('${table}', '${tableIdColumn}', ${Number(endCursor.orderKey)}, '${indexerId}');
         `),
       );
     }

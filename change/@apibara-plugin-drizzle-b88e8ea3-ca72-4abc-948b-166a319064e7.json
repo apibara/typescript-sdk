@@ -1,0 +1,7 @@
+{
+  "type": "prerelease",
+  "comment": "plugin-drizzle: use table_name instead of TG_TABLE_NAME",
+  "packageName": "@apibara/plugin-drizzle",
+  "email": "jadejajaipal5@gmail.com",
+  "dependentChangeType": "patch"
+}
