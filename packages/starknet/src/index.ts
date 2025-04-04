@@ -15,6 +15,8 @@ export { getBigIntSelector, getEventSelector, getSelector } from "./abi";
 
 declare module "abi-wan-kanabi" {
   interface Config {
+    AddressType: `0x${string}`;
+    ClassHashType: `0x${string}`;
     FeltType: bigint;
     BigIntType: bigint;
     U256Type: bigint;

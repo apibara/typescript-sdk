@@ -1,4 +1,4 @@
-import type { Abi } from "abi-wan-kanabi";
+import type { Abi } from "../../src/index";
 
 export const ekuboAbi = [
   {
