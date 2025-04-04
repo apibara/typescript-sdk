@@ -2,6 +2,21 @@
   "name": "@apibara/starknet",
   "entries": [
     {
+      "date": "Fri, 04 Apr 2025 13:44:12 GMT",
+      "version": "2.1.0-beta.25",
+      "tag": "@apibara/starknet_v2.1.0-beta.25",
+      "comments": {
+        "prerelease": [
+          {
+            "author": "jadejajaipal5@gmail.com",
+            "package": "@apibara/starknet",
+            "commit": "bf37b437708f29cab18679f3a34fa3b566adb7f8",
+            "comment": "starknet: add enum event decoding"
+          }
+        ]
+      }
+    },
+    {
       "date": "Wed, 02 Apr 2025 09:06:14 GMT",
       "version": "2.1.0-beta.24",
       "tag": "@apibara/starknet_v2.1.0-beta.24",

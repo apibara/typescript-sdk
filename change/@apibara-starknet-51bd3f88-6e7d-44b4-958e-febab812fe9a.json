@@ -1,7 +1,0 @@
-{
-  "type": "prerelease",
-  "comment": "starknet: add enum event decoding",
-  "packageName": "@apibara/starknet",
-  "email": "jadejajaipal5@gmail.com",
-  "dependentChangeType": "patch"
-}
