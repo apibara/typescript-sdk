@@ -2,8 +2,11 @@ import { describe, expect, it } from "vitest";
 
 import type { Event } from "../src/block";
 import { decodeEvent } from "../src/event";
+
+import { getEventSelector } from "../src";
 import { chainlinkAbi } from "./fixtures/chainlink-abi";
 import { ekuboAbi } from "./fixtures/ekubo-abi";
+import { golifeAbi } from "./fixtures/golife-abi";
 
 describe("decodeEvent", () => {
   describe("non strict mode", () => {
@@ -203,17 +206,15 @@ describe("decodeEvent", () => {
           "0x0",
           "0x0",
         ],
-        "eventIndex": 1893,
-        "eventIndexInTransaction": 6,
+        "eventIndex": 0,
+        "eventIndexInTransaction": 0,
         "eventName": "ekubo::core::Core::PositionUpdated",
-        "filterIds": [
-          0,
-        ],
+        "filterIds": [],
         "keys": [
           "0x3a7adca3546c213ce791fabf3b04090c163e419c808c9830fb343a4a395946e",
         ],
         "transactionHash": "0x008691c1fa0f5c650b3492396dc1c22423c04e9a8843a12eaab03799d0a45cd0",
-        "transactionIndex": 318,
+        "transactionIndex": 0,
         "transactionStatus": "succeeded",
       }
     `);
@@ -325,8 +326,278 @@ describe("decodeEvent", () => {
         ],
         "transactionHash": "0x07021da0c8e9319d1144b0d56ed0bd86e46b15459cbb65c4dc0a05c8e274521d",
         "transactionIndex": 0,
-        "transactionStatus": "unknown",
+        "transactionStatus": "succeeded",
       }
     `);
+  });
+
+  describe("Enum event decoding", () => {
+    it("can decode RoleGranted (flat) event from enum", () => {
+      const abi = golifeAbi;
+
+      const roleGrantedEventSelector = getEventSelector("RoleGranted");
+
+      const event = {
+        transactionHash:
+          "0x068b0a81f96d16e1b90d994d7e47e187770bcbc07257495e50fb3396712d9101",
+        address:
+          "0x00f92d3789e679e4ac8e94472ec6a67a63b99d042f772a0227b0d6bd241096c2",
+        keys: [roleGrantedEventSelector],
+        data: [
+          "0x0", // Role Data
+          "0x76e65f2bea9d559196eb91e967e8c4f43b4503198978bf672d10149b70cc1c6", // Account data
+          "0x41a78e741e5af2fec34b695679bc6891742439f7afb8484ecd7766661ad02bf", // Sender data
+        ],
+        filterIds: [],
+        eventIndex: 0,
+        eventIndexInTransaction: 0,
+        transactionIndex: 0,
+        transactionStatus: "succeeded",
+      } as const satisfies Event;
+
+      const decoded = decodeEvent({
+        abi,
+        event,
+        eventName: "gol_starknet::gol_lifeforms::GolLifeforms::Event",
+        strict: false,
+      });
+
+      expect(decoded).toMatchInlineSnapshot(`
+        {
+          "address": "0x00f92d3789e679e4ac8e94472ec6a67a63b99d042f772a0227b0d6bd241096c2",
+          "args": {
+            "RoleGranted": {
+              "account": "0x76e65f2bea9d559196eb91e967e8c4f43b4503198978bf672d10149b70cc1c6",
+              "role": 0n,
+              "sender": "0x41a78e741e5af2fec34b695679bc6891742439f7afb8484ecd7766661ad02bf",
+            },
+            "_tag": "RoleGranted",
+          },
+          "data": [
+            "0x0",
+            "0x76e65f2bea9d559196eb91e967e8c4f43b4503198978bf672d10149b70cc1c6",
+            "0x41a78e741e5af2fec34b695679bc6891742439f7afb8484ecd7766661ad02bf",
+          ],
+          "eventIndex": 0,
+          "eventIndexInTransaction": 0,
+          "eventName": "gol_starknet::gol_lifeforms::GolLifeforms::Event",
+          "filterIds": [],
+          "keys": [
+            "0x009d4a59b844ac9d98627ddba326ab3707a7d7e105fd03c777569d0f61a91f1e",
+          ],
+          "transactionHash": "0x068b0a81f96d16e1b90d994d7e47e187770bcbc07257495e50fb3396712d9101",
+          "transactionIndex": 0,
+          "transactionStatus": "succeeded",
+        }
+      `);
+    });
+
+    it("can decode Transfer (flat) event from enum", () => {
+      const abi = golifeAbi;
+      const transferEventSelector = getEventSelector("Transfer");
+      const event = {
+        transactionHash:
+          "0x02e0abd9a260095622f71ff8869aaee0267af1199be78ad5ad91a3c83df0ad08",
+        address:
+          "0x00f92d3789e679e4ac8e94472ec6a67a63b99d042f772a0227b0d6bd241096c2",
+        keys: [
+          transferEventSelector,
+          "0x0",
+          "0x76e65f2bea9d559196eb91e967e8c4f43b4503198978bf672d10149b70cc1c6",
+          "0xe000000",
+          "0x0",
+        ],
+        data: [],
+        filterIds: [],
+        eventIndex: 0,
+        eventIndexInTransaction: 0,
+        transactionIndex: 0,
+        transactionStatus: "succeeded",
+      } as const satisfies Event;
+
+      const decoded = decodeEvent({
+        abi,
+        event,
+        eventName: "gol_starknet::gol_lifeforms::GolLifeforms::Event",
+        strict: true,
+      });
+
+      expect(decoded).toMatchInlineSnapshot(`
+        {
+          "address": "0x00f92d3789e679e4ac8e94472ec6a67a63b99d042f772a0227b0d6bd241096c2",
+          "args": {
+            "Transfer": {
+              "from": "0x0",
+              "to": "0x76e65f2bea9d559196eb91e967e8c4f43b4503198978bf672d10149b70cc1c6",
+              "token_id": 234881024n,
+            },
+            "_tag": "Transfer",
+          },
+          "data": [],
+          "eventIndex": 0,
+          "eventIndexInTransaction": 0,
+          "eventName": "gol_starknet::gol_lifeforms::GolLifeforms::Event",
+          "filterIds": [],
+          "keys": [
+            "0x0099cd8bde557814842a3121e8ddfd433a539b8c9f14bf31ebf108d12e6196e9",
+            "0x0",
+            "0x76e65f2bea9d559196eb91e967e8c4f43b4503198978bf672d10149b70cc1c6",
+            "0xe000000",
+            "0x0",
+          ],
+          "transactionHash": "0x02e0abd9a260095622f71ff8869aaee0267af1199be78ad5ad91a3c83df0ad08",
+          "transactionIndex": 0,
+          "transactionStatus": "succeeded",
+        }
+      `);
+    });
+
+    it("can decode NewLifeForm (nested) event from enum", () => {
+      const abi = golifeAbi;
+      const newLifeFormEventSelector = getEventSelector("NewLifeForm");
+      const event = {
+        transactionHash:
+          "0x02e0abd9a260095622f71ff8869aaee0267af1199be78ad5ad91a3c83df0ad08",
+        address:
+          "0x00f92d3789e679e4ac8e94472ec6a67a63b99d042f772a0227b0d6bd241096c2",
+        keys: [newLifeFormEventSelector],
+        data: [
+          "0x76e65f2bea9d559196eb91e967e8c4f43b4503198978bf672d10149b70cc1c6",
+          "0xe000000",
+          "0x0",
+          "0x1",
+          "0x0",
+          "0x1",
+          "0x0",
+          "0x2",
+          "0xe000000",
+          "0x0",
+          "0x0",
+        ],
+        filterIds: [],
+        eventIndex: 0,
+        eventIndexInTransaction: 0,
+        transactionIndex: 0,
+        transactionStatus: "succeeded",
+      } as const satisfies Event;
+
+      const decoded = decodeEvent({
+        abi,
+        event,
+        eventName: "gol_starknet::gol_lifeforms::GolLifeforms::Event",
+        strict: true,
+      });
+
+      expect(decoded).toMatchInlineSnapshot(`
+        {
+          "address": "0x00f92d3789e679e4ac8e94472ec6a67a63b99d042f772a0227b0d6bd241096c2",
+          "args": {
+            "NewLifeForm": {
+              "lifeform_data": {
+                "age": 0n,
+                "current_state": 234881024n,
+                "is_alive": true,
+                "is_dead": false,
+                "is_loop": true,
+                "is_still": false,
+                "sequence_length": 2n,
+              },
+              "owner": "0x76e65f2bea9d559196eb91e967e8c4f43b4503198978bf672d10149b70cc1c6",
+              "token_id": 234881024n,
+            },
+            "_tag": "NewLifeForm",
+          },
+          "data": [
+            "0x76e65f2bea9d559196eb91e967e8c4f43b4503198978bf672d10149b70cc1c6",
+            "0xe000000",
+            "0x0",
+            "0x1",
+            "0x0",
+            "0x1",
+            "0x0",
+            "0x2",
+            "0xe000000",
+            "0x0",
+            "0x0",
+          ],
+          "eventIndex": 0,
+          "eventIndexInTransaction": 0,
+          "eventName": "gol_starknet::gol_lifeforms::GolLifeforms::Event",
+          "filterIds": [],
+          "keys": [
+            "0x011f46882e19ad05d3762feda18b95af02b4d04ff264650de9665ede8f823262",
+          ],
+          "transactionHash": "0x02e0abd9a260095622f71ff8869aaee0267af1199be78ad5ad91a3c83df0ad08",
+          "transactionIndex": 0,
+          "transactionStatus": "succeeded",
+        }
+      `);
+    });
+
+    it("returns null when selector does not match in enum event", () => {
+      const abi = golifeAbi;
+      const transferEventSelector = getEventSelector("XXXX");
+      const event = {
+        transactionHash:
+          "0x02e0abd9a260095622f71ff8869aaee0267af1199be78ad5ad91a3c83df0ad08",
+        address:
+          "0x00f92d3789e679e4ac8e94472ec6a67a63b99d042f772a0227b0d6bd241096c2",
+        keys: [
+          transferEventSelector,
+          "0x0",
+          "0x76e65f2bea9d559196eb91e967e8c4f43b4503198978bf672d10149b70cc1c6",
+          "0xe000000",
+          "0x0",
+        ],
+        data: [],
+        filterIds: [],
+        eventIndex: 0,
+        eventIndexInTransaction: 0,
+        transactionIndex: 0,
+        transactionStatus: "succeeded",
+      } as const satisfies Event;
+
+      const decoded = decodeEvent({
+        abi,
+        event,
+        eventName: "gol_starknet::gol_lifeforms::GolLifeforms::Event",
+        strict: false,
+      });
+
+      expect(decoded).toBeNull();
+    });
+
+    it("returns null if parsing fails for enum event", () => {
+      const abi = golifeAbi;
+
+      const roleGrantedEventSelector = getEventSelector("RoleGranted");
+
+      const event = {
+        transactionHash:
+          "0x068b0a81f96d16e1b90d994d7e47e187770bcbc07257495e50fb3396712d9101",
+        address:
+          "0x00f92d3789e679e4ac8e94472ec6a67a63b99d042f772a0227b0d6bd241096c2",
+        keys: [roleGrantedEventSelector],
+        data: [
+          "0x0", // Role Data
+          "0x76e65f2bea9d559196eb91e967e8c4f43b4503198978bf672d10149b70cc1c6",
+          // Missing data
+        ],
+        filterIds: [],
+        eventIndex: 0,
+        eventIndexInTransaction: 0,
+        transactionIndex: 0,
+        transactionStatus: "succeeded",
+      } as const satisfies Event;
+
+      const decoded = decodeEvent({
+        abi,
+        event,
+        eventName: "gol_starknet::gol_lifeforms::GolLifeforms::Event",
+        strict: false,
+      });
+
+      expect(decoded).toBeNull();
+    });
   });
 });

@@ -1,4 +1,5 @@
 import { describe, expectTypeOf, it } from "vitest";
+import type { EventToPrimitiveType } from "../src/abi-wan-helpers";
 import type { Event } from "../src/block";
 import { decodeEvent } from "../src/event";
 import { ekuboAbi } from "./fixtures/ekubo-abi";
@@ -40,7 +41,8 @@ describe("decodeEvent", () => {
       event: {} as Event,
     });
 
-    // TODO: fill this.
-    expectTypeOf(decoded.args).toEqualTypeOf<{ fixme: unknown }>();
+    expectTypeOf(decoded.args).toEqualTypeOf<
+      EventToPrimitiveType<typeof ekuboAbi, "ekubo::core::Core::Event">
+    >();
   });
 });
