@@ -5,6 +5,7 @@ import {
   type DataFinality,
   type Finalize,
   type Invalidate,
+  ServerError,
   Status,
   type StreamConfig,
   type StreamDataOptions,
@@ -179,13 +180,18 @@ export async function runWithReconnect<TFilter, TBlock>(
 
       retryCount++;
 
-      if (error instanceof ClientError) {
+      if (error instanceof ClientError || error instanceof ServerError) {
+        const isServerError = error instanceof ServerError;
+
         if (error.code === Status.INTERNAL) {
           if (retryCount < maxRetries) {
             consola.error(
-              "Internal server error, reconnecting...",
-              error.message,
+              `Internal ${isServerError ? "server" : "client"} error: ${
+                error.message
+              }`,
             );
+            consola.start("Reconnecting...");
+            console.log();
 
             // Add jitter to the retry delay to avoid all clients retrying at the same time.
             const delay = Math.random() * (retryDelay * 0.2) + retryDelay;
