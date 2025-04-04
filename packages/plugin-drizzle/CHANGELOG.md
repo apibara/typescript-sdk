@@ -1,8 +1,16 @@
 # Change Log - @apibara/plugin-drizzle
 
-<!-- This log was last generated on Wed, 02 Apr 2025 09:06:14 GMT and should not be manually modified. -->
+<!-- This log was last generated on Fri, 04 Apr 2025 14:00:17 GMT and should not be manually modified. -->
 
 <!-- Start content -->
+
+## 2.1.0-beta.26
+
+Fri, 04 Apr 2025 14:00:17 GMT
+
+### Changes
+
+- plugin-drizzle: use table_name instead of TG_TABLE_NAME (jadejajaipal5@gmail.com)
 
 ## 2.1.0-beta.24
 

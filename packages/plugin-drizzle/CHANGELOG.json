@@ -2,6 +2,21 @@
   "name": "@apibara/plugin-drizzle",
   "entries": [
     {
+      "date": "Fri, 04 Apr 2025 14:00:17 GMT",
+      "version": "2.1.0-beta.26",
+      "tag": "@apibara/plugin-drizzle_v2.1.0-beta.26",
+      "comments": {
+        "prerelease": [
+          {
+            "author": "jadejajaipal5@gmail.com",
+            "package": "@apibara/plugin-drizzle",
+            "commit": "ec259d5fb80e4c44c01b7720c73a86395ee1505d",
+            "comment": "plugin-drizzle: use table_name instead of TG_TABLE_NAME"
+          }
+        ]
+      }
+    },
+    {
       "date": "Wed, 02 Apr 2025 09:06:14 GMT",
       "version": "2.1.0-beta.24",
       "tag": "@apibara/plugin-drizzle_v2.1.0-beta.24",
