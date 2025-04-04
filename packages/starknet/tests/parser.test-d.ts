@@ -9,7 +9,7 @@ import {
   parseTuple,
   parseU8,
   parseU256,
-} from "./parser";
+} from "../src/parser";
 
 describe("Array parser", () => {
   it("has the type of the inner parser", () => {

@@ -166,6 +166,12 @@ function decodeEnumEvent<
   event: Event,
   eventName: TEventName,
 ): DecodedEvent<TAbi, TEventName> {
+  if (!event.keys || event.keys.length === 0) {
+    throw new DecodeEventError(
+      "Event has no keys; cannot determine variant selector",
+    );
+  }
+
   const variants = eventAbi.variants;
 
   const variantSelector = event.keys[0];
