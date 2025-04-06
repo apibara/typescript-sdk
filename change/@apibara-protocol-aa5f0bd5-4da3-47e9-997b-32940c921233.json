@@ -1,7 +1,0 @@
-{
-  "type": "prerelease",
-  "comment": "indexer: fix reconnect on internal server errors",
-  "packageName": "@apibara/protocol",
-  "email": "jadejajaipal5@gmail.com",
-  "dependentChangeType": "patch"
-}

@@ -2,6 +2,21 @@
   "name": "@apibara/protocol",
   "entries": [
     {
+      "date": "Sun, 06 Apr 2025 10:22:35 GMT",
+      "version": "2.1.0-beta.27",
+      "tag": "@apibara/protocol_v2.1.0-beta.27",
+      "comments": {
+        "prerelease": [
+          {
+            "author": "jadejajaipal5@gmail.com",
+            "package": "@apibara/protocol",
+            "commit": "953de327e070c0a0f981cb31469cfbde0aea2a5a",
+            "comment": "indexer: fix reconnect on internal server errors"
+          }
+        ]
+      }
+    },
+    {
       "date": "Wed, 02 Apr 2025 09:06:14 GMT",
       "version": "2.1.0-beta.24",
       "tag": "@apibara/protocol_v2.1.0-beta.24",
