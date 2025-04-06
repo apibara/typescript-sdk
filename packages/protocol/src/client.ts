@@ -16,7 +16,7 @@ import type { StreamConfig } from "./config";
 import { StatusRequest, StatusResponse } from "./status";
 import { type StreamDataRequest, StreamDataResponse } from "./stream";
 
-export { ClientError, Status, Metadata } from "nice-grpc";
+export { ClientError, ServerError, Status, Metadata } from "nice-grpc";
 
 const DEFAULT_TIMEOUT_MS = 45_000;
 
