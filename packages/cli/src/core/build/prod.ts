@@ -6,9 +6,11 @@ export async function buildProduction(
   apibara: Apibara,
   rolldownConfig: rolldown.RolldownOptions,
 ) {
-  apibara.logger.start(
-    `Building ${colors.cyan(apibara.indexers.length)} indexers`,
-  );
+  if (!apibara.options.disableLogs) {
+    apibara.logger.start(
+      `Building ${colors.cyan(apibara.indexers.length)} indexers`,
+    );
+  }
 
   const startTime = Date.now();
 
@@ -30,10 +32,12 @@ export async function buildProduction(
     const endTime = Date.now();
     const duration = endTime - startTime;
 
-    apibara.logger.success(`Build succeeded in ${duration}ms`);
-    apibara.logger.info(
-      `You can start the indexers with ${colors.cyan("apibara start")}`,
-    );
+    if (!apibara.options.disableLogs) {
+      apibara.logger.success(`Build succeeded in ${duration}ms`);
+      apibara.logger.info(
+        `You can start the indexers with ${colors.cyan("apibara start")}`,
+      );
+    }
   } catch (error) {
     apibara.logger.error("Build failed", error);
     throw error;

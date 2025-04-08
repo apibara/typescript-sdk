@@ -55,5 +55,7 @@ declare module "apibara/types" {`,
     }),
   );
 
-  apibara.logger.success(`Types written to ${prettyPath(typesDir)}`);
+  if (!apibara.options.disableLogs) {
+    apibara.logger.success(`Types written to ${prettyPath(typesDir)}`);
+  }
 }
