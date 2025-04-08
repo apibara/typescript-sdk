@@ -1,8 +1,16 @@
 # Change Log - @apibara/starknet
 
-<!-- This log was last generated on Fri, 04 Apr 2025 13:44:12 GMT and should not be manually modified. -->
+<!-- This log was last generated on Tue, 08 Apr 2025 17:13:36 GMT and should not be manually modified. -->
 
 <!-- Start content -->
+
+## 2.1.0-beta.29
+
+Tue, 08 Apr 2025 17:13:36 GMT
+
+### Changes
+
+- protocol: add chain name to StreamConfig (jadejajaipal5@gmail.com)
 
 ## 2.1.0-beta.25
 

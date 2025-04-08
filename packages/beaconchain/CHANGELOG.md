@@ -1,8 +1,16 @@
 # Change Log - @apibara/beaconchain
 
-<!-- This log was last generated on Wed, 02 Apr 2025 09:06:14 GMT and should not be manually modified. -->
+<!-- This log was last generated on Tue, 08 Apr 2025 17:13:36 GMT and should not be manually modified. -->
 
 <!-- Start content -->
+
+## 2.1.0-beta.29
+
+Tue, 08 Apr 2025 17:13:36 GMT
+
+### Changes
+
+- protocol: add chain name to StreamConfig (jadejajaipal5@gmail.com)
 
 ## 2.1.0-beta.24
 

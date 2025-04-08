@@ -1,8 +1,16 @@
 # Change Log - apibara
 
-<!-- This log was last generated on Tue, 08 Apr 2025 10:13:36 GMT and should not be manually modified. -->
+<!-- This log was last generated on Tue, 08 Apr 2025 17:13:36 GMT and should not be manually modified. -->
 
 <!-- Start content -->
+
+## 2.1.0-beta.29
+
+Tue, 08 Apr 2025 17:13:36 GMT
+
+### Changes
+
+- cli: add `write-project-info` command to generate `project-info.json` (jadejajaipal5@gmail.com)
 
 ## 2.1.0-beta.28
 
