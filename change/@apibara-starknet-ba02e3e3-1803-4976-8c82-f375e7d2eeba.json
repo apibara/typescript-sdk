@@ -1,0 +1,7 @@
+{
+  "type": "prerelease",
+  "comment": "protocol: add chain name to StreamConfig",
+  "packageName": "@apibara/starknet",
+  "email": "jadejajaipal5@gmail.com",
+  "dependentChangeType": "patch"
+}
