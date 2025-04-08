@@ -35,6 +35,8 @@ export default defineCommand({
         "project-info.mjs",
       ),
       "start",
+      "--build-dir",
+      apibara.options.buildDir,
     ];
 
     const child = spawn("node", childArgs, {
@@ -44,9 +46,11 @@ export default defineCommand({
     child.on("close", (code) => {
       if (code === 0) {
         consola.success("Project info written to `.apibara/project-info.json`");
-      } else {
-        consola.error("Failed to write project info");
       }
+    });
+
+    child.on("error", (error) => {
+      consola.error(`Failed to write project info: ${error.message}`, error);
     });
   },
 });

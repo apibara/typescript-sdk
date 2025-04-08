@@ -20,8 +20,13 @@ const startCommand = defineCommand({
     name: "write-project-info",
     description: "Write json-encoded information about the project.",
   },
-  args: {},
-  async run() {
+  args: {
+    "build-dir": {
+      type: "string",
+      description: "project build directory",
+    },
+  },
+  async run({ args }) {
     const projectInfo: ProjectInfo = {
       indexers: {},
     };
@@ -44,8 +49,7 @@ const startCommand = defineCommand({
     }
 
     const projectInfoPath = resolve(
-      process.cwd(),
-      ".apibara",
+      args["build-dir"] ?? ".apibara",
       "project-info.json",
     );
 
