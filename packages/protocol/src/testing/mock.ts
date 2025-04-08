@@ -61,6 +61,7 @@ export const MockStream = new StreamConfig(
   MockFilterFromBytes,
   MockBlockFromBytes,
   mergeMockFilter,
+  "mock",
 );
 
 export const MockStreamResponse = StreamDataResponse(MockBlockFromBytes);

@@ -10,6 +10,7 @@ export class StreamConfig<TFilter, TBlock> {
     private filter: Codec<TFilter, Uint8Array>,
     private block: Codec<TBlock | null, Uint8Array>,
     public mergeFilter: (a: TFilter, b: TFilter) => TFilter,
+    public name: string,
   ) {
     this.request = StreamDataRequest(this.filter);
     this.response = StreamDataResponse(this.block);
