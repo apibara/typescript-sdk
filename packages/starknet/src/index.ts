@@ -27,4 +27,5 @@ export const StarknetStream = new StreamConfig(
   FilterFromBytes,
   BlockFromBytes,
   mergeFilter,
+  "starknet",
 );

@@ -12,4 +12,5 @@ export const EvmStream = new StreamConfig(
   FilterFromBytes,
   BlockFromBytes,
   mergeFilter,
+  "evm",
 );

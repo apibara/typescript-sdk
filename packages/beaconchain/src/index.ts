@@ -12,4 +12,5 @@ export const BeaconChainStream = new StreamConfig(
   FilterFromBytes,
   BlockFromBytes,
   mergeFilter,
+  "beaconchain",
 );

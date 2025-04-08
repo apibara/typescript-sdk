@@ -13,6 +13,8 @@ export const mainCli = defineCommand({
     prepare: () => import("./commands/prepare").then((r) => r.default),
     init: () => import("./commands/init").then((r) => r.default),
     add: () => import("./commands/add").then((r) => r.default),
+    "write-project-info": () =>
+      import("./commands/write-project-info").then((r) => r.default),
   },
 });
 

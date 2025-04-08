@@ -7,9 +7,11 @@ export async function prepare(apibara: Apibara) {
   await prepareDir(apibara.options.buildDir);
   await prepareDir(apibara.options.outputDir);
 
-  apibara.logger.success(
-    `Output directory ${prettyPath(apibara.options.outputDir)} cleaned`,
-  );
+  if (!apibara.options.disableLogs) {
+    apibara.logger.success(
+      `Output directory ${prettyPath(apibara.options.outputDir)} cleaned`,
+    );
+  }
 }
 
 async function prepareDir(dir: string) {

@@ -75,6 +75,7 @@ export interface ApibaraOptions<
   buildDir: string;
   outputDir: string;
   indexersDir: string;
+  disableLogs?: boolean;
 
   // Dev
   dev: boolean;
