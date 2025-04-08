@@ -17,6 +17,11 @@ export async function createApibara(
 ): Promise<Apibara> {
   const options = await loadOptions(config, opts, dev);
 
+  // Enable source map support in Node
+  process.env.NODE_OPTIONS = process.env.NODE_OPTIONS
+    ? `${process.env.NODE_OPTIONS} --enable-source-maps`
+    : "--enable-source-maps";
+
   const apibara: Apibara = {
     options,
     indexers: [],
