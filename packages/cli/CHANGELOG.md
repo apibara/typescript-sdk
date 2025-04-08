@@ -1,8 +1,16 @@
 # Change Log - apibara
 
-<!-- This log was last generated on Tue, 25 Mar 2025 13:41:11 GMT and should not be manually modified. -->
+<!-- This log was last generated on Tue, 08 Apr 2025 10:13:36 GMT and should not be manually modified. -->
 
 <!-- Start content -->
+
+## 2.1.0-beta.28
+
+Tue, 08 Apr 2025 10:13:36 GMT
+
+### Changes
+
+- cli: add source map support (jadejajaipal5@gmail.com)
 
 ## 2.1.0-beta.22
 

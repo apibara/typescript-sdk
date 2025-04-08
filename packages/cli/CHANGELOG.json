@@ -2,6 +2,21 @@
   "name": "apibara",
   "entries": [
     {
+      "date": "Tue, 08 Apr 2025 10:13:36 GMT",
+      "version": "2.1.0-beta.28",
+      "tag": "apibara_v2.1.0-beta.28",
+      "comments": {
+        "prerelease": [
+          {
+            "author": "jadejajaipal5@gmail.com",
+            "package": "apibara",
+            "commit": "478ea66ae7902d4760408290ab401b4126620381",
+            "comment": "cli: add source map support"
+          }
+        ]
+      }
+    },
+    {
       "date": "Tue, 25 Mar 2025 13:41:11 GMT",
       "version": "2.1.0-beta.22",
       "tag": "apibara_v2.1.0-beta.22",
