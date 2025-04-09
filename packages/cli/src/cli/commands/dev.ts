@@ -138,6 +138,7 @@ export default defineCommand({
         });
 
         childProcess.on("close", (code, signal) => {
+          childProcess = undefined;
           console.log();
           apibara.logger.log(
             `Indexers process exited${
