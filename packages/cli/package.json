@@ -55,6 +55,22 @@
     "./dist/runtime/*": {
       "types": "./dist/runtime/*.d.ts",
       "import": "./dist/runtime/*.mjs"
+    },
+    "./indexer": {
+      "types": "./dist/indexer/index.d.ts",
+      "import": "./dist/indexer/index.mjs"
+    },
+    "./plugins": {
+      "types": "./dist/indexer/plugins.d.ts",
+      "import": "./dist/indexer/plugins.mjs"
+    },
+    "./testing": {
+      "types": "./dist/indexer/testing.d.ts",
+      "import": "./dist/indexer/testing.mjs"
+    },
+    "./vcr": {
+      "types": "./dist/indexer/vcr.d.ts",
+      "import": "./dist/indexer/vcr.mjs"
     }
   },
   "bin": {

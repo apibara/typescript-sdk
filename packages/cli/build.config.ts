@@ -28,6 +28,7 @@ export default defineBuildConfig({
     { input: "./src/create/index.ts" },
     { input: "./src/common/index.ts" },
     { input: "./src/runtime/", outDir: "./dist/runtime", format: "esm" },
+    { input: "./src/indexer/", outDir: "./dist/indexer", format: "esm" },
   ],
   sourcemap: true,
   clean: true,
