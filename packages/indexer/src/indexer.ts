@@ -1,6 +1,7 @@
 import {
   type Client,
   ClientError,
+  type CreateClientOptions,
   type Cursor,
   type DataFinality,
   type Finalize,
@@ -82,6 +83,7 @@ export type IndexerConfig<TFilter, TBlock> = {
   streamUrl: string;
   filter: TFilter;
   finality?: DataFinality;
+  clientOptions?: CreateClientOptions;
   factory?: ({
     block,
     context,
