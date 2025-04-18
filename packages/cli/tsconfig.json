@@ -4,7 +4,7 @@
     "outDir": "dist",
     "declarationDir": "dist",
     "noEmit": false,
-    "rootDir": "src",
+    "rootDir": ".",
     "types": ["node"],
     "paths": {
       "apibara/cli": ["./src/cli"],
@@ -15,9 +15,9 @@
       "apibara/hooks": ["./src/hooks"],
       "apibara/create": ["./src/create"],
       "apibara/runtime/meta": ["./runtime-meta"],
+      "apibara/runtime": ["./src/runtime"],
+      "apibara/common": ["./src/common"],
       "#apibara-internal-virtual/*": ["./src/types/virtual/*"]
     }
-  },
-  "include": ["src/**/*"],
-  "exclude": ["src/playground/**/*"]
+  }
 }

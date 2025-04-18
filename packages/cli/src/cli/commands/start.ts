@@ -50,13 +50,7 @@ export default defineCommand({
 
     await apibara.close();
 
-    const childArgs = [
-      entry,
-      "start",
-      "--indexer",
-      indexer,
-      ...(preset ? ["--preset", preset] : []),
-    ];
+    const childArgs = [entry, "start", "--indexer", indexer];
 
     const childProcess = spawn("node", childArgs, {
       stdio: "inherit",
@@ -64,7 +58,7 @@ export default defineCommand({
 
     childProcess.on("close", (code, signal) => {
       console.log();
-      apibara.logger.log(
+      apibara.logger.info(
         `Indexers process exited${
           code !== null ? ` with code ${colors.red(code)}` : ""
         }`,
