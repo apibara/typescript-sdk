@@ -22,7 +22,6 @@ export function generatePackageJson(isTypeScript: boolean) {
       ...(isTypeScript && { typecheck: "tsc --noEmit" }),
     },
     dependencies: {
-      "@apibara/indexer": packageVersions["@apibara/indexer"],
       "@apibara/protocol": packageVersions["@apibara/protocol"],
       apibara: packageVersions.apibara,
     },
@@ -70,8 +69,8 @@ export function generateIndexer({
   chain,
   language,
 }: IndexerOptions) {
-  return `import { defineIndexer } from "@apibara/indexer";
-import { useLogger } from "@apibara/indexer/plugins";
+  return `import { defineIndexer } from "apibara/indexer";
+import { useLogger } from "apibara/plugins";
 ${storage === "postgres" ? `import { drizzleStorage } from "@apibara/plugin-drizzle";` : ""}
 ${storage === "postgres" ? `import { drizzle } from "@apibara/plugin-drizzle";` : ""}
 ${

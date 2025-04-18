@@ -28,8 +28,8 @@ export async function createApibara(
     hooks: createHooks(),
     close: () => apibara.hooks.callHook("close"),
     logger: consola.withTag("apibara"),
-    async updateConfig(config: ApibaraDynamicConfig) {
-      updateApibaraConfig(apibara, config);
+    async updateConfig(newConfig: ApibaraDynamicConfig) {
+      updateApibaraConfig(apibara, newConfig);
     },
   };
 

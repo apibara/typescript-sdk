@@ -1,4 +1,5 @@
 import { runWithReconnect } from "@apibara/indexer";
+import { getRuntimeDataFromEnv } from "apibara/common";
 import { defineCommand, runMain } from "citty";
 import { blueBright } from "picocolors";
 import {
@@ -17,13 +18,11 @@ const startCommand = defineCommand({
       type: "string",
       description: "Which indexers to run",
     },
-    preset: {
-      type: "string",
-      description: "Preset to use",
-    },
   },
   async run({ args }) {
-    const { indexers: indexersArgs, preset } = args;
+    const { indexers: indexersArgs } = args;
+
+    const { processedRuntimeConfig, preset } = getRuntimeDataFromEnv();
 
     let selectedIndexers = availableIndexers;
     if (indexersArgs) {
@@ -41,7 +40,11 @@ const startCommand = defineCommand({
     await Promise.all(
       selectedIndexers.map(async (indexer) => {
         const { indexer: indexerInstance, logger } =
-          createIndexer(indexer, preset) ?? {};
+          createIndexer({
+            indexerName: indexer,
+            processedRuntimeConfig,
+            preset,
+          }) ?? {};
         if (!indexerInstance) {
           return;
         }
@@ -49,6 +52,7 @@ const startCommand = defineCommand({
         const client = createAuthenticatedClient(
           indexerInstance.streamConfig,
           indexerInstance.options.streamUrl,
+          indexerInstance.options.clientOptions,
         );
 
         if (logger) {

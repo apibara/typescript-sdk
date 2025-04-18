@@ -1,4 +1,5 @@
 import { runWithReconnect } from "@apibara/indexer";
+import { getRuntimeDataFromEnv } from "apibara/common";
 import { defineCommand, runMain } from "citty";
 import consola from "consola";
 import { blueBright } from "picocolors";
@@ -16,16 +17,18 @@ const startCommand = defineCommand({
       description: "Indexer name",
       required: true,
     },
-    preset: {
-      type: "string",
-      description: "Preset to use",
-    },
   },
   async run({ args }) {
-    const { indexer, preset } = args;
+    const { indexer } = args;
+
+    const { processedRuntimeConfig, preset } = getRuntimeDataFromEnv();
 
     const { indexer: indexerInstance, logger } =
-      createIndexer(indexer, preset) ?? {};
+      createIndexer({
+        indexerName: indexer,
+        processedRuntimeConfig,
+        preset,
+      }) ?? {};
     if (!indexerInstance) {
       consola.error(`Specified indexer "${indexer}" but it was not defined`);
       process.exit(1);
@@ -34,6 +37,7 @@ const startCommand = defineCommand({
     const client = createAuthenticatedClient(
       indexerInstance.streamConfig,
       indexerInstance.options.streamUrl,
+      indexerInstance.options.clientOptions,
     );
 
     if (register) {

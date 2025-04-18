@@ -67,7 +67,6 @@ export const storages: StorageDataType[] = [
 export const packageVersions = {
   // Required Dependencies
   apibara: "next",
-  "@apibara/indexer": "next",
   "@apibara/protocol": "next",
   // Chain Dependencies
   "@apibara/evm": "next",

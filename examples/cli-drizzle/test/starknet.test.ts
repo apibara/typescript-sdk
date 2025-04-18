@@ -1,4 +1,4 @@
-import { createVcr } from "@apibara/indexer/testing";
+import { createVcr } from "apibara/testing";
 import { describe, expect, it } from "vitest";
 
 import createIndexer from "@/indexers/2-starknet.indexer";

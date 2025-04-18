@@ -15,25 +15,27 @@ import {
   createClient,
 } from "@apibara/protocol";
 import consola from "consola";
-import { config } from "#apibara-internal-virtual/config";
 import { indexers } from "#apibara-internal-virtual/indexers";
 import { logger as instrumentationLogger } from "#apibara-internal-virtual/instrumentation";
-import { getProcessedRuntimeConfig } from "./helper";
 import { createLogger } from "./logger";
 
 export const availableIndexers = indexers.map((i) => i.name);
 
-export function createIndexer(indexerName: string, preset?: string) {
-  // Get merged runtime config from preset and process.env.APIBARA_RUNTIME_CONFIG and defaults.
-  const runtimeConfig = getProcessedRuntimeConfig({
-    preset,
-    presets: config.presets,
-    runtimeConfig: config.runtimeConfig,
-  });
-
-  // Set the runtime config in the environment so that it can be used by the useRuntimeConfig hook.
-  process.env.APIBARA_RUNTIME_CONFIG_HOOK_DATA = JSON.stringify(runtimeConfig);
-
+export function createIndexer({
+  indexerName,
+  processedRuntimeConfig,
+  preset,
+}: {
+  indexerName: string;
+  /**
+   * Final processed runtime config to be used by the indexer
+   */
+  processedRuntimeConfig: Record<string, unknown>;
+  /**
+   * Preset name which was used to generate the runtime config
+   */
+  preset?: string;
+}) {
   const indexerDefinition = indexers.find((i) => i.name === indexerName);
 
   if (indexerDefinition === undefined) {
@@ -52,7 +54,7 @@ export function createIndexer(indexerName: string, preset?: string) {
 
   const definition =
     typeof indexerModule === "function"
-      ? indexerModule(runtimeConfig)
+      ? indexerModule(processedRuntimeConfig)
       : indexerModule;
 
   let reporter: ConsolaReporter = createLogger({
@@ -109,10 +111,13 @@ export function createAuthenticatedClient(
   return createClient(config, streamUrl, {
     ...options,
     defaultCallOptions: {
+      ...(options?.defaultCallOptions ?? {}),
       "*": {
         metadata: Metadata({
           Authorization: `Bearer ${dnaToken}`,
         }),
+        // metadata cant be overrided with spread as its a class so we override it fully if user provided it.
+        ...(options?.defaultCallOptions?.["*"] ?? {}),
       },
     },
   });

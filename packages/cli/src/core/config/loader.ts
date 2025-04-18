@@ -7,8 +7,10 @@ import { loadConfig, watchConfig } from "c12";
 import { klona } from "klona/full";
 import { ApibaraDefaults } from "./defaults";
 import { resolvePathOptions } from "./resolvers/paths.resolver";
+import { runtimeConfigResolver } from "./resolvers/runtime.resolver";
 
-const configResolvers = [resolvePathOptions] as const;
+// runtimeConfigResolver handles assigning runtime values to env
+const configResolvers = [resolvePathOptions, runtimeConfigResolver] as const;
 
 export async function loadOptions(
   configOverrides: ApibaraConfig = {},

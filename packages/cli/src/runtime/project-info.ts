@@ -1,7 +1,10 @@
 import { writeFileSync } from "node:fs";
 import { resolve } from "node:path";
+import {
+  getProcessedRuntimeConfig,
+  getRuntimeDataFromEnv,
+} from "apibara/common";
 import { defineCommand, runMain } from "citty";
-import { config } from "#apibara-internal-virtual/config";
 import { availableIndexers, createIndexer } from "./internal/app";
 
 type ProjectInfo = {
@@ -31,10 +34,25 @@ const startCommand = defineCommand({
       indexers: {},
     };
 
-    for (const preset of Object.keys(config.presets ?? {})) {
+    // get all original runtime data from env
+    const { presets, runtimeConfig, userEnvRuntimeConfig } =
+      getRuntimeDataFromEnv();
+
+    for (const preset of Object.keys(presets ?? {})) {
+      // process runtime config for each preset
+      const processedRuntimeConfig = getProcessedRuntimeConfig({
+        preset,
+        presets,
+        runtimeConfig,
+        userEnvRuntimeConfig,
+      });
       for (const indexer of availableIndexers) {
         const { indexer: indexerInstance } =
-          createIndexer(indexer, preset) ?? {};
+          createIndexer({
+            indexerName: indexer,
+            processedRuntimeConfig,
+            preset,
+          }) ?? {};
         if (!indexerInstance) {
           continue;
         }
