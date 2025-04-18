@@ -1,8 +1,8 @@
+import { checkForUnknownArgs, commonArgs } from "apibara/common";
 import { build, createApibara, prepare, writeTypes } from "apibara/core";
 import { runtimeDir } from "apibara/runtime/meta";
 import { defineCommand } from "citty";
 import { join, resolve } from "pathe";
-import { checkForUnknownArgs, commonArgs } from "../common";
 
 export default defineCommand({
   meta: {

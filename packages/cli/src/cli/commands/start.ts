@@ -1,10 +1,10 @@
 import { spawn } from "node:child_process";
+import { checkForUnknownArgs, commonArgs } from "apibara/common";
 import { createApibara } from "apibara/core";
 import { defineCommand } from "citty";
 import { colors } from "consola/utils";
 import fse from "fs-extra";
 import { resolve } from "pathe";
-import { checkForUnknownArgs, commonArgs } from "../common";
 
 export default defineCommand({
   meta: {
@@ -50,7 +50,15 @@ export default defineCommand({
 
     await apibara.close();
 
-    const childArgs = [entry, "start", "--indexer", indexer];
+    const childArgs = [
+      entry,
+      "start",
+      "--indexer",
+      indexer,
+      // important: this is required to run the indexer with apibara cli to load runtime values correctly
+      "--no-standalone",
+      ...(preset ? ["--preset", preset] : []),
+    ];
 
     const childProcess = spawn("node", childArgs, {
       stdio: "inherit",

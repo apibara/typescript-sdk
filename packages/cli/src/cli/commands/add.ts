@@ -1,6 +1,6 @@
+import { checkForUnknownArgs } from "apibara/common";
 import { addIndexer } from "apibara/create";
 import { defineCommand } from "citty";
-import { checkForUnknownArgs } from "../common";
 
 export default defineCommand({
   meta: {
