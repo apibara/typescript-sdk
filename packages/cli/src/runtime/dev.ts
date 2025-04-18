@@ -52,6 +52,7 @@ const startCommand = defineCommand({
         const client = createAuthenticatedClient(
           indexerInstance.streamConfig,
           indexerInstance.options.streamUrl,
+          indexerInstance.options.clientOptions,
         );
 
         if (logger) {

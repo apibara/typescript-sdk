@@ -111,10 +111,13 @@ export function createAuthenticatedClient(
   return createClient(config, streamUrl, {
     ...options,
     defaultCallOptions: {
+      ...(options?.defaultCallOptions ?? {}),
       "*": {
         metadata: Metadata({
           Authorization: `Bearer ${dnaToken}`,
         }),
+        // metadata cant be overrided with spread as its a class so we override it fully if user provided it.
+        ...(options?.defaultCallOptions?.["*"] ?? {}),
       },
     },
   });
