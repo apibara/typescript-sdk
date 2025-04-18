@@ -1,13 +1,13 @@
 import { EvmStream } from "@apibara/evm";
-import { defineIndexer } from "@apibara/indexer";
 import { drizzleStorage, useDrizzleStorage } from "@apibara/plugin-drizzle";
+import { defineIndexer } from "apibara/indexer";
 
 import type { ApibaraRuntimeConfig } from "apibara/types";
 import { encodeEventTopics, parseAbi } from "viem";
 
 import { ethereumUsdcTransfers } from "@/lib/schema";
-import { useLogger } from "@apibara/indexer/plugins";
 import { drizzle } from "@apibara/plugin-drizzle";
+import { useLogger } from "apibara/plugins";
 
 const abi = parseAbi([
   "event Transfer(address indexed from, address indexed to, uint256 value)",

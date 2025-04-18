@@ -1,4 +1,4 @@
-import { createVcr } from "@apibara/indexer/testing";
+import { createVcr } from "apibara/testing";
 
 import createIndexer from "@/indexers/1-evm.indexer";
 import { ethereumUsdcTransfers } from "@/lib/schema";

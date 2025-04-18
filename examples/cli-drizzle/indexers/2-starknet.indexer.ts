@@ -1,10 +1,10 @@
-import { defineIndexer } from "@apibara/indexer";
 import { drizzleStorage, useDrizzleStorage } from "@apibara/plugin-drizzle";
 import { drizzle } from "@apibara/plugin-drizzle";
 import { StarknetStream } from "@apibara/starknet";
+import { defineIndexer } from "apibara/indexer";
 
 import { starknetUsdcTransfers } from "@/lib/schema";
-import { useLogger } from "@apibara/indexer/plugins";
+import { useLogger } from "apibara/plugins";
 import type { ApibaraRuntimeConfig } from "apibara/types";
 import { hash } from "starknet";
 
