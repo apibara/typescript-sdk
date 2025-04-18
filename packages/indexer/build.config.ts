@@ -13,6 +13,7 @@ export default defineBuildConfig({
   clean: true,
   outDir: "./dist",
   declaration: true,
+  sourcemap: true,
   rollup: {
     emitCJS: true,
   },
