@@ -41,7 +41,10 @@ export interface ApibaraConfig<
   preset?: keyof T;
 }
 
-export type ApibaraDynamicConfig = Pick<ApibaraConfig, "runtimeConfig">;
+export type ApibaraDynamicConfig = Pick<
+  ApibaraConfig,
+  "runtimeConfig" | "preset" | "presets"
+>;
 
 /**
  * Config loader options

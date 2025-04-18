@@ -9,8 +9,8 @@ import { blueBright, gray } from "../../create/colors";
 import { checkForUnknownArgs, commonArgs } from "../common";
 
 // Hot module reloading key regex
-// for only runtimeConfig.* keys
-const hmrKeyRe = /^runtimeConfig\./;
+// for only runtimeConfig.*, presets.* keys & preset key
+const hmrKeyRe = /^(runtimeConfig\.|presets\.|preset$)/;
 
 export default defineCommand({
   meta: {
@@ -79,12 +79,12 @@ export default defineCommand({
               }
 
               apibara.logger.info(
-                `Config updated:
-                  ${diff.map((entry) => `  ${entry.toString()}`).join("\n")}`,
+                `Config updated: \n${diff.map((entry) => `  ${entry.toString()}`).join("\n")}`,
               );
 
               await (diff.every((e) => hmrKeyRe.test(e.key))
-                ? apibara.updateConfig(newConfig.config || {}) // Hot reload
+                ? // in hot reload we only update the runtime values & restart indexers,no build step, apibara instance remains the same
+                  apibara.updateConfig(newConfig.config || {}) // Hot reload
                 : reload()); // Full reload
             },
           },
@@ -92,7 +92,9 @@ export default defineCommand({
         true,
       );
 
-      apibara.hooks.hookOnce("restart", reload);
+      apibara.hooks.hookOnce("restart", async () => {
+        await reload();
+      });
 
       apibara.options.entry = join(runtimeDir, "dev.mjs");
 
@@ -110,9 +112,9 @@ export default defineCommand({
 
       apibara.hooks.hook("dev:reload", async () => {
         if (childProcess) {
-          apibara.logger.info("Restarting indexers");
           await killProcess(childProcess);
           childProcess = undefined;
+          apibara.logger.info("Restarting indexers");
         } else {
           apibara.logger.info("Starting indexers");
 
@@ -130,7 +132,6 @@ export default defineCommand({
           resolve(apibara.options.outputDir || "./.apibara/build", "dev.mjs"),
           "start",
           ...(args.indexers ? ["--indexers", args.indexers] : []),
-          ...(args.preset ? ["--preset", args.preset] : []),
         ];
 
         childProcess = spawn("node", childArgs, {
@@ -140,7 +141,7 @@ export default defineCommand({
         childProcess.on("close", (code, signal) => {
           childProcess = undefined;
           console.log();
-          apibara.logger.log(
+          apibara.logger.info(
             `Indexers process exited${
               code !== null ? ` with code ${colors.red(code)}` : ""
             }`,
