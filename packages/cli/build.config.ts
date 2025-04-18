@@ -11,6 +11,7 @@ const modules = [
   "hooks",
   "runtime",
   "create",
+  "common",
 ];
 
 // @ts-ignore
@@ -25,8 +26,10 @@ export default defineBuildConfig({
     { input: "./src/types/index.ts" },
     { input: "./src/hooks/index.ts" },
     { input: "./src/create/index.ts" },
+    { input: "./src/common/index.ts" },
     { input: "./src/runtime/", outDir: "./dist/runtime", format: "esm" },
   ],
+  sourcemap: true,
   clean: true,
   outDir: "./dist",
   declaration: true,
@@ -43,9 +46,17 @@ export default defineBuildConfig({
     "apibara/runtime/meta",
     ...modules.map((module) => `apibara/${module}`),
   ],
+  hooks: {
+    "build:before": () => {
+      console.time("build");
+    },
+    "build:done": () => {
+      console.timeEnd("build");
+    },
+  },
   rollup: {
     output: {
-      banner: ({ fileName }) =>
+      banner: ({ fileName }: { fileName: string }) =>
         fileName === "cli/index.mjs" ? "#!/usr/bin/env node" : undefined,
     },
   },
