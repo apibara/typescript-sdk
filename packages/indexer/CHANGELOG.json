@@ -2,6 +2,21 @@
   "name": "@apibara/indexer",
   "entries": [
     {
+      "date": "Fri, 18 Apr 2025 14:21:30 GMT",
+      "version": "2.1.0-beta.31",
+      "tag": "@apibara/indexer_v2.1.0-beta.31",
+      "comments": {
+        "prerelease": [
+          {
+            "author": "jadejajaipal5@gmail.com",
+            "package": "@apibara/indexer",
+            "commit": "c60ae9bee36f337f48d4e835dd4897840a1f0f0e",
+            "comment": "build: add sourcemaps to all packages"
+          }
+        ]
+      }
+    },
+    {
       "date": "Sun, 06 Apr 2025 10:22:35 GMT",
       "version": "2.1.0-beta.27",
       "tag": "@apibara/indexer_v2.1.0-beta.27",

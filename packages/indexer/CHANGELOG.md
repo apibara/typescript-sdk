@@ -1,8 +1,16 @@
 # Change Log - @apibara/indexer
 
-<!-- This log was last generated on Sun, 06 Apr 2025 10:22:35 GMT and should not be manually modified. -->
+<!-- This log was last generated on Fri, 18 Apr 2025 14:21:30 GMT and should not be manually modified. -->
 
 <!-- Start content -->
+
+## 2.1.0-beta.31
+
+Fri, 18 Apr 2025 14:21:30 GMT
+
+### Changes
+
+- build: add sourcemaps to all packages (jadejajaipal5@gmail.com)
 
 ## 2.1.0-beta.27
 

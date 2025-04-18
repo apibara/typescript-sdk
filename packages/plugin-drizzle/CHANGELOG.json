@@ -2,6 +2,21 @@
   "name": "@apibara/plugin-drizzle",
   "entries": [
     {
+      "date": "Fri, 18 Apr 2025 14:21:30 GMT",
+      "version": "2.1.0-beta.31",
+      "tag": "@apibara/plugin-drizzle_v2.1.0-beta.31",
+      "comments": {
+        "prerelease": [
+          {
+            "author": "jadejajaipal5@gmail.com",
+            "package": "@apibara/plugin-drizzle",
+            "commit": "c60ae9bee36f337f48d4e835dd4897840a1f0f0e",
+            "comment": "build: add sourcemaps to all packages"
+          }
+        ]
+      }
+    },
+    {
       "date": "Fri, 04 Apr 2025 14:00:17 GMT",
       "version": "2.1.0-beta.26",
       "tag": "@apibara/plugin-drizzle_v2.1.0-beta.26",

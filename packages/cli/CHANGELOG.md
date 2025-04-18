@@ -1,8 +1,16 @@
 # Change Log - apibara
 
-<!-- This log was last generated on Wed, 09 Apr 2025 10:43:06 GMT and should not be manually modified. -->
+<!-- This log was last generated on Fri, 18 Apr 2025 14:21:30 GMT and should not be manually modified. -->
 
 <!-- Start content -->
+
+## 2.1.0-beta.31
+
+Fri, 18 Apr 2025 14:21:30 GMT
+
+### Changes
+
+- cli: refactor runtime data flow, improve hot reloading, add sourcemaps, re-export indexer modules, update templates (jadejajaipal5@gmail.com)
 
 ## 2.1.0-beta.30
 

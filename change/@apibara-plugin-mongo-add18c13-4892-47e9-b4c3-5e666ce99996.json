@@ -1,7 +1,0 @@
-{
-  "type": "prerelease",
-  "comment": "build: add sourcemaps to all packages",
-  "packageName": "@apibara/plugin-mongo",
-  "email": "jadejajaipal5@gmail.com",
-  "dependentChangeType": "patch"
-}

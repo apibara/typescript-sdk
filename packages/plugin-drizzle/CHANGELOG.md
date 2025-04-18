@@ -1,8 +1,16 @@
 # Change Log - @apibara/plugin-drizzle
 
-<!-- This log was last generated on Fri, 04 Apr 2025 14:00:17 GMT and should not be manually modified. -->
+<!-- This log was last generated on Fri, 18 Apr 2025 14:21:30 GMT and should not be manually modified. -->
 
 <!-- Start content -->
+
+## 2.1.0-beta.31
+
+Fri, 18 Apr 2025 14:21:30 GMT
+
+### Changes
+
+- build: add sourcemaps to all packages (jadejajaipal5@gmail.com)
 
 ## 2.1.0-beta.26
 

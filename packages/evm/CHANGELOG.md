@@ -1,8 +1,16 @@
 # Change Log - @apibara/evm
 
-<!-- This log was last generated on Tue, 08 Apr 2025 17:13:36 GMT and should not be manually modified. -->
+<!-- This log was last generated on Fri, 18 Apr 2025 14:21:30 GMT and should not be manually modified. -->
 
 <!-- Start content -->
+
+## 2.1.0-beta.31
+
+Fri, 18 Apr 2025 14:21:30 GMT
+
+### Changes
+
+- build: add sourcemaps to all packages (jadejajaipal5@gmail.com)
 
 ## 2.1.0-beta.29
 
