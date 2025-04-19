@@ -1,4 +1,5 @@
 import { type ChildProcess, spawn } from "node:child_process";
+import { checkForUnknownArgs, commonArgs } from "apibara/common";
 import { build, createApibara, prepare, writeTypes } from "apibara/core";
 import { runtimeDir } from "apibara/runtime/meta";
 import type { Apibara } from "apibara/types";
@@ -6,7 +7,6 @@ import { defineCommand } from "citty";
 import { colors } from "consola/utils";
 import { join, resolve } from "pathe";
 import { blueBright, gray } from "../../create/colors";
-import { checkForUnknownArgs, commonArgs } from "../common";
 
 // Hot module reloading key regex
 // for only runtimeConfig.*, presets.* keys & preset key

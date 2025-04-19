@@ -1,11 +1,11 @@
 import { spawn } from "node:child_process";
 import { join } from "node:path";
+import { checkForUnknownArgs, commonArgs } from "apibara/common";
 import { build, createApibara, prepare, writeTypes } from "apibara/core";
 import { runtimeDir } from "apibara/runtime/meta";
 import { defineCommand } from "citty";
 import consola from "consola";
 import { resolve } from "pathe";
-import { checkForUnknownArgs, commonArgs } from "../common";
 
 export default defineCommand({
   meta: {
