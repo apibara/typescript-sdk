@@ -1,8 +1,16 @@
 # Change Log - apibara
 
-<!-- This log was last generated on Fri, 18 Apr 2025 14:21:30 GMT and should not be manually modified. -->
+<!-- This log was last generated on Sat, 19 Apr 2025 11:33:10 GMT and should not be manually modified. -->
 
 <!-- Start content -->
+
+## 2.1.0-beta.32
+
+Sat, 19 Apr 2025 11:33:10 GMT
+
+### Changes
+
+- cli: fix prod mode for runtime values (jadejajaipal5@gmail.com)
 
 ## 2.1.0-beta.31
 

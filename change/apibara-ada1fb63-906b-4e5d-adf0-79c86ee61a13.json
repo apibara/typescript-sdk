@@ -1,7 +1,0 @@
-{
-  "type": "prerelease",
-  "comment": "cli: fix prod mode for runtime values",
-  "packageName": "apibara",
-  "email": "jadejajaipal5@gmail.com",
-  "dependentChangeType": "patch"
-}
