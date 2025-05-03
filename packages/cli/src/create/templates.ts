@@ -87,8 +87,7 @@ ${storage === "postgres" ? `import * as schema from "../lib/schema";` : ""}
 
 
 export default function (runtimeConfig${language === "typescript" ? ": ApibaraRuntimeConfig" : ""}) {
-  const indexerId = "${indexerId}";
-  const { startingBlock, streamUrl } = runtimeConfig[indexerId];
+  const { startingBlock, streamUrl } = runtimeConfig["${indexerId}"];
   ${
     storage === "postgres"
       ? `const db = drizzle({
@@ -110,7 +109,7 @@ export default function (runtimeConfig${language === "typescript" ? ": ApibaraRu
     finality: "accepted",
     startingBlock: BigInt(startingBlock),
     filter: {
-      header: "always",
+      ${chain === "ethereum" ? "logs: []," : chain === "starknet" ? "events:  []," : ""}
     },
     plugins: [${storage === "postgres" ? "drizzleStorage({ db, migrate: { migrationsFolder: './drizzle' } })" : ""}],
     async transform({ endCursor, finality }) {
