@@ -2,6 +2,21 @@
   "name": "apibara",
   "entries": [
     {
+      "date": "Sat, 03 May 2025 18:05:38 GMT",
+      "version": "2.1.0-beta.33",
+      "tag": "apibara_v2.1.0-beta.33",
+      "comments": {
+        "prerelease": [
+          {
+            "author": "jadejajaipal5@gmail.com",
+            "package": "apibara",
+            "commit": "849eb6c2d803a92740be5f0893de66faeb4f2e0f",
+            "comment": "cli: update create template"
+          }
+        ]
+      }
+    },
+    {
       "date": "Sat, 19 Apr 2025 11:33:10 GMT",
       "version": "2.1.0-beta.32",
       "tag": "apibara_v2.1.0-beta.32",
