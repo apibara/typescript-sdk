@@ -35,7 +35,7 @@ export const BlockHeader = MessageCodec({
   randaoReveal: RequiredCodec(BytesFromUint8Array),
   depositCount: RequiredCodec(BigIntCodec),
   depositRoot: RequiredCodec(B256),
-  blockHash: RequiredCodec(B256),
+  blockHash: OptionalCodec(B256),
   graffiti: RequiredCodec(B256),
   executionPayload: OptionalCodec(ExecutionPayload),
   blobKzgCommitments: ArrayCodec(B384),

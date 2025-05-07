@@ -184,7 +184,7 @@ export type DataAvailabilityMode = CodecType<typeof DataAvailabilityMode>;
  * @prop l1DataAvailabilityMode How data is posted to L1.
  */
 export const BlockHeader = MessageCodec({
-  blockHash: RequiredCodec(FieldElement),
+  blockHash: OptionalCodec(FieldElement),
   parentBlockHash: RequiredCodec(FieldElement),
   blockNumber: RequiredCodec(BigIntCodec),
   sequencerAddress: RequiredCodec(FieldElement),
