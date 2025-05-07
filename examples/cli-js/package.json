@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "apibara dev",
     "lint": "biome check .",
+    "start": "apibara start",
     "lint:fix": "pnpm lint --write"
   },
   "keywords": [],

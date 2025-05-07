@@ -60,7 +60,7 @@ export type TransactionStatus = CodecType<typeof TransactionStatus>;
 
 export const BlockHeader = MessageCodec({
   blockNumber: RequiredCodec(BigIntCodec),
-  blockHash: RequiredCodec(B256),
+  blockHash: OptionalCodec(B256),
   parentBlockHash: RequiredCodec(B256),
   unclesHash: RequiredCodec(B256),
   miner: RequiredCodec(Address),
