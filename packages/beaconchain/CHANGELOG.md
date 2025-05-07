@@ -1,8 +1,16 @@
 # Change Log - @apibara/beaconchain
 
-<!-- This log was last generated on Fri, 18 Apr 2025 14:21:30 GMT and should not be manually modified. -->
+<!-- This log was last generated on Wed, 07 May 2025 08:48:19 GMT and should not be manually modified. -->
 
 <!-- Start content -->
+
+## 2.1.0-beta.34
+
+Wed, 07 May 2025 08:48:19 GMT
+
+### Changes
+
+- Make block hash optional to support pending blocks (francesco@ceccon.me)
 
 ## 2.1.0-beta.31
 

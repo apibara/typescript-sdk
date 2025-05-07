@@ -2,6 +2,21 @@
   "name": "@apibara/starknet",
   "entries": [
     {
+      "date": "Wed, 07 May 2025 08:48:19 GMT",
+      "version": "2.1.0-beta.34",
+      "tag": "@apibara/starknet_v2.1.0-beta.34",
+      "comments": {
+        "prerelease": [
+          {
+            "author": "francesco@ceccon.me",
+            "package": "@apibara/starknet",
+            "commit": "53ff7d8c56740d6a3cd8f0a52afc0ac22b3092eb",
+            "comment": "Make block hash optional to support pending blocks"
+          }
+        ]
+      }
+    },
+    {
       "date": "Fri, 18 Apr 2025 14:21:30 GMT",
       "version": "2.1.0-beta.31",
       "tag": "@apibara/starknet_v2.1.0-beta.31",

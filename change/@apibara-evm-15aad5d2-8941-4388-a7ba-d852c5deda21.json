@@ -1,7 +1,0 @@
-{
-  "type": "prerelease",
-  "comment": "Make block hash optional to support pending blocks",
-  "packageName": "@apibara/evm",
-  "email": "francesco@ceccon.me",
-  "dependentChangeType": "patch"
-}
