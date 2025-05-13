@@ -11,20 +11,21 @@ export default function (config) {
         "grpc.max_send_message_length": 100_000_000,
       },
     },
-    startingBlock: BigInt(22_211_000),
+    startingBlock: 8_318_000n,
     filter: {
       logs: [
         {
-          address: "0x8236a87084f8B84306f72007F36F2618A5634494",
+          address: "0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238",
         },
       ],
     },
-    async transform({ block: { header, logs }, finality }) {
+    async transform({ block: { header, logs }, finality, production }) {
       console.log(
         "Transforming block ",
         header.blockNumber,
         header.blockHash,
         finality,
+        production,
         logs.length,
       );
     },

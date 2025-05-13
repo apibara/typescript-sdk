@@ -4,6 +4,7 @@ import {
   type CreateClientOptions,
   type Cursor,
   type DataFinality,
+  type DataProduction,
   type Finalize,
   type Invalidate,
   ServerError,
@@ -49,7 +50,9 @@ export interface IndexerHooks<TFilter, TBlock> {
   }) => void;
   "connect:after": ({
     request,
-  }: { request: StreamDataRequest<TFilter> }) => void;
+  }: {
+    request: StreamDataRequest<TFilter>;
+  }) => void;
   "connect:factory": ({
     request,
     endCursor,
@@ -79,24 +82,24 @@ export type IndexerStartingCursor =
       startingBlock?: never;
     };
 
+export type HandlerArgs<TBlock> = {
+  block: TBlock;
+  cursor?: Cursor | undefined;
+  endCursor?: Cursor | undefined;
+  finality: DataFinality;
+  production: DataProduction;
+  context: IndexerContext;
+};
+
 export type IndexerConfig<TFilter, TBlock> = {
   streamUrl: string;
   filter: TFilter;
   finality?: DataFinality;
   clientOptions?: CreateClientOptions;
-  factory?: ({
-    block,
-    context,
-  }: { block: TBlock; context: IndexerContext }) => Promise<{
+  factory?: (args: HandlerArgs<TBlock>) => Promise<{
     filter?: TFilter;
   }>;
-  transform: (args: {
-    block: TBlock;
-    cursor?: Cursor | undefined;
-    endCursor?: Cursor | undefined;
-    finality: DataFinality;
-    context: IndexerContext;
-  }) => Promise<void>;
+  transform: (args: HandlerArgs<TBlock>) => Promise<void>;
   hooks?: NestedHooks<IndexerHooks<TFilter, TBlock>>;
   plugins?: ReadonlyArray<IndexerPlugin<TFilter, TBlock>>;
   debug?: boolean;
@@ -295,7 +298,7 @@ export async function run<TFilter, TBlock>(
         case "data": {
           await tracer.startActiveSpan("message data", async (span) => {
             const blocks = message.data.data;
-            const { cursor, endCursor, finality } = message.data;
+            const { cursor, endCursor, finality, production } = message.data;
 
             context.cursor = cursor;
             context.endCursor = endCursor;
@@ -323,6 +326,10 @@ export async function run<TFilter, TBlock>(
                 if (factoryBlock !== null) {
                   const { filter } = await indexer.options.factory({
                     block: factoryBlock,
+                    cursor,
+                    endCursor,
+                    finality,
+                    production,
                     context,
                   });
 
@@ -374,6 +381,7 @@ export async function run<TFilter, TBlock>(
                     cursor,
                     endCursor,
                     finality,
+                    production,
                     context,
                   });
 
