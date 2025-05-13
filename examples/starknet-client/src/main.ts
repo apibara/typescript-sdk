@@ -46,7 +46,7 @@ const command = defineCommand({
   args: {
     stream: {
       type: "string",
-      default: "https://starknet.preview.apibara.org",
+      default: "https://mainnet.starknet.a5a.ch",
       description: "Starknet stream URL",
     },
     authToken: {

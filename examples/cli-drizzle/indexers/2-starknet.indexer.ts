@@ -22,7 +22,7 @@ export default function (runtimeConfig: ApibaraRuntimeConfig) {
   });
 
   return defineIndexer(StarknetStream)({
-    streamUrl: "https://starknet.preview.apibara.org",
+    streamUrl: "https://mainnet.starknet.a5a.ch",
     finality: "accepted",
     startingBlock: BigInt(startingBlock),
     plugins: [

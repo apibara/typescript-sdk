@@ -1,0 +1,7 @@
+{
+  "type": "prerelease",
+  "comment": "indexer: include block production mode in handler args",
+  "packageName": "@apibara/indexer",
+  "email": "francesco@ceccon.me",
+  "dependentChangeType": "patch"
+}

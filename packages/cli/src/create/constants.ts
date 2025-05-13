@@ -88,9 +88,9 @@ export const packageVersions = {
 };
 
 export const dnaUrls = {
-  ethereum: "https://ethereum.preview.apibara.org",
-  ethereumSepolia: "https://ethereum-sepolia.preview.apibara.org",
+  ethereum: "https://mainnet.ethereum.a5a.ch",
+  ethereumSepolia: "https://sepolia.ethereum.a5a.ch",
   beaconchain: "https://beaconchain.preview.apibara.org",
-  starknet: "https://starknet.preview.apibara.org",
-  starknetSepolia: "https://starknet-sepolia.preview.apibara.org",
+  starknet: "https://mainnet.starknet.a5a.ch",
+  starknetSepolia: "https://sepolia.starknet.a5a.ch",
 };

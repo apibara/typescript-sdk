@@ -8,7 +8,7 @@ export default function (_runtimeConfig) {
   const mongodb = new MongoClient("mongodb://mongo:mongo@localhost:27017/");
 
   return defineIndexer(StarknetStream)({
-    streamUrl: "https://starknet.preview.apibara.org",
+    streamUrl: "https://mainnet.starknet.a5a.ch",
     finality: "accepted",
     startingBlock: 1_000_000n,
     filter: {

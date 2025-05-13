@@ -5,7 +5,7 @@ import { hash } from "starknet";
 export default function (config) {
   console.log(config);
   return defineIndexer(StarknetStream)({
-    streamUrl: "https://starknet.preview.apibara.org",
+    streamUrl: "https://mainnet.starknet.a5a.ch",
     finality: "pending",
     clientOptions: {
       channelOptions: {
