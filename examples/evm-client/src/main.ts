@@ -21,7 +21,7 @@ const command = defineCommand({
   args: {
     stream: {
       type: "string",
-      default: "https://ethereum-sepolia.preview.apibara.org",
+      default: "https://sepolia.ethereum.a5a.ch",
       description: "EVM stream URL",
     },
     authToken: {

@@ -20,6 +20,7 @@
     "@apibara/indexer": "workspace:*",
     "@apibara/protocol": "workspace:*",
     "@apibara/starknet": "workspace:*",
+    "@apibara/evm": "workspace:*",
     "apibara": "workspace:*",
     "starknet": "^6.11.0"
   }

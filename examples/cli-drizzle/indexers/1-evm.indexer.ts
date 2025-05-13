@@ -27,7 +27,7 @@ export default function (runtimeConfig: ApibaraRuntimeConfig) {
   });
 
   return defineIndexer(EvmStream)({
-    streamUrl: "https://ethereum.preview.apibara.org",
+    streamUrl: "https://mainnet.ethereum.a5a.ch",
     finality: "accepted",
     startingBlock: BigInt(startingBlock),
     filter: {
