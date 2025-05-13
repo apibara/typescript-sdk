@@ -1,8 +1,16 @@
 # Change Log - apibara
 
-<!-- This log was last generated on Sat, 03 May 2025 18:05:38 GMT and should not be manually modified. -->
+<!-- This log was last generated on Tue, 13 May 2025 15:39:07 GMT and should not be manually modified. -->
 
 <!-- Start content -->
+
+## 2.1.0-beta.35
+
+Tue, 13 May 2025 15:39:07 GMT
+
+### Changes
+
+- cli: update stream urls to a5a.ch (francesco@ceccon.me)
 
 ## 2.1.0-beta.33
 

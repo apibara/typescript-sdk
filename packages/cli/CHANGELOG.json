@@ -2,6 +2,21 @@
   "name": "apibara",
   "entries": [
     {
+      "date": "Tue, 13 May 2025 15:39:07 GMT",
+      "version": "2.1.0-beta.35",
+      "tag": "apibara_v2.1.0-beta.35",
+      "comments": {
+        "prerelease": [
+          {
+            "author": "francesco@ceccon.me",
+            "package": "apibara",
+            "commit": "2ce9c4c7a213b9ebafccbed7b4eb3c80ecab356c",
+            "comment": "cli: update stream urls to a5a.ch"
+          }
+        ]
+      }
+    },
+    {
       "date": "Sat, 03 May 2025 18:05:38 GMT",
       "version": "2.1.0-beta.33",
       "tag": "apibara_v2.1.0-beta.33",

@@ -2,6 +2,21 @@
   "name": "@apibara/indexer",
   "entries": [
     {
+      "date": "Tue, 13 May 2025 15:39:07 GMT",
+      "version": "2.1.0-beta.35",
+      "tag": "@apibara/indexer_v2.1.0-beta.35",
+      "comments": {
+        "prerelease": [
+          {
+            "author": "francesco@ceccon.me",
+            "package": "@apibara/indexer",
+            "commit": "2ce9c4c7a213b9ebafccbed7b4eb3c80ecab356c",
+            "comment": "indexer: include block production mode in handler args"
+          }
+        ]
+      }
+    },
+    {
       "date": "Fri, 18 Apr 2025 14:21:30 GMT",
       "version": "2.1.0-beta.31",
       "tag": "@apibara/indexer_v2.1.0-beta.31",

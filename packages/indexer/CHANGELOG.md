@@ -1,8 +1,16 @@
 # Change Log - @apibara/indexer
 
-<!-- This log was last generated on Fri, 18 Apr 2025 14:21:30 GMT and should not be manually modified. -->
+<!-- This log was last generated on Tue, 13 May 2025 15:39:07 GMT and should not be manually modified. -->
 
 <!-- Start content -->
+
+## 2.1.0-beta.35
+
+Tue, 13 May 2025 15:39:07 GMT
+
+### Changes
+
+- indexer: include block production mode in handler args (francesco@ceccon.me)
 
 ## 2.1.0-beta.31
 

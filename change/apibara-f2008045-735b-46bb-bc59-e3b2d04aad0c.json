@@ -1,7 +1,0 @@
-{
-  "type": "prerelease",
-  "comment": "cli: update stream urls to a5a.ch",
-  "packageName": "apibara",
-  "email": "francesco@ceccon.me",
-  "dependentChangeType": "patch"
-}
