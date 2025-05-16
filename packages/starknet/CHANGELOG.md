@@ -1,8 +1,16 @@
 # Change Log - @apibara/starknet
 
-<!-- This log was last generated on Wed, 07 May 2025 08:48:19 GMT and should not be manually modified. -->
+<!-- This log was last generated on Fri, 16 May 2025 15:09:35 GMT and should not be manually modified. -->
 
 <!-- Start content -->
+
+## 2.1.0-beta.36
+
+Fri, 16 May 2025 15:09:35 GMT
+
+### Changes
+
+- starknet: add ByteArray parser (francesco@ceccon.me)
 
 ## 2.1.0-beta.34
 

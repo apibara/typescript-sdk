@@ -2,6 +2,21 @@
   "name": "@apibara/starknet",
   "entries": [
     {
+      "date": "Fri, 16 May 2025 15:09:35 GMT",
+      "version": "2.1.0-beta.36",
+      "tag": "@apibara/starknet_v2.1.0-beta.36",
+      "comments": {
+        "prerelease": [
+          {
+            "author": "francesco@ceccon.me",
+            "package": "@apibara/starknet",
+            "commit": "dd002f1f7370f7c1fcb434c4a02c5ddb2dc10823",
+            "comment": "starknet: add ByteArray parser"
+          }
+        ]
+      }
+    },
+    {
       "date": "Wed, 07 May 2025 08:48:19 GMT",
       "version": "2.1.0-beta.34",
       "tag": "@apibara/starknet_v2.1.0-beta.34",
