@@ -45,7 +45,6 @@
     "@apibara/protocol": "workspace:*",
     "@scure/starknet": "^1.1.0",
     "abi-wan-kanabi": "^2.2.4",
-    "effect": "^3.2.6",
     "long": "^5.2.1",
     "nice-grpc-common": "^2.0.2",
     "protobufjs": "^7.1.2"

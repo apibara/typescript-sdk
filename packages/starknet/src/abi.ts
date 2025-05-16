@@ -3,6 +3,7 @@ import { keccak } from "@scure/starknet";
 import type { FieldElement } from "./common";
 import {
   parseBool,
+  parseBytes31,
   parseContractAddress,
   parseFelt252,
   parseU8,
@@ -43,6 +44,7 @@ export const PrimitiveTypeParsers = {
   "core::integer::u64": parseU64,
   "core::integer::u128": parseU128,
   "core::integer::u256": parseU256,
+  "core::bytes_31::bytes31": parseBytes31,
   "core::starknet::contract_address::ContractAddress": parseContractAddress,
 };
 
@@ -76,4 +78,8 @@ export function getOptionType(type: string) {
 
 export function isEmptyType(type: string) {
   return type === "()";
+}
+
+export function isByteArray(type: string) {
+  return type === "core::byte_array::ByteArray";
 }

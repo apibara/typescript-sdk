@@ -620,9 +620,6 @@ importers:
       abi-wan-kanabi:
         specifier: ^2.2.4
         version: 2.2.4
-      effect:
-        specifier: ^3.2.6
-        version: 3.2.6
       long:
         specifier: ^5.2.1
         version: 5.2.3
