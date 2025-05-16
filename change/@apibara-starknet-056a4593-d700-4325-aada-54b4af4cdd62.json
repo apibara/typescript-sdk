@@ -1,0 +1,7 @@
+{
+  "type": "prerelease",
+  "comment": "starknet: add ByteArray parser",
+  "packageName": "@apibara/starknet",
+  "email": "francesco@ceccon.me",
+  "dependentChangeType": "patch"
+}
