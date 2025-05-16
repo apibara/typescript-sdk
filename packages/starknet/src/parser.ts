@@ -133,7 +133,9 @@ export function parseOption<T>(type: Parser<T>) {
 }
 
 export function parseStruct<T extends Record<string, unknown>>(
-  parsers: { [K in keyof T]: { index: number; parser: Parser<T[K]> } },
+  parsers: {
+    [K in keyof T]: { index: number; parser: Parser<T[K]> };
+  },
 ): Parser<{ [K in keyof T]: T[K] }> {
   const sortedParsers = Object.entries(parsers).sort(
     (a, b) => a[1].index - b[1].index,
@@ -169,3 +171,68 @@ export function parseTuple<T extends Parser<unknown>[]>(
 type UnwrapParsers<TP> = {
   [Index in keyof TP]: TP[Index] extends Parser<infer U> ? U : never;
 };
+
+const parseByteArrayStruct = parseStruct({
+  data: {
+    index: 0,
+    parser: parseArray(parseBytes31),
+  },
+  pendingWord: { index: 1, parser: parseFelt252 },
+  pendingWordLen: { index: 2, parser: parseU32 },
+});
+
+export function parseByteArray(data: readonly FieldElement[], offset: number) {
+  // A ByteArray is a struct with the following abi:
+  //
+  // {
+  //   name: "core::byte_array::ByteArray",
+  //   type: "struct",
+  //   members: [
+  //     {
+  //       name: "data",
+  //       type: "core::array::Array::<core::bytes_31::bytes31>",
+  //     },
+  //     {
+  //       name: "pending_word",
+  //       type: "core::felt252",
+  //     },
+  //     {
+  //       name: "pending_word_len",
+  //       type: "core::integer::u32",
+  //     },
+  //   ],
+  // },
+  //
+  // We first parse it using a parser for that struct, then convert it to the output `0x${string}` type.
+  const { out, offset: offsetOut } = parseByteArrayStruct(data, offset);
+
+  // Remove 0x prefix from data elements and pad them to 31 bytes.
+  const dataBytes = out.data
+    .map((bytes) => bytes.slice(2).padStart(62, "0"))
+    .join("");
+
+  let pending = out.pendingWord.toString(16);
+  const pendingWordLength = Number(out.pendingWordLen);
+  if (pending.length < pendingWordLength * 2) {
+    pending = pending.padStart(pendingWordLength * 2, "0");
+  }
+
+  const pendingBytes = pending.slice(pending.length - 2 * pendingWordLength);
+  const bytes = removeLeadingZeros(dataBytes + pendingBytes);
+
+  return { out: `0x${bytes}`, offset: offsetOut };
+}
+
+function removeLeadingZeros(bytes: string): string {
+  for (let i = 0; i < bytes.length; i++) {
+    if (bytes[i] !== "0") {
+      let j = i;
+      if (i % 2 !== 0) {
+        j -= 1;
+      }
+      return bytes.slice(j);
+    }
+  }
+  // The bytes are all 0, so return something reasonable.
+  return "00";
+}

@@ -5,6 +5,7 @@ import {
   parseArray,
   parseAsHex,
   parseBool,
+  parseByteArray,
   parseFelt252,
   parseOption,
   parseStruct,
@@ -165,5 +166,46 @@ describe("Tuple parser", () => {
     )(data, 0);
     expect(out).toEqual([1n, [2n, 3n], false]);
     expect(offset).toBe(4);
+  });
+});
+
+describe("ByteArray parser", () => {
+  it("can parse an empty byte array", () => {
+    const data = ["0x0", "0x0", "0x0"] as const;
+    const { out, offset } = parseByteArray(data, 0);
+    expect(out).toEqual("0x00");
+    expect(offset).toBe(3);
+  });
+
+  it("can parse a byte array with empty data", () => {
+    const data = ["0x0", "0x465737420726566", "0x8"] as const;
+    const { out, offset } = parseByteArray(data, 0);
+    expect(out).toEqual("0x0465737420726566");
+    expect(offset).toBe(3);
+  });
+
+  it("can parse a byte array with pending data starting with zero", () => {
+    const data = ["0x0", "0x465737420726566", "0xa"] as const;
+    const { out, offset } = parseByteArray(data, 0);
+    expect(out).toEqual("0x0465737420726566");
+    expect(offset).toBe(3);
+  });
+
+  it("can parse a byte array data and no pending data", () => {
+    const data = ["0x2", "0xa", "0x07", "0x0", "0x0"] as const;
+    const { out, offset } = parseByteArray(data, 0);
+    expect(out).toEqual(
+      "0x0a00000000000000000000000000000000000000000000000000000000000007",
+    );
+    expect(offset).toBe(5);
+  });
+
+  it("can parse a byte array data and pending data", () => {
+    const data = ["0x2", "0xa", "0x07", "0x7465737420726566", "0xa"] as const;
+    const { out, offset } = parseByteArray(data, 0);
+    expect(out).toEqual(
+      "0x0a0000000000000000000000000000000000000000000000000000000000000700007465737420726566",
+    );
+    expect(offset).toBe(5);
   });
 });

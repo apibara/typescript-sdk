@@ -10,6 +10,7 @@ import {
   getOptionType,
   getSpanType,
   isArrayType,
+  isByteArray,
   isEmptyType,
   isOptionType,
   isPrimitiveType,
@@ -30,6 +31,7 @@ import {
   ParseError,
   type Parser,
   parseArray,
+  parseByteArray,
   parseEmpty,
   parseOption,
   parseSpan,
@@ -296,6 +298,10 @@ function compileTypeParser(abi: Abi, type: string): Parser<unknown> {
 
   if (isEmptyType(type)) {
     return parseEmpty;
+  }
+
+  if (isByteArray(type)) {
+    return parseByteArray;
   }
 
   // Not a well-known type. Look it up in the ABI.

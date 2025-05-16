@@ -7,6 +7,7 @@ import { getEventSelector } from "../src";
 import { chainlinkAbi } from "./fixtures/chainlink-abi";
 import { ekuboAbi } from "./fixtures/ekubo-abi";
 import { golifeAbi } from "./fixtures/golife-abi";
+import { paymentAbi } from "./fixtures/payment-abi";
 
 describe("decodeEvent", () => {
   describe("non strict mode", () => {
@@ -528,6 +529,74 @@ describe("decodeEvent", () => {
             "0x011f46882e19ad05d3762feda18b95af02b4d04ff264650de9665ede8f823262",
           ],
           "transactionHash": "0x02e0abd9a260095622f71ff8869aaee0267af1199be78ad5ad91a3c83df0ad08",
+          "transactionIndex": 0,
+          "transactionStatus": "succeeded",
+        }
+      `);
+    });
+
+    it("can decode PaymentReceived", () => {
+      const abi = paymentAbi;
+      const event = {
+        transactionHash:
+          "0x00c7b1db05a7d6e7edd6118f04de189db2353cb2484c6df7c191be1ef5af029c",
+        address:
+          "0x01f103e6694fcbdf2bfbe8db10d7b622bfab12da196ea1f212cb26367196af2c",
+        keys: [
+          "0x0040b634dd7cac6a7e5330478aa1704c7f20133def5f3fd107f3d185844a7b56",
+        ],
+        data: [
+          "0x2137b4260e19ab8beac7bcd8b006186ff855a3b257df8ebad346978972567fb",
+          "0x7d54bad6d6fcff799133a8c0b1fb8120876bb080d75cd601a5c68164d6f6d75",
+          "0xc8",
+          "0x0",
+          "0x0",
+          "0x7465737420726566",
+          "0x8",
+        ],
+        filterIds: [],
+        eventIndex: 0,
+        eventIndexInTransaction: 0,
+        transactionIndex: 0,
+        transactionStatus: "succeeded",
+      } as const satisfies Event;
+
+      const decoded = decodeEvent({
+        abi,
+        event,
+        eventName: "my_pay::contract::MyPay::Event",
+        strict: true,
+      });
+
+      expect(decoded).toMatchInlineSnapshot(`
+        {
+          "address": "0x01f103e6694fcbdf2bfbe8db10d7b622bfab12da196ea1f212cb26367196af2c",
+          "args": {
+            "PaymentReceived": {
+              "amount": 200n,
+              "reference": "0x7465737420726566",
+              "sender": "0x2137b4260e19ab8beac7bcd8b006186ff855a3b257df8ebad346978972567fb",
+              "token": "0x7d54bad6d6fcff799133a8c0b1fb8120876bb080d75cd601a5c68164d6f6d75",
+            },
+            "_tag": "PaymentReceived",
+          },
+          "data": [
+            "0x2137b4260e19ab8beac7bcd8b006186ff855a3b257df8ebad346978972567fb",
+            "0x7d54bad6d6fcff799133a8c0b1fb8120876bb080d75cd601a5c68164d6f6d75",
+            "0xc8",
+            "0x0",
+            "0x0",
+            "0x7465737420726566",
+            "0x8",
+          ],
+          "eventIndex": 0,
+          "eventIndexInTransaction": 0,
+          "eventName": "my_pay::contract::MyPay::Event",
+          "filterIds": [],
+          "keys": [
+            "0x0040b634dd7cac6a7e5330478aa1704c7f20133def5f3fd107f3d185844a7b56",
+          ],
+          "transactionHash": "0x00c7b1db05a7d6e7edd6118f04de189db2353cb2484c6df7c191be1ef5af029c",
           "transactionIndex": 0,
           "transactionStatus": "succeeded",
         }
