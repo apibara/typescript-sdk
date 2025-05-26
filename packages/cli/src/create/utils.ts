@@ -4,7 +4,7 @@ import * as prettier from "prettier";
 import prompts from "prompts";
 import { blue, cyan, red, yellow } from "./colors";
 import { dnaUrls, networks } from "./constants";
-import type { Chain, Language, Network, PkgInfo } from "./types";
+import type { Chain, FileExtension, Language, Network, PkgInfo } from "./types";
 
 export function isEmpty(path: string) {
   const files = fs.readdirSync(path);
@@ -31,7 +31,8 @@ export function validateLanguage(language?: string, throwError = false) {
     language === "typescript" ||
     language === "ts" ||
     language === "javascript" ||
-    language === "js"
+    language === "js" ||
+    language === "mjs"
   ) {
     return true;
   }
@@ -49,7 +50,7 @@ export function getLanguageFromAlias(alias: string): Language {
   if (alias === "ts" || alias === "typescript") {
     return "typescript";
   }
-  if (alias === "js" || alias === "javascript") {
+  if (alias === "js" || alias === "javascript" || alias === "mjs") {
     return "javascript";
   }
 
@@ -184,19 +185,31 @@ export function validateDnaUrl(dnaUrl?: string, throwError = false) {
 export function hasApibaraConfig(cwd: string): boolean {
   const configPathJS = path.join(cwd, "apibara.config.js");
   const configPathTS = path.join(cwd, "apibara.config.ts");
+  const configPathMJS = path.join(cwd, "apibara.config.mjs");
 
-  return fs.existsSync(configPathJS) || fs.existsSync(configPathTS);
+  return (
+    fs.existsSync(configPathJS) ||
+    fs.existsSync(configPathTS) ||
+    fs.existsSync(configPathMJS)
+  );
 }
 
-export function getApibaraConfigLanguage(cwd: string): Language {
+export function getApibaraConfigLanguage(cwd: string): {
+  language: Language;
+  extension: FileExtension;
+} {
   const configPathJS = path.join(cwd, "apibara.config.js");
   const configPathTS = path.join(cwd, "apibara.config.ts");
+  const configPathMJS = path.join(cwd, "apibara.config.mjs");
 
+  if (fs.existsSync(configPathMJS)) {
+    return { language: "javascript", extension: "mjs" };
+  }
   if (fs.existsSync(configPathJS)) {
-    return "javascript";
+    return { language: "javascript", extension: "js" };
   }
   if (fs.existsSync(configPathTS)) {
-    return "typescript";
+    return { language: "typescript", extension: "ts" };
   }
 
   throw new Error(red("✖") + " No apibara.config found");

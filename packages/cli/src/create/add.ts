@@ -77,7 +77,7 @@ export async function addIndexer({
     }
   }
 
-  const language = getApibaraConfigLanguage(cwd);
+  const { language, extension } = getApibaraConfigLanguage(cwd);
 
   validateIndexerId(argIndexerId, true);
   validateChain(argChain, true);
@@ -95,14 +95,10 @@ export async function addIndexer({
         validate: (id) =>
           validateIndexerId(id)
             ? checkFileExists(
-                path.join(
-                  cwd,
-                  "indexers",
-                  `${id}.indexer.${language === "typescript" ? "ts" : "js"}`,
-                ),
+                path.join(cwd, "indexers", `${id}.indexer.${extension}`),
               ).then(({ exists }) =>
                 exists
-                  ? `Indexer ${cyan(`${id}.indexer.${language === "typescript" ? "ts" : "js"}`)} already exists`
+                  ? `Indexer ${cyan(`${id}.indexer.${extension}`)} already exists`
                   : true,
               )
             : "Invalid indexer ID, it cannot be empty and must be in kebab-case format",
@@ -209,13 +205,12 @@ export async function addIndexer({
     dnaUrl: argDnaUrl ?? prompt_dnaUrl,
     language,
     packageManager: pkgManager.name,
+    extension,
   };
 
   await updateApibaraConfigFile(options);
 
-  consola.success(
-    `Updated ${cyan("apibara.config." + (language === "typescript" ? "ts" : "js"))}`,
-  );
+  consola.success(`Updated ${cyan(`apibara.config.${extension}`)}`);
 
   await updatePackageJson(options);
 
@@ -223,9 +218,7 @@ export async function addIndexer({
 
   await createIndexerFile(options);
 
-  consola.success(
-    `Created ${cyan(`${indexerFileId}.indexer.${language === "typescript" ? "ts" : "js"}`)}`,
-  );
+  consola.success(`Created ${cyan(`${indexerFileId}.indexer.${extension}`)}`);
 
   await createStorageRelatedFiles(options);
 

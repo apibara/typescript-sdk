@@ -7,7 +7,7 @@ import type { RolldownPluginOption } from "rolldown";
 export function instrumentation(apibara: Apibara) {
   const instrumentationPath = join(
     apibara.options._c12.cwd!,
-    `instrumentation.${apibara.options._c12.configFile?.endsWith(".ts") ? "ts" : "js"}`,
+    `instrumentation.${apibara.options._c12.configFile?.endsWith(".ts") ? "ts" : apibara.options._c12.configFile?.endsWith(".mjs") ? "mjs" : "js"}`,
   );
 
   if (!existsSync(instrumentationPath)) {

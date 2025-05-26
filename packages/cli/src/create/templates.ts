@@ -143,7 +143,7 @@ export async function createIndexerFile(options: IndexerOptions) {
   const indexerFilePath = path.join(
     options.cwd,
     "indexers",
-    `${options.indexerFileId}.indexer.${options.language === "typescript" ? "ts" : "js"}`,
+    `${options.indexerFileId}.indexer.${options.extension}`,
   );
 
   const { exists, overwrite } = await checkFileExists(indexerFilePath, {
@@ -214,11 +214,9 @@ export async function updateApibaraConfigFile({
   language,
   network,
   dnaUrl,
+  extension,
 }: IndexerOptions) {
-  const pathToConfig = path.join(
-    cwd,
-    `apibara.config.${language === "typescript" ? "ts" : "js"}`,
-  );
+  const pathToConfig = path.join(cwd, `apibara.config.${extension}`);
 
   const runtimeConfigString = `{
   startingBlock: 0,
@@ -267,11 +265,15 @@ export async function updateApibaraConfigFile({
 }
 
 export async function createDrizzleStorageFiles(options: IndexerOptions) {
-  const { cwd, language, storage, indexerId } = options;
+  const {
+    cwd,
+    language,
+    storage,
+    indexerId,
+    extension: fileExtension,
+  } = options;
 
   if (storage !== "postgres") return;
-
-  const fileExtension = language === "typescript" ? "ts" : "js";
 
   /**
    *
@@ -349,7 +351,7 @@ export {};
 
     await formatFile(schemaPath);
 
-    consola.success(`Created ${cyan("lib/schema.ts")}`);
+    consola.success(`Created ${cyan(`lib/${schemaFileName}`)}`);
   }
 
   console.log("\n");
@@ -366,7 +368,7 @@ export {};
     
 ${yellow(`
 ┌──────────────────────────────────────────┐
-│               lib/schema.ts              │
+│               lib/schema                 │
 └──────────────────────────────────────────┘
 
 import { bigint, pgTable, text, uuid } from "drizzle-orm/pg-core";
