@@ -2,7 +2,7 @@ import type { Apibara } from "apibara/types";
 import fse from "fs-extra";
 import { basename, join } from "pathe";
 
-const INDEXER_EXTENSIONS = [".indexer.ts", ".indexer.js"];
+const INDEXER_EXTENSIONS = [".indexer.ts", ".indexer.js", ".indexer.mjs"];
 
 export async function scanIndexers(apibara: Apibara) {
   apibara.logger.debug("Scanning indexers");

@@ -225,6 +225,11 @@ export async function run<TFilter, TBlock>(
 ) {
   await indexerAsyncContext.callAsync({}, async () => {
     const context = useIndexerContext();
+
+    if (indexer.options.debug) {
+      context.debug = true;
+    }
+
     const middleware = await registerMiddleware(indexer);
 
     const indexerMetrics = createIndexerMetrics();

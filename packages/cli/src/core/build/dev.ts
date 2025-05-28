@@ -103,5 +103,5 @@ const getIgnorePatterns = (apibara: Apibara) => [
   "**/dist/**",
   "**/.turbo/**",
   // changes to apibara.config is handled by c12 itself so we dont need rolldown to handle this
-  "**/apibara.config?(.ts|.js)",
+  "**/apibara.config?(.ts|.js|.mjs)",
 ];

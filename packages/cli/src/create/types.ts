@@ -16,6 +16,8 @@ export type Network =
 
 export type Storage = "postgres" | "none";
 
+export type FileExtension = "js" | "ts" | "mjs";
+
 export type IndexerOptions = {
   cwd: string;
   indexerFileId: string;
@@ -26,6 +28,7 @@ export type IndexerOptions = {
   dnaUrl?: string;
   packageManager: string;
   language: Language;
+  extension: FileExtension;
 };
 
 export type PkgInfo = {

@@ -1,4 +1,9 @@
-import { type ConsolaInstance, type ConsolaReporter, consola } from "consola";
+import {
+  type ConsolaInstance,
+  type ConsolaReporter,
+  LogLevels,
+  consola,
+} from "consola";
 import { useIndexerContext } from "../context";
 import { defineIndexerPlugin } from "./config";
 
@@ -15,6 +20,10 @@ export function logger<TFilter, TBlock, TTxnParams>({
         ctx.logger = consola.create({ reporters: [logger] });
       } else {
         ctx.logger = consola.create({});
+      }
+
+      if (ctx.debug) {
+        ctx.logger.level = LogLevels.debug;
       }
     });
   });
