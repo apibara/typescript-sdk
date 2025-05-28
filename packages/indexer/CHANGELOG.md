@@ -1,8 +1,16 @@
 # Change Log - @apibara/indexer
 
-<!-- This log was last generated on Tue, 13 May 2025 15:39:07 GMT and should not be manually modified. -->
+<!-- This log was last generated on Wed, 28 May 2025 07:31:11 GMT and should not be manually modified. -->
 
 <!-- Start content -->
+
+## 2.1.0-beta.37
+
+Wed, 28 May 2025 07:31:11 GMT
+
+### Changes
+
+- indexer: show debug logs with useLogger when debug is true (jadejajaipal5@gmail.com)
 
 ## 2.1.0-beta.35
 

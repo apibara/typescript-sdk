@@ -2,6 +2,21 @@
   "name": "@apibara/indexer",
   "entries": [
     {
+      "date": "Wed, 28 May 2025 07:31:11 GMT",
+      "version": "2.1.0-beta.37",
+      "tag": "@apibara/indexer_v2.1.0-beta.37",
+      "comments": {
+        "prerelease": [
+          {
+            "author": "jadejajaipal5@gmail.com",
+            "package": "@apibara/indexer",
+            "commit": "1e92ba8ff45cfdc5055bce5feea31d14ae9e1658",
+            "comment": "indexer: show debug logs with useLogger when debug is true"
+          }
+        ]
+      }
+    },
+    {
       "date": "Tue, 13 May 2025 15:39:07 GMT",
       "version": "2.1.0-beta.35",
       "tag": "@apibara/indexer_v2.1.0-beta.35",
