@@ -1,3 +1,6 @@
+import assert from "node:assert";
+
+import consola from "consola";
 import {
   type ChannelCredentials,
   type ChannelOptions,
@@ -10,7 +13,6 @@ import {
 
 import * as proto from "./proto";
 
-import assert from "node:assert";
 import type { Codec } from "./codec";
 import type { Cursor } from "./common";
 import type { StreamConfig } from "./config";
@@ -18,7 +20,6 @@ import { StatusRequest, StatusResponse } from "./status";
 import { type StreamDataRequest, StreamDataResponse } from "./stream";
 
 export { ClientError, ServerError, Status, Metadata } from "nice-grpc";
-import consola from "consola";
 
 const DEFAULT_TIMEOUT_MS = 45_000;
 
