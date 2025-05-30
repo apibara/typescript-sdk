@@ -1,5 +1,5 @@
 import assert from "node:assert";
-import { createClient } from "@apibara/protocol";
+import { createAuthenticatedClient } from "@apibara/protocol";
 import type { CodecType } from "@apibara/protocol/codec";
 import {
   type Abi,
@@ -56,7 +56,7 @@ const command = defineCommand({
   },
   async run({ args }) {
     consola.info("Connecting to Starknet stream", args.stream);
-    const client = createClient(StarknetStream, args.stream);
+    const client = createAuthenticatedClient(StarknetStream, args.stream);
 
     const response = await client.status();
     console.log(response);

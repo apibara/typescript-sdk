@@ -1,6 +1,6 @@
 import assert from "node:assert";
 import { EvmStream, type Filter } from "@apibara/evm";
-import { createClient } from "@apibara/protocol";
+import { createAuthenticatedClient } from "@apibara/protocol";
 import type { CodecType } from "@apibara/protocol/codec";
 import { defineCommand, runMain } from "citty";
 import consola from "consola";
@@ -31,7 +31,7 @@ const command = defineCommand({
   },
   async run({ args }) {
     consola.info("Connecting to EVM stream", args.stream);
-    const client = createClient(EvmStream, args.stream);
+    const client = createAuthenticatedClient(EvmStream, args.stream);
 
     const response = await client.status();
     console.log(response);
