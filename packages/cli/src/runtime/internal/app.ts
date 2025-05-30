@@ -8,12 +8,6 @@ import {
   inMemoryPersistence,
   logger,
 } from "@apibara/indexer/plugins";
-import {
-  type CreateClientOptions,
-  Metadata,
-  type StreamConfig,
-  createClient,
-} from "@apibara/protocol";
 import consola from "consola";
 import { indexers } from "#apibara-internal-virtual/indexers";
 import { logger as instrumentationLogger } from "#apibara-internal-virtual/instrumentation";
@@ -94,31 +88,4 @@ export function createIndexer({
     indexer: _createIndexer(definition),
     logger: consola.create({ reporters: [reporter] }),
   };
-}
-
-export function createAuthenticatedClient(
-  config: StreamConfig<unknown, unknown>,
-  streamUrl: string,
-  options?: CreateClientOptions,
-) {
-  const dnaToken = process.env.DNA_TOKEN;
-  if (!dnaToken) {
-    consola.warn(
-      "DNA_TOKEN environment variable is not set. Trying to connect without authentication.",
-    );
-  }
-
-  return createClient(config, streamUrl, {
-    ...options,
-    defaultCallOptions: {
-      ...(options?.defaultCallOptions ?? {}),
-      "*": {
-        metadata: Metadata({
-          Authorization: `Bearer ${dnaToken}`,
-        }),
-        // metadata cant be overrided with spread as its a class so we override it fully if user provided it.
-        ...(options?.defaultCallOptions?.["*"] ?? {}),
-      },
-    },
-  });
 }
