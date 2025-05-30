@@ -17,12 +17,10 @@
       "_tag": "data",
       "data": {
         "cursor": {
-          "orderKey": "10000000n",
-          "uniqueKey": "0xaa20f7bde5be60603f11a45fc4923aab7552be775403fc00c2e6b805e6297dbe"
+          "orderKey": "10000000n"
         },
         "endCursor": {
-          "orderKey": "10000001n",
-          "uniqueKey": "0x7823fa4da327cf97a9b86da990b0755ebfaa3b490ecd0be80b0ed24106d1a8d7"
+          "orderKey": "10000001n"
         },
         "finality": "finalized",
         "data": [
@@ -43,17 +41,15 @@
               "timestamp": "2020-05-04T13:22:16.000Z",
               "extraData": "0x6574682d70726f2d687a692d74303032",
               "mixHash": "0x717f7a0302c899ad7e6d512a4c2a95bcf841ad20eb28ac4ee52964ff424fb76f",
-              "nonce": "6195666383866726764n",
-              "totalDifficulty": "15273302058394245892951n"
+              "nonce": "6195666383866726764n"
             },
             "withdrawals": [],
             "transactions": [],
             "receipts": [],
             "logs": [
               {
-                "logIndex": 5,
-                "transactionIndex": 16,
                 "filterIds": [0],
+                "logIndex": 5,
                 "address": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
                 "topics": [
                   "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
@@ -61,13 +57,14 @@
                   "0x000000000000000000000000d69b640c423e96301f13c1c3cd08651cd3f22fc8"
                 ],
                 "data": "0x0000000000000000000000000000000000000000000000000000001737ff18bc",
+                "transactionIndex": 16,
                 "transactionHash": "0xfc80de5a3b766eece5c5a7f7858a9d537a8fefa8186c71fa7766a2bae939b816",
-                "transactionStatus": "succeeded"
+                "transactionStatus": "succeeded",
+                "logIndexInTransaction": 0
               },
               {
-                "logIndex": 7,
-                "transactionIndex": 18,
                 "filterIds": [0],
+                "logIndex": 7,
                 "address": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
                 "topics": [
                   "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
@@ -75,24 +72,26 @@
                   "0x000000000000000000000000c04a5416307510933e3f887584258916b2f8a353"
                 ],
                 "data": "0x000000000000000000000000000000000000000000000000000000001814783a",
+                "transactionIndex": 18,
                 "transactionHash": "0x8a38d2a2de4821f6d13d393c364fced4b0280dc66976cd43b7f9c3dd4aeebae6",
-                "transactionStatus": "succeeded"
+                "transactionStatus": "succeeded",
+                "logIndexInTransaction": 0
               }
-            ]
+            ],
+            "traces": []
           }
-        ]
+        ],
+        "production": "backfill"
       }
     },
     {
       "_tag": "data",
       "data": {
         "cursor": {
-          "orderKey": "10000001n",
-          "uniqueKey": "0x7823fa4da327cf97a9b86da990b0755ebfaa3b490ecd0be80b0ed24106d1a8d7"
+          "orderKey": "10000001n"
         },
         "endCursor": {
-          "orderKey": "10000002n",
-          "uniqueKey": "0xd2f603c012df04a0d5dd9fe2d9e7917f762954c4bb7a85dc0a5eec7b4e0d2150"
+          "orderKey": "10000002n"
         },
         "finality": "finalized",
         "data": [
@@ -113,17 +112,15 @@
               "timestamp": "2020-05-04T13:22:21.000Z",
               "extraData": "0x6574682d70726f2d687a672d74303032",
               "mixHash": "0x8a5c1c818caca7e8c44d67384b4d5d4d457093406e014c771cc48369553d9e01",
-              "nonce": "4508872026381924132n",
-              "totalDifficulty": "15273304445755513112608n"
+              "nonce": "4508872026381924132n"
             },
             "withdrawals": [],
             "transactions": [],
             "receipts": [],
             "logs": [
               {
-                "logIndex": 122,
-                "transactionIndex": 151,
                 "filterIds": [0],
+                "logIndex": 122,
                 "address": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
                 "topics": [
                   "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
@@ -131,13 +128,14 @@
                   "0x0000000000000000000000003516fc50444ce41ef5f97d8034d1932001dd729d"
                 ],
                 "data": "0x000000000000000000000000000000000000000000000000000000002034846d",
+                "transactionIndex": 151,
                 "transactionHash": "0xa20537a561c41855e6719f687d060217cfe105f6314c2facd68accbb197b7a72",
-                "transactionStatus": "succeeded"
+                "transactionStatus": "succeeded",
+                "logIndexInTransaction": 0
               },
               {
-                "logIndex": 129,
-                "transactionIndex": 163,
                 "filterIds": [0],
+                "logIndex": 129,
                 "address": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
                 "topics": [
                   "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
@@ -145,24 +143,26 @@
                   "0x000000000000000000000000b6aec889d2ed8e681f0ba9c7a1e36de829cfe5b5"
                 ],
                 "data": "0x0000000000000000000000000000000000000000000000000000000012064200",
+                "transactionIndex": 163,
                 "transactionHash": "0xec921d30995ee6e19c67712d264311fffc1936262d6bc99db44e93682866838f",
-                "transactionStatus": "succeeded"
+                "transactionStatus": "succeeded",
+                "logIndexInTransaction": 0
               }
-            ]
+            ],
+            "traces": []
           }
-        ]
+        ],
+        "production": "backfill"
       }
     },
     {
       "_tag": "data",
       "data": {
         "cursor": {
-          "orderKey": "10000002n",
-          "uniqueKey": "0xd2f603c012df04a0d5dd9fe2d9e7917f762954c4bb7a85dc0a5eec7b4e0d2150"
+          "orderKey": "10000002n"
         },
         "endCursor": {
-          "orderKey": "10000003n",
-          "uniqueKey": "0x7ad086cc8714bd2251a47fbd6473f74f0c20547451f0c201a57fb8386ba3c44e"
+          "orderKey": "10000003n"
         },
         "finality": "finalized",
         "data": [
@@ -183,17 +183,15 @@
               "timestamp": "2020-05-04T13:22:51.000Z",
               "extraData": "0x6574682d70726f2d687a692d74303032",
               "mixHash": "0x85ab08fe7dadffc4323d8db0fad093828d4c4b9c61cd3d6fdd2cbafa4a8eeab0",
-              "nonce": "1043166055037592862n",
-              "totalDifficulty": "15273306830785372845003n"
+              "nonce": "1043166055037592862n"
             },
             "withdrawals": [],
             "transactions": [],
             "receipts": [],
             "logs": [
               {
-                "logIndex": 20,
-                "transactionIndex": 25,
                 "filterIds": [0],
+                "logIndex": 20,
                 "address": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
                 "topics": [
                   "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
@@ -201,13 +199,14 @@
                   "0x00000000000000000000000004046027549f739edfd5b2a78efdbaf0f0bf4514"
                 ],
                 "data": "0x000000000000000000000000000000000000000000000000000000003be71540",
+                "transactionIndex": 25,
                 "transactionHash": "0x2894671b55148dc194b9ad859ca231fa3ff8a7e0a3cde2e5c7bb21915a448104",
-                "transactionStatus": "succeeded"
+                "transactionStatus": "succeeded",
+                "logIndexInTransaction": 0
               },
               {
-                "logIndex": 37,
-                "transactionIndex": 44,
                 "filterIds": [0],
+                "logIndex": 37,
                 "address": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
                 "topics": [
                   "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
@@ -215,13 +214,14 @@
                   "0x00000000000000000000000097dec872013f6b5fb443861090ad931542878126"
                 ],
                 "data": "0x0000000000000000000000000000000000000000000000000000000005f5e100",
+                "transactionIndex": 44,
                 "transactionHash": "0x77b58d6769d43bd21379dea89d65bd860127753de7e7b607cec267d4ddcbf9c6",
-                "transactionStatus": "succeeded"
+                "transactionStatus": "succeeded",
+                "logIndexInTransaction": 0
               },
               {
-                "logIndex": 118,
-                "transactionIndex": 89,
                 "filterIds": [0],
+                "logIndex": 118,
                 "address": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
                 "topics": [
                   "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
@@ -229,13 +229,14 @@
                   "0x00000000000000000000000097dec872013f6b5fb443861090ad931542878126"
                 ],
                 "data": "0x000000000000000000000000000000000000000000000000000000003e0c6640",
+                "transactionIndex": 89,
                 "transactionHash": "0x46d3e295575268ddb5cb778d52dd2b2f66e6e4dc984bdaa1b3ae8459d3c0ccb3",
-                "transactionStatus": "succeeded"
+                "transactionStatus": "succeeded",
+                "logIndexInTransaction": 0
               },
               {
-                "logIndex": 136,
-                "transactionIndex": 107,
                 "filterIds": [0],
+                "logIndex": 136,
                 "address": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
                 "topics": [
                   "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
@@ -243,24 +244,26 @@
                   "0x000000000000000000000000e28612de1880be09034096e2b967f9ac6b16fd88"
                 ],
                 "data": "0x000000000000000000000000000000000000000000000000000000000001e140",
+                "transactionIndex": 107,
                 "transactionHash": "0x0862e1e01a91390133574765808540617de4dc3faf66c3acc6b45fe3eb478b0d",
-                "transactionStatus": "succeeded"
+                "transactionStatus": "succeeded",
+                "logIndexInTransaction": 0
               }
-            ]
+            ],
+            "traces": []
           }
-        ]
+        ],
+        "production": "backfill"
       }
     },
     {
       "_tag": "data",
       "data": {
         "cursor": {
-          "orderKey": "10000004n",
-          "uniqueKey": "0xb73b9ffc32d91b4b712aaa281993668a2345fafcb150c3fd3c0586efeb87070a"
+          "orderKey": "10000004n"
         },
         "endCursor": {
-          "orderKey": "10000005n",
-          "uniqueKey": "0x5e90e163a82a72c3447e540731ede4d57c322e1eb70b2c195bf398354cee3dc9"
+          "orderKey": "10000005n"
         },
         "finality": "finalized",
         "data": [
@@ -281,17 +284,15 @@
               "timestamp": "2020-05-04T13:23:20.000Z",
               "extraData": "0x7070796520e4b883e5bda9e7a59ee4bb99e9b1bc",
               "mixHash": "0xeb217c7bfc8bfeb31876f2194d99b1e68bf369be11165657d4d1ea9a29b3bfea",
-              "nonce": "15027841530091361343n",
-              "totalDifficulty": "15273311603174223032955n"
+              "nonce": "15027841530091361343n"
             },
             "withdrawals": [],
             "transactions": [],
             "receipts": [],
             "logs": [
               {
-                "logIndex": 70,
-                "transactionIndex": 168,
                 "filterIds": [0],
+                "logIndex": 70,
                 "address": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
                 "topics": [
                   "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
@@ -299,12 +300,16 @@
                   "0x00000000000000000000000067aaa0d849909fbb34936bb52b2250c506ebce82"
                 ],
                 "data": "0x0000000000000000000000000000000000000000000000000000000000cba96d",
+                "transactionIndex": 168,
                 "transactionHash": "0xd50111f6b29419d975446d9f1ce05386f4778a1532ab43267e88f33fb71e01e2",
-                "transactionStatus": "succeeded"
+                "transactionStatus": "succeeded",
+                "logIndexInTransaction": 0
               }
-            ]
+            ],
+            "traces": []
           }
-        ]
+        ],
+        "production": "backfill"
       }
     }
   ]

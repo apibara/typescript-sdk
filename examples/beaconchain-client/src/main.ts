@@ -1,6 +1,6 @@
 import assert from "node:assert";
 import { BeaconChainStream, type Filter } from "@apibara/beaconchain";
-import { createClient } from "@apibara/protocol";
+import { createAuthenticatedClient } from "@apibara/protocol";
 import type { CodecType } from "@apibara/protocol/codec";
 import { defineCommand, runMain } from "citty";
 import consola from "consola";
@@ -35,7 +35,7 @@ const command = defineCommand({
   },
   async run({ args }) {
     consola.info("Connecting to Beacon Chain stream", args.stream);
-    const client = createClient(BeaconChainStream, args.stream);
+    const client = createAuthenticatedClient(BeaconChainStream, args.stream);
 
     const response = await client.status();
     console.log(response);

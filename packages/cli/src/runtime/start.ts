@@ -1,4 +1,5 @@
 import { runWithReconnect } from "@apibara/indexer";
+import { createAuthenticatedClient } from "@apibara/protocol";
 import {
   checkForUnknownArgs,
   getProcessedRuntimeConfig,
@@ -15,7 +16,7 @@ import {
   runtimeConfig,
   userEnvRuntimeConfig,
 } from "#apibara-internal-virtual/static-config";
-import { createAuthenticatedClient, createIndexer } from "./internal/app";
+import { createIndexer } from "./internal/app";
 
 const startCommand = defineCommand({
   meta: {

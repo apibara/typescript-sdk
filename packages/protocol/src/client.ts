@@ -1,7 +1,11 @@
+import assert from "node:assert";
+
+import consola from "consola";
 import {
   type ChannelCredentials,
   type ChannelOptions,
   type DefaultCallOptions,
+  Metadata,
   type NormalizedServiceDefinition,
   createChannel,
   createClient as grpcCreateClient,
@@ -9,7 +13,6 @@ import {
 
 import * as proto from "./proto";
 
-import assert from "node:assert";
 import type { Codec } from "./codec";
 import type { Cursor } from "./common";
 import type { StreamConfig } from "./config";
@@ -81,6 +84,33 @@ export function createClient<TFilter, TBlock>(
   );
 
   return new GrpcClient(config, client);
+}
+
+export function createAuthenticatedClient<TFilter, TBlock>(
+  config: StreamConfig<TFilter, TBlock>,
+  streamUrl: string,
+  options?: CreateClientOptions,
+) {
+  const dnaToken = process.env.DNA_TOKEN;
+  if (!dnaToken) {
+    consola.warn(
+      "DNA_TOKEN environment variable is not set. Trying to connect without authentication.",
+    );
+  }
+
+  return createClient(config, streamUrl, {
+    ...options,
+    defaultCallOptions: {
+      ...(options?.defaultCallOptions ?? {}),
+      "*": {
+        metadata: Metadata({
+          Authorization: `Bearer ${dnaToken}`,
+        }),
+        // metadata cant be overrided with spread as its a class so we override it fully if user provided it.
+        ...(options?.defaultCallOptions?.["*"] ?? {}),
+      },
+    },
+  });
 }
 
 export class GrpcClient<TFilter, TBlock> implements Client<TFilter, TBlock> {

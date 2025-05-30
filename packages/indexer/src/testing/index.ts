@@ -1,4 +1,4 @@
-import { createClient } from "@apibara/protocol";
+import { createAuthenticatedClient } from "@apibara/protocol";
 import ci from "ci-info";
 import { useIndexerContext } from "../context";
 import { type IndexerWithStreamConfig, createIndexer } from "../indexer";
@@ -54,7 +54,7 @@ export function createVcr() {
           throw new Error("Cannot record cassette in CI");
         }
 
-        const client = createClient(
+        const client = createAuthenticatedClient(
           indexer.streamConfig,
           indexer.options.streamUrl,
         );

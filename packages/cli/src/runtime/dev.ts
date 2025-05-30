@@ -1,12 +1,9 @@
 import { runWithReconnect } from "@apibara/indexer";
+import { createAuthenticatedClient } from "@apibara/protocol";
 import { getRuntimeDataFromEnv } from "apibara/common";
 import { defineCommand, runMain } from "citty";
 import { blueBright } from "picocolors";
-import {
-  availableIndexers,
-  createAuthenticatedClient,
-  createIndexer,
-} from "./internal/app";
+import { availableIndexers, createIndexer } from "./internal/app";
 
 const startCommand = defineCommand({
   meta: {
