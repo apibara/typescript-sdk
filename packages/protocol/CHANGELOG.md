@@ -1,8 +1,16 @@
 # Change Log - @apibara/protocol
 
-<!-- This log was last generated on Fri, 18 Apr 2025 14:21:30 GMT and should not be manually modified. -->
+<!-- This log was last generated on Fri, 30 May 2025 12:31:48 GMT and should not be manually modified. -->
 
 <!-- Start content -->
+
+## 2.1.0-beta.38
+
+Fri, 30 May 2025 12:31:48 GMT
+
+### Changes
+
+- protocol: add createAuthenticatedClient (jadejajaipal5@gmail.com)
 
 ## 2.1.0-beta.31
 

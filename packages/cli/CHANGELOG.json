@@ -2,6 +2,21 @@
   "name": "apibara",
   "entries": [
     {
+      "date": "Fri, 30 May 2025 12:31:48 GMT",
+      "version": "2.1.0-beta.38",
+      "tag": "apibara_v2.1.0-beta.38",
+      "comments": {
+        "prerelease": [
+          {
+            "author": "jadejajaipal5@gmail.com",
+            "package": "apibara",
+            "commit": "09d70f6d56b384326920d4729f3ffd846e0e900e",
+            "comment": "cli: use createAuthenticatedClient from protocol package"
+          }
+        ]
+      }
+    },
+    {
       "date": "Wed, 28 May 2025 07:31:11 GMT",
       "version": "2.1.0-beta.37",
       "tag": "apibara_v2.1.0-beta.37",

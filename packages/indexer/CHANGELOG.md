@@ -1,8 +1,16 @@
 # Change Log - @apibara/indexer
 
-<!-- This log was last generated on Wed, 28 May 2025 07:31:11 GMT and should not be manually modified. -->
+<!-- This log was last generated on Fri, 30 May 2025 12:31:48 GMT and should not be manually modified. -->
 
 <!-- Start content -->
+
+## 2.1.0-beta.38
+
+Fri, 30 May 2025 12:31:48 GMT
+
+### Changes
+
+- indexer: use createAuthenticatedClient in VCR (jadejajaipal5@gmail.com)
 
 ## 2.1.0-beta.37
 
