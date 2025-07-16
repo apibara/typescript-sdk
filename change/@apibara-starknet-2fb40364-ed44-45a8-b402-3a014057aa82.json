@@ -1,0 +1,7 @@
+{
+  "type": "prerelease",
+  "comment": "starknet: fix enum handling and types in eventDecoder",
+  "packageName": "@apibara/starknet",
+  "email": "jadejajaipal5@gmail.com",
+  "dependentChangeType": "patch"
+}

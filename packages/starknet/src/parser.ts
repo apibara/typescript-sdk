@@ -153,6 +153,34 @@ export function parseStruct<T extends Record<string, unknown>>(
   return parser as Parser<{ [K in keyof T]: T[K] }>;
 }
 
+export function parseEnum<T extends Record<string, unknown>>(
+  parsers: {
+    [K in keyof T]: { index: number; parser: Parser<T[K]> };
+  },
+): Parser<T[keyof T]> {
+  return (data: readonly FieldElement[], startingOffset: number) => {
+    const selectorFelt = data[startingOffset];
+    const selector = Number(BigInt(selectorFelt));
+
+    // Find the parser by index
+    const parserEntry = Object.entries(parsers).find(
+      ([, { index }]) => index === selector,
+    );
+
+    if (!parserEntry) {
+      throw new ParseError(`Unknown enum variant selector: ${selector}`);
+    }
+
+    const [variantName, { parser }] = parserEntry;
+    const { out, offset: newOffset } = parser(data, startingOffset + 1);
+
+    return {
+      out: { _tag: variantName, [variantName]: out } as T[keyof T],
+      offset: newOffset,
+    };
+  };
+}
+
 export function parseTuple<T extends Parser<unknown>[]>(
   ...parsers: T
 ): Parser<UnwrapParsers<T>> {
