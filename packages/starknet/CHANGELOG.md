@@ -1,8 +1,16 @@
 # Change Log - @apibara/starknet
 
-<!-- This log was last generated on Fri, 16 May 2025 15:09:35 GMT and should not be manually modified. -->
+<!-- This log was last generated on Sun, 20 Jul 2025 11:15:12 GMT and should not be manually modified. -->
 
 <!-- Start content -->
+
+## 2.1.0-beta.39
+
+Sun, 20 Jul 2025 11:15:12 GMT
+
+### Changes
+
+- starknet: fix enum handling and types in eventDecoder (jadejajaipal5@gmail.com)
 
 ## 2.1.0-beta.36
 

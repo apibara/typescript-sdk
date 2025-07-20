@@ -2,6 +2,21 @@
   "name": "@apibara/starknet",
   "entries": [
     {
+      "date": "Sun, 20 Jul 2025 11:15:12 GMT",
+      "version": "2.1.0-beta.39",
+      "tag": "@apibara/starknet_v2.1.0-beta.39",
+      "comments": {
+        "prerelease": [
+          {
+            "author": "jadejajaipal5@gmail.com",
+            "package": "@apibara/starknet",
+            "commit": "f288075eff8c12a2c844679506d9b00e0264169e",
+            "comment": "starknet: fix enum handling and types in eventDecoder"
+          }
+        ]
+      }
+    },
+    {
       "date": "Fri, 16 May 2025 15:09:35 GMT",
       "version": "2.1.0-beta.36",
       "tag": "@apibara/starknet_v2.1.0-beta.36",
