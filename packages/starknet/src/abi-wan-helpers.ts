@@ -15,9 +15,10 @@ For more information, please refer to https://unlicense.org
 import type { Abi } from "abi-wan-kanabi";
 import type {
   AbiEventMember,
+  ExtractAbiEnum,
   ExtractAbiEvent,
   ExtractAbiEventNames,
-  StringToPrimitiveType,
+  StringToPrimitiveType as OriginalStringToPrimitiveType,
 } from "abi-wan-kanabi/kanabi";
 
 export type AbiEventStruct = {
@@ -39,9 +40,49 @@ export type AbiEventEnum = {
   variants: AbiEventMember[];
 };
 
+export type AbiParameter = {
+  name: string;
+  type: string;
+};
+
+export type AbiEnum = {
+  type: "enum";
+  name: string;
+  variants: readonly AbiParameter[];
+};
+
 export type AbiEvent = AbiEventStruct | AbiEventEnum;
 
 export type AbiItem = Abi[number];
+
+// Custom StringToPrimitiveType that overrides abi-wan-kanabi's enum handling.
+// The original StringToPrimitiveType from abi-wan-kanabi produces ObjectToUnion types
+// for enums, which don't include the `_tag` property that our runtime parser generates.
+// This custom version ensures TypeScript types match the actual runtime values.
+export type StringToPrimitiveType<
+  TAbi extends Abi,
+  T extends string,
+> = ExtractAbiEnum<TAbi, T> extends never
+  ? // Not an enum type, forward to original abi-wan-kanabi type
+    OriginalStringToPrimitiveType<TAbi, T>
+  : ExtractAbiEnum<TAbi, T> extends {
+        type: "enum";
+        variants: infer TVariants extends readonly AbiParameter[];
+      }
+    ? // It's an enum type, create tagged union with _tag property
+      {
+        [Variant in TVariants[number] as Variant["name"]]: Variant["type"] extends "()"
+          ? // Unit variant (no data): { _tag: "VariantName"; VariantName: null }
+            { _tag: Variant["name"] } & { [K in Variant["name"]]: null }
+          : // Variant with data: { _tag: "VariantName"; VariantName: StringToPrimitiveType }
+            { _tag: Variant["name"] } & {
+              [K in Variant["name"]]: StringToPrimitiveType<
+                TAbi,
+                Variant["type"]
+              >;
+            };
+      }[TVariants[number]["name"]]
+    : never;
 
 export type DecodeEventArgs<
   TAbi extends Abi = Abi,

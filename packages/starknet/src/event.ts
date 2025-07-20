@@ -17,6 +17,7 @@ import {
   isSpanType,
 } from "./abi";
 import {
+  type AbiEnum,
   type AbiEvent,
   type AbiEventEnum,
   type AbiEventStruct,
@@ -33,6 +34,7 @@ import {
   parseArray,
   parseByteArray,
   parseEmpty,
+  parseEnum,
   parseOption,
   parseSpan,
   parseStruct,
@@ -315,9 +317,7 @@ function compileTypeParser(abi: Abi, type: string): Parser<unknown> {
       return compileStructParser(abi, typeAbi.members);
     }
     case "enum": {
-      // This should never happen anyways as compileTypeParser is only called
-      // primitive types or to compile structs parsers.
-      throw new DecodeEventError(`Enum types are not supported: ${type}`);
+      return compileEnumParser(abi, typeAbi);
     }
     default:
       throw new DecodeEventError(`Invalid type ${typeAbi.type}`);
@@ -337,4 +337,16 @@ function compileStructParser(
     };
   }
   return parseStruct(parsers);
+}
+
+function compileEnumParser(abi: Abi, enumAbi: AbiEnum): Parser<unknown> {
+  const parsers: Record<string, { index: number; parser: Parser<unknown> }> =
+    {};
+  for (const [index, variant] of enumAbi.variants.entries()) {
+    parsers[variant.name] = {
+      index,
+      parser: compileTypeParser(abi, variant.type),
+    };
+  }
+  return parseEnum(parsers);
 }

@@ -8,6 +8,7 @@ import { chainlinkAbi } from "./fixtures/chainlink-abi";
 import { ekuboAbi } from "./fixtures/ekubo-abi";
 import { golifeAbi } from "./fixtures/golife-abi";
 import { paymentAbi } from "./fixtures/payment-abi";
+import { registryAbi } from "./fixtures/registry-abi";
 
 describe("decodeEvent", () => {
   describe("non strict mode", () => {
@@ -667,6 +668,68 @@ describe("decodeEvent", () => {
       });
 
       expect(decoded).toBeNull();
+    });
+
+    it('can decode event with nested enum with null ["()" type] data', () => {
+      const abi = registryAbi;
+      const userRegisteredEventSelector = getEventSelector("UserRegistered");
+
+      const event = {
+        transactionHash:
+          "0x07c2ea2b2211421e1a74e25f9fe9ad36862c83d6b7189b91185496c41cd83fc9",
+        address:
+          "0x04319b2cdf8f484e965a7df709e75c4d5c89780d3601f5105e1bc26243dd45b6",
+        keys: [
+          userRegisteredEventSelector,
+          "0x348ed741a6cfdfa876b4bc233e8f769468a624ae66543d610235112943cc993",
+          "0x796f64613133",
+        ],
+        data: ["0x6877a1fd", "0x1"],
+        filterIds: [],
+        eventIndex: 0,
+        eventIndexInTransaction: 0,
+        transactionIndex: 0,
+        transactionStatus: "succeeded",
+      } as const satisfies Event;
+
+      const decoded = decodeEvent({
+        abi,
+        event,
+        eventName:
+          "opinion_competitions::utils::common::events::UserRegistered",
+        strict: true,
+      });
+
+      expect(decoded).toMatchInlineSnapshot(`
+        {
+          "address": "0x04319b2cdf8f484e965a7df709e75c4d5c89780d3601f5105e1bc26243dd45b6",
+          "args": {
+            "timestamp": 1752670717n,
+            "user": "0x348ed741a6cfdfa876b4bc233e8f769468a624ae66543d610235112943cc993",
+            "username": 133519332421939n,
+            "verification_level": {
+              "ORB": null,
+              "_tag": "ORB",
+            },
+          },
+          "data": [
+            "0x6877a1fd",
+            "0x1",
+          ],
+          "eventIndex": 0,
+          "eventIndexInTransaction": 0,
+          "eventName": "opinion_competitions::utils::common::events::UserRegistered",
+          "filterIds": [],
+          "keys": [
+            "0x015854d06e396351cf7ea2143ce9ba79f24588d0f1b1617f54e9acca7a6ac325",
+            "0x348ed741a6cfdfa876b4bc233e8f769468a624ae66543d610235112943cc993",
+            "0x796f64613133",
+          ],
+          "transactionHash": "0x07c2ea2b2211421e1a74e25f9fe9ad36862c83d6b7189b91185496c41cd83fc9",
+          "transactionIndex": 0,
+          "transactionStatus": "succeeded",
+        }
+      `);
     });
   });
 });
