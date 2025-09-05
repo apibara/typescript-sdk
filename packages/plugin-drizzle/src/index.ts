@@ -425,9 +425,7 @@ export function drizzleStorage<
         } catch (error) {
           await removeTriggers(db, tableNames, indexerId);
 
-          throw new DrizzleStorageError("Failed to run handler:middleware", {
-            cause: error,
-          });
+          throw error;
         }
       });
     });
