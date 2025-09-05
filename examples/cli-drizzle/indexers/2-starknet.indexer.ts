@@ -9,10 +9,17 @@ import type { ApibaraRuntimeConfig } from "apibara/types";
 import { hash } from "starknet";
 
 // USDC Transfers on Starknet
-export default function (runtimeConfig: ApibaraRuntimeConfig) {
+export default async function (runtimeConfig: ApibaraRuntimeConfig) {
   const {
     starknet: { startingBlock },
   } = runtimeConfig;
+
+  console.log("[2-starknet] Starknet indexer waiting.....");
+
+  // Simulating a API call that takes 5 seconds
+  await new Promise((resolve) => setTimeout(resolve, 5000));
+
+  console.log("[2-starknet] Starknet indexer done waiting.....");
 
   // connectionString defaults to process.env["POSTGRES_CONNECTION_STRING"](postgresql) ?? "memory://" (in memory pglite)
   const database = drizzle({
