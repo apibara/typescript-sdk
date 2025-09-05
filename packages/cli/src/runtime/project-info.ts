@@ -48,11 +48,11 @@ const startCommand = defineCommand({
       });
       for (const indexer of availableIndexers) {
         const { indexer: indexerInstance } =
-          createIndexer({
+          (await createIndexer({
             indexerName: indexer,
             processedRuntimeConfig,
             preset,
-          }) ?? {};
+          })) ?? {};
         if (!indexerInstance) {
           continue;
         }

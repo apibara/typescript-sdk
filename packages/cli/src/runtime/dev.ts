@@ -37,11 +37,11 @@ const startCommand = defineCommand({
     await Promise.all(
       selectedIndexers.map(async (indexer) => {
         const { indexer: indexerInstance, logger } =
-          createIndexer({
+          (await createIndexer({
             indexerName: indexer,
             processedRuntimeConfig,
             preset,
-          }) ?? {};
+          })) ?? {};
         if (!indexerInstance) {
           return;
         }

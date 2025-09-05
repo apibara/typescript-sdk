@@ -64,11 +64,11 @@ const startCommand = defineCommand({
     }
 
     const { indexer: indexerInstance, logger } =
-      createIndexer({
+      (await createIndexer({
         indexerName: indexer,
         processedRuntimeConfig,
         preset,
-      }) ?? {};
+      })) ?? {};
 
     if (!indexerInstance) {
       consola.error(`Specified indexer "${indexer}" but it was not defined`);
