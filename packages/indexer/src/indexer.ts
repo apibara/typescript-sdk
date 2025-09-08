@@ -33,6 +33,7 @@ import {
 import { createIndexerMetrics, createTracer } from "./otel";
 import type { IndexerPlugin } from "./plugins";
 import { useInternalContext } from "./plugins/context";
+import { ReloadIndexerRequest } from "./utils";
 
 export type UseMiddlewareFunction = (
   fn: MiddlewareFunction<IndexerContext>,
@@ -320,6 +321,11 @@ export async function run<TFilter, TBlock>(
               },
             );
 
+            if (context._reload) {
+              context._reload = false;
+              throw new ReloadIndexerRequest();
+            }
+
             await middleware(context, async () => {
               let block: TBlock | null;
 
@@ -397,6 +403,11 @@ export async function run<TFilter, TBlock>(
                 });
               }
             });
+
+            if (context._reload) {
+              context._reload = false;
+              throw new ReloadIndexerRequest();
+            }
 
             span.end();
           });

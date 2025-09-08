@@ -1,9 +1,8 @@
+import { starknetUsdcTransfers } from "@/lib/schema";
 import { drizzleStorage, useDrizzleStorage } from "@apibara/plugin-drizzle";
 import { drizzle } from "@apibara/plugin-drizzle";
 import { StarknetStream } from "@apibara/starknet";
 import { defineIndexer } from "apibara/indexer";
-
-import { starknetUsdcTransfers } from "@/lib/schema";
 import { useLogger } from "apibara/plugins";
 import type { ApibaraRuntimeConfig } from "apibara/types";
 import { hash } from "starknet";
@@ -16,8 +15,8 @@ export default async function (runtimeConfig: ApibaraRuntimeConfig) {
 
   console.log("[2-starknet] Starknet indexer waiting.....");
 
-  // Simulating a API call that takes 5 seconds
-  await new Promise((resolve) => setTimeout(resolve, 5000));
+  // Simulating a API call that takes 500 ms
+  await new Promise((resolve) => setTimeout(resolve, 500));
 
   console.log("[2-starknet] Starknet indexer done waiting.....");
 

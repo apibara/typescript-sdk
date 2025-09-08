@@ -1,11 +1,10 @@
-import { runWithReconnect } from "@apibara/indexer";
+import { ReloadIndexerRequest, runWithReconnect } from "@apibara/indexer";
 import { createAuthenticatedClient } from "@apibara/protocol";
 import {
   checkForUnknownArgs,
   getProcessedRuntimeConfig,
   getRuntimeDataFromEnv,
 } from "apibara/common";
-import { ReloadIndexerRequest } from "apibara/core";
 import { defineCommand, runMain } from "citty";
 import consola, { type ConsolaInstance } from "consola";
 import { blueBright } from "picocolors";

@@ -1,5 +1,8 @@
+import { useIndexerContext } from "../context";
+
 export function reloadIndexer() {
-  throw new ReloadIndexerRequest();
+  const context = useIndexerContext();
+  context._reload = true;
 }
 
 export class ReloadIndexerRequest extends Error {
