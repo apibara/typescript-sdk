@@ -33,7 +33,7 @@ import {
 import { createIndexerMetrics, createTracer } from "./otel";
 import type { IndexerPlugin } from "./plugins";
 import { useInternalContext } from "./plugins/context";
-import { ReloadIndexerRequest } from "./utils";
+import { reloadIfNeeded } from "./utils";
 
 export type UseMiddlewareFunction = (
   fn: MiddlewareFunction<IndexerContext>,
@@ -321,10 +321,7 @@ export async function run<TFilter, TBlock>(
               },
             );
 
-            if (context._reload) {
-              context._reload = false;
-              throw new ReloadIndexerRequest();
-            }
+            reloadIfNeeded();
 
             await middleware(context, async () => {
               let block: TBlock | null;
@@ -404,10 +401,7 @@ export async function run<TFilter, TBlock>(
               }
             });
 
-            if (context._reload) {
-              context._reload = false;
-              throw new ReloadIndexerRequest();
-            }
+            reloadIfNeeded();
 
             span.end();
           });
@@ -447,7 +441,11 @@ export async function run<TFilter, TBlock>(
         }
         case "heartbeat": {
           await tracer.startActiveSpan("message heartbeat", async (span) => {
+            reloadIfNeeded();
+
             await indexer.hooks.callHook("message:heartbeat");
+            reloadIfNeeded();
+
             span.end();
           });
           break;

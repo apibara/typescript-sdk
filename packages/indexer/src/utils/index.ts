@@ -5,6 +5,14 @@ export function reloadIndexer() {
   context._reload = true;
 }
 
+export function reloadIfNeeded() {
+  const context = useIndexerContext();
+  if (context._reload) {
+    context._reload = false;
+    throw new ReloadIndexerRequest();
+  }
+}
+
 export class ReloadIndexerRequest extends Error {
   constructor(message?: string) {
     super(message);

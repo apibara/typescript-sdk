@@ -1,3 +1,3 @@
 export * from "./indexer";
 export { useIndexerContext } from "./context";
-export * from "./utils";
+export { reloadIndexer, ReloadIndexerRequest } from "./utils";
