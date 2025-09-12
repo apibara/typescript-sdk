@@ -1,8 +1,16 @@
 # Change Log - @apibara/indexer
 
-<!-- This log was last generated on Fri, 30 May 2025 12:31:48 GMT and should not be manually modified. -->
+<!-- This log was last generated on Fri, 12 Sep 2025 15:31:39 GMT and should not be manually modified. -->
 
 <!-- Start content -->
+
+## 2.1.0-beta.40
+
+Fri, 12 Sep 2025 15:31:39 GMT
+
+### Changes
+
+- indexer: add hooks support to vcr and plugins:init hook (jadejajaipal5@gmail.com)
 
 ## 2.1.0-beta.38
 

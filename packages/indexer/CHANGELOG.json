@@ -2,6 +2,21 @@
   "name": "@apibara/indexer",
   "entries": [
     {
+      "date": "Fri, 12 Sep 2025 15:31:39 GMT",
+      "version": "2.1.0-beta.40",
+      "tag": "@apibara/indexer_v2.1.0-beta.40",
+      "comments": {
+        "prerelease": [
+          {
+            "author": "jadejajaipal5@gmail.com",
+            "package": "@apibara/indexer",
+            "commit": "70f30b7b5de10dbec4704e78e9f6de1ff1728248",
+            "comment": "indexer: add hooks support to vcr and plugins:init hook"
+          }
+        ]
+      }
+    },
+    {
       "date": "Fri, 30 May 2025 12:31:48 GMT",
       "version": "2.1.0-beta.38",
       "tag": "@apibara/indexer_v2.1.0-beta.38",

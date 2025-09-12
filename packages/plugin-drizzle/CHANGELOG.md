@@ -1,8 +1,16 @@
 # Change Log - @apibara/plugin-drizzle
 
-<!-- This log was last generated on Fri, 18 Apr 2025 14:21:30 GMT and should not be manually modified. -->
+<!-- This log was last generated on Fri, 12 Sep 2025 15:31:39 GMT and should not be manually modified. -->
 
 <!-- Start content -->
+
+## 2.1.0-beta.40
+
+Fri, 12 Sep 2025 15:31:39 GMT
+
+### Changes
+
+- plugin-drizzle: add useTestDrizzleStorage and use `plugin:init` hook (jadejajaipal5@gmail.com)
 
 ## 2.1.0-beta.31
 
