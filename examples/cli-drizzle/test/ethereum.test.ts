@@ -2,6 +2,7 @@ import { createVcr } from "apibara/testing";
 
 import createIndexer from "@/indexers/1-evm.indexer";
 import { ethereumUsdcTransfers } from "@/lib/schema";
+import { useTestDrizzleStorage } from "@apibara/plugin-drizzle";
 import { getTestDatabase } from "@apibara/plugin-drizzle/testing";
 import { describe, expect, it } from "vitest";
 
@@ -15,8 +16,20 @@ describe("Ethereum USDC Transfers indexer", () => {
     });
 
     const testResult = await vcr.run("ethereum-usdc-transfers", indexer, {
-      fromBlock: 10_000_000n,
-      toBlock: 10_000_005n,
+      range: {
+        fromBlock: 10_000_000n,
+        toBlock: 10_000_005n,
+      },
+      hooks: {
+        "run:before": async () => {
+          console.log("run:before hook called from test function");
+          const db = useTestDrizzleStorage();
+          await db.insert(ethereumUsdcTransfers).values({
+            number: 1,
+            hash: "0x0000000000000000000000000000000000000000000000000000000000000000",
+          });
+        },
+      },
     });
 
     const database = getTestDatabase(testResult);
@@ -25,6 +38,10 @@ describe("Ethereum USDC Transfers indexer", () => {
 
     expect(rows.map(({ _id, ...rest }) => rest)).toMatchInlineSnapshot(`
       [
+        {
+          "hash": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "number": 1,
+        },
         {
           "hash": "0xfc80de5a3b766eece5c5a7f7858a9d537a8fefa8186c71fa7766a2bae939b816",
           "number": 10000001,

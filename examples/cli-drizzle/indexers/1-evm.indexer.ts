@@ -43,6 +43,11 @@ export default function (runtimeConfig: ApibaraRuntimeConfig) {
         },
       ],
     },
+    hooks: {
+      "run:before": () => {
+        console.log("run:before hook called from indexer");
+      },
+    },
     plugins: [
       drizzleStorage({
         db: database,

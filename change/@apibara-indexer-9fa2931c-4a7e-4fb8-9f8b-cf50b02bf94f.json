@@ -1,0 +1,7 @@
+{
+  "type": "prerelease",
+  "comment": "indexer: add hooks support to vcr and plugins:init hook",
+  "packageName": "@apibara/indexer",
+  "email": "jadejajaipal5@gmail.com",
+  "dependentChangeType": "patch"
+}
