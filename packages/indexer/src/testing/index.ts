@@ -1,7 +1,12 @@
 import { createAuthenticatedClient } from "@apibara/protocol";
 import ci from "ci-info";
+import { type NestedHooks, mergeHooks } from "hookable";
 import { useIndexerContext } from "../context";
-import { type IndexerWithStreamConfig, createIndexer } from "../indexer";
+import {
+  type IndexerHooks,
+  type IndexerWithStreamConfig,
+  createIndexer,
+} from "../indexer";
 import { type InternalContext, internalContext } from "../plugins/context";
 import { logger } from "../plugins/logger";
 import type { CassetteOptions, VcrConfig } from "../vcr/config";
@@ -18,19 +23,27 @@ export function createVcr() {
     async run<TFilter, TBlock>(
       cassetteName: string,
       indexerConfig: IndexerWithStreamConfig<TFilter, TBlock>,
-      range: { fromBlock: bigint; toBlock: bigint },
+      config: {
+        range: { fromBlock: bigint; toBlock: bigint };
+        hooks?: NestedHooks<IndexerHooks<TFilter, TBlock>>;
+      },
     ) {
       const vcrConfig: VcrConfig = {
         cassetteDir: "cassettes",
       };
 
+      indexerConfig.hooks = mergeHooks(
+        indexerConfig.hooks ?? {},
+        config.hooks ?? {},
+      );
+
       const cassetteOptions: CassetteOptions = {
         name: cassetteName,
         startingCursor: {
-          orderKey: range.fromBlock,
+          orderKey: config.range.fromBlock,
         },
         endingCursor: {
-          orderKey: range.toBlock,
+          orderKey: config.range.toBlock,
         },
       };
 
