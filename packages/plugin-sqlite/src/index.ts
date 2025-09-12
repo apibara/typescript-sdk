@@ -81,7 +81,7 @@ export function sqliteStorage<TFilter, TBlock>({
     let prevFinality: DataFinality | undefined;
     const alwaysReindex = process.env["APIBARA_ALWAYS_REINDEX"] === "true";
 
-    indexer.hooks.hook("run:before", async () => {
+    indexer.hooks.hook("plugins:init", async () => {
       const { indexerName: indexerFileName, availableIndexers } =
         useInternalContext();
 

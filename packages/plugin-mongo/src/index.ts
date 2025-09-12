@@ -65,7 +65,7 @@ export function mongoStorage<TFilter, TBlock>({
     const alwaysReindex = process.env["APIBARA_ALWAYS_REINDEX"] === "true";
     let prevFinality: DataFinality | undefined;
 
-    indexer.hooks.hook("run:before", async () => {
+    indexer.hooks.hook("plugins:init", async () => {
       const { indexerName } = useInternalContext();
       indexerId = generateIndexerId(indexerName, identifier);
       const logger = useLogger();

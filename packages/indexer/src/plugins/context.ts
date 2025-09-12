@@ -7,7 +7,7 @@ export function internalContext<TFilter, TBlock, TTxnParams>(
   values: Record<string, unknown>,
 ) {
   return defineIndexerPlugin<TFilter, TBlock>((indexer) => {
-    indexer.hooks.hook("run:before", () => {
+    indexer.hooks.hook("plugins:init", () => {
       try {
         const ctx = useIndexerContext();
         ctx[INTERNAL_CONTEXT_PROPERTY] = {

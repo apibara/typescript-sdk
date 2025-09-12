@@ -16,8 +16,7 @@ describe("Starknet USDC Transfers indexer", () => {
     });
 
     const testResult = await vcr.run("starknet-usdc-transfers", indexer, {
-      fromBlock: 800_000n,
-      toBlock: 800_005n,
+      range: { fromBlock: 800_000n, toBlock: 800_005n },
     });
 
     const database = getTestDatabase(testResult);

@@ -39,6 +39,7 @@ export type UseMiddlewareFunction = (
 ) => void;
 
 export interface IndexerHooks<TFilter, TBlock> {
+  "plugins:init": () => void;
   "run:before": () => void;
   "run:after": () => void;
   "connect:before": ({
@@ -229,6 +230,8 @@ export async function run<TFilter, TBlock>(
     if (indexer.options.debug) {
       context.debug = true;
     }
+
+    await indexer.hooks.callHook("plugins:init");
 
     const middleware = await registerMiddleware(indexer);
 
