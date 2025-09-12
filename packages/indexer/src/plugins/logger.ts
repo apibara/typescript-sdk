@@ -13,7 +13,7 @@ export function logger<TFilter, TBlock, TTxnParams>({
   logger,
 }: { logger?: ConsolaReporter } = {}) {
   return defineIndexerPlugin<TFilter, TBlock>((indexer) => {
-    indexer.hooks.hook("run:before", () => {
+    indexer.hooks.hook("plugins:init", () => {
       const ctx = useIndexerContext();
 
       if (logger) {
