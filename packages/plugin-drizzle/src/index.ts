@@ -74,6 +74,23 @@ export function useDrizzleStorage<
   return context[DRIZZLE_PROPERTY];
 }
 
+export function useTestDrizzleStorage<
+  TQueryResult extends PgQueryResultHKT,
+  TFullSchema extends Record<string, unknown> = Record<string, never>,
+  TSchema extends
+    TablesRelationalConfig = ExtractTablesWithRelations<TFullSchema>,
+>(): PgDatabase<TQueryResult, TFullSchema, TSchema> {
+  const context = useIndexerContext();
+
+  if (!context[DRIZZLE_STORAGE_DB_PROPERTY]) {
+    throw new DrizzleStorageError(
+      "drizzle storage db is not available. Did you register the plugin?",
+    );
+  }
+
+  return context[DRIZZLE_STORAGE_DB_PROPERTY];
+}
+
 export interface DrizzleStorageOptions<
   TQueryResult extends PgQueryResultHKT,
   TFullSchema extends Record<string, unknown> = Record<string, never>,
@@ -191,7 +208,7 @@ export function drizzleStorage<
       }
     }
 
-    indexer.hooks.hook("run:before", async () => {
+    indexer.hooks.hook("plugins:init", async () => {
       const internalContext = useInternalContext();
       const context = useIndexerContext();
       const logger = useLogger();
