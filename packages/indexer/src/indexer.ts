@@ -194,16 +194,16 @@ export async function runWithReconnect<TFilter, TBlock>(
   const retryDelay = options.retryDelay ?? 1_000;
   const maxWait = options.maxWait ?? 30_000;
 
-  const abortController = new AbortController();
-
-  const runOptions: RunOptions = {
-    onConnect() {
-      retryCount = 0;
-    },
-    abortSignal: abortController.signal,
-  };
-
   while (true) {
+    const abortController = new AbortController();
+
+    const runOptions: RunOptions = {
+      onConnect() {
+        retryCount = 0;
+      },
+      abortSignal: abortController.signal,
+    };
+
     try {
       await run(client, indexer, runOptions);
       abortController.abort();
