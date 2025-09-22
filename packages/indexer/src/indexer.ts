@@ -265,7 +265,7 @@ export async function run<TFilter, TBlock>(
 
     await indexer.hooks.callHook("plugins:init", { abortSignal });
 
-    const middleware = await registerMiddleware(indexer);
+    const middleware = await registerMiddleware(indexer, abortSignal);
 
     const indexerMetrics = createIndexerMetrics();
     const tracer = createTracer();
@@ -473,6 +473,7 @@ export async function run<TFilter, TBlock>(
           await tracer.startActiveSpan("message finalize", async (span) => {
             await indexer.hooks.callHook("message:finalize", {
               message: message.finalize,
+              abortSignal,
             });
             span.end();
           });
@@ -528,13 +529,14 @@ export async function run<TFilter, TBlock>(
 
 async function registerMiddleware<TFilter, TBlock>(
   indexer: Indexer<TFilter, TBlock>,
+  abortSignal?: AbortSignal,
 ): Promise<MiddlewareFunction<IndexerContext>> {
   const middleware: MiddlewareFunction<IndexerContext>[] = [];
   const use = (fn: MiddlewareFunction<IndexerContext>) => {
     middleware.push(fn);
   };
 
-  await indexer.hooks.callHook("handler:middleware", { use });
+  await indexer.hooks.callHook("handler:middleware", { use, abortSignal });
 
   const composed = compose(middleware);
 
