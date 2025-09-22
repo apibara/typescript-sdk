@@ -521,9 +521,9 @@ export async function run<TFilter, TBlock>(
           throw new Error("not implemented");
         }
       }
-
-      await indexer.hooks.callHook("run:after", { abortSignal });
     }
+
+    await indexer.hooks.callHook("run:after", { abortSignal });
   });
 }
 
