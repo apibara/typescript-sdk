@@ -464,7 +464,7 @@ describe("Drizzle persistence", () => {
       [
         {
           "id": "indexer_testing_default",
-          "orderKey": 107,
+          "orderKey": 105,
           "uniqueKey": null,
         },
       ]
