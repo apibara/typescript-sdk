@@ -5,7 +5,14 @@ import type {
   TablesRelationalConfig,
 } from "drizzle-orm";
 import type { PgQueryResultHKT, PgTransaction } from "drizzle-orm/pg-core";
-import { integer, pgSchema, primaryKey, text } from "drizzle-orm/pg-core";
+import {
+  integer,
+  pgSchema,
+  primaryKey,
+  serial,
+  text,
+  timestamp,
+} from "drizzle-orm/pg-core";
 import { SCHEMA_NAME } from "./constants";
 import { DrizzleStorageError, deserialize, serialize } from "./utils";
 
@@ -37,6 +44,21 @@ export const filters = schema.table(
     },
   ],
 );
+
+/** Table for recording chain reorganizations */
+export const chainReorganizations = schema.table("chain_reorganizations", {
+  id: serial("id").primaryKey(),
+  indexerId: text("indexer_id").notNull(),
+  oldHeadOrderKey: integer("old_head_order_key"),
+  oldHeadUniqueKey: text("old_head_unique_key")
+    .$type<string | null>()
+    .default(null),
+  newHeadOrderKey: integer("new_head_order_key").notNull(),
+  newHeadUniqueKey: text("new_head_unique_key")
+    .$type<string | null>()
+    .default(null),
+  recordedAt: timestamp("recorded_at").defaultNow().notNull(),
+});
 
 /** This table is not used for migrations, its only used for ease of internal operations with drizzle. */
 export const schemaVersion = schema.table(SCHEMA_VERSION_TABLE_NAME, {
@@ -74,6 +96,27 @@ export async function initializePersistentState<
       version INTEGER NOT NULL
     );
   `),
+  );
+
+  await tx.execute(
+    sql.raw(`
+      CREATE TABLE IF NOT EXISTS ${SCHEMA_NAME}.chain_reorganizations (
+        id SERIAL PRIMARY KEY,
+        indexer_id TEXT NOT NULL,
+        old_head_order_key INTEGER,
+        old_head_unique_key TEXT DEFAULT NULL,
+        new_head_order_key INTEGER NOT NULL,
+        new_head_unique_key TEXT DEFAULT NULL,
+        recorded_at TIMESTAMP NOT NULL DEFAULT NOW()
+      );
+    `),
+  );
+
+  await tx.execute(
+    sql.raw(`
+      CREATE INDEX IF NOT EXISTS idx_chain_reorgs_indexer_id 
+      ON ${SCHEMA_NAME}.chain_reorganizations(indexer_id);
+    `),
   );
 
   // Get current schema version
@@ -144,6 +187,34 @@ export async function initializePersistentState<
       "Failed to initialize or migrate database schema",
       { cause: error },
     );
+  }
+}
+
+export async function recordChainReorganization<
+  TQueryResult extends PgQueryResultHKT,
+  TFullSchema extends Record<string, unknown> = Record<string, never>,
+  TSchema extends
+    TablesRelationalConfig = ExtractTablesWithRelations<TFullSchema>,
+>(props: {
+  tx: PgTransaction<TQueryResult, TFullSchema, TSchema>;
+  indexerId: string;
+  oldHead: Cursor | undefined;
+  newHead: Cursor;
+}) {
+  const { tx, indexerId, oldHead, newHead } = props;
+
+  try {
+    await tx.insert(chainReorganizations).values({
+      indexerId: indexerId,
+      oldHeadOrderKey: oldHead ? Number(oldHead.orderKey) : null,
+      oldHeadUniqueKey: oldHead?.uniqueKey ? oldHead.uniqueKey : null,
+      newHeadOrderKey: Number(newHead.orderKey),
+      newHeadUniqueKey: newHead.uniqueKey ? newHead.uniqueKey : null,
+    });
+  } catch (error) {
+    throw new DrizzleStorageError("Failed to record chain reorganization", {
+      cause: error,
+    });
   }
 }
 
@@ -266,6 +337,14 @@ export async function invalidateState<
   const { tx, cursor, indexerId } = props;
 
   try {
+    await tx
+      .update(checkpoints)
+      .set({
+        orderKey: Number(cursor.orderKey),
+        uniqueKey: cursor.uniqueKey ? cursor.uniqueKey : null,
+      })
+      .where(eq(checkpoints.id, indexerId));
+
     await tx
       .delete(filters)
       .where(
