@@ -1,6 +1,6 @@
 {
   "type": "prerelease",
-  "comment": "plugin-drizzle: forward original error",
+  "comment": "plugin-drizzle: add record reorgs option and forward original error",
   "packageName": "@apibara/plugin-drizzle",
   "email": "jadejajaipal5@gmail.com",
   "dependentChangeType": "patch"
