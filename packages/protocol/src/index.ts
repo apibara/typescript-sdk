@@ -9,3 +9,5 @@ export * from "./config";
 export * from "./client";
 
 export * from "./rate";
+
+export * as rpc from "./rpc";
