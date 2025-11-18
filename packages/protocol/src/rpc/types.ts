@@ -6,11 +6,7 @@ export type BlockInfo = {
   parentHash: Bytes;
 };
 
-export type CanonicalBlock = {
-  blockNumber: bigint;
-  blockHash: Bytes;
-  parentHash: Bytes;
-};
+export type CanonicalBlock = BlockInfo;
 
 export type CanonicalChain = Map<string, CanonicalBlock>;
 
@@ -20,4 +16,10 @@ export type LoopState = {
   headCursor: Cursor;
   canonicalChain: CanonicalChain;
   lastHeartbeat: number;
+};
+
+export type FinalizedRangeResult<TBlock> = {
+  blocks: (TBlock | null)[];
+  startCursor: Cursor;
+  endCursor: Cursor;
 };

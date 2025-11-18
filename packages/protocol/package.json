@@ -27,6 +27,12 @@
       "import": "./dist/codec.mjs",
       "require": "./dist/codec.cjs",
       "default": "./dist/codec.mjs"
+    },
+    "./rpc": {
+      "types": "./dist/rpc/index.d.ts",
+      "import": "./dist/rpc/index.mjs",
+      "require": "./dist/rpc/index.cjs",
+      "default": "./dist/rpc/index.mjs"
     }
   },
   "scripts": {
