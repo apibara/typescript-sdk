@@ -47,7 +47,7 @@ describe("Drizzle persistence", () => {
     );
 
     await expect(run(mockClient, indexer)).rejects.toThrow(
-      "Failed to run handler:middleware",
+      "Intentional error to test persistence",
     );
 
     const result = (await db.select().from(testTable)).sort(
@@ -464,7 +464,7 @@ describe("Drizzle persistence", () => {
       [
         {
           "id": "indexer_testing_default",
-          "orderKey": 107,
+          "orderKey": 105,
           "uniqueKey": null,
         },
       ]

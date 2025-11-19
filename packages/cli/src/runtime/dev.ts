@@ -1,9 +1,52 @@
-import { runWithReconnect } from "@apibara/indexer";
+import { ReloadIndexerRequest, runWithReconnect } from "@apibara/indexer";
 import { createAuthenticatedClient } from "@apibara/protocol";
 import { getRuntimeDataFromEnv } from "apibara/common";
 import { defineCommand, runMain } from "citty";
+import type { ConsolaInstance } from "consola";
 import { blueBright } from "picocolors";
 import { availableIndexers, createIndexer } from "./internal/app";
+
+async function startIndexer(indexer: string) {
+  let _logger: ConsolaInstance | undefined;
+  while (true) {
+    try {
+      const { processedRuntimeConfig, preset } = getRuntimeDataFromEnv();
+
+      const { indexer: indexerInstance, logger } =
+        (await createIndexer({
+          indexerName: indexer,
+          processedRuntimeConfig,
+          preset,
+        })) ?? {};
+
+      _logger = logger;
+
+      if (!indexerInstance) {
+        return;
+      }
+
+      const client = createAuthenticatedClient(
+        indexerInstance.streamConfig,
+        indexerInstance.options.streamUrl,
+        indexerInstance.options.clientOptions,
+      );
+
+      if (logger) {
+        logger.info(`Indexer ${blueBright(indexer)} started`);
+      }
+
+      await runWithReconnect(client, indexerInstance);
+
+      return;
+    } catch (error) {
+      if (error instanceof ReloadIndexerRequest) {
+        _logger?.info(`Indexer ${blueBright(indexer)} reloaded`);
+        continue;
+      }
+      throw error;
+    }
+  }
+}
 
 const startCommand = defineCommand({
   meta: {
@@ -19,8 +62,6 @@ const startCommand = defineCommand({
   async run({ args }) {
     const { indexers: indexersArgs } = args;
 
-    const { processedRuntimeConfig, preset } = getRuntimeDataFromEnv();
-
     let selectedIndexers = availableIndexers;
     if (indexersArgs) {
       selectedIndexers = indexersArgs.split(",");
@@ -34,31 +75,7 @@ const startCommand = defineCommand({
       }
     }
 
-    await Promise.all(
-      selectedIndexers.map(async (indexer) => {
-        const { indexer: indexerInstance, logger } =
-          createIndexer({
-            indexerName: indexer,
-            processedRuntimeConfig,
-            preset,
-          }) ?? {};
-        if (!indexerInstance) {
-          return;
-        }
-
-        const client = createAuthenticatedClient(
-          indexerInstance.streamConfig,
-          indexerInstance.options.streamUrl,
-          indexerInstance.options.clientOptions,
-        );
-
-        if (logger) {
-          logger.info(`Indexer ${blueBright(indexer)} started`);
-        }
-
-        await runWithReconnect(client, indexerInstance);
-      }),
-    );
+    await Promise.all(selectedIndexers.map((indexer) => startIndexer(indexer)));
   },
 });
 

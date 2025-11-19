@@ -19,6 +19,7 @@ const runtimeDependencies = [
   // https://socket.io/docs/v4/server-installation/#additional-packages
   "utf-8-validate",
   "bufferutil",
+  "fsevents",
   // was giving unresolved import warnings from `node-fetch` library.
   "encoding",
 ];

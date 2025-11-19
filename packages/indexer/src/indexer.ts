@@ -33,40 +33,63 @@ import {
 import { createIndexerMetrics, createTracer } from "./otel";
 import type { IndexerPlugin } from "./plugins";
 import { useInternalContext } from "./plugins/context";
+import { reloadIfNeeded } from "./utils";
 
 export type UseMiddlewareFunction = (
   fn: MiddlewareFunction<IndexerContext>,
 ) => void;
 
 export interface IndexerHooks<TFilter, TBlock> {
-  "plugins:init": () => void;
-  "run:before": () => void;
-  "run:after": () => void;
+  "plugins:init": ({ abortSignal }: { abortSignal?: AbortSignal }) => void;
+  "run:before": ({ abortSignal }: { abortSignal?: AbortSignal }) => void;
+  "run:after": ({ abortSignal }: { abortSignal?: AbortSignal }) => void;
   "connect:before": ({
     request,
     options,
   }: {
     request: StreamDataRequest<TFilter>;
     options: StreamDataOptions;
+    abortSignal?: AbortSignal;
   }) => void;
   "connect:after": ({
     request,
   }: {
     request: StreamDataRequest<TFilter>;
+    abortSignal?: AbortSignal;
   }) => void;
   "connect:factory": ({
     request,
     endCursor,
+    abortSignal,
   }: {
     request: StreamDataRequest<TFilter>;
     endCursor?: Cursor;
+    abortSignal?: AbortSignal;
   }) => void;
-  "handler:middleware": ({ use }: { use: UseMiddlewareFunction }) => void;
-  message: ({ message }: { message: StreamDataResponse<TBlock> }) => void;
-  "message:invalidate": ({ message }: { message: Invalidate }) => void;
-  "message:finalize": ({ message }: { message: Finalize }) => void;
-  "message:heartbeat": () => void;
-  "message:systemMessage": ({ message }: { message: SystemMessage }) => void;
+  "handler:middleware": ({
+    use,
+    abortSignal,
+  }: { use: UseMiddlewareFunction; abortSignal?: AbortSignal }) => void;
+  message: ({
+    message,
+    abortSignal,
+  }: {
+    message: StreamDataResponse<TBlock>;
+    abortSignal?: AbortSignal;
+  }) => void;
+  "message:invalidate": ({
+    message,
+    abortSignal,
+  }: { message: Invalidate; abortSignal?: AbortSignal }) => void;
+  "message:finalize": ({
+    message,
+    abortSignal,
+  }: { message: Finalize; abortSignal?: AbortSignal }) => void;
+  "message:heartbeat": ({ abortSignal }: { abortSignal?: AbortSignal }) => void;
+  "message:systemMessage": ({
+    message,
+    abortSignal,
+  }: { message: SystemMessage; abortSignal?: AbortSignal }) => void;
 }
 
 export type IndexerStartingCursor =
@@ -90,6 +113,7 @@ export type HandlerArgs<TBlock> = {
   finality: DataFinality;
   production: DataProduction;
   context: IndexerContext;
+  abortSignal?: AbortSignal;
 };
 
 export type IndexerConfig<TFilter, TBlock> = {
@@ -170,21 +194,27 @@ export async function runWithReconnect<TFilter, TBlock>(
   const retryDelay = options.retryDelay ?? 1_000;
   const maxWait = options.maxWait ?? 30_000;
 
-  const runOptions: RunOptions = {
-    onConnect() {
-      retryCount = 0;
-    },
-  };
-
   while (true) {
+    const abortController = new AbortController();
+
+    const runOptions: RunOptions = {
+      onConnect() {
+        retryCount = 0;
+      },
+      abortSignal: abortController.signal,
+    };
+
     try {
       await run(client, indexer, runOptions);
+      abortController.abort();
       return;
     } catch (error) {
       // Only reconnect on internal/server errors.
       // All other errors should be rethrown.
 
       retryCount++;
+
+      abortController.abort();
 
       if (error instanceof ClientError || error instanceof ServerError) {
         const isServerError = error instanceof ServerError;
@@ -209,7 +239,6 @@ export async function runWithReconnect<TFilter, TBlock>(
           }
         }
       }
-
       throw error;
     }
   }
@@ -217,6 +246,7 @@ export async function runWithReconnect<TFilter, TBlock>(
 
 export interface RunOptions {
   onConnect?: () => void | Promise<void>;
+  abortSignal?: AbortSignal;
 }
 
 export async function run<TFilter, TBlock>(
@@ -231,14 +261,16 @@ export async function run<TFilter, TBlock>(
       context.debug = true;
     }
 
-    await indexer.hooks.callHook("plugins:init");
+    const { abortSignal } = runOptions;
 
-    const middleware = await registerMiddleware(indexer);
+    await indexer.hooks.callHook("plugins:init", { abortSignal });
+
+    const middleware = await registerMiddleware(indexer, abortSignal);
 
     const indexerMetrics = createIndexerMetrics();
     const tracer = createTracer();
 
-    await indexer.hooks.callHook("run:before");
+    await indexer.hooks.callHook("run:before", { abortSignal });
 
     const { indexerName: indexerId } = useInternalContext();
 
@@ -269,7 +301,11 @@ export async function run<TFilter, TBlock>(
 
     const options: StreamDataOptions = {};
 
-    await indexer.hooks.callHook("connect:before", { request, options });
+    await indexer.hooks.callHook("connect:before", {
+      request,
+      options,
+      abortSignal,
+    });
 
     // store main filter, so later it can be merged
     let mainFilter: TFilter;
@@ -282,7 +318,7 @@ export async function run<TFilter, TBlock>(
       StreamDataResponse<TBlock>
     > = client.streamData(request, options)[Symbol.asyncIterator]();
 
-    await indexer.hooks.callHook("connect:after", { request });
+    await indexer.hooks.callHook("connect:after", { request, abortSignal });
 
     let onConnectCalled = false;
 
@@ -300,7 +336,7 @@ export async function run<TFilter, TBlock>(
         }
       }
 
-      await indexer.hooks.callHook("message", { message });
+      await indexer.hooks.callHook("message", { message, abortSignal });
 
       switch (message._tag) {
         case "data": {
@@ -319,6 +355,8 @@ export async function run<TFilter, TBlock>(
                 indexer_id: indexerId,
               },
             );
+
+            reloadIfNeeded();
 
             await middleware(context, async () => {
               let block: TBlock | null;
@@ -339,6 +377,7 @@ export async function run<TFilter, TBlock>(
                     finality,
                     production,
                     context,
+                    abortSignal,
                   });
 
                   // write returned data from factory function if filter is not defined
@@ -360,6 +399,7 @@ export async function run<TFilter, TBlock>(
                     await indexer.hooks.callHook("connect:factory", {
                       request,
                       endCursor,
+                      abortSignal,
                     });
 
                     // create new stream with new request
@@ -391,12 +431,15 @@ export async function run<TFilter, TBlock>(
                     finality,
                     production,
                     context,
+                    abortSignal,
                   });
 
                   span.end();
                 });
               }
             });
+
+            reloadIfNeeded();
 
             span.end();
           });
@@ -420,6 +463,7 @@ export async function run<TFilter, TBlock>(
             });
             await indexer.hooks.callHook("message:invalidate", {
               message: message.invalidate,
+              abortSignal,
             });
             span.end();
           });
@@ -429,6 +473,7 @@ export async function run<TFilter, TBlock>(
           await tracer.startActiveSpan("message finalize", async (span) => {
             await indexer.hooks.callHook("message:finalize", {
               message: message.finalize,
+              abortSignal,
             });
             span.end();
           });
@@ -436,7 +481,11 @@ export async function run<TFilter, TBlock>(
         }
         case "heartbeat": {
           await tracer.startActiveSpan("message heartbeat", async (span) => {
-            await indexer.hooks.callHook("message:heartbeat");
+            reloadIfNeeded();
+
+            await indexer.hooks.callHook("message:heartbeat", { abortSignal });
+            reloadIfNeeded();
+
             span.end();
           });
           break;
@@ -460,6 +509,7 @@ export async function run<TFilter, TBlock>(
 
               await indexer.hooks.callHook("message:systemMessage", {
                 message: message.systemMessage,
+                abortSignal,
               });
               span.end();
             },
@@ -471,21 +521,22 @@ export async function run<TFilter, TBlock>(
           throw new Error("not implemented");
         }
       }
-
-      await indexer.hooks.callHook("run:after");
     }
+
+    await indexer.hooks.callHook("run:after", { abortSignal });
   });
 }
 
 async function registerMiddleware<TFilter, TBlock>(
   indexer: Indexer<TFilter, TBlock>,
+  abortSignal?: AbortSignal,
 ): Promise<MiddlewareFunction<IndexerContext>> {
   const middleware: MiddlewareFunction<IndexerContext>[] = [];
   const use = (fn: MiddlewareFunction<IndexerContext>) => {
     middleware.push(fn);
   };
 
-  await indexer.hooks.callHook("handler:middleware", { use });
+  await indexer.hooks.callHook("handler:middleware", { use, abortSignal });
 
   const composed = compose(middleware);
 

@@ -1,4 +1,4 @@
-import { runWithReconnect } from "@apibara/indexer";
+import { ReloadIndexerRequest, runWithReconnect } from "@apibara/indexer";
 import { createAuthenticatedClient } from "@apibara/protocol";
 import {
   checkForUnknownArgs,
@@ -6,7 +6,7 @@ import {
   getRuntimeDataFromEnv,
 } from "apibara/common";
 import { defineCommand, runMain } from "citty";
-import consola from "consola";
+import consola, { type ConsolaInstance } from "consola";
 import { blueBright } from "picocolors";
 import { register } from "#apibara-internal-virtual/instrumentation";
 // used when running with node .apibara/build/start.mjs as these values are made static during build time (except userEnvRuntimeConfig)
@@ -44,54 +44,72 @@ const startCommand = defineCommand({
     const { indexer, preset: argPreset, standalone } = args;
     await checkForUnknownArgs(args, cmd);
 
-    let preset: string | undefined;
-    let processedRuntimeConfig: Record<string, unknown> | undefined;
+    let _logger: ConsolaInstance | undefined;
 
-    if (standalone) {
-      // when user does node .apibara/build/start.mjs
-      preset = argPreset ?? originalPreset;
-      processedRuntimeConfig = getProcessedRuntimeConfig({
-        preset,
-        presets,
-        runtimeConfig,
-        userEnvRuntimeConfig,
-      });
-    } else {
-      // When user does apibara start
-      const envResult = getRuntimeDataFromEnv();
-      preset = envResult.preset;
-      processedRuntimeConfig = envResult.processedRuntimeConfig;
+    while (true) {
+      try {
+        let preset: string | undefined;
+        let processedRuntimeConfig: Record<string, unknown> | undefined;
+
+        if (standalone) {
+          // when user does node .apibara/build/start.mjs
+          preset = argPreset ?? originalPreset;
+          processedRuntimeConfig = getProcessedRuntimeConfig({
+            preset,
+            presets,
+            runtimeConfig,
+            userEnvRuntimeConfig,
+          });
+        } else {
+          // When user does apibara start
+          const envResult = getRuntimeDataFromEnv();
+          preset = envResult.preset;
+          processedRuntimeConfig = envResult.processedRuntimeConfig;
+        }
+
+        const { indexer: indexerInstance, logger } =
+          (await createIndexer({
+            indexerName: indexer,
+            processedRuntimeConfig,
+            preset,
+          })) ?? {};
+
+        _logger = logger;
+
+        if (!indexerInstance) {
+          consola.error(
+            `Specified indexer "${indexer}" but it was not defined`,
+          );
+          process.exit(1);
+        }
+
+        const client = createAuthenticatedClient(
+          indexerInstance.streamConfig,
+          indexerInstance.options.streamUrl,
+          indexerInstance.options.clientOptions,
+        );
+
+        if (register) {
+          consola.start("Registering from instrumentation");
+          await register();
+          consola.success("Registered from instrumentation");
+        }
+
+        if (logger) {
+          logger.info(`Indexer ${blueBright(indexer)} started`);
+        }
+
+        await runWithReconnect(client, indexerInstance);
+
+        return;
+      } catch (error) {
+        if (error instanceof ReloadIndexerRequest) {
+          _logger?.info(`Indexer ${blueBright(indexer)} reloaded`);
+          continue;
+        }
+        throw error;
+      }
     }
-
-    const { indexer: indexerInstance, logger } =
-      createIndexer({
-        indexerName: indexer,
-        processedRuntimeConfig,
-        preset,
-      }) ?? {};
-
-    if (!indexerInstance) {
-      consola.error(`Specified indexer "${indexer}" but it was not defined`);
-      process.exit(1);
-    }
-
-    const client = createAuthenticatedClient(
-      indexerInstance.streamConfig,
-      indexerInstance.options.streamUrl,
-      indexerInstance.options.clientOptions,
-    );
-
-    if (register) {
-      consola.start("Registering from instrumentation");
-      await register();
-      consola.success("Registered from instrumentation");
-    }
-
-    if (logger) {
-      logger.info(`Indexer ${blueBright(indexer)} started`);
-    }
-
-    await runWithReconnect(client, indexerInstance);
   },
 });
 

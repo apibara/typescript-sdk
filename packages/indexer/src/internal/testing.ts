@@ -10,15 +10,19 @@ import { type IndexerConfig, createIndexer, defineIndexer } from "../indexer";
 import { defineIndexerPlugin, logger } from "../plugins";
 import { type InternalContext, internalContext } from "./plugins";
 
+export type InvalidateConfig = {
+  invalidateFromIndex: number;
+  invalidateTriggerIndex: number;
+};
+
+export type FinalizeConfig = {
+  finalizeToIndex: number;
+  finalizeTriggerIndex: number;
+};
+
 export type MockMessagesOptions = {
-  invalidate?: {
-    invalidateFromIndex: number;
-    invalidateTriggerIndex: number;
-  };
-  finalize?: {
-    finalizeToIndex: number;
-    finalizeTriggerIndex: number;
-  };
+  invalidate?: InvalidateConfig | InvalidateConfig[];
+  finalize?: FinalizeConfig | FinalizeConfig[];
   uniqueKey?: boolean;
   baseBlockNumber?: bigint;
 };
@@ -27,18 +31,35 @@ export function generateMockMessages(
   count = 10,
   options?: MockMessagesOptions,
 ): MockStreamResponse[] {
-  const invalidateAt = options?.invalidate;
-  const finalizeAt = options?.finalize;
   const messages: MockStreamResponse[] = [];
-
   const baseBlockNumber = options?.baseBlockNumber ?? BigInt(5_000_000);
+
+  const invalidateConfigs = options?.invalidate
+    ? Array.isArray(options.invalidate)
+      ? options.invalidate
+      : [options.invalidate]
+    : [];
+
+  const finalizeConfigs = options?.finalize
+    ? Array.isArray(options.finalize)
+      ? options.finalize
+      : [options.finalize]
+    : [];
 
   for (let i = 0; i < count; i++) {
     const currentBlockNumber = baseBlockNumber + BigInt(i);
     const uniqueKey = uniqueKeyFromOrderKey(currentBlockNumber);
-    if (invalidateAt && i === invalidateAt.invalidateTriggerIndex) {
+
+    const invalidateConfig = invalidateConfigs.find(
+      (cfg) => cfg.invalidateTriggerIndex === i,
+    );
+    const finalizeConfig = finalizeConfigs.find(
+      (cfg) => cfg.finalizeTriggerIndex === i,
+    );
+
+    if (invalidateConfig) {
       const invalidateToBlock =
-        baseBlockNumber + BigInt(invalidateAt.invalidateFromIndex);
+        baseBlockNumber + BigInt(invalidateConfig.invalidateFromIndex);
       messages.push({
         _tag: "invalidate",
         invalidate: {
@@ -50,16 +71,16 @@ export function generateMockMessages(
           },
         } as Invalidate,
       });
-    } else if (finalizeAt && i === finalizeAt.finalizeTriggerIndex) {
-      const fianlizedToBlock =
-        baseBlockNumber + BigInt(finalizeAt.finalizeToIndex);
+    } else if (finalizeConfig) {
+      const finalizedToBlock =
+        baseBlockNumber + BigInt(finalizeConfig.finalizeToIndex);
       messages.push({
         _tag: "finalize",
         finalize: {
           cursor: {
-            orderKey: fianlizedToBlock,
+            orderKey: finalizedToBlock,
             uniqueKey: options?.uniqueKey
-              ? uniqueKeyFromOrderKey(fianlizedToBlock)
+              ? uniqueKeyFromOrderKey(finalizedToBlock)
               : undefined,
           },
         } as Finalize,

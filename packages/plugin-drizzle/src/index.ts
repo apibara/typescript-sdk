@@ -22,6 +22,7 @@ import {
   initializePersistentState,
   invalidateState,
   persistState,
+  recordChainReorganization,
   resetPersistence,
 } from "./persistence";
 import {
@@ -144,6 +145,12 @@ export interface DrizzleStorageOptions<
    * The options for the database migration. When provided, the database will automatically run migrations before the indexer runs.
    */
   migrate?: MigrateOptions;
+
+  /**
+   * Whether to record chain reorganizations in the database.
+   * @default false
+   */
+  recordChainReorganizations?: boolean;
 }
 
 /**
@@ -156,6 +163,7 @@ export interface DrizzleStorageOptions<
  * @param options.schema - The schema of the database.
  * @param options.idColumn - The column to use as the id. Defaults to 'id'.
  * @param options.migrate - The options for the database migration. when provided, the database will automatically run migrations before the indexer runs.
+ * @param options.recordChainReorganizations - Whether to record chain reorganizations in the database. Defaults to false.
  */
 export function drizzleStorage<
   TFilter,
@@ -171,6 +179,7 @@ export function drizzleStorage<
   schema: _schema,
   idColumn,
   migrate: migrateOptions,
+  recordChainReorganizations = false,
 }: DrizzleStorageOptions<TQueryResult, TFullSchema, TSchema>) {
   return defineIndexerPlugin<TFilter, TBlock>((indexer) => {
     let tableNames: string[] = [];
@@ -360,7 +369,28 @@ export function drizzleStorage<
       }
 
       await withTransaction(db, async (tx) => {
-        // Use the appropriate idColumn for each table when calling invalidate
+        let oldHead: Cursor | undefined;
+
+        if (recordChainReorganizations) {
+          const { cursor: currentCursor } = await getState<
+            TFilter,
+            TQueryResult,
+            TFullSchema,
+            TSchema
+          >({
+            tx,
+            indexerId,
+          });
+          oldHead = currentCursor;
+
+          await recordChainReorganization({
+            tx,
+            indexerId,
+            oldHead,
+            newHead: cursor,
+          });
+        }
+
         await invalidate(tx, cursor, idColumnMap, indexerId);
 
         if (enablePersistence) {
@@ -425,9 +455,7 @@ export function drizzleStorage<
         } catch (error) {
           await removeTriggers(db, tableNames, indexerId);
 
-          throw new DrizzleStorageError("Failed to run handler:middleware", {
-            cause: error,
-          });
+          throw error;
         }
       });
     });

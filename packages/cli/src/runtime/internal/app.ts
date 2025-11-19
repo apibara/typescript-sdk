@@ -15,7 +15,7 @@ import { createLogger } from "./logger";
 
 export const availableIndexers = indexers.map((i) => i.name);
 
-export function createIndexer({
+export async function createIndexer({
   indexerName,
   processedRuntimeConfig,
   preset,
@@ -48,7 +48,7 @@ export function createIndexer({
 
   const definition =
     typeof indexerModule === "function"
-      ? indexerModule(processedRuntimeConfig)
+      ? await indexerModule(processedRuntimeConfig)
       : indexerModule;
 
   let reporter: ConsolaReporter = createLogger({
