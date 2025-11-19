@@ -1,8 +1,16 @@
 # Change Log - @apibara/plugin-drizzle
 
-<!-- This log was last generated on Fri, 12 Sep 2025 15:31:39 GMT and should not be manually modified. -->
+<!-- This log was last generated on Wed, 19 Nov 2025 11:42:55 GMT and should not be manually modified. -->
 
 <!-- Start content -->
+
+## 2.1.0-beta.41
+
+Wed, 19 Nov 2025 11:42:55 GMT
+
+### Changes
+
+- plugin-drizzle: add record reorgs option and forward original error (jadejajaipal5@gmail.com)
 
 ## 2.1.0-beta.40
 

@@ -2,6 +2,21 @@
   "name": "@apibara/plugin-drizzle",
   "entries": [
     {
+      "date": "Wed, 19 Nov 2025 11:42:55 GMT",
+      "version": "2.1.0-beta.41",
+      "tag": "@apibara/plugin-drizzle_v2.1.0-beta.41",
+      "comments": {
+        "prerelease": [
+          {
+            "author": "jadejajaipal5@gmail.com",
+            "package": "@apibara/plugin-drizzle",
+            "commit": "5b06e7fd79ed47713aee5ff205291b78985808ae",
+            "comment": "plugin-drizzle: add record reorgs option and forward original error"
+          }
+        ]
+      }
+    },
+    {
       "date": "Fri, 12 Sep 2025 15:31:39 GMT",
       "version": "2.1.0-beta.40",
       "tag": "@apibara/plugin-drizzle_v2.1.0-beta.40",

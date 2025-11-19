@@ -1,8 +1,16 @@
 # Change Log - @apibara/indexer
 
-<!-- This log was last generated on Fri, 12 Sep 2025 15:31:39 GMT and should not be manually modified. -->
+<!-- This log was last generated on Wed, 19 Nov 2025 11:42:55 GMT and should not be manually modified. -->
 
 <!-- Start content -->
+
+## 2.1.0-beta.41
+
+Wed, 19 Nov 2025 11:42:55 GMT
+
+### Changes
+
+- indexer: update reloadIndexer() logic with context and update generateMockMessages() (jadejajaipal5@gmail.com)
 
 ## 2.1.0-beta.40
 

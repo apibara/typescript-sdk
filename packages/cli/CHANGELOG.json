@@ -2,6 +2,21 @@
   "name": "apibara",
   "entries": [
     {
+      "date": "Wed, 19 Nov 2025 11:42:55 GMT",
+      "version": "2.1.0-beta.41",
+      "tag": "apibara_v2.1.0-beta.41",
+      "comments": {
+        "prerelease": [
+          {
+            "author": "jadejajaipal5@gmail.com",
+            "package": "apibara",
+            "commit": "5b06e7fd79ed47713aee5ff205291b78985808ae",
+            "comment": "cli: add reloadIndexer() and async support for indexer constructors"
+          }
+        ]
+      }
+    },
+    {
       "date": "Fri, 30 May 2025 12:31:48 GMT",
       "version": "2.1.0-beta.38",
       "tag": "apibara_v2.1.0-beta.38",

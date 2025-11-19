@@ -1,8 +1,16 @@
 # Change Log - apibara
 
-<!-- This log was last generated on Fri, 30 May 2025 12:31:48 GMT and should not be manually modified. -->
+<!-- This log was last generated on Wed, 19 Nov 2025 11:42:55 GMT and should not be manually modified. -->
 
 <!-- Start content -->
+
+## 2.1.0-beta.41
+
+Wed, 19 Nov 2025 11:42:55 GMT
+
+### Changes
+
+- cli: add reloadIndexer() and async support for indexer constructors (jadejajaipal5@gmail.com)
 
 ## 2.1.0-beta.38
 
