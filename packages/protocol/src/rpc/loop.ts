@@ -7,16 +7,15 @@ import type {
   StreamDataResponse,
 } from "../stream";
 import type { RpcStreamConfig } from "./config";
-import type { BlockInfo, CanonicalBlock, LoopState } from "./types";
+import type { BlockInfo, CanonicalChain, LoopState } from "./types";
 
 const DEFAULT_HEARTBEAT_INTERVAL_MS = 30_000;
 const DEFAULT_REFRESH_INTERVAL_MS = 5_000;
 const DEFAULT_POLL_INTERVAL_MS = 1_000;
 const DEFAULT_ERROR_RETRY_MS = 5_000;
-const DEFAULT_BATCH_SIZE = 10n;
 
 export class StreamLoop<TFilter, TBlock> {
-  private state!: LoopState;
+  private state: LoopState | null = null;
   private request: StreamDataRequest<TFilter>;
   private config: RpcStreamConfig<TFilter, TBlock>;
   private options: StreamDataOptions | undefined;
@@ -75,26 +74,26 @@ export class StreamLoop<TFilter, TBlock> {
       headCursor,
       canonicalChain: new Map(),
       lastHeartbeat: Date.now(),
+      blockNumberToHash: new Map(),
     };
 
-    // Always backfill to finalized (safe, stable blocks)
-    // phaseBuildCanonicalChain will handle the gap from finalized to head
     yield* this.backfillToTarget(finalizedCursor.orderKey, "backfill");
   }
 
   private async *phaseBuildCanonicalChain(): AsyncGenerator<
     StreamDataResponse<TBlock>
   > {
+    const state = this.ensureState();
     // finalized may have advanced during Phase 1
     const [newFinalized, newHead] = await Promise.all([
       this.config.getCursor("finalized"),
       this.config.getCursor("head"),
     ]);
 
-    this.state.finalizedCursor = newFinalized;
-    this.state.headCursor = newHead;
+    state.finalizedCursor = newFinalized;
+    state.headCursor = newHead;
 
-    if (this.state.cursor.orderKey < newFinalized.orderKey) {
+    if (state.cursor.orderKey < newFinalized.orderKey) {
       yield* this.backfillToTarget(newFinalized.orderKey, "catch-up");
     }
 
@@ -105,7 +104,7 @@ export class StreamLoop<TFilter, TBlock> {
         newHead.orderKey,
         abortController.signal,
       );
-      this.state.canonicalChain = chainMap;
+      state.canonicalChain = chainMap;
     } catch (error) {
       yield {
         _tag: "systemMessage",
@@ -121,6 +120,7 @@ export class StreamLoop<TFilter, TBlock> {
   }
 
   private async *phaseLiveStream(): AsyncGenerator<StreamDataResponse<TBlock>> {
+    const state = this.ensureState();
     while (true) {
       if (this.shouldStop()) return;
       if (this.options?.signal?.aborted) return;
@@ -143,20 +143,20 @@ export class StreamLoop<TFilter, TBlock> {
             const { blockInfo, blockData, newHead, newFinalized } = result;
 
             if (newHead) {
-              this.state.headCursor = newHead;
+              state.headCursor = newHead;
             }
 
             if (newFinalized) {
-              this.state.finalizedCursor = newFinalized;
+              state.finalizedCursor = newFinalized;
             }
 
-            const parentInChain = this.state.canonicalChain.get(
+            const parentInChain = state.canonicalChain.get(
               blockInfo.parentHash,
             );
 
             if (
               !parentInChain &&
-              blockInfo.blockNumber > this.state.finalizedCursor.orderKey
+              blockInfo.blockNumber > state.finalizedCursor.orderKey
             ) {
               const commonAncestor = await this.findCommonAncestor(blockInfo);
 
@@ -165,23 +165,27 @@ export class StreamLoop<TFilter, TBlock> {
                 invalidate: { cursor: commonAncestor },
               };
 
-              this.state.cursor = commonAncestor;
+              state.cursor = commonAncestor;
 
               const rebuildController = new AbortController();
               const chainMap = await this.computeCanonicalChain(
                 commonAncestor.orderKey,
-                this.state.headCursor.orderKey,
+                state.headCursor.orderKey,
                 rebuildController.signal,
               );
-              this.state.canonicalChain = chainMap;
+              state.canonicalChain = chainMap;
               continue;
             }
 
-            this.state.canonicalChain.set(blockInfo.blockHash, blockInfo);
+            state.canonicalChain.set(blockInfo.blockHash, blockInfo);
+            state.blockNumberToHash.set(
+              blockInfo.blockNumber,
+              blockInfo.blockHash,
+            );
 
-            const previousCursor = this.state.cursor;
+            const previousCursor = state.cursor;
 
-            this.state.cursor = {
+            state.cursor = {
               orderKey: blockInfo.blockNumber,
               uniqueKey: blockInfo.blockHash,
             };
@@ -192,14 +196,14 @@ export class StreamLoop<TFilter, TBlock> {
               _tag: "data",
               data: {
                 cursor: previousCursor,
-                endCursor: this.state.cursor,
+                endCursor: state.cursor,
                 finality,
                 production: "live",
                 data: [blockData],
               },
             };
 
-            this.state.lastHeartbeat = Date.now();
+            state.lastHeartbeat = Date.now();
             break;
           }
 
@@ -207,17 +211,17 @@ export class StreamLoop<TFilter, TBlock> {
             yield {
               _tag: "heartbeat",
             };
-            this.state.lastHeartbeat = Date.now();
+            state.lastHeartbeat = Date.now();
             break;
           }
 
           case "refresh": {
             const { newFinalized, newHead } = result;
 
-            this.state.headCursor = newHead;
+            state.headCursor = newHead;
 
-            if (newFinalized.orderKey !== this.state.finalizedCursor.orderKey) {
-              this.state.finalizedCursor = newFinalized;
+            if (newFinalized.orderKey !== state.finalizedCursor.orderKey) {
+              state.finalizedCursor = newFinalized;
 
               yield {
                 _tag: "finalize",
@@ -260,32 +264,30 @@ export class StreamLoop<TFilter, TBlock> {
     newHead: Cursor | null;
     newFinalized: Cursor | null;
   }> {
-    const nextBlockNumber = this.state.cursor.orderKey + 1n;
+    const state = this.ensureState();
+    const nextBlockNumber = state.cursor.orderKey + 1n;
     const requestedFinality = this.request.finality || "accepted";
     let newHead: Cursor | null = null;
     let newFinalized: Cursor | null = null;
 
-    // Wait based on requested finality
     if (requestedFinality === "finalized") {
-      // For finalized: wait until block is finalized
-      while (nextBlockNumber > this.state.finalizedCursor.orderKey) {
+      // wait for finalized block
+      while (nextBlockNumber > state.finalizedCursor.orderKey) {
         if (signal.aborted) throw new Error("AbortError");
         await this.sleep(DEFAULT_POLL_INTERVAL_MS);
         newFinalized = await this.config.getCursor("finalized");
         if (signal.aborted) throw new Error("AbortError");
-        // Only break if we have enough finalized blocks
         if (newFinalized.orderKey >= nextBlockNumber) {
           break;
         }
       }
     } else {
-      // For accepted/pending: wait until block is at head
-      while (nextBlockNumber > this.state.headCursor.orderKey) {
+      // wait for head block
+      while (nextBlockNumber > state.headCursor.orderKey) {
         if (signal.aborted) throw new Error("AbortError");
         await this.sleep(DEFAULT_POLL_INTERVAL_MS);
         if (signal.aborted) throw new Error("AbortError");
         newHead = await this.config.getCursor("head");
-        // Only break if head has reached our target block
         if (newHead.orderKey >= nextBlockNumber) {
           break;
         }
@@ -314,7 +316,8 @@ export class StreamLoop<TFilter, TBlock> {
     signal: AbortSignal,
   ): Promise<{ type: "heartbeat" }> {
     const now = Date.now();
-    const elapsed = now - this.state.lastHeartbeat;
+    const state = this.ensureState();
+    const elapsed = now - state.lastHeartbeat;
     const remaining = this.heartbeatIntervalMs - elapsed;
 
     if (remaining > 0) {
@@ -359,28 +362,42 @@ export class StreamLoop<TFilter, TBlock> {
     startBlock: bigint,
     endBlock: bigint,
     signal: AbortSignal,
-  ): Promise<Map<string, CanonicalBlock>> {
-    const chainMap = new Map<string, CanonicalBlock>();
+  ): Promise<CanonicalChain> {
+    const state = this.ensureState();
+    const chainMap: CanonicalChain = new Map();
 
     for (let blockNum = startBlock; blockNum <= endBlock; blockNum++) {
       if (signal.aborted) throw new Error("AbortError");
       const blockInfo = await this.config.getBlockInfo(blockNum);
       chainMap.set(blockInfo.blockHash, blockInfo);
+      state.blockNumberToHash.set(blockInfo.blockNumber, blockInfo.blockHash);
     }
 
     return chainMap;
   }
 
   private pruneCanonicalChain(beforeBlock: bigint): void {
-    for (const [hash, block] of this.state.canonicalChain.entries()) {
-      if (block.blockNumber < beforeBlock) {
-        this.state.canonicalChain.delete(hash);
+    const state = this.ensureState();
+    const toDelete: bigint[] = [];
+
+    for (const [blockNum] of state.blockNumberToHash.entries()) {
+      if (blockNum < beforeBlock) {
+        toDelete.push(blockNum);
+      }
+    }
+
+    for (const blockNum of toDelete) {
+      const hash = state.blockNumberToHash.get(blockNum);
+      if (hash) {
+        state.canonicalChain.delete(hash);
+        state.blockNumberToHash.delete(blockNum);
       }
     }
   }
 
   private async findCommonAncestor(reorgedBlock: BlockInfo): Promise<Cursor> {
-    const parentBlock = this.state.canonicalChain.get(reorgedBlock.parentHash);
+    const state = this.ensureState();
+    const parentBlock = state.canonicalChain.get(reorgedBlock.parentHash);
 
     if (parentBlock) {
       return {
@@ -391,10 +408,11 @@ export class StreamLoop<TFilter, TBlock> {
 
     let currentBlockNum = reorgedBlock.blockNumber - 1n;
 
-    while (currentBlockNum >= this.state.finalizedCursor.orderKey) {
-      const blockInChain = Array.from(this.state.canonicalChain.values()).find(
-        (b) => b.blockNumber === currentBlockNum,
-      );
+    while (currentBlockNum >= state.finalizedCursor.orderKey) {
+      const blockHash = state.blockNumberToHash.get(currentBlockNum);
+      const blockInChain = blockHash
+        ? state.canonicalChain.get(blockHash)
+        : undefined;
 
       if (blockInChain) {
         const isValid = await this.config.verifyBlock(
@@ -413,11 +431,12 @@ export class StreamLoop<TFilter, TBlock> {
       currentBlockNum--;
     }
 
-    return this.state.finalizedCursor;
+    return state.finalizedCursor;
   }
 
   private determineFinality(blockNumber: bigint): DataFinality {
-    if (blockNumber <= this.state.finalizedCursor.orderKey) {
+    const state = this.ensureState();
+    if (blockNumber <= state.finalizedCursor.orderKey) {
       return "finalized";
     }
 
@@ -428,66 +447,71 @@ export class StreamLoop<TFilter, TBlock> {
     target: bigint,
     reason: "backfill" | "catch-up",
   ): AsyncGenerator<StreamDataResponse<TBlock>> {
-    if (this.state.cursor.orderKey >= target) {
+    const state = this.ensureState();
+    if (state.cursor.orderKey >= target) {
       return;
     }
 
-    while (this.state.cursor.orderKey < target) {
-      if (this.shouldStop()) return;
-      if (this.options?.signal?.aborted) return;
+    if (this.shouldStop()) return;
+    if (this.options?.signal?.aborted) return;
 
-      const startBlock = this.state.cursor.orderKey + 1n;
-      let endBlock = target;
+    const startBlock = state.cursor.orderKey + 1n;
+    const endBlock = target;
 
-      if (endBlock - startBlock + 1n > DEFAULT_BATCH_SIZE) {
-        endBlock = startBlock + DEFAULT_BATCH_SIZE - 1n;
-      }
+    try {
+      const result = await this.config.fetchFinalizedRange(
+        startBlock,
+        endBlock,
+        this.request.filter,
+      );
 
-      try {
-        const result = await this.config.fetchFinalizedRange(
-          startBlock,
-          endBlock,
-          this.request.filter,
-        );
+      const dataMsg: Data<TBlock> = {
+        cursor: result.startCursor,
+        endCursor: result.endCursor,
+        finality: "finalized",
+        production: reason === "backfill" ? "backfill" : "live",
+        data: result.blocks,
+      };
 
-        const dataMsg: Data<TBlock> = {
-          cursor: result.startCursor,
-          endCursor: result.endCursor,
-          finality: "finalized",
-          production: reason === "backfill" ? "backfill" : "live",
-          data: result.blocks,
-        };
+      yield {
+        _tag: "data",
+        data: dataMsg,
+      };
 
-        yield {
-          _tag: "data",
-          data: dataMsg,
-        };
-
-        this.state.cursor = result.endCursor;
-        this.state.lastHeartbeat = Date.now();
-      } catch (error) {
-        yield {
-          _tag: "systemMessage",
-          systemMessage: {
-            output: {
-              _tag: "stderr",
-              stderr: `${reason === "backfill" ? "Backfill" : "Catch-up"} error: ${error instanceof Error ? error.message : String(error)}`,
-            },
+      state.cursor = result.endCursor;
+      state.lastHeartbeat = Date.now();
+    } catch (error) {
+      yield {
+        _tag: "systemMessage",
+        systemMessage: {
+          output: {
+            _tag: "stderr",
+            stderr: `${reason === "backfill" ? "Backfill" : "Catch-up"} error: ${error instanceof Error ? error.message : String(error)}`,
           },
-        };
-        await this.sleep(DEFAULT_ERROR_RETRY_MS);
-      }
+        },
+      };
+      await this.sleep(DEFAULT_ERROR_RETRY_MS);
     }
   }
 
   private shouldStop(): boolean {
+    const state = this.ensureState();
     const { endingCursor } = this.options || {};
     if (!endingCursor) return false;
 
-    return this.state.cursor.orderKey >= endingCursor.orderKey;
+    return state.cursor.orderKey >= endingCursor.orderKey;
   }
 
   private sleep(ms: number): Promise<void> {
     return new Promise((resolve) => setTimeout(resolve, ms));
+  }
+
+  private ensureState(): LoopState {
+    if (!this.state) {
+      throw new Error(
+        "StreamLoop not initialized. Must iterate before accessing state.",
+      );
+    }
+    return this.state;
   }
 }
