@@ -69,7 +69,14 @@ class MockRpcConfig extends RpcStreamConfig<TestFilter, TestBlock> {
     const blocks: (TestBlock | null)[] = [];
     let actualEnd = endBlock;
 
-    for (let i = startBlock; i <= endBlock && i <= this.finalizedBlock; i++) {
+    const MAX_BATCH_SIZE = 10n;
+    const requestedRange = endBlock - startBlock + 1n;
+    const batchEnd =
+      requestedRange > MAX_BATCH_SIZE
+        ? startBlock + MAX_BATCH_SIZE - 1n
+        : endBlock;
+
+    for (let i = startBlock; i <= batchEnd && i <= this.finalizedBlock; i++) {
       const block = this.blockDataStore.get(i);
       blocks.push(block || null);
       actualEnd = i;

@@ -448,49 +448,55 @@ export class StreamLoop<TFilter, TBlock> {
     reason: "backfill" | "catch-up",
   ): AsyncGenerator<StreamDataResponse<TBlock>> {
     const state = this.ensureState();
-    if (state.cursor.orderKey >= target) {
-      return;
-    }
 
-    if (this.shouldStop()) return;
-    if (this.options?.signal?.aborted) return;
+    while (state.cursor.orderKey < target) {
+      if (this.shouldStop()) return;
+      if (this.options?.signal?.aborted) return;
 
-    const startBlock = state.cursor.orderKey + 1n;
-    const endBlock = target;
+      const startBlock = state.cursor.orderKey + 1n;
+      const endBlock = target;
 
-    try {
-      const result = await this.config.fetchFinalizedRange(
-        startBlock,
-        endBlock,
-        this.request.filter,
-      );
+      try {
+        const result = await this.config.fetchFinalizedRange(
+          startBlock,
+          endBlock,
+          this.request.filter,
+        );
 
-      const dataMsg: Data<TBlock> = {
-        cursor: result.startCursor,
-        endCursor: result.endCursor,
-        finality: "finalized",
-        production: reason === "backfill" ? "backfill" : "live",
-        data: result.blocks,
-      };
+        const dataMsg: Data<TBlock> = {
+          cursor: result.startCursor,
+          endCursor: result.endCursor,
+          finality: "finalized",
+          production: reason === "backfill" ? "backfill" : "live",
+          data: result.blocks,
+        };
 
-      yield {
-        _tag: "data",
-        data: dataMsg,
-      };
+        yield {
+          _tag: "data",
+          data: dataMsg,
+        };
 
-      state.cursor = result.endCursor;
-      state.lastHeartbeat = Date.now();
-    } catch (error) {
-      yield {
-        _tag: "systemMessage",
-        systemMessage: {
-          output: {
-            _tag: "stderr",
-            stderr: `${reason === "backfill" ? "Backfill" : "Catch-up"} error: ${error instanceof Error ? error.message : String(error)}`,
+        state.cursor = result.endCursor;
+        state.lastHeartbeat = Date.now();
+
+        // returned fewer blocks than requested. Continue fetching.
+        if (state.cursor.orderKey < target) {
+          continue;
+        }
+
+        break;
+      } catch (error) {
+        yield {
+          _tag: "systemMessage",
+          systemMessage: {
+            output: {
+              _tag: "stderr",
+              stderr: `${reason === "backfill" ? "Backfill" : "Catch-up"} error: ${error instanceof Error ? error.message : String(error)}`,
+            },
           },
-        },
-      };
-      await this.sleep(DEFAULT_ERROR_RETRY_MS);
+        };
+        await this.sleep(DEFAULT_ERROR_RETRY_MS);
+      }
     }
   }
 
