@@ -17,6 +17,15 @@ import { type EvmRpcFilter, validateEvmRpcFilter } from "./filter";
 import { fetchLogsForBlock } from "./log-fetcher";
 import { viemBlockHeaderToDna } from "./transform";
 
+export type EvmRpcStreamConfigOptions = {
+  dynamicBatching?: {
+    initialBatchSize?: bigint;
+    minBatchSize?: bigint;
+    maxBatchSize?: bigint;
+  };
+  clientConfig?: HttpTransportConfig;
+};
+
 export class EvmRpcStreamConfig extends RpcStreamConfig<
   EvmRpcFilter,
   EvmRpcBlock
@@ -27,46 +36,28 @@ export class EvmRpcStreamConfig extends RpcStreamConfig<
   constructor(
     rpcUrl: string,
     chain?: Chain,
-    options?: {
-      retryCount?: number;
-      retryDelay?: number;
-      batch?: HttpTransportConfig["batch"];
-      initialBatchSize?: bigint;
-      minBatchSize?: bigint;
-      maxBatchSize?: bigint;
-    },
+    options?: EvmRpcStreamConfigOptions,
   ) {
     super();
 
     this.client = createPublicClient({
       chain: chain ?? mainnet,
       transport: http(rpcUrl, {
-        retryCount: options?.retryCount ?? 3,
-        retryDelay: options?.retryDelay ?? 1000,
-        batch: options?.batch ?? {
+        batch: {
           batchSize: 1000,
           wait: 50,
         },
-        // onFetchRequest(request) {
-        //   request
-        //     .clone()
-        //     .json()
-        //     .then((body) => {
-        //       if (Array.isArray(body)) {
-        //         console.log(`----->>> Batched ${body.length} requests`);
-        //       } else {
-        //         console.log("----->>> Single request");
-        //       }
-        //     });
-        // },
+        retryCount: 5,
+        retryDelay: 3000,
+        ...(options?.clientConfig ?? {}),
       }),
     });
 
     this.adaptiveFetcher = new AdaptiveRangeFetcher(
       this.client,
-      options?.initialBatchSize ?? 100n,
-      options?.minBatchSize ?? 10n,
-      options?.maxBatchSize ?? 1000n,
+      options?.dynamicBatching?.initialBatchSize,
+      options?.dynamicBatching?.minBatchSize,
+      options?.dynamicBatching?.maxBatchSize,
     );
   }
 

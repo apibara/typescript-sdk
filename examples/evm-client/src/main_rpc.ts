@@ -45,11 +45,22 @@ const command = defineCommand({
     const chain = (args.network === "mainnet" ? mainnet : sepolia) as Chain;
 
     const client = createEvmRpcClient(args.rpcUrl, chain, {
-      initialBatchSize: 100n,
-      minBatchSize: 10n,
-      maxBatchSize: 1000n,
-      retryCount: 3,
-      retryDelay: 1000,
+      clientConfig: {
+        retryDelay: 10000,
+        onFetchRequest(request) {
+          request
+            .clone()
+            .json()
+            .then((body) => {
+              if (Array.isArray(body)) {
+                consola.debug(`----->>> Batched ${body.length} requests`);
+              } else {
+                consola.debug("----->>> Single request");
+              }
+              // console.dir(body, { depth: null });
+            });
+        },
+      },
     });
 
     try {
@@ -100,7 +111,7 @@ const command = defineCommand({
                 consola.info("   Logs:", logs.length);
 
                 for (const log of logs) {
-                  consola.info("   🔔 Transfer Event");
+                  consola.info("   🔔 Log");
                   consola.info("      Tx:", log.transactionHash);
                   consola.info("      Address:", log.address);
                   consola.info("      Topics:", log.topics.join(", "));

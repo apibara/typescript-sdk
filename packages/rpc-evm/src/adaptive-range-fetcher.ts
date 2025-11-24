@@ -26,7 +26,7 @@ export class AdaptiveRangeFetcher {
 
   constructor(
     client: PublicClient,
-    initialBatchSize = 100n,
+    initialBatchSize = 10n,
     minBatchSize = 1n,
     maxBatchSize = 1000n,
   ) {

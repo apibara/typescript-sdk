@@ -1,6 +1,6 @@
 import { RpcClient } from "@apibara/protocol/rpc";
 import type { Chain } from "viem";
-import { EvmRpcStreamConfig } from "./config";
+import { EvmRpcStreamConfig, type EvmRpcStreamConfigOptions } from "./config";
 
 export * from "./block";
 export * from "./filter";
@@ -11,14 +11,7 @@ export * from "./adaptive-range-fetcher";
 export function createEvmRpcClient(
   rpcUrl: string,
   chain?: Chain,
-  options?: {
-    retryCount?: number;
-    retryDelay?: number;
-    batch?: boolean;
-    initialBatchSize?: bigint;
-    minBatchSize?: bigint;
-    maxBatchSize?: bigint;
-  },
+  options?: EvmRpcStreamConfigOptions,
 ) {
   const config = new EvmRpcStreamConfig(rpcUrl, chain, options);
   return new RpcClient(config);
