@@ -1,22 +1,15 @@
 import type { Cursor } from "@apibara/protocol";
-import type { FinalizedRangeResult } from "@apibara/protocol/rpc";
+import type {
+  FetchBlockResult,
+  FinalizedRangeResult,
+} from "@apibara/protocol/rpc";
 import type { PublicClient } from "viem";
 import type { EvmRpcBlock } from "./block";
 import type { EvmRpcFilter } from "./filter";
 import { fetchLogsForRange } from "./log-fetcher";
 import { viemBlockHeaderToDna } from "./transform";
 
-const BLOCK_RANGE_ERROR_PATTERNS = [
-  "invalid block range params",
-  "block range",
-  "query returned more than",
-  "exceeds max",
-  "too many results",
-  "response size exceeded",
-  "log response size exceeded",
-  "result window",
-  "limit exceeded",
-] as const;
+const BLOCK_RANGE_ERROR_PATTERNS = ["invalid block range params"] as const;
 
 export class AdaptiveRangeFetcher {
   private currentBatchSize: bigint;
@@ -39,7 +32,7 @@ export class AdaptiveRangeFetcher {
   async fetchRange(
     startBlock: bigint,
     endBlock: bigint,
-    filters: EvmRpcFilter[],
+    filter: EvmRpcFilter,
   ): Promise<FinalizedRangeResult<EvmRpcBlock>> {
     const rangeEnd =
       startBlock + this.currentBatchSize - 1n < endBlock
@@ -51,57 +44,88 @@ export class AdaptiveRangeFetcher {
         this.client,
         startBlock,
         rangeEnd,
-        filters,
+        filter,
       );
 
       const newSize = this.currentBatchSize * 2n;
       this.currentBatchSize =
         newSize > this.maxBatchSize ? this.maxBatchSize : newSize;
 
-      const blockPromises = [];
+      const blockPromises: Promise<FetchBlockResult<EvmRpcBlock>>[] = [];
+
       for (let bn = startBlock; bn <= rangeEnd; bn++) {
-        blockPromises.push(
-          this.client
-            .getBlock({
-              blockNumber: bn,
-              includeTransactions: false,
-            })
-            .then((viemBlock) => ({
-              blockNumber: bn,
-              logs: logsByBlock[Number(bn)] || [],
-              viemBlock,
-            })),
-        );
+        const logs = logsByBlock[Number(bn)] || [];
+        const shouldFetchHeader = filter.header === "always" || logs.length > 0;
+
+        if (shouldFetchHeader) {
+          blockPromises.push(
+            this.client
+              .getBlock({
+                blockNumber: bn,
+                includeTransactions: false,
+              })
+              .then((viemBlock) => {
+                const header = viemBlockHeaderToDna(viemBlock);
+
+                const cursor: Cursor | undefined =
+                  bn === 0n
+                    ? undefined
+                    : {
+                        orderKey: bn - 1n,
+                        uniqueKey: header.parentBlockHash,
+                      };
+
+                const endCursor: Cursor = {
+                  orderKey: bn,
+                  uniqueKey: header.blockHash,
+                };
+
+                return {
+                  cursor,
+                  endCursor,
+                  block: {
+                    header,
+                    logs,
+                  },
+                };
+              }),
+          );
+        } else {
+          // no header needed and no logs either, return null block
+          const cursor: Cursor | undefined =
+            bn === 0n
+              ? undefined
+              : {
+                  orderKey: bn - 1n,
+                  uniqueKey: undefined,
+                };
+
+          const endCursor: Cursor = {
+            orderKey: bn,
+            uniqueKey: undefined,
+          };
+
+          blockPromises.push(
+            Promise.resolve({
+              cursor,
+              endCursor,
+              block: null,
+            }),
+          );
+        }
       }
 
-      const blockResults = await Promise.all(blockPromises);
-      const blocks = blockResults.map(({ viemBlock, logs }) => ({
-        header: viemBlockHeaderToDna(viemBlock),
-        logs,
-      }));
+      const blocks = await Promise.all(blockPromises);
 
-      // TODO: check
-      const startCursor: Cursor =
-        blocks.length > 0 && startBlock > 0n
-          ? {
-              orderKey: blocks[0].header.blockNumber,
-              uniqueKey: blocks[0].header.blockHash,
-            }
-          : { orderKey: -1n };
+      const firstCursor = blocks.length > 0 ? blocks[0].endCursor : null;
 
-      // TODO: check
-      const endCursor: Cursor =
-        blocks.length > 0
-          ? {
-              orderKey: blocks[blocks.length - 1].header.blockNumber,
-              uniqueKey: blocks[blocks.length - 1].header.blockHash,
-            }
-          : { orderKey: -1n };
+      const lastCursor =
+        blocks.length > 0 ? blocks[blocks.length - 1].endCursor : null;
 
       return {
         blocks,
-        startCursor,
-        endCursor,
+        firstCursor,
+        lastCursor,
       };
     } catch (error) {
       const errorMessage =
@@ -118,7 +142,7 @@ export class AdaptiveRangeFetcher {
         this.currentBatchSize =
           newSize < this.minBatchSize ? this.minBatchSize : newSize;
 
-        return this.fetchRange(startBlock, endBlock, filters);
+        return this.fetchRange(startBlock, endBlock, filter);
       }
 
       throw error;

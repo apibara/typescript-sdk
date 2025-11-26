@@ -1,6 +1,7 @@
 import type { Bytes, Cursor } from "@apibara/protocol";
 import {
   type BlockInfo,
+  type FetchBlockResult,
   type FinalizedRangeResult,
   RpcStreamConfig,
 } from "@apibara/protocol/rpc";
@@ -103,29 +104,73 @@ export class EvmRpcStreamConfig extends RpcStreamConfig<
   async fetchFinalizedRange(
     startBlock: bigint,
     endBlock: bigint,
-    filters: EvmRpcFilter[],
+    filter: EvmRpcFilter,
   ): Promise<FinalizedRangeResult<EvmRpcBlock>> {
-    return await this.adaptiveFetcher.fetchRange(startBlock, endBlock, filters);
+    return await this.adaptiveFetcher.fetchRange(startBlock, endBlock, filter);
   }
 
   async fetchBlock(
     blockNumber: bigint,
-    filters: EvmRpcFilter[],
-  ): Promise<EvmRpcBlock | null> {
-    const viemBlock = await this.client.getBlock({
-      blockNumber,
-      includeTransactions: false,
-    });
+    filter: EvmRpcFilter,
+  ): Promise<FetchBlockResult<EvmRpcBlock>> {
+    const logs = await fetchLogsForBlock(this.client, blockNumber, filter);
 
-    if (!viemBlock.number || !viemBlock.hash) {
-      return null;
+    const shouldFetchHeader = filter.header === "always" || logs.length > 0;
+
+    let block: EvmRpcBlock | null = null;
+    let cursor: Cursor | undefined;
+    let endCursor: Cursor;
+
+    if (shouldFetchHeader) {
+      const viemBlock = await this.client.getBlock({
+        blockNumber,
+        includeTransactions: false,
+      });
+
+      if (!viemBlock.number || !viemBlock.hash) {
+        throw new Error(`Block ${blockNumber} not found`);
+      }
+
+      const header = viemBlockHeaderToDna(viemBlock);
+
+      cursor =
+        blockNumber === 0n
+          ? undefined
+          : {
+              orderKey: blockNumber - 1n,
+              uniqueKey: header.parentBlockHash,
+            };
+
+      endCursor = {
+        orderKey: blockNumber,
+        uniqueKey: header.blockHash,
+      };
+
+      block = {
+        header,
+        logs,
+      };
+    } else {
+      cursor =
+        blockNumber === 0n
+          ? undefined
+          : {
+              orderKey: blockNumber - 1n,
+              uniqueKey: undefined,
+            };
+
+      endCursor = {
+        orderKey: blockNumber,
+        uniqueKey: undefined,
+      };
+
+      block = null;
     }
 
-    const logs = await fetchLogsForBlock(this.client, blockNumber, filters);
-
     return {
-      header: viemBlockHeaderToDna(viemBlock),
-      logs,
+      cursor,
+      endCursor,
+      block,
     };
   }
 

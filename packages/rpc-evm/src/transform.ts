@@ -32,19 +32,16 @@ export function viemBlockHeaderToDna(viemBlock: ViemBlock): DnaBlockHeader {
     );
   }
 
-  // TODO: check
-  const emptyBloom = "0x0" as const;
-
   return {
     blockNumber: viemBlock.number,
     blockHash: viemBlock.hash,
     parentBlockHash: viemBlock.parentHash,
     unclesHash: viemBlock.sha3Uncles,
-    miner: viemBlock.miner ?? "0x0000000000000000000000000000000000000000",
+    miner: viemBlock.miner ?? undefined,
     stateRoot: viemBlock.stateRoot,
     transactionsRoot: viemBlock.transactionsRoot,
     receiptsRoot: viemBlock.receiptsRoot,
-    logsBloom: viemBlock.logsBloom ?? emptyBloom,
+    logsBloom: viemBlock.logsBloom ?? undefined,
     difficulty: viemBlock.difficulty,
     gasLimit: viemBlock.gasLimit,
     gasUsed: viemBlock.gasUsed,

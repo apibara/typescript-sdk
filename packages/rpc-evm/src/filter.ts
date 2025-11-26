@@ -1,6 +1,7 @@
-import type { LogFilter as DnaLogFilter } from "@apibara/evm";
+import type { LogFilter as DnaLogFilter, HeaderFilter } from "@apibara/evm";
 
 export type EvmRpcFilter = {
+  header?: HeaderFilter;
   logs?: LogFilter[];
 };
 
