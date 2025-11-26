@@ -1,5 +1,9 @@
 import type { Bytes, Cursor } from "../common";
-import type { BlockInfo, FinalizedRangeResult } from "./types";
+import type {
+  BlockInfo,
+  FetchBlockResult,
+  FinalizedRangeResult,
+} from "./types";
 
 export abstract class RpcStreamConfig<TFilter, TBlock> {
   abstract validateFilter(filter: TFilter): void;
@@ -11,13 +15,13 @@ export abstract class RpcStreamConfig<TFilter, TBlock> {
   abstract fetchFinalizedRange(
     startBlock: bigint,
     endBlock: bigint,
-    filter: TFilter[],
+    filter: TFilter,
   ): Promise<FinalizedRangeResult<TBlock>>;
 
   abstract fetchBlock(
     blockNumber: bigint,
-    filter: TFilter[],
-  ): Promise<TBlock | null>;
+    filter: TFilter,
+  ): Promise<FetchBlockResult<TBlock>>;
 
   abstract verifyBlock(blockNumber: bigint, blockHash: Bytes): Promise<boolean>;
 }

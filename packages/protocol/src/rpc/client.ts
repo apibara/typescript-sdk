@@ -3,7 +3,7 @@ import type { Cursor } from "../common";
 import type { StatusRequest, StatusResponse } from "../status";
 import type { StreamDataRequest, StreamDataResponse } from "../stream";
 import type { RpcStreamConfig } from "./config";
-import { StreamLoop } from "./loop";
+import { RpcDataStream } from "./data-stream";
 
 export class RpcClient<TFilter, TBlock> implements Client<TFilter, TBlock> {
   constructor(private config: RpcStreamConfig<TFilter, TBlock>) {}
@@ -35,7 +35,7 @@ export class RpcClient<TFilter, TBlock> implements Client<TFilter, TBlock> {
       this.config.validateFilter(filter);
     }
 
-    return new StreamLoop(this.config, request, options);
+    return new RpcDataStream(this.config, request, options);
   }
 }
 

@@ -1,4 +1,4 @@
 export * from "./types";
 export * from "./config";
 export * from "./client";
-export * from "./loop";
+export * from "./data-stream";

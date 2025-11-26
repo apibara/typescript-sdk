@@ -14,7 +14,7 @@ const DEFAULT_REFRESH_INTERVAL_MS = 5_000;
 const DEFAULT_POLL_INTERVAL_MS = 1_000;
 const DEFAULT_ERROR_RETRY_MS = 5_000;
 
-export class StreamLoop<TFilter, TBlock> {
+export class RpcDataStream<TFilter, TBlock> {
   private state: LoopState | null = null;
   private request: StreamDataRequest<TFilter>;
   private config: RpcStreamConfig<TFilter, TBlock>;
@@ -140,7 +140,14 @@ export class StreamLoop<TFilter, TBlock> {
 
         switch (result.type) {
           case "block_data": {
-            const { blockInfo, blockData, newHead, newFinalized } = result;
+            const {
+              blockInfo,
+              blockData,
+              cursor,
+              endCursor,
+              newHead,
+              newFinalized,
+            } = result;
 
             if (newHead) {
               state.headCursor = newHead;
@@ -148,6 +155,19 @@ export class StreamLoop<TFilter, TBlock> {
 
             if (newFinalized) {
               state.finalizedCursor = newFinalized;
+            }
+
+            const hasData = blockData.some((block) => block !== null);
+
+            if (!hasData) {
+              // No data for this block, just update cursor and continue
+              state.cursor = endCursor;
+              state.canonicalChain.set(blockInfo.blockHash, blockInfo);
+              state.blockNumberToHash.set(
+                blockInfo.blockNumber,
+                blockInfo.blockHash,
+              );
+              break;
             }
 
             const parentInChain = state.canonicalChain.get(
@@ -183,23 +203,18 @@ export class StreamLoop<TFilter, TBlock> {
               blockInfo.blockHash,
             );
 
-            const previousCursor = state.cursor;
-
-            state.cursor = {
-              orderKey: blockInfo.blockNumber,
-              uniqueKey: blockInfo.blockHash,
-            };
+            state.cursor = endCursor;
 
             const finality = this.determineFinality(blockInfo.blockNumber);
 
             yield {
               _tag: "data",
               data: {
-                cursor: previousCursor,
-                endCursor: state.cursor,
+                cursor,
+                endCursor,
                 finality,
                 production: "live",
-                data: [blockData],
+                data: blockData,
               },
             };
 
@@ -260,23 +275,33 @@ export class StreamLoop<TFilter, TBlock> {
   private async computeNextBlock(signal: AbortSignal): Promise<{
     type: "block_data";
     blockInfo: BlockInfo;
-    blockData: TBlock | null;
+    blockData: (TBlock | null)[];
+    cursor: Cursor | undefined;
+    endCursor: Cursor;
     newHead: Cursor | null;
     newFinalized: Cursor | null;
   }> {
     const state = this.ensureState();
+
     const nextBlockNumber = state.cursor.orderKey + 1n;
+
     const requestedFinality = this.request.finality || "accepted";
+
     let newHead: Cursor | null = null;
+
     let newFinalized: Cursor | null = null;
 
     if (requestedFinality === "finalized") {
       // wait for finalized block
       while (nextBlockNumber > state.finalizedCursor.orderKey) {
         if (signal.aborted) throw new Error("AbortError");
+
         await this.sleep(DEFAULT_POLL_INTERVAL_MS);
+
         newFinalized = await this.config.getCursor("finalized");
+
         if (signal.aborted) throw new Error("AbortError");
+
         if (newFinalized.orderKey >= nextBlockNumber) {
           break;
         }
@@ -285,9 +310,13 @@ export class StreamLoop<TFilter, TBlock> {
       // wait for head block
       while (nextBlockNumber > state.headCursor.orderKey) {
         if (signal.aborted) throw new Error("AbortError");
+
         await this.sleep(DEFAULT_POLL_INTERVAL_MS);
+
         if (signal.aborted) throw new Error("AbortError");
+
         newHead = await this.config.getCursor("head");
+
         if (newHead.orderKey >= nextBlockNumber) {
           break;
         }
@@ -296,17 +325,27 @@ export class StreamLoop<TFilter, TBlock> {
 
     if (signal.aborted) throw new Error("AbortError");
 
-    const [blockInfo, blockData] = await Promise.all([
+    const [blockInfo, fetchResults] = await Promise.all([
       this.config.getBlockInfo(nextBlockNumber),
-      this.config.fetchBlock(nextBlockNumber, this.request.filter),
+      Promise.all(
+        this.request.filter.map((filter) =>
+          this.config.fetchBlock(nextBlockNumber, filter),
+        ),
+      ),
     ]);
 
     if (signal.aborted) throw new Error("AbortError");
+
+    // all filters should return the same cursor, endCursor since they are for the same block
+    const { cursor, endCursor } = fetchResults[0];
+    const blockData = fetchResults.map((result) => result.block);
 
     return {
       type: "block_data",
       blockInfo,
       blockData,
+      cursor,
+      endCursor,
       newHead,
       newFinalized,
     };
@@ -316,8 +355,11 @@ export class StreamLoop<TFilter, TBlock> {
     signal: AbortSignal,
   ): Promise<{ type: "heartbeat" }> {
     const now = Date.now();
+
     const state = this.ensureState();
+
     const elapsed = now - state.lastHeartbeat;
+
     const remaining = this.heartbeatIntervalMs - elapsed;
 
     if (remaining > 0) {
@@ -366,9 +408,19 @@ export class StreamLoop<TFilter, TBlock> {
     const state = this.ensureState();
     const chainMap: CanonicalChain = new Map();
 
+    const blockInfoPromises: Promise<BlockInfo>[] = [];
     for (let blockNum = startBlock; blockNum <= endBlock; blockNum++) {
       if (signal.aborted) throw new Error("AbortError");
-      const blockInfo = await this.config.getBlockInfo(blockNum);
+      blockInfoPromises.push(this.config.getBlockInfo(blockNum));
+    }
+
+    if (signal.aborted) throw new Error("AbortError");
+
+    const blockInfos = await Promise.all(blockInfoPromises);
+
+    if (signal.aborted) throw new Error("AbortError");
+
+    for (const blockInfo of blockInfos) {
       chainMap.set(blockInfo.blockHash, blockInfo);
       state.blockNumberToHash.set(blockInfo.blockNumber, blockInfo.blockHash);
     }
@@ -457,29 +509,98 @@ export class StreamLoop<TFilter, TBlock> {
       const endBlock = target;
 
       try {
-        const result = await this.config.fetchFinalizedRange(
-          startBlock,
-          endBlock,
-          this.request.filter,
+        const results = await Promise.all(
+          this.request.filter.map((filter) =>
+            this.config.fetchFinalizedRange(startBlock, endBlock, filter),
+          ),
         );
 
-        const dataMsg: Data<TBlock> = {
-          cursor: result.startCursor,
-          endCursor: result.endCursor,
-          finality: "finalized",
-          production: reason === "backfill" ? "backfill" : "live",
-          data: result.blocks,
-        };
+        // if any filter has no lastCursor, we cannot go ahead
+        if (results.some((result) => !result.lastCursor)) {
+          continue;
+        }
 
-        yield {
-          _tag: "data",
-          data: dataMsg,
-        };
+        // find the minimum lastCursor across all filters
+        // we only yield blocks for which ALL filters have processed
+        const minLastCursor = results.reduce(
+          (min, result) =>
+            result.lastCursor!.orderKey < min.orderKey
+              ? result.lastCursor!
+              : min,
+          results[0].lastCursor!,
+        );
 
-        state.cursor = result.endCursor;
-        state.lastHeartbeat = Date.now();
+        const blockMap = new Map<
+          string,
+          {
+            cursor: Cursor | undefined;
+            endCursor: Cursor;
+            blocks: (TBlock | null)[];
+          }
+        >();
 
-        // returned fewer blocks than requested. Continue fetching.
+        for (let filterIdx = 0; filterIdx < results.length; filterIdx++) {
+          const result = results[filterIdx];
+
+          for (const blockWithCursor of result.blocks) {
+            const { cursor, endCursor, block } = blockWithCursor;
+
+            // only include blocks up to the minimum lastCursor
+            if (endCursor.orderKey > minLastCursor.orderKey) {
+              continue;
+            }
+
+            const key = `${endCursor.orderKey}-${endCursor.uniqueKey || ""}`;
+
+            if (!blockMap.has(key)) {
+              blockMap.set(key, {
+                cursor,
+                endCursor,
+                blocks: new Array(this.request.filter.length).fill(null),
+              });
+            }
+
+            const entry = blockMap.get(key)!;
+
+            entry.blocks[filterIdx] = block;
+          }
+        }
+
+        const sortedEntries = Array.from(blockMap.entries()).sort(
+          ([, a], [, b]) => Number(a.endCursor.orderKey - b.endCursor.orderKey),
+        );
+
+        let lastEmittedCursor: Cursor | null = null;
+
+        for (const [, { cursor, endCursor, blocks }] of sortedEntries) {
+          const hasData = blocks.some((block) => block !== null);
+          if (!hasData) continue;
+
+          const dataMsg: Data<TBlock> = {
+            cursor,
+            endCursor,
+            finality: "finalized",
+            production: reason === "backfill" ? "backfill" : "live",
+            data: blocks,
+          };
+
+          yield {
+            _tag: "data",
+            data: dataMsg,
+          };
+
+          state.cursor = endCursor;
+          lastEmittedCursor = endCursor;
+          state.lastHeartbeat = Date.now();
+        }
+
+        // If no data was emitted, move cursor forward to avoid infinite loop
+        // Use the minimum lastCursor to ensure consistency across filters
+        if (lastEmittedCursor === null && minLastCursor) {
+          state.cursor = minLastCursor;
+        }
+
+        // continue fetching if we haven't reached the target
         if (state.cursor.orderKey < target) {
           continue;
         }

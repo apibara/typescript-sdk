@@ -18,7 +18,13 @@ export type LoopState = {
 };
 
 export type FinalizedRangeResult<TBlock> = {
-  blocks: (TBlock | null)[];
-  startCursor: Cursor;
+  blocks: FetchBlockResult<TBlock>[];
+  firstCursor: Cursor | null;
+  lastCursor: Cursor | null;
+};
+
+export type FetchBlockResult<TBlock> = {
+  cursor: Cursor | undefined;
   endCursor: Cursor;
+  block: TBlock | null;
 };
