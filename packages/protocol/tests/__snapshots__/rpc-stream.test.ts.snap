@@ -1,0 +1,1188 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`RpcClient > backfill phase > backfills from block 0 to finalized 1`] = `
+[
+  {
+    "_tag": "data",
+    "data": {
+      "cursor": undefined,
+      "data": [
+        {
+          "blockHash": "0xblock0",
+          "blockNumber": 0n,
+          "data": "block 0 data",
+        },
+      ],
+      "endCursor": {
+        "orderKey": 0n,
+        "uniqueKey": "0xblock0",
+      },
+      "finality": "finalized",
+      "production": "backfill",
+    },
+  },
+  {
+    "_tag": "data",
+    "data": {
+      "cursor": {
+        "orderKey": 0n,
+        "uniqueKey": "0xblock0",
+      },
+      "data": [
+        {
+          "blockHash": "0xblock1",
+          "blockNumber": 1n,
+          "data": "block 1 data",
+        },
+      ],
+      "endCursor": {
+        "orderKey": 1n,
+        "uniqueKey": "0xblock1",
+      },
+      "finality": "finalized",
+      "production": "backfill",
+    },
+  },
+  {
+    "_tag": "data",
+    "data": {
+      "cursor": {
+        "orderKey": 1n,
+        "uniqueKey": "0xblock1",
+      },
+      "data": [
+        {
+          "blockHash": "0xblock2",
+          "blockNumber": 2n,
+          "data": "block 2 data",
+        },
+      ],
+      "endCursor": {
+        "orderKey": 2n,
+        "uniqueKey": "0xblock2",
+      },
+      "finality": "finalized",
+      "production": "backfill",
+    },
+  },
+  {
+    "_tag": "data",
+    "data": {
+      "cursor": {
+        "orderKey": 2n,
+        "uniqueKey": "0xblock2",
+      },
+      "data": [
+        {
+          "blockHash": "0xblock3",
+          "blockNumber": 3n,
+          "data": "block 3 data",
+        },
+      ],
+      "endCursor": {
+        "orderKey": 3n,
+        "uniqueKey": "0xblock3",
+      },
+      "finality": "finalized",
+      "production": "backfill",
+    },
+  },
+  {
+    "_tag": "data",
+    "data": {
+      "cursor": {
+        "orderKey": 3n,
+        "uniqueKey": "0xblock3",
+      },
+      "data": [
+        {
+          "blockHash": "0xblock4",
+          "blockNumber": 4n,
+          "data": "block 4 data",
+        },
+      ],
+      "endCursor": {
+        "orderKey": 4n,
+        "uniqueKey": "0xblock4",
+      },
+      "finality": "finalized",
+      "production": "backfill",
+    },
+  },
+  {
+    "_tag": "data",
+    "data": {
+      "cursor": {
+        "orderKey": 4n,
+        "uniqueKey": "0xblock4",
+      },
+      "data": [
+        {
+          "blockHash": "0xblock5",
+          "blockNumber": 5n,
+          "data": "block 5 data",
+        },
+      ],
+      "endCursor": {
+        "orderKey": 5n,
+        "uniqueKey": "0xblock5",
+      },
+      "finality": "finalized",
+      "production": "backfill",
+    },
+  },
+  {
+    "_tag": "data",
+    "data": {
+      "cursor": {
+        "orderKey": 5n,
+        "uniqueKey": "0xblock5",
+      },
+      "data": [
+        {
+          "blockHash": "0xblock6",
+          "blockNumber": 6n,
+          "data": "block 6 data",
+        },
+      ],
+      "endCursor": {
+        "orderKey": 6n,
+        "uniqueKey": "0xblock6",
+      },
+      "finality": "finalized",
+      "production": "backfill",
+    },
+  },
+  {
+    "_tag": "data",
+    "data": {
+      "cursor": {
+        "orderKey": 6n,
+        "uniqueKey": "0xblock6",
+      },
+      "data": [
+        {
+          "blockHash": "0xblock7",
+          "blockNumber": 7n,
+          "data": "block 7 data",
+        },
+      ],
+      "endCursor": {
+        "orderKey": 7n,
+        "uniqueKey": "0xblock7",
+      },
+      "finality": "finalized",
+      "production": "backfill",
+    },
+  },
+  {
+    "_tag": "data",
+    "data": {
+      "cursor": {
+        "orderKey": 7n,
+        "uniqueKey": "0xblock7",
+      },
+      "data": [
+        {
+          "blockHash": "0xblock8",
+          "blockNumber": 8n,
+          "data": "block 8 data",
+        },
+      ],
+      "endCursor": {
+        "orderKey": 8n,
+        "uniqueKey": "0xblock8",
+      },
+      "finality": "finalized",
+      "production": "backfill",
+    },
+  },
+  {
+    "_tag": "data",
+    "data": {
+      "cursor": {
+        "orderKey": 8n,
+        "uniqueKey": "0xblock8",
+      },
+      "data": [
+        {
+          "blockHash": "0xblock9",
+          "blockNumber": 9n,
+          "data": "block 9 data",
+        },
+      ],
+      "endCursor": {
+        "orderKey": 9n,
+        "uniqueKey": "0xblock9",
+      },
+      "finality": "finalized",
+      "production": "backfill",
+    },
+  },
+  {
+    "_tag": "data",
+    "data": {
+      "cursor": {
+        "orderKey": 9n,
+        "uniqueKey": "0xblock9",
+      },
+      "data": [
+        {
+          "blockHash": "0xblock10",
+          "blockNumber": 10n,
+          "data": "block 10 data",
+        },
+      ],
+      "endCursor": {
+        "orderKey": 10n,
+        "uniqueKey": "0xblock10",
+      },
+      "finality": "finalized",
+      "production": "backfill",
+    },
+  },
+  {
+    "_tag": "data",
+    "data": {
+      "cursor": {
+        "orderKey": 10n,
+        "uniqueKey": "0xblock10",
+      },
+      "data": [
+        {
+          "blockHash": "0xblock11",
+          "blockNumber": 11n,
+          "data": "block 11 data",
+        },
+      ],
+      "endCursor": {
+        "orderKey": 11n,
+        "uniqueKey": "0xblock11",
+      },
+      "finality": "finalized",
+      "production": "backfill",
+    },
+  },
+  {
+    "_tag": "data",
+    "data": {
+      "cursor": {
+        "orderKey": 11n,
+        "uniqueKey": "0xblock11",
+      },
+      "data": [
+        {
+          "blockHash": "0xblock12",
+          "blockNumber": 12n,
+          "data": "block 12 data",
+        },
+      ],
+      "endCursor": {
+        "orderKey": 12n,
+        "uniqueKey": "0xblock12",
+      },
+      "finality": "finalized",
+      "production": "backfill",
+    },
+  },
+  {
+    "_tag": "data",
+    "data": {
+      "cursor": {
+        "orderKey": 12n,
+        "uniqueKey": "0xblock12",
+      },
+      "data": [
+        {
+          "blockHash": "0xblock13",
+          "blockNumber": 13n,
+          "data": "block 13 data",
+        },
+      ],
+      "endCursor": {
+        "orderKey": 13n,
+        "uniqueKey": "0xblock13",
+      },
+      "finality": "finalized",
+      "production": "backfill",
+    },
+  },
+  {
+    "_tag": "data",
+    "data": {
+      "cursor": {
+        "orderKey": 13n,
+        "uniqueKey": "0xblock13",
+      },
+      "data": [
+        {
+          "blockHash": "0xblock14",
+          "blockNumber": 14n,
+          "data": "block 14 data",
+        },
+      ],
+      "endCursor": {
+        "orderKey": 14n,
+        "uniqueKey": "0xblock14",
+      },
+      "finality": "finalized",
+      "production": "backfill",
+    },
+  },
+  {
+    "_tag": "data",
+    "data": {
+      "cursor": {
+        "orderKey": 14n,
+        "uniqueKey": "0xblock14",
+      },
+      "data": [
+        {
+          "blockHash": "0xblock15",
+          "blockNumber": 15n,
+          "data": "block 15 data",
+        },
+      ],
+      "endCursor": {
+        "orderKey": 15n,
+        "uniqueKey": "0xblock15",
+      },
+      "finality": "finalized",
+      "production": "backfill",
+    },
+  },
+  {
+    "_tag": "data",
+    "data": {
+      "cursor": {
+        "orderKey": 15n,
+        "uniqueKey": "0xblock15",
+      },
+      "data": [
+        {
+          "blockHash": "0xblock16",
+          "blockNumber": 16n,
+          "data": "block 16 data",
+        },
+      ],
+      "endCursor": {
+        "orderKey": 16n,
+        "uniqueKey": "0xblock16",
+      },
+      "finality": "finalized",
+      "production": "backfill",
+    },
+  },
+  {
+    "_tag": "data",
+    "data": {
+      "cursor": {
+        "orderKey": 16n,
+        "uniqueKey": "0xblock16",
+      },
+      "data": [
+        {
+          "blockHash": "0xblock17",
+          "blockNumber": 17n,
+          "data": "block 17 data",
+        },
+      ],
+      "endCursor": {
+        "orderKey": 17n,
+        "uniqueKey": "0xblock17",
+      },
+      "finality": "finalized",
+      "production": "backfill",
+    },
+  },
+  {
+    "_tag": "data",
+    "data": {
+      "cursor": {
+        "orderKey": 17n,
+        "uniqueKey": "0xblock17",
+      },
+      "data": [
+        {
+          "blockHash": "0xblock18",
+          "blockNumber": 18n,
+          "data": "block 18 data",
+        },
+      ],
+      "endCursor": {
+        "orderKey": 18n,
+        "uniqueKey": "0xblock18",
+      },
+      "finality": "finalized",
+      "production": "backfill",
+    },
+  },
+  {
+    "_tag": "data",
+    "data": {
+      "cursor": {
+        "orderKey": 18n,
+        "uniqueKey": "0xblock18",
+      },
+      "data": [
+        {
+          "blockHash": "0xblock19",
+          "blockNumber": 19n,
+          "data": "block 19 data",
+        },
+      ],
+      "endCursor": {
+        "orderKey": 19n,
+        "uniqueKey": "0xblock19",
+      },
+      "finality": "finalized",
+      "production": "backfill",
+    },
+  },
+  {
+    "_tag": "data",
+    "data": {
+      "cursor": {
+        "orderKey": 19n,
+        "uniqueKey": "0xblock19",
+      },
+      "data": [
+        {
+          "blockHash": "0xblock20",
+          "blockNumber": 20n,
+          "data": "block 20 data",
+        },
+      ],
+      "endCursor": {
+        "orderKey": 20n,
+        "uniqueKey": "0xblock20",
+      },
+      "finality": "finalized",
+      "production": "backfill",
+    },
+  },
+  {
+    "_tag": "data",
+    "data": {
+      "cursor": {
+        "orderKey": 20n,
+        "uniqueKey": "0xblock20",
+      },
+      "data": [
+        {
+          "blockHash": "0xblock21",
+          "blockNumber": 21n,
+          "data": "block 21 data",
+        },
+      ],
+      "endCursor": {
+        "orderKey": 21n,
+        "uniqueKey": "0xblock21",
+      },
+      "finality": "finalized",
+      "production": "backfill",
+    },
+  },
+  {
+    "_tag": "data",
+    "data": {
+      "cursor": {
+        "orderKey": 21n,
+        "uniqueKey": "0xblock21",
+      },
+      "data": [
+        {
+          "blockHash": "0xblock22",
+          "blockNumber": 22n,
+          "data": "block 22 data",
+        },
+      ],
+      "endCursor": {
+        "orderKey": 22n,
+        "uniqueKey": "0xblock22",
+      },
+      "finality": "finalized",
+      "production": "backfill",
+    },
+  },
+  {
+    "_tag": "data",
+    "data": {
+      "cursor": {
+        "orderKey": 22n,
+        "uniqueKey": "0xblock22",
+      },
+      "data": [
+        {
+          "blockHash": "0xblock23",
+          "blockNumber": 23n,
+          "data": "block 23 data",
+        },
+      ],
+      "endCursor": {
+        "orderKey": 23n,
+        "uniqueKey": "0xblock23",
+      },
+      "finality": "finalized",
+      "production": "backfill",
+    },
+  },
+  {
+    "_tag": "data",
+    "data": {
+      "cursor": {
+        "orderKey": 23n,
+        "uniqueKey": "0xblock23",
+      },
+      "data": [
+        {
+          "blockHash": "0xblock24",
+          "blockNumber": 24n,
+          "data": "block 24 data",
+        },
+      ],
+      "endCursor": {
+        "orderKey": 24n,
+        "uniqueKey": "0xblock24",
+      },
+      "finality": "finalized",
+      "production": "backfill",
+    },
+  },
+  {
+    "_tag": "data",
+    "data": {
+      "cursor": {
+        "orderKey": 24n,
+        "uniqueKey": "0xblock24",
+      },
+      "data": [
+        {
+          "blockHash": "0xblock25",
+          "blockNumber": 25n,
+          "data": "block 25 data",
+        },
+      ],
+      "endCursor": {
+        "orderKey": 25n,
+        "uniqueKey": "0xblock25",
+      },
+      "finality": "finalized",
+      "production": "backfill",
+    },
+  },
+]
+`;
+
+exports[`RpcClient > live streaming > streams accepted blocks 1`] = `
+[
+  {
+    "_tag": "data",
+    "data": {
+      "cursor": {
+        "orderKey": 4n,
+        "uniqueKey": "0xblock4",
+      },
+      "data": [
+        {
+          "blockHash": "0xblock5",
+          "blockNumber": 5n,
+          "data": "block 5 data",
+        },
+      ],
+      "endCursor": {
+        "orderKey": 5n,
+        "uniqueKey": "0xblock5",
+      },
+      "finality": "finalized",
+      "production": "backfill",
+    },
+  },
+  {
+    "_tag": "data",
+    "data": {
+      "cursor": {
+        "orderKey": 5n,
+        "uniqueKey": "0xblock5",
+      },
+      "data": [
+        {
+          "blockHash": "0xblock6",
+          "blockNumber": 6n,
+          "data": "block 6 data",
+        },
+      ],
+      "endCursor": {
+        "orderKey": 6n,
+        "uniqueKey": "0xblock6",
+      },
+      "finality": "accepted",
+      "production": "live",
+    },
+  },
+  {
+    "_tag": "data",
+    "data": {
+      "cursor": {
+        "orderKey": 6n,
+        "uniqueKey": "0xblock6",
+      },
+      "data": [
+        {
+          "blockHash": "0xblock7",
+          "blockNumber": 7n,
+          "data": "block 7 data",
+        },
+      ],
+      "endCursor": {
+        "orderKey": 7n,
+        "uniqueKey": "0xblock7",
+      },
+      "finality": "accepted",
+      "production": "live",
+    },
+  },
+  {
+    "_tag": "data",
+    "data": {
+      "cursor": {
+        "orderKey": 7n,
+        "uniqueKey": "0xblock7",
+      },
+      "data": [
+        {
+          "blockHash": "0xblock8",
+          "blockNumber": 8n,
+          "data": "block 8 data",
+        },
+      ],
+      "endCursor": {
+        "orderKey": 8n,
+        "uniqueKey": "0xblock8",
+      },
+      "finality": "accepted",
+      "production": "live",
+    },
+  },
+  {
+    "_tag": "data",
+    "data": {
+      "cursor": {
+        "orderKey": 8n,
+        "uniqueKey": "0xblock8",
+      },
+      "data": [
+        {
+          "blockHash": "0xblock9",
+          "blockNumber": 9n,
+          "data": "block 9 data",
+        },
+      ],
+      "endCursor": {
+        "orderKey": 9n,
+        "uniqueKey": "0xblock9",
+      },
+      "finality": "accepted",
+      "production": "live",
+    },
+  },
+  {
+    "_tag": "data",
+    "data": {
+      "cursor": {
+        "orderKey": 9n,
+        "uniqueKey": "0xblock9",
+      },
+      "data": [
+        {
+          "blockHash": "0xblock10",
+          "blockNumber": 10n,
+          "data": "block 10 data",
+        },
+      ],
+      "endCursor": {
+        "orderKey": 10n,
+        "uniqueKey": "0xblock10",
+      },
+      "finality": "accepted",
+      "production": "live",
+    },
+  },
+  {
+    "_tag": "data",
+    "data": {
+      "cursor": {
+        "orderKey": 10n,
+        "uniqueKey": "0xblock10",
+      },
+      "data": [
+        {
+          "blockHash": "0xblock11",
+          "blockNumber": 11n,
+          "data": "block 11 data",
+        },
+      ],
+      "endCursor": {
+        "orderKey": 11n,
+        "uniqueKey": "0xblock11",
+      },
+      "finality": "accepted",
+      "production": "live",
+    },
+  },
+  {
+    "_tag": "data",
+    "data": {
+      "cursor": {
+        "orderKey": 11n,
+        "uniqueKey": "0xblock11",
+      },
+      "data": [
+        {
+          "blockHash": "0xblock12",
+          "blockNumber": 12n,
+          "data": "block 12 data",
+        },
+      ],
+      "endCursor": {
+        "orderKey": 12n,
+        "uniqueKey": "0xblock12",
+      },
+      "finality": "accepted",
+      "production": "live",
+    },
+  },
+  {
+    "_tag": "data",
+    "data": {
+      "cursor": {
+        "orderKey": 12n,
+        "uniqueKey": "0xblock12",
+      },
+      "data": [
+        {
+          "blockHash": "0xblock13",
+          "blockNumber": 13n,
+          "data": "block 13 data",
+        },
+      ],
+      "endCursor": {
+        "orderKey": 13n,
+        "uniqueKey": "0xblock13",
+      },
+      "finality": "accepted",
+      "production": "live",
+    },
+  },
+  {
+    "_tag": "data",
+    "data": {
+      "cursor": {
+        "orderKey": 13n,
+        "uniqueKey": "0xblock13",
+      },
+      "data": [
+        {
+          "blockHash": "0xblock14",
+          "blockNumber": 14n,
+          "data": "block 14 data",
+        },
+      ],
+      "endCursor": {
+        "orderKey": 14n,
+        "uniqueKey": "0xblock14",
+      },
+      "finality": "accepted",
+      "production": "live",
+    },
+  },
+  {
+    "_tag": "data",
+    "data": {
+      "cursor": {
+        "orderKey": 14n,
+        "uniqueKey": "0xblock14",
+      },
+      "data": [
+        {
+          "blockHash": "0xblock15",
+          "blockNumber": 15n,
+          "data": "block 15 data",
+        },
+      ],
+      "endCursor": {
+        "orderKey": 15n,
+        "uniqueKey": "0xblock15",
+      },
+      "finality": "accepted",
+      "production": "live",
+    },
+  },
+  {
+    "_tag": "data",
+    "data": {
+      "cursor": {
+        "orderKey": 15n,
+        "uniqueKey": "0xblock15",
+      },
+      "data": [
+        {
+          "blockHash": "0xblock16",
+          "blockNumber": 16n,
+          "data": "block 16 data",
+        },
+      ],
+      "endCursor": {
+        "orderKey": 16n,
+        "uniqueKey": "0xblock16",
+      },
+      "finality": "accepted",
+      "production": "live",
+    },
+  },
+  {
+    "_tag": "data",
+    "data": {
+      "cursor": {
+        "orderKey": 16n,
+        "uniqueKey": "0xblock16",
+      },
+      "data": [
+        {
+          "blockHash": "0xblock17",
+          "blockNumber": 17n,
+          "data": "block 17 data",
+        },
+      ],
+      "endCursor": {
+        "orderKey": 17n,
+        "uniqueKey": "0xblock17",
+      },
+      "finality": "accepted",
+      "production": "live",
+    },
+  },
+  {
+    "_tag": "data",
+    "data": {
+      "cursor": {
+        "orderKey": 17n,
+        "uniqueKey": "0xblock17",
+      },
+      "data": [
+        {
+          "blockHash": "0xblock18",
+          "blockNumber": 18n,
+          "data": "block 18 data",
+        },
+      ],
+      "endCursor": {
+        "orderKey": 18n,
+        "uniqueKey": "0xblock18",
+      },
+      "finality": "accepted",
+      "production": "live",
+    },
+  },
+  {
+    "_tag": "data",
+    "data": {
+      "cursor": {
+        "orderKey": 18n,
+        "uniqueKey": "0xblock18",
+      },
+      "data": [
+        {
+          "blockHash": "0xblock19",
+          "blockNumber": 19n,
+          "data": "block 19 data",
+        },
+      ],
+      "endCursor": {
+        "orderKey": 19n,
+        "uniqueKey": "0xblock19",
+      },
+      "finality": "accepted",
+      "production": "live",
+    },
+  },
+  {
+    "_tag": "data",
+    "data": {
+      "cursor": {
+        "orderKey": 19n,
+        "uniqueKey": "0xblock19",
+      },
+      "data": [
+        {
+          "blockHash": "0xblock20",
+          "blockNumber": 20n,
+          "data": "block 20 data",
+        },
+      ],
+      "endCursor": {
+        "orderKey": 20n,
+        "uniqueKey": "0xblock20",
+      },
+      "finality": "accepted",
+      "production": "live",
+    },
+  },
+]
+`;
+
+exports[`RpcClient > reorg detection > detects reorg and sends invalidate message 1`] = `
+[
+  {
+    "_tag": "data",
+    "data": {
+      "cursor": {
+        "orderKey": 4n,
+        "uniqueKey": "0xblock4",
+      },
+      "data": [
+        {
+          "blockHash": "0xblock5",
+          "blockNumber": 5n,
+          "data": "block 5 data",
+        },
+      ],
+      "endCursor": {
+        "orderKey": 5n,
+        "uniqueKey": "0xblock5",
+      },
+      "finality": "finalized",
+      "production": "backfill",
+    },
+  },
+  {
+    "_tag": "data",
+    "data": {
+      "cursor": {
+        "orderKey": 5n,
+        "uniqueKey": "0xblock5",
+      },
+      "data": [
+        {
+          "blockHash": "0xblock6",
+          "blockNumber": 6n,
+          "data": "block 6 data",
+        },
+      ],
+      "endCursor": {
+        "orderKey": 6n,
+        "uniqueKey": "0xblock6",
+      },
+      "finality": "accepted",
+      "production": "live",
+    },
+  },
+  {
+    "_tag": "data",
+    "data": {
+      "cursor": {
+        "orderKey": 6n,
+        "uniqueKey": "0xblock6",
+      },
+      "data": [
+        {
+          "blockHash": "0xblock7",
+          "blockNumber": 7n,
+          "data": "block 7 data",
+        },
+      ],
+      "endCursor": {
+        "orderKey": 7n,
+        "uniqueKey": "0xblock7",
+      },
+      "finality": "accepted",
+      "production": "live",
+    },
+  },
+  {
+    "_tag": "data",
+    "data": {
+      "cursor": {
+        "orderKey": 7n,
+        "uniqueKey": "0xblock7",
+      },
+      "data": [
+        {
+          "blockHash": "0xblock8",
+          "blockNumber": 8n,
+          "data": "block 8 data",
+        },
+      ],
+      "endCursor": {
+        "orderKey": 8n,
+        "uniqueKey": "0xblock8",
+      },
+      "finality": "accepted",
+      "production": "live",
+    },
+  },
+  {
+    "_tag": "data",
+    "data": {
+      "cursor": {
+        "orderKey": 8n,
+        "uniqueKey": "0xblock8",
+      },
+      "data": [
+        {
+          "blockHash": "0xblock9",
+          "blockNumber": 9n,
+          "data": "block 9 data",
+        },
+      ],
+      "endCursor": {
+        "orderKey": 9n,
+        "uniqueKey": "0xblock9",
+      },
+      "finality": "accepted",
+      "production": "live",
+    },
+  },
+  {
+    "_tag": "invalidate",
+    "invalidate": {
+      "cursor": {
+        "orderKey": 7n,
+        "uniqueKey": "0xblock7",
+      },
+    },
+  },
+  {
+    "_tag": "data",
+    "data": {
+      "cursor": {
+        "orderKey": 7n,
+        "uniqueKey": "0xblock7",
+      },
+      "data": [
+        {
+          "blockHash": "0xblock8_reorg",
+          "blockNumber": 8n,
+          "data": "block 8 reorg data",
+        },
+      ],
+      "endCursor": {
+        "orderKey": 8n,
+        "uniqueKey": "0xblock8",
+      },
+      "finality": "accepted",
+      "production": "live",
+    },
+  },
+  {
+    "_tag": "data",
+    "data": {
+      "cursor": {
+        "orderKey": 8n,
+        "uniqueKey": "0xblock8",
+      },
+      "data": [
+        {
+          "blockHash": "0xblock9_reorg",
+          "blockNumber": 9n,
+          "data": "block 9 reorg data",
+        },
+      ],
+      "endCursor": {
+        "orderKey": 9n,
+        "uniqueKey": "0xblock9",
+      },
+      "finality": "accepted",
+      "production": "live",
+    },
+  },
+  {
+    "_tag": "data",
+    "data": {
+      "cursor": {
+        "orderKey": 9n,
+        "uniqueKey": "0xblock9",
+      },
+      "data": [
+        {
+          "blockHash": "0xblock10_reorg",
+          "blockNumber": 10n,
+          "data": "block 10 reorg data",
+        },
+      ],
+      "endCursor": {
+        "orderKey": 10n,
+        "uniqueKey": "0xblock10",
+      },
+      "finality": "accepted",
+      "production": "live",
+    },
+  },
+  {
+    "_tag": "data",
+    "data": {
+      "cursor": {
+        "orderKey": 10n,
+        "uniqueKey": "0xblock10",
+      },
+      "data": [
+        {
+          "blockHash": "0xblock11_reorg",
+          "blockNumber": 11n,
+          "data": "block 11 reorg data",
+        },
+      ],
+      "endCursor": {
+        "orderKey": 11n,
+        "uniqueKey": "0xblock11",
+      },
+      "finality": "accepted",
+      "production": "live",
+    },
+  },
+  {
+    "_tag": "data",
+    "data": {
+      "cursor": {
+        "orderKey": 11n,
+        "uniqueKey": "0xblock11",
+      },
+      "data": [
+        {
+          "blockHash": "0xblock12_reorg",
+          "blockNumber": 12n,
+          "data": "block 12 reorg data",
+        },
+      ],
+      "endCursor": {
+        "orderKey": 12n,
+        "uniqueKey": "0xblock12",
+      },
+      "finality": "accepted",
+      "production": "live",
+    },
+  },
+  {
+    "_tag": "data",
+    "data": {
+      "cursor": {
+        "orderKey": 12n,
+        "uniqueKey": "0xblock12",
+      },
+      "data": [
+        {
+          "blockHash": "0xblock13_reorg",
+          "blockNumber": 13n,
+          "data": "block 13 reorg data",
+        },
+      ],
+      "endCursor": {
+        "orderKey": 13n,
+        "uniqueKey": "0xblock13",
+      },
+      "finality": "accepted",
+      "production": "live",
+    },
+  },
+]
+`;

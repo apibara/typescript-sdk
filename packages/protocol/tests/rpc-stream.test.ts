@@ -2,7 +2,11 @@ import { beforeEach, describe, expect, it } from "vitest";
 import type { Bytes, Cursor } from "../src/common";
 import { RpcClient } from "../src/rpc/client";
 import { RpcStreamConfig } from "../src/rpc/config";
-import type { BlockInfo, FinalizedRangeResult } from "../src/rpc/types";
+import type {
+  BlockInfo,
+  FetchBlockResult,
+  FinalizedRangeResult,
+} from "../src/rpc/types";
 import type { StreamDataRequest, StreamDataResponse } from "../src/stream";
 
 type TestFilter = {
@@ -64,9 +68,9 @@ class MockRpcConfig extends RpcStreamConfig<TestFilter, TestBlock> {
   async fetchFinalizedRange(
     startBlock: bigint,
     endBlock: bigint,
-    _filter: TestFilter[],
+    _filter: TestFilter,
   ): Promise<FinalizedRangeResult<TestBlock>> {
-    const blocks: (TestBlock | null)[] = [];
+    const blocks: FetchBlockResult<TestBlock>[] = [];
     let actualEnd = endBlock;
 
     const MAX_BATCH_SIZE = 10n;
@@ -78,28 +82,61 @@ class MockRpcConfig extends RpcStreamConfig<TestFilter, TestBlock> {
 
     for (let i = startBlock; i <= batchEnd && i <= this.finalizedBlock; i++) {
       const block = this.blockDataStore.get(i);
-      blocks.push(block || null);
+      const cursor: Cursor | undefined =
+        i === 0n
+          ? undefined
+          : {
+              orderKey: i - 1n,
+              uniqueKey: i > 0n ? `0xblock${i - 1n}` : undefined,
+            };
+      const endCursor: Cursor = {
+        orderKey: i,
+        uniqueKey: `0xblock${i}`,
+      };
+      blocks.push({
+        cursor,
+        endCursor,
+        block: block || null,
+      });
       actualEnd = i;
     }
 
+    const firstCursor: Cursor | null =
+      blocks.length > 0 && blocks[0].cursor !== undefined
+        ? blocks[0].cursor
+        : null;
+    const lastCursor: Cursor | null =
+      blocks.length > 0 ? blocks[blocks.length - 1].endCursor : null;
+
     return {
       blocks,
-      startCursor: {
-        orderKey: startBlock - 1n,
-        uniqueKey: startBlock > 0n ? `0xblock${startBlock - 1n}` : undefined,
-      },
-      endCursor: {
-        orderKey: actualEnd,
-        uniqueKey: `0xblock${actualEnd}`,
-      },
+      firstCursor,
+      lastCursor,
     };
   }
 
   async fetchBlock(
     blockNumber: bigint,
-    _filter: TestFilter[],
-  ): Promise<TestBlock | null> {
-    return this.blockDataStore.get(blockNumber) || null;
+    _filter: TestFilter,
+  ): Promise<FetchBlockResult<TestBlock>> {
+    const block = this.blockDataStore.get(blockNumber) || null;
+    const cursor: Cursor | undefined =
+      blockNumber === 0n
+        ? undefined
+        : {
+            orderKey: blockNumber - 1n,
+            uniqueKey:
+              blockNumber > 0n ? `0xblock${blockNumber - 1n}` : undefined,
+          };
+    const endCursor: Cursor = {
+      orderKey: blockNumber,
+      uniqueKey: `0xblock${blockNumber}`,
+    };
+    return {
+      cursor,
+      endCursor,
+      block,
+    };
   }
 
   async verifyBlock(blockNumber: bigint, blockHash: string): Promise<boolean> {
@@ -169,7 +206,7 @@ describe("RpcClient", () => {
 
       const request: StreamDataRequest<TestFilter> = {
         finality: "finalized",
-        filter: [],
+        filter: [{}],
       };
 
       const messages: StreamDataResponse<TestBlock>[] = [];
@@ -193,191 +230,7 @@ describe("RpcClient", () => {
         expect(lastMessage.data.production).toBe("backfill");
       }
 
-      expect(messages).toMatchInlineSnapshot(`
-        [
-          {
-            "_tag": "data",
-            "data": {
-              "cursor": {
-                "orderKey": -1n,
-                "uniqueKey": undefined,
-              },
-              "data": [
-                {
-                  "blockHash": "0xblock0",
-                  "blockNumber": 0n,
-                  "data": "block 0 data",
-                },
-                {
-                  "blockHash": "0xblock1",
-                  "blockNumber": 1n,
-                  "data": "block 1 data",
-                },
-                {
-                  "blockHash": "0xblock2",
-                  "blockNumber": 2n,
-                  "data": "block 2 data",
-                },
-                {
-                  "blockHash": "0xblock3",
-                  "blockNumber": 3n,
-                  "data": "block 3 data",
-                },
-                {
-                  "blockHash": "0xblock4",
-                  "blockNumber": 4n,
-                  "data": "block 4 data",
-                },
-                {
-                  "blockHash": "0xblock5",
-                  "blockNumber": 5n,
-                  "data": "block 5 data",
-                },
-                {
-                  "blockHash": "0xblock6",
-                  "blockNumber": 6n,
-                  "data": "block 6 data",
-                },
-                {
-                  "blockHash": "0xblock7",
-                  "blockNumber": 7n,
-                  "data": "block 7 data",
-                },
-                {
-                  "blockHash": "0xblock8",
-                  "blockNumber": 8n,
-                  "data": "block 8 data",
-                },
-                {
-                  "blockHash": "0xblock9",
-                  "blockNumber": 9n,
-                  "data": "block 9 data",
-                },
-              ],
-              "endCursor": {
-                "orderKey": 9n,
-                "uniqueKey": "0xblock9",
-              },
-              "finality": "finalized",
-              "production": "backfill",
-            },
-          },
-          {
-            "_tag": "data",
-            "data": {
-              "cursor": {
-                "orderKey": 9n,
-                "uniqueKey": "0xblock9",
-              },
-              "data": [
-                {
-                  "blockHash": "0xblock10",
-                  "blockNumber": 10n,
-                  "data": "block 10 data",
-                },
-                {
-                  "blockHash": "0xblock11",
-                  "blockNumber": 11n,
-                  "data": "block 11 data",
-                },
-                {
-                  "blockHash": "0xblock12",
-                  "blockNumber": 12n,
-                  "data": "block 12 data",
-                },
-                {
-                  "blockHash": "0xblock13",
-                  "blockNumber": 13n,
-                  "data": "block 13 data",
-                },
-                {
-                  "blockHash": "0xblock14",
-                  "blockNumber": 14n,
-                  "data": "block 14 data",
-                },
-                {
-                  "blockHash": "0xblock15",
-                  "blockNumber": 15n,
-                  "data": "block 15 data",
-                },
-                {
-                  "blockHash": "0xblock16",
-                  "blockNumber": 16n,
-                  "data": "block 16 data",
-                },
-                {
-                  "blockHash": "0xblock17",
-                  "blockNumber": 17n,
-                  "data": "block 17 data",
-                },
-                {
-                  "blockHash": "0xblock18",
-                  "blockNumber": 18n,
-                  "data": "block 18 data",
-                },
-                {
-                  "blockHash": "0xblock19",
-                  "blockNumber": 19n,
-                  "data": "block 19 data",
-                },
-              ],
-              "endCursor": {
-                "orderKey": 19n,
-                "uniqueKey": "0xblock19",
-              },
-              "finality": "finalized",
-              "production": "backfill",
-            },
-          },
-          {
-            "_tag": "data",
-            "data": {
-              "cursor": {
-                "orderKey": 19n,
-                "uniqueKey": "0xblock19",
-              },
-              "data": [
-                {
-                  "blockHash": "0xblock20",
-                  "blockNumber": 20n,
-                  "data": "block 20 data",
-                },
-                {
-                  "blockHash": "0xblock21",
-                  "blockNumber": 21n,
-                  "data": "block 21 data",
-                },
-                {
-                  "blockHash": "0xblock22",
-                  "blockNumber": 22n,
-                  "data": "block 22 data",
-                },
-                {
-                  "blockHash": "0xblock23",
-                  "blockNumber": 23n,
-                  "data": "block 23 data",
-                },
-                {
-                  "blockHash": "0xblock24",
-                  "blockNumber": 24n,
-                  "data": "block 24 data",
-                },
-                {
-                  "blockHash": "0xblock25",
-                  "blockNumber": 25n,
-                  "data": "block 25 data",
-                },
-              ],
-              "endCursor": {
-                "orderKey": 25n,
-                "uniqueKey": "0xblock25",
-              },
-              "finality": "finalized",
-              "production": "backfill",
-            },
-          },
-        ]
-      `);
+      expect(messages).toMatchSnapshot();
     });
 
     it("starts from provided startingCursor", async () => {
@@ -388,7 +241,7 @@ describe("RpcClient", () => {
 
       const request: StreamDataRequest<TestFilter> = {
         finality: "finalized",
-        filter: [],
+        filter: [{}],
         startingCursor: {
           orderKey: 40n,
           uniqueKey: "0xblock40",
@@ -423,7 +276,7 @@ describe("RpcClient", () => {
 
       const request: StreamDataRequest<TestFilter> = {
         finality: "finalized",
-        filter: [],
+        filter: [{}],
         startingCursor: {
           orderKey: 40n,
           uniqueKey: "0xINVALID",
@@ -448,7 +301,7 @@ describe("RpcClient", () => {
 
       const request: StreamDataRequest<TestFilter> = {
         finality: "accepted",
-        filter: [],
+        filter: [{}],
         startingCursor: { orderKey: 4n },
       };
 
@@ -477,362 +330,7 @@ describe("RpcClient", () => {
         (m) => m.data.finality === "accepted",
       );
       expect(hasAcceptedBlocks).toBe(true);
-      expect(messages).toMatchInlineSnapshot(`
-        [
-          {
-            "_tag": "data",
-            "data": {
-              "cursor": {
-                "orderKey": 4n,
-                "uniqueKey": "0xblock4",
-              },
-              "data": [
-                {
-                  "blockHash": "0xblock5",
-                  "blockNumber": 5n,
-                  "data": "block 5 data",
-                },
-              ],
-              "endCursor": {
-                "orderKey": 5n,
-                "uniqueKey": "0xblock5",
-              },
-              "finality": "finalized",
-              "production": "backfill",
-            },
-          },
-          {
-            "_tag": "data",
-            "data": {
-              "cursor": {
-                "orderKey": 5n,
-                "uniqueKey": "0xblock5",
-              },
-              "data": [
-                {
-                  "blockHash": "0xblock6",
-                  "blockNumber": 6n,
-                  "data": "block 6 data",
-                },
-              ],
-              "endCursor": {
-                "orderKey": 6n,
-                "uniqueKey": "0xblock6",
-              },
-              "finality": "accepted",
-              "production": "live",
-            },
-          },
-          {
-            "_tag": "data",
-            "data": {
-              "cursor": {
-                "orderKey": 6n,
-                "uniqueKey": "0xblock6",
-              },
-              "data": [
-                {
-                  "blockHash": "0xblock7",
-                  "blockNumber": 7n,
-                  "data": "block 7 data",
-                },
-              ],
-              "endCursor": {
-                "orderKey": 7n,
-                "uniqueKey": "0xblock7",
-              },
-              "finality": "accepted",
-              "production": "live",
-            },
-          },
-          {
-            "_tag": "data",
-            "data": {
-              "cursor": {
-                "orderKey": 7n,
-                "uniqueKey": "0xblock7",
-              },
-              "data": [
-                {
-                  "blockHash": "0xblock8",
-                  "blockNumber": 8n,
-                  "data": "block 8 data",
-                },
-              ],
-              "endCursor": {
-                "orderKey": 8n,
-                "uniqueKey": "0xblock8",
-              },
-              "finality": "accepted",
-              "production": "live",
-            },
-          },
-          {
-            "_tag": "data",
-            "data": {
-              "cursor": {
-                "orderKey": 8n,
-                "uniqueKey": "0xblock8",
-              },
-              "data": [
-                {
-                  "blockHash": "0xblock9",
-                  "blockNumber": 9n,
-                  "data": "block 9 data",
-                },
-              ],
-              "endCursor": {
-                "orderKey": 9n,
-                "uniqueKey": "0xblock9",
-              },
-              "finality": "accepted",
-              "production": "live",
-            },
-          },
-          {
-            "_tag": "data",
-            "data": {
-              "cursor": {
-                "orderKey": 9n,
-                "uniqueKey": "0xblock9",
-              },
-              "data": [
-                {
-                  "blockHash": "0xblock10",
-                  "blockNumber": 10n,
-                  "data": "block 10 data",
-                },
-              ],
-              "endCursor": {
-                "orderKey": 10n,
-                "uniqueKey": "0xblock10",
-              },
-              "finality": "accepted",
-              "production": "live",
-            },
-          },
-          {
-            "_tag": "data",
-            "data": {
-              "cursor": {
-                "orderKey": 10n,
-                "uniqueKey": "0xblock10",
-              },
-              "data": [
-                {
-                  "blockHash": "0xblock11",
-                  "blockNumber": 11n,
-                  "data": "block 11 data",
-                },
-              ],
-              "endCursor": {
-                "orderKey": 11n,
-                "uniqueKey": "0xblock11",
-              },
-              "finality": "accepted",
-              "production": "live",
-            },
-          },
-          {
-            "_tag": "data",
-            "data": {
-              "cursor": {
-                "orderKey": 11n,
-                "uniqueKey": "0xblock11",
-              },
-              "data": [
-                {
-                  "blockHash": "0xblock12",
-                  "blockNumber": 12n,
-                  "data": "block 12 data",
-                },
-              ],
-              "endCursor": {
-                "orderKey": 12n,
-                "uniqueKey": "0xblock12",
-              },
-              "finality": "accepted",
-              "production": "live",
-            },
-          },
-          {
-            "_tag": "data",
-            "data": {
-              "cursor": {
-                "orderKey": 12n,
-                "uniqueKey": "0xblock12",
-              },
-              "data": [
-                {
-                  "blockHash": "0xblock13",
-                  "blockNumber": 13n,
-                  "data": "block 13 data",
-                },
-              ],
-              "endCursor": {
-                "orderKey": 13n,
-                "uniqueKey": "0xblock13",
-              },
-              "finality": "accepted",
-              "production": "live",
-            },
-          },
-          {
-            "_tag": "data",
-            "data": {
-              "cursor": {
-                "orderKey": 13n,
-                "uniqueKey": "0xblock13",
-              },
-              "data": [
-                {
-                  "blockHash": "0xblock14",
-                  "blockNumber": 14n,
-                  "data": "block 14 data",
-                },
-              ],
-              "endCursor": {
-                "orderKey": 14n,
-                "uniqueKey": "0xblock14",
-              },
-              "finality": "accepted",
-              "production": "live",
-            },
-          },
-          {
-            "_tag": "data",
-            "data": {
-              "cursor": {
-                "orderKey": 14n,
-                "uniqueKey": "0xblock14",
-              },
-              "data": [
-                {
-                  "blockHash": "0xblock15",
-                  "blockNumber": 15n,
-                  "data": "block 15 data",
-                },
-              ],
-              "endCursor": {
-                "orderKey": 15n,
-                "uniqueKey": "0xblock15",
-              },
-              "finality": "accepted",
-              "production": "live",
-            },
-          },
-          {
-            "_tag": "data",
-            "data": {
-              "cursor": {
-                "orderKey": 15n,
-                "uniqueKey": "0xblock15",
-              },
-              "data": [
-                {
-                  "blockHash": "0xblock16",
-                  "blockNumber": 16n,
-                  "data": "block 16 data",
-                },
-              ],
-              "endCursor": {
-                "orderKey": 16n,
-                "uniqueKey": "0xblock16",
-              },
-              "finality": "accepted",
-              "production": "live",
-            },
-          },
-          {
-            "_tag": "data",
-            "data": {
-              "cursor": {
-                "orderKey": 16n,
-                "uniqueKey": "0xblock16",
-              },
-              "data": [
-                {
-                  "blockHash": "0xblock17",
-                  "blockNumber": 17n,
-                  "data": "block 17 data",
-                },
-              ],
-              "endCursor": {
-                "orderKey": 17n,
-                "uniqueKey": "0xblock17",
-              },
-              "finality": "accepted",
-              "production": "live",
-            },
-          },
-          {
-            "_tag": "data",
-            "data": {
-              "cursor": {
-                "orderKey": 17n,
-                "uniqueKey": "0xblock17",
-              },
-              "data": [
-                {
-                  "blockHash": "0xblock18",
-                  "blockNumber": 18n,
-                  "data": "block 18 data",
-                },
-              ],
-              "endCursor": {
-                "orderKey": 18n,
-                "uniqueKey": "0xblock18",
-              },
-              "finality": "accepted",
-              "production": "live",
-            },
-          },
-          {
-            "_tag": "data",
-            "data": {
-              "cursor": {
-                "orderKey": 18n,
-                "uniqueKey": "0xblock18",
-              },
-              "data": [
-                {
-                  "blockHash": "0xblock19",
-                  "blockNumber": 19n,
-                  "data": "block 19 data",
-                },
-              ],
-              "endCursor": {
-                "orderKey": 19n,
-                "uniqueKey": "0xblock19",
-              },
-              "finality": "accepted",
-              "production": "live",
-            },
-          },
-          {
-            "_tag": "data",
-            "data": {
-              "cursor": {
-                "orderKey": 19n,
-                "uniqueKey": "0xblock19",
-              },
-              "data": [
-                {
-                  "blockHash": "0xblock20",
-                  "blockNumber": 20n,
-                  "data": "block 20 data",
-                },
-              ],
-              "endCursor": {
-                "orderKey": 20n,
-                "uniqueKey": "0xblock20",
-              },
-              "finality": "accepted",
-              "production": "live",
-            },
-          },
-        ]
-      `);
+      expect(messages).toMatchSnapshot();
     });
   });
 
@@ -845,7 +343,7 @@ describe("RpcClient", () => {
 
       const request: StreamDataRequest<TestFilter> = {
         finality: "accepted",
-        filter: [],
+        filter: [{}],
         startingCursor: { orderKey: 4n },
       };
 
@@ -880,261 +378,7 @@ describe("RpcClient", () => {
         .filter((m) => m._tag === "data");
 
       expect(dataAfterReorg.length).toBeGreaterThan(0);
-      expect(messages).toMatchInlineSnapshot(`
-        [
-          {
-            "_tag": "data",
-            "data": {
-              "cursor": {
-                "orderKey": 4n,
-                "uniqueKey": "0xblock4",
-              },
-              "data": [
-                {
-                  "blockHash": "0xblock5",
-                  "blockNumber": 5n,
-                  "data": "block 5 data",
-                },
-              ],
-              "endCursor": {
-                "orderKey": 5n,
-                "uniqueKey": "0xblock5",
-              },
-              "finality": "finalized",
-              "production": "backfill",
-            },
-          },
-          {
-            "_tag": "data",
-            "data": {
-              "cursor": {
-                "orderKey": 5n,
-                "uniqueKey": "0xblock5",
-              },
-              "data": [
-                {
-                  "blockHash": "0xblock6",
-                  "blockNumber": 6n,
-                  "data": "block 6 data",
-                },
-              ],
-              "endCursor": {
-                "orderKey": 6n,
-                "uniqueKey": "0xblock6",
-              },
-              "finality": "accepted",
-              "production": "live",
-            },
-          },
-          {
-            "_tag": "data",
-            "data": {
-              "cursor": {
-                "orderKey": 6n,
-                "uniqueKey": "0xblock6",
-              },
-              "data": [
-                {
-                  "blockHash": "0xblock7",
-                  "blockNumber": 7n,
-                  "data": "block 7 data",
-                },
-              ],
-              "endCursor": {
-                "orderKey": 7n,
-                "uniqueKey": "0xblock7",
-              },
-              "finality": "accepted",
-              "production": "live",
-            },
-          },
-          {
-            "_tag": "data",
-            "data": {
-              "cursor": {
-                "orderKey": 7n,
-                "uniqueKey": "0xblock7",
-              },
-              "data": [
-                {
-                  "blockHash": "0xblock8",
-                  "blockNumber": 8n,
-                  "data": "block 8 data",
-                },
-              ],
-              "endCursor": {
-                "orderKey": 8n,
-                "uniqueKey": "0xblock8",
-              },
-              "finality": "accepted",
-              "production": "live",
-            },
-          },
-          {
-            "_tag": "data",
-            "data": {
-              "cursor": {
-                "orderKey": 8n,
-                "uniqueKey": "0xblock8",
-              },
-              "data": [
-                {
-                  "blockHash": "0xblock9",
-                  "blockNumber": 9n,
-                  "data": "block 9 data",
-                },
-              ],
-              "endCursor": {
-                "orderKey": 9n,
-                "uniqueKey": "0xblock9",
-              },
-              "finality": "accepted",
-              "production": "live",
-            },
-          },
-          {
-            "_tag": "invalidate",
-            "invalidate": {
-              "cursor": {
-                "orderKey": 7n,
-                "uniqueKey": "0xblock7",
-              },
-            },
-          },
-          {
-            "_tag": "data",
-            "data": {
-              "cursor": {
-                "orderKey": 7n,
-                "uniqueKey": "0xblock7",
-              },
-              "data": [
-                {
-                  "blockHash": "0xblock8_reorg",
-                  "blockNumber": 8n,
-                  "data": "block 8 reorg data",
-                },
-              ],
-              "endCursor": {
-                "orderKey": 8n,
-                "uniqueKey": "0xblock8_reorg",
-              },
-              "finality": "accepted",
-              "production": "live",
-            },
-          },
-          {
-            "_tag": "data",
-            "data": {
-              "cursor": {
-                "orderKey": 8n,
-                "uniqueKey": "0xblock8_reorg",
-              },
-              "data": [
-                {
-                  "blockHash": "0xblock9_reorg",
-                  "blockNumber": 9n,
-                  "data": "block 9 reorg data",
-                },
-              ],
-              "endCursor": {
-                "orderKey": 9n,
-                "uniqueKey": "0xblock9_reorg",
-              },
-              "finality": "accepted",
-              "production": "live",
-            },
-          },
-          {
-            "_tag": "data",
-            "data": {
-              "cursor": {
-                "orderKey": 9n,
-                "uniqueKey": "0xblock9_reorg",
-              },
-              "data": [
-                {
-                  "blockHash": "0xblock10_reorg",
-                  "blockNumber": 10n,
-                  "data": "block 10 reorg data",
-                },
-              ],
-              "endCursor": {
-                "orderKey": 10n,
-                "uniqueKey": "0xblock10_reorg",
-              },
-              "finality": "accepted",
-              "production": "live",
-            },
-          },
-          {
-            "_tag": "data",
-            "data": {
-              "cursor": {
-                "orderKey": 10n,
-                "uniqueKey": "0xblock10_reorg",
-              },
-              "data": [
-                {
-                  "blockHash": "0xblock11_reorg",
-                  "blockNumber": 11n,
-                  "data": "block 11 reorg data",
-                },
-              ],
-              "endCursor": {
-                "orderKey": 11n,
-                "uniqueKey": "0xblock11_reorg",
-              },
-              "finality": "accepted",
-              "production": "live",
-            },
-          },
-          {
-            "_tag": "data",
-            "data": {
-              "cursor": {
-                "orderKey": 11n,
-                "uniqueKey": "0xblock11_reorg",
-              },
-              "data": [
-                {
-                  "blockHash": "0xblock12_reorg",
-                  "blockNumber": 12n,
-                  "data": "block 12 reorg data",
-                },
-              ],
-              "endCursor": {
-                "orderKey": 12n,
-                "uniqueKey": "0xblock12_reorg",
-              },
-              "finality": "accepted",
-              "production": "live",
-            },
-          },
-          {
-            "_tag": "data",
-            "data": {
-              "cursor": {
-                "orderKey": 12n,
-                "uniqueKey": "0xblock12_reorg",
-              },
-              "data": [
-                {
-                  "blockHash": "0xblock13_reorg",
-                  "blockNumber": 13n,
-                  "data": "block 13 reorg data",
-                },
-              ],
-              "endCursor": {
-                "orderKey": 13n,
-                "uniqueKey": "0xblock13_reorg",
-              },
-              "finality": "accepted",
-              "production": "live",
-            },
-          },
-        ]
-      `);
+      expect(messages).toMatchSnapshot();
     });
   });
 
@@ -1163,7 +407,7 @@ describe("RpcClient", () => {
 
       const request: StreamDataRequest<TestFilter> = {
         finality: "finalized",
-        filter: [],
+        filter: [{}],
       };
 
       const options = {
@@ -1203,7 +447,7 @@ describe("RpcClient", () => {
 
         const request: StreamDataRequest<TestFilter> = {
           finality: "finalized",
-          filter: [],
+          filter: [{}],
           startingCursor: { orderKey: 4n },
           // 100ms
           heartbeatInterval: { seconds: 0n, nanos: 100_000_000 },
@@ -1243,7 +487,7 @@ describe("RpcClient", () => {
 
         const request: StreamDataRequest<TestFilter> = {
           finality: "accepted",
-          filter: [],
+          filter: [{}],
           startingCursor: { orderKey: 4n },
         };
 
@@ -1309,7 +553,7 @@ describe("RpcClient", () => {
 
       const request: StreamDataRequest<TestFilter> = {
         finality: "finalized",
-        filter: [],
+        filter: [{}],
       };
 
       const messages: StreamDataResponse<TestBlock>[] = [];
@@ -1362,7 +606,7 @@ describe("RpcClient", () => {
 
         const request: StreamDataRequest<TestFilter> = {
           finality: "accepted",
-          filter: [],
+          filter: [{}],
           startingCursor: { orderKey: 4n },
         };
 
@@ -1421,7 +665,7 @@ describe("RpcClient", () => {
 
         const request: StreamDataRequest<TestFilter> = {
           finality: "finalized",
-          filter: [],
+          filter: [{}],
         };
 
         const messages: StreamDataResponse<TestBlock>[] = [];
