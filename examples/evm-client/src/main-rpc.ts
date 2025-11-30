@@ -49,14 +49,14 @@ const command = defineCommand({
       chain,
       transport: http(args.rpcUrl, {
         batch: {
-          wait: 10,
+          wait: 200,
         },
       }),
     });
 
     const client = createRpcClient(
       new EvmRpcStream(viemClient, {
-        getLogsRangeSize: 10n,
+        getLogsRangeSize: 100n,
       }),
     );
 
