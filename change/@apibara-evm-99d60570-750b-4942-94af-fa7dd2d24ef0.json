@@ -1,7 +1,0 @@
-{
-  "type": "prerelease",
-  "comment": "evm: make miner and logsBloom optional",
-  "packageName": "@apibara/evm",
-  "email": "jadejajaipal5@gmail.com",
-  "dependentChangeType": "patch"
-}

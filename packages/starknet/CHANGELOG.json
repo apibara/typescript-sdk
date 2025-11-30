@@ -2,6 +2,21 @@
   "name": "@apibara/starknet",
   "entries": [
     {
+      "date": "Sun, 30 Nov 2025 21:29:41 GMT",
+      "version": "2.1.0-beta.42",
+      "tag": "@apibara/starknet_v2.1.0-beta.42",
+      "comments": {
+        "prerelease": [
+          {
+            "author": "francesco@ceccon.me",
+            "package": "@apibara/starknet",
+            "commit": "6819c8987ae6665a27d40acd2c7959d272b7b166",
+            "comment": "Add EVM-RPC package"
+          }
+        ]
+      }
+    },
+    {
       "date": "Sun, 20 Jul 2025 11:15:12 GMT",
       "version": "2.1.0-beta.39",
       "tag": "@apibara/starknet_v2.1.0-beta.39",

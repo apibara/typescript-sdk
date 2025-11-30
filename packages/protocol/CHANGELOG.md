@@ -1,8 +1,16 @@
 # Change Log - @apibara/protocol
 
-<!-- This log was last generated on Fri, 30 May 2025 12:31:48 GMT and should not be manually modified. -->
+<!-- This log was last generated on Sun, 30 Nov 2025 21:29:41 GMT and should not be manually modified. -->
 
 <!-- Start content -->
+
+## 2.1.0-beta.42
+
+Sun, 30 Nov 2025 21:29:41 GMT
+
+### Changes
+
+- protocol: rpc stream client setup (jadejajaipal5@gmail.com)
 
 ## 2.1.0-beta.38
 

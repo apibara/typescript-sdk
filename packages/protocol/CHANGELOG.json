@@ -2,6 +2,21 @@
   "name": "@apibara/protocol",
   "entries": [
     {
+      "date": "Sun, 30 Nov 2025 21:29:41 GMT",
+      "version": "2.1.0-beta.42",
+      "tag": "@apibara/protocol_v2.1.0-beta.42",
+      "comments": {
+        "prerelease": [
+          {
+            "author": "jadejajaipal5@gmail.com",
+            "package": "@apibara/protocol",
+            "commit": "6819c8987ae6665a27d40acd2c7959d272b7b166",
+            "comment": "protocol: rpc stream client setup"
+          }
+        ]
+      }
+    },
+    {
       "date": "Fri, 30 May 2025 12:31:48 GMT",
       "version": "2.1.0-beta.38",
       "tag": "@apibara/protocol_v2.1.0-beta.38",

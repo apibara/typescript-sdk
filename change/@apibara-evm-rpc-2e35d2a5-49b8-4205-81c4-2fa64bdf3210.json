@@ -1,7 +1,0 @@
-{
-  "type": "prerelease",
-  "comment": "Add EVM-RPC package",
-  "packageName": "@apibara/evm-rpc",
-  "email": "francesco@ceccon.me",
-  "dependentChangeType": "patch"
-}

@@ -1,8 +1,16 @@
 # Change Log - @apibara/evm
 
-<!-- This log was last generated on Wed, 07 May 2025 08:48:19 GMT and should not be manually modified. -->
+<!-- This log was last generated on Sun, 30 Nov 2025 21:29:41 GMT and should not be manually modified. -->
 
 <!-- Start content -->
+
+## 2.1.0-beta.42
+
+Sun, 30 Nov 2025 21:29:41 GMT
+
+### Changes
+
+- evm: make miner and logsBloom optional (jadejajaipal5@gmail.com)
 
 ## 2.1.0-beta.34
 
