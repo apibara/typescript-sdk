@@ -217,6 +217,9 @@ importers:
       '@apibara/evm':
         specifier: workspace:*
         version: link:../../packages/evm
+      '@apibara/evm-rpc':
+        specifier: workspace:*
+        version: link:../../packages/evm-rpc
       '@apibara/protocol':
         specifier: workspace:*
         version: link:../../packages/protocol
@@ -230,8 +233,8 @@ importers:
         specifier: ^2.1.8
         version: 2.1.8
       viem:
-        specifier: ^2.12.4
-        version: 2.13.8(typescript@5.6.2)(zod@3.23.8)
+        specifier: ^2.13.2
+        version: 2.22.9(typescript@5.6.2)(zod@3.23.8)
     devDependencies:
       '@types/node':
         specifier: ^20.12.12
@@ -447,6 +450,25 @@ importers:
       vitest:
         specifier: ^1.6.0
         version: 1.6.0(@types/node@20.12.12)
+
+  packages/evm-rpc:
+    dependencies:
+      '@apibara/evm':
+        specifier: workspace:*
+        version: link:../evm
+      '@apibara/protocol':
+        specifier: workspace:*
+        version: link:../protocol
+      viem:
+        specifier: ^2.13.2
+        version: 2.22.9(typescript@5.6.2)(zod@3.23.8)
+    devDependencies:
+      '@types/node':
+        specifier: ^20.12.13
+        version: 20.14.0
+      unbuild:
+        specifier: ^2.0.0
+        version: 2.0.0(typescript@5.6.2)
 
   packages/indexer:
     dependencies:

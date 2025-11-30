@@ -1,0 +1,299 @@
+import type { Bytes } from "@apibara/protocol";
+import {
+  type BlockInfo,
+  type FetchBlockByNumberArgs,
+  type FetchBlockByNumberResult,
+  type FetchBlockRangeArgs,
+  type FetchBlockRangeResult,
+  type FetchBlockResult,
+  type FetchCursorArgs,
+  RpcStreamConfig,
+  type ValidateFilterResult,
+} from "@apibara/protocol/rpc";
+import {
+  type EIP1193Parameters,
+  type PublicRpcSchema,
+  type RpcBlock,
+  formatBlock,
+  numberToHex,
+  toHex,
+} from "viem";
+import type { Block, Log } from "./block";
+import { type Filter, validateFilter } from "./filter";
+import { fetchLogsByBlockHash, fetchLogsForRange } from "./log-fetcher";
+import { type BlockRangeOracle, createBlockRangeOracle } from "./range-oracle";
+import { rpcBlockHeaderToDna } from "./transform";
+
+export type RequestParameters = EIP1193Parameters<PublicRpcSchema>;
+
+export type RequestReturnType<method extends RequestParameters["method"]> =
+  Extract<PublicRpcSchema[number], { Method: method }>["ReturnType"];
+
+// Require just the bare minimum from the provided viem client.
+export type ViemRpcClient = {
+  request: <TParams extends RequestParameters>(
+    params: TParams,
+  ) => Promise<RequestReturnType<TParams["method"]>>;
+};
+
+export type EvmRpcStreamOptions = {
+  /** How many blocks to fetch in a single eth_getLogs call. */
+  getLogsRangeSize?: bigint;
+  /** How often to refresh the head block. */
+  headRefreshIntervalMs?: number;
+  /** How often to refresh the finalized block. */
+  finalizedRefreshIntervalMs?: number;
+};
+
+export class EvmRpcStream extends RpcStreamConfig<Filter, Block> {
+  private blockRangeOracle: BlockRangeOracle;
+
+  constructor(
+    private client: ViemRpcClient,
+    private options: EvmRpcStreamOptions = {},
+  ) {
+    super();
+
+    this.blockRangeOracle = createBlockRangeOracle({
+      startingSize: options.getLogsRangeSize ?? 1_000n,
+      // Use the provided size to limit the maximum range size
+      maxSize: options.getLogsRangeSize ? options.getLogsRangeSize : undefined,
+    });
+  }
+
+  headRefreshIntervalMs(): number {
+    return this.options.headRefreshIntervalMs ?? 3_000;
+  }
+
+  finalizedRefreshIntervalMs(): number {
+    return this.options.finalizedRefreshIntervalMs ?? 30_000;
+  }
+
+  validateFilter(filter: Filter): ValidateFilterResult {
+    return validateFilter(filter);
+  }
+
+  async fetchCursor(args: FetchCursorArgs): Promise<BlockInfo | null> {
+    let block: RpcBlock | null = null;
+    if (args.blockNumber !== undefined) {
+      const blockNumber = toHex(args.blockNumber);
+      block = await this.client.request({
+        method: "eth_getBlockByNumber",
+        params: [blockNumber, false],
+      });
+    } else if (args.blockTag) {
+      block = await this.client.request({
+        method: "eth_getBlockByNumber",
+        params: [args.blockTag, false],
+      });
+    } else if (args.blockHash) {
+      block = await this.client.request({
+        method: "eth_getBlockByHash",
+        params: [args.blockHash, false],
+      });
+    } else {
+      throw new Error(
+        "One of blockNumber, blockHash or blockTag must be provided",
+      );
+    }
+
+    if (!block) {
+      return null;
+    }
+
+    const formattedBlock = formatBlock(block);
+
+    if (formattedBlock.number === null) {
+      throw new Error("RPC block is missing required block number");
+    }
+
+    if (formattedBlock.hash === null) {
+      throw new Error("RPC block is missing required block hash");
+    }
+
+    return {
+      blockNumber: formattedBlock.number,
+      blockHash: formattedBlock.hash,
+      parentBlockHash: formattedBlock.parentHash,
+    };
+  }
+
+  async fetchBlockRange({
+    startBlock,
+    finalizedBlock,
+    filter,
+  }: FetchBlockRangeArgs<Filter>): Promise<FetchBlockRangeResult<Block>> {
+    const { start: fromBlock, end: toBlock } = this.blockRangeOracle.clampRange(
+      { start: startBlock, end: finalizedBlock },
+    );
+
+    // console.log("Fetching block range", fromBlock, toBlock, filter);
+
+    const { logs: logsByBlockNumber, blockNumbers } =
+      await this.fetchLogsForRangeWithRetry({
+        fromBlock,
+        toBlock,
+        filter,
+      });
+
+    // If the client needs all headers, we iterate over the range and fetch headers
+    // and then join them with the logs
+    // Otherwise, we drive the block number iteration from the fetched logs.
+    const data: FetchBlockResult<Block>[] = [];
+
+    // Fetch block headers in parallel to optimize batching.
+    const blockNumberResponses = [];
+    if (filter.header === "always") {
+      for (let blockNumber = fromBlock; blockNumber <= toBlock; blockNumber++) {
+        blockNumberResponses.push(
+          this.fetchBlockHeaderByNumberWithRetry({
+            blockNumber,
+          }),
+        );
+      }
+    } else {
+      for (const blockNumber of blockNumbers) {
+        blockNumberResponses.push(
+          this.fetchBlockHeaderByNumberWithRetry({
+            blockNumber,
+          }),
+        );
+      }
+    }
+
+    const blockNumbersWithHeader = await Promise.all(blockNumberResponses);
+    for (const { blockNumber, header } of blockNumbersWithHeader) {
+      const logs = logsByBlockNumber[Number(blockNumber)] ?? [];
+
+      data.push({
+        cursor: undefined,
+        endCursor: { orderKey: blockNumber },
+        block: { header, logs },
+      });
+    }
+
+    return { startBlock: fromBlock, endBlock: toBlock, data };
+  }
+
+  async fetchBlockByNumber({
+    blockNumber,
+    expectedParentBlockHash,
+    filter,
+  }: FetchBlockByNumberArgs<Filter>): Promise<FetchBlockByNumberResult<Block>> {
+    // Fetch block header and check it matches the expected parent block hash.
+    const { header } = await this.fetchBlockHeaderByNumberWithRetry({
+      blockNumber,
+    });
+
+    if (header.blockHash === undefined) {
+      throw new Error(`Block ${blockNumber} has no block hash`);
+    }
+
+    const blockInfo: BlockInfo = {
+      blockNumber: header.blockNumber,
+      blockHash: header.blockHash,
+      parentBlockHash: header.parentBlockHash,
+    };
+
+    if (header.parentBlockHash !== expectedParentBlockHash) {
+      return {
+        status: "reorg",
+        blockInfo,
+      };
+    }
+
+    // Use the hash from the current block to fetch logs in a reorg-safe way.
+    const { logs } = await this.fetchLogsByBlockHashWithRetry({
+      blockHash: header.blockHash,
+      filter,
+    });
+
+    let cursor = undefined;
+    if (blockNumber > 0n) {
+      cursor = {
+        orderKey: blockNumber - 1n,
+        uniqueKey: header.parentBlockHash,
+      };
+    }
+    const endCursor = {
+      orderKey: blockNumber,
+      uniqueKey: header.blockHash,
+    };
+
+    let block = null;
+
+    // TODO: handle header on new block.
+    if (filter.header === "always" || logs.length > 0) {
+      block = {
+        header,
+        logs,
+      };
+    }
+
+    return {
+      status: "success",
+      blockInfo,
+      data: {
+        cursor,
+        endCursor,
+        block,
+      },
+    };
+  }
+
+  private async fetchLogsForRangeWithRetry({
+    fromBlock,
+    toBlock,
+    filter,
+  }: {
+    fromBlock: bigint;
+    toBlock: bigint;
+    filter: Filter;
+  }): Promise<{ logs: Record<number, Log[]>; blockNumbers: bigint[] }> {
+    // TODO: implement retry
+    try {
+      return await fetchLogsForRange({
+        client: this.client,
+        fromBlock,
+        toBlock,
+        filter,
+      });
+    } catch (error) {
+      this.blockRangeOracle.handleError(error);
+      throw error;
+    }
+  }
+
+  private async fetchLogsByBlockHashWithRetry({
+    blockHash,
+    filter,
+  }: {
+    blockHash: Bytes;
+    filter: Filter;
+  }): Promise<{ logs: Log[] }> {
+    // TODO: implement retry
+    return await fetchLogsByBlockHash({
+      client: this.client,
+      blockHash,
+      filter,
+    });
+  }
+
+  private async fetchBlockHeaderByNumberWithRetry({
+    blockNumber,
+  }: {
+    blockNumber: bigint;
+  }) {
+    // TODO: implement retry
+    const block = await this.client.request({
+      method: "eth_getBlockByNumber",
+      params: [numberToHex(blockNumber), false],
+    });
+
+    if (block === null) {
+      throw new Error(`Block ${blockNumber} not found`);
+    }
+
+    return { header: rpcBlockHeaderToDna(block), blockNumber };
+  }
+}

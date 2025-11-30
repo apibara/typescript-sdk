@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "start": "jiti ./src/main.ts",
+    "start:rpc": "jiti ./src/main-rpc.ts",
     "typecheck": "tsc --noEmit",
     "lint": "biome check .",
     "lint:fix": "pnpm lint --write",
@@ -11,11 +12,12 @@
   },
   "dependencies": {
     "@apibara/evm": "workspace:*",
+    "@apibara/evm-rpc": "workspace:*",
     "@apibara/protocol": "workspace:*",
     "citty": "^0.1.6",
     "consola": "^3.4.2",
     "nice-grpc": "^2.1.8",
-    "viem": "^2.12.4"
+    "viem": "^2.13.2"
   },
   "devDependencies": {
     "@types/node": "^20.12.12",
