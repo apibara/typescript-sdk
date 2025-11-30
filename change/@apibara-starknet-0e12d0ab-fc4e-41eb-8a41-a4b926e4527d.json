@@ -1,0 +1,7 @@
+{
+  "type": "prerelease",
+  "comment": "Add EVM-RPC package",
+  "packageName": "@apibara/starknet",
+  "email": "francesco@ceccon.me",
+  "dependentChangeType": "patch"
+}
