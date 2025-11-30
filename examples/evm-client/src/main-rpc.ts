@@ -1,8 +1,9 @@
 import assert from "node:assert";
-import { type EvmRpcFilter, createEvmRpcClient } from "@apibara/rpc-evm";
+import { EvmRpcStream, type Filter } from "@apibara/evm-rpc";
+import { createRpcClient } from "@apibara/protocol/rpc";
 import { defineCommand, runMain } from "citty";
 import consola from "consola";
-import type { Chain } from "viem";
+import { http, type Chain, createPublicClient } from "viem";
 import { mainnet, sepolia } from "viem/chains";
 
 const command = defineCommand({
@@ -19,7 +20,7 @@ const command = defineCommand({
     },
     network: {
       type: "string",
-      default: "sepolia",
+      default: "mainnet",
       description: "Network name (mainnet, sepolia)",
     },
     contract: {
@@ -29,13 +30,13 @@ const command = defineCommand({
     },
     startBlock: {
       type: "string",
-      default: "23857000",
+      default: "23911400",
       description: "Starting block number",
     },
     finality: {
       type: "string",
       default: "finalized",
-      description: "Block finality (finalized, accepted, pending)",
+      description: "Block finality (finalized, accepted)",
     },
   },
   async run({ args }) {
@@ -44,42 +45,40 @@ const command = defineCommand({
 
     const chain = (args.network === "mainnet" ? mainnet : sepolia) as Chain;
 
-    const client = createEvmRpcClient(args.rpcUrl, chain, {
-      clientConfig: {
-        retryDelay: 10000,
-        onFetchRequest(request) {
-          request
-            .clone()
-            .json()
-            .then((body) => {
-              if (Array.isArray(body)) {
-                consola.debug(`----->>> Batched ${body.length} requests`);
-              } else {
-                consola.debug("----->>> Single request");
-              }
-              // console.dir(body, { depth: null });
-            });
+    const viemClient = createPublicClient({
+      chain,
+      transport: http(args.rpcUrl, {
+        batch: {
+          wait: 10,
         },
-      },
+      }),
     });
 
-    try {
-      const status = await client.status();
-      consola.success("Connected to RPC endpoint");
-      consola.info("Current head:", status.currentHead?.orderKey);
-      consola.info("Finalized:", status.finalized?.orderKey);
-    } catch (error) {
-      consola.error("Failed to connect:", error);
-      process.exit(1);
-    }
+    const client = createRpcClient(
+      new EvmRpcStream(viemClient, {
+        getLogsRangeSize: 10n,
+      }),
+    );
 
-    const filter: EvmRpcFilter = {
+    const status = await client.status();
+    consola.success("Connected to RPC endpoint");
+    consola.info("Current head:", status.currentHead?.orderKey);
+    consola.info("Finalized:", status.finalized?.orderKey);
+
+    const filter: Filter = {
+      header: "always",
       logs: [
         {
-          address: args.contract as `0x${string}`,
-          topics: [
-            "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef" as `0x${string}`,
-          ],
+          id: 1,
+          address: "0xe0e0e08A6A4b9Dc7bD67BCB7aadE5cF48157d444",
+        },
+        {
+          id: 2,
+          address: "0xA37cc341634AFD9E0919D334606E676dbAb63E17",
+        },
+        {
+          id: 3,
+          address: "0xe0e0e08A6A4b9Dc7bD67BCB7aadE5cF48157d444",
         },
       ],
     };
@@ -88,74 +87,70 @@ const command = defineCommand({
     consola.info("Monitoring contract:", args.contract);
     consola.info("Finality:", args.finality);
 
-    try {
-      for await (const message of client.streamData({
-        filter: [filter],
-        finality: args.finality as "finalized" | "accepted" | "pending",
-        startingCursor: {
-          orderKey: BigInt(args.startBlock),
-        },
-      })) {
-        switch (message._tag) {
-          case "data": {
-            const { data, endCursor, finality, production } = message.data;
+    for await (const message of client.streamData({
+      filter: [filter],
+      finality: args.finality as "finalized" | "accepted" | "pending",
+      startingCursor: {
+        orderKey: BigInt(args.startBlock),
+      },
+    })) {
+      switch (message._tag) {
+        case "data": {
+          const { data, endCursor, finality, production } = message.data;
 
-            for (const block of data) {
-              assert(block !== null);
-              const logs = block.logs;
+          for (const block of data) {
+            assert(block !== null);
+            const logs = block.logs;
 
-              if (logs.length > 0) {
-                consola.info(
-                  `📦 Block ${block.header?.blockNumber} [${finality}/${production}]`,
-                );
-                consola.info("   Logs:", logs.length);
-
-                for (const log of logs) {
-                  consola.info("   🔔 Log");
-                  consola.info("      Tx:", log.transactionHash);
-                  consola.info("      Address:", log.address);
-                  consola.info("      Topics:", log.topics.join(", "));
-                  consola.info("      Log Index:", log.logIndex);
-                }
-              }
-            }
-
-            break;
-          }
-
-          case "invalidate": {
-            consola.warn(
-              "⚠️  Reorg detected! Invalidating to block",
-              message.invalidate.cursor?.orderKey,
+            consola.info(
+              `block ${block.header?.blockNumber} [${finality}/${production}]`,
             );
-            break;
-          }
+            consola.info("   logs:", logs.length);
 
-          case "finalize": {
-            consola.success(
-              "✅ Finalized up to block",
-              message.finalize.cursor?.orderKey,
-            );
-            break;
-          }
-
-          case "heartbeat": {
-            consola.info("💓 Heartbeat");
-            break;
-          }
-
-          case "systemMessage": {
-            const output = message.systemMessage.output;
-            if (output._tag === "stderr") {
-              consola.error("System error:", output.stderr);
+            for (const log of logs) {
+              // consola.info(log);
+              // consola.info("   🔔 Log");
+              // consola.info("      Tx:", log.transactionHash);
+              // consola.info("      Address:", log.address);
+              // consola.info("      Topics:", log.topics.join(", "));
+              // consola.info("      Log Index:", log.logIndex);
             }
-            break;
           }
+
+          break;
+        }
+
+        case "invalidate": {
+          consola.warn(
+            "invalidating to block",
+            message.invalidate.cursor?.orderKey,
+          );
+          break;
+        }
+
+        case "finalize": {
+          consola.success(
+            "finalized up to block",
+            message.finalize.cursor?.orderKey,
+          );
+          break;
+        }
+
+        case "heartbeat": {
+          consola.info("heartbeat");
+          break;
+        }
+
+        case "systemMessage": {
+          const output = message.systemMessage.output;
+          if (output._tag === "stderr") {
+            consola.error(output.stderr);
+          } else {
+            consola.info(output.stdout);
+          }
+          break;
         }
       }
-    } catch (error) {
-      consola.error("Stream error:", error);
-      process.exit(1);
     }
   },
 });

@@ -4,6 +4,7 @@ import type { StatusRequest, StatusResponse } from "../status";
 import type { StreamDataRequest, StreamDataResponse } from "../stream";
 import type { RpcStreamConfig } from "./config";
 import { RpcDataStream } from "./data-stream";
+import { blockInfoToCursor } from "./helpers";
 
 export class RpcClient<TFilter, TBlock> implements Client<TFilter, TBlock> {
   constructor(private config: RpcStreamConfig<TFilter, TBlock>) {}
@@ -13,16 +14,16 @@ export class RpcClient<TFilter, TBlock> implements Client<TFilter, TBlock> {
     _options?: ClientCallOptions,
   ): Promise<StatusResponse> {
     const [currentHead, finalized] = await Promise.all([
-      this.config.getCursor("head"),
-      this.config.getCursor("finalized"),
+      this.config.fetchCursor({ blockTag: "latest" }),
+      this.config.fetchCursor({ blockTag: "finalized" }),
     ]);
 
     const starting: Cursor = { orderKey: 0n };
 
     return {
-      currentHead,
-      lastIngested: currentHead,
-      finalized,
+      currentHead: currentHead ? blockInfoToCursor(currentHead) : undefined,
+      lastIngested: currentHead ? blockInfoToCursor(currentHead) : undefined,
+      finalized: finalized ? blockInfoToCursor(finalized) : undefined,
       starting,
     };
   }
@@ -31,8 +32,12 @@ export class RpcClient<TFilter, TBlock> implements Client<TFilter, TBlock> {
     request: StreamDataRequest<TFilter>,
     options?: StreamDataOptions,
   ): AsyncIterable<StreamDataResponse<TBlock>> {
+    const index = 0;
     for (const filter of request.filter) {
-      this.config.validateFilter(filter);
+      const { valid, error } = this.config.validateFilter(filter);
+      if (!valid) {
+        throw new Error(`Filter at position ${index} is invalid: ${error}`);
+      }
     }
 
     return new RpcDataStream(this.config, request, options);

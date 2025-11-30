@@ -1,27 +1,86 @@
 import type { Bytes, Cursor } from "../common";
-import type {
-  BlockInfo,
-  FetchBlockResult,
-  FinalizedRangeResult,
-} from "./types";
+
+export type FetchBlockRangeArgs<TFilter> = {
+  startBlock: bigint;
+  finalizedBlock: bigint;
+  filter: TFilter;
+};
+
+export type FetchBlockRangeResult<TBlock> = {
+  startBlock: bigint;
+  endBlock: bigint;
+  data: FetchBlockResult<TBlock>[];
+};
+
+export type FetchBlockResult<TBlock> = {
+  block: TBlock | null;
+  cursor: Cursor | undefined;
+  endCursor: Cursor;
+};
+
+export type BlockInfo = {
+  blockNumber: bigint;
+  blockHash: Bytes;
+  parentBlockHash: Bytes;
+};
+
+export type FetchBlockByNumberArgs<TFilter> = {
+  blockNumber: bigint;
+  expectedParentBlockHash: Bytes;
+  filter: TFilter;
+};
+
+export type FetchBlockByNumberResult<TBlock> =
+  | {
+      status: "success";
+      data: FetchBlockResult<TBlock>;
+      blockInfo: BlockInfo;
+    }
+  | {
+      status: "reorg";
+      blockInfo: BlockInfo;
+    };
+
+export type FetchCursorArgs =
+  | {
+      blockTag: "latest" | "finalized";
+      blockNumber?: undefined;
+      blockHash?: undefined;
+    }
+  | {
+      blockTag?: undefined;
+      blockNumber: bigint;
+      blockHash?: undefined;
+    }
+  | {
+      blockTag?: undefined;
+      blockNumber?: undefined;
+      blockHash: Bytes;
+    };
+
+export type ValidateFilterResult =
+  | {
+      valid: true;
+      error?: undefined;
+    }
+  | {
+      valid: false;
+      error: string;
+    };
 
 export abstract class RpcStreamConfig<TFilter, TBlock> {
-  abstract validateFilter(filter: TFilter): void;
+  abstract headRefreshIntervalMs(): number;
+  abstract finalizedRefreshIntervalMs(): number;
 
-  abstract getCursor(finality: "head" | "finalized"): Promise<Cursor>;
+  abstract fetchCursor(args: FetchCursorArgs): Promise<BlockInfo | null>;
 
-  abstract getBlockInfo(blockNumber: bigint): Promise<BlockInfo>;
+  abstract validateFilter(filter: TFilter): ValidateFilterResult;
 
-  abstract fetchFinalizedRange(
-    startBlock: bigint,
-    endBlock: bigint,
-    filter: TFilter,
-  ): Promise<FinalizedRangeResult<TBlock>>;
+  abstract fetchBlockRange(
+    args: FetchBlockRangeArgs<TFilter>,
+  ): Promise<FetchBlockRangeResult<TBlock>>;
 
-  abstract fetchBlock(
-    blockNumber: bigint,
-    filter: TFilter,
-  ): Promise<FetchBlockResult<TBlock>>;
-
-  abstract verifyBlock(blockNumber: bigint, blockHash: Bytes): Promise<boolean>;
+  abstract fetchBlockByNumber(
+    args: FetchBlockByNumberArgs<TFilter>,
+  ): Promise<FetchBlockByNumberResult<TBlock>>;
 }

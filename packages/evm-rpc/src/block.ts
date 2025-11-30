@@ -3,11 +3,11 @@ import type {
   Log as DnaLog,
 } from "@apibara/evm";
 
-export type EvmRpcBlock = {
+export type BlockHeader = DnaBlockHeader;
+
+export type Log = Omit<DnaLog, "logIndexInTransaction">;
+
+export type Block = {
   header: BlockHeader;
   logs: Log[];
 };
-
-export type BlockHeader = DnaBlockHeader;
-
-export type Log = DnaLog;

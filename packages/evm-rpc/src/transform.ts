@@ -1,4 +1,10 @@
-import { type RpcLog, type Block as ViemBlock, hexToNumber } from "viem";
+import {
+  type RpcBlock,
+  type RpcLog,
+  type Block as ViemBlock,
+  formatBlock,
+  hexToNumber,
+} from "viem";
 import type { BlockHeader as DnaBlockHeader, Log as DnaLog } from "./block";
 
 export function viemRpcLogToDna(viemLog: RpcLog): DnaLog {
@@ -21,12 +27,16 @@ export function viemRpcLogToDna(viemLog: RpcLog): DnaLog {
     transactionIndex: hexToNumber(viemLog.transactionIndex),
     transactionHash: viemLog.transactionHash,
     transactionStatus: viemLog.removed ? "reverted" : "succeeded",
-    logIndexInTransaction: hexToNumber(viemLog.logIndex),
   };
 }
 
+export function rpcBlockHeaderToDna(block: RpcBlock): DnaBlockHeader {
+  const formattedBlock = formatBlock(block);
+  return viemBlockHeaderToDna(formattedBlock);
+}
+
 export function viemBlockHeaderToDna(viemBlock: ViemBlock): DnaBlockHeader {
-  if (!viemBlock.number || !viemBlock.hash) {
+  if (viemBlock.number === null || !viemBlock.hash) {
     throw new Error(
       `Invalid block: missing required fields (number: ${viemBlock.number}, hash: ${viemBlock.hash})`,
     );

@@ -12,8 +12,8 @@
   },
   "dependencies": {
     "@apibara/evm": "workspace:*",
+    "@apibara/evm-rpc": "workspace:*",
     "@apibara/protocol": "workspace:*",
-    "@apibara/rpc-evm": "workspace:*",
     "citty": "^0.1.6",
     "consola": "^3.4.2",
     "nice-grpc": "^2.1.8",
