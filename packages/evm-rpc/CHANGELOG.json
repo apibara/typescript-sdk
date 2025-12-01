@@ -2,6 +2,21 @@
   "name": "@apibara/evm-rpc",
   "entries": [
     {
+      "date": "Mon, 01 Dec 2025 15:55:09 GMT",
+      "version": "2.1.0-beta.42",
+      "tag": "@apibara/evm-rpc_v2.1.0-beta.42",
+      "comments": {
+        "prerelease": [
+          {
+            "author": "francesco@ceccon.me",
+            "package": "@apibara/evm-rpc",
+            "commit": "ea713651cbbb981b71f73f3187f1f94226bceedc",
+            "comment": "evm-rpc: add rate-limited http client"
+          }
+        ]
+      }
+    },
+    {
       "date": "Sun, 30 Nov 2025 21:29:41 GMT",
       "version": "2.1.0-beta.41",
       "tag": "@apibara/evm-rpc_v2.1.0-beta.41",

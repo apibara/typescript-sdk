@@ -1,7 +1,0 @@
-{
-  "type": "prerelease",
-  "comment": "evm-rpc: add rate-limited http client",
-  "packageName": "@apibara/beaconchain",
-  "email": "francesco@ceccon.me",
-  "dependentChangeType": "patch"
-}
