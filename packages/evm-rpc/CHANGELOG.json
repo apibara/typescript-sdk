@@ -2,6 +2,21 @@
   "name": "@apibara/evm-rpc",
   "entries": [
     {
+      "date": "Mon, 01 Dec 2025 19:13:51 GMT",
+      "version": "2.1.0-beta.44",
+      "tag": "@apibara/evm-rpc_v2.1.0-beta.44",
+      "comments": {
+        "prerelease": [
+          {
+            "author": "francesco@ceccon.me",
+            "package": "@apibara/evm-rpc",
+            "commit": "d89396e0e94166d27496fdb2ad16867de281922d",
+            "comment": "evm-rpc: ensure logs are sorted by index"
+          }
+        ]
+      }
+    },
+    {
       "date": "Mon, 01 Dec 2025 15:55:09 GMT",
       "version": "2.1.0-beta.42",
       "tag": "@apibara/evm-rpc_v2.1.0-beta.42",
