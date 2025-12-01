@@ -1,0 +1,7 @@
+{
+  "type": "prerelease",
+  "comment": "evm-rpc: add rate-limited http client",
+  "packageName": "@apibara/starknet",
+  "email": "francesco@ceccon.me",
+  "dependentChangeType": "patch"
+}
