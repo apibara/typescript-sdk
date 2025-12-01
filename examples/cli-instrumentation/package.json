@@ -31,6 +31,6 @@
     "@opentelemetry/semantic-conventions": "^1.30.0",
     "apibara": "workspace:*",
     "starknet": "^6.11.0",
-    "viem": "^2.21.53"
+    "viem": "^2.40.0"
   }
 }

@@ -17,7 +17,7 @@
     "citty": "^0.1.6",
     "consola": "^3.4.2",
     "nice-grpc": "^2.1.8",
-    "viem": "^2.13.2"
+    "viem": "^2.40.3"
   },
   "devDependencies": {
     "@types/node": "^20.12.12",
