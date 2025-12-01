@@ -165,6 +165,8 @@ export class EvmRpcStream extends RpcStreamConfig<Filter, Block> {
     for (const { blockNumber, header } of blockNumbersWithHeader) {
       const logs = logsByBlockNumber[Number(blockNumber)] ?? [];
 
+      logs.sort((a, b) => a.logIndex - b.logIndex);
+
       data.push({
         cursor: undefined,
         endCursor: { orderKey: blockNumber },
@@ -207,6 +209,8 @@ export class EvmRpcStream extends RpcStreamConfig<Filter, Block> {
       blockHash: header.blockHash,
       filter,
     });
+
+    logs.sort((a, b) => a.logIndex - b.logIndex);
 
     let cursor = undefined;
     if (blockNumber > 0n) {

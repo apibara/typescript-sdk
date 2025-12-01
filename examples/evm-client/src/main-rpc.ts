@@ -111,7 +111,11 @@ const command = defineCommand({
             consola.info(
               `block ${block.header?.blockNumber} [${finality}/${production}]`,
             );
-            consola.info("   logs:", logs.length);
+            consola.info(
+              "   logs:",
+              logs.length,
+              logs.map(({ logIndex }) => logIndex),
+            );
 
             for (const log of logs) {
               // consola.info(log);
