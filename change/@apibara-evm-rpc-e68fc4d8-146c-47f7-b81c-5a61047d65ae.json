@@ -1,0 +1,7 @@
+{
+  "type": "prerelease",
+  "comment": "evm-rpc: ensure logs are sorted by index",
+  "packageName": "@apibara/evm-rpc",
+  "email": "francesco@ceccon.me",
+  "dependentChangeType": "patch"
+}
