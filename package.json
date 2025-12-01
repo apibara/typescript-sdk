@@ -33,6 +33,7 @@
           "packages/beaconchain",
           "packages/cli",
           "packages/evm",
+          "packages/evm-rpc",
           "packages/indexer",
           "packages/protocol",
           "packages/starknet",

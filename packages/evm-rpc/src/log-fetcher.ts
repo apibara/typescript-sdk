@@ -1,8 +1,9 @@
+import type { LogFilter } from "@apibara/evm";
 import type { Bytes } from "@apibara/protocol";
 import type { RpcLog } from "viem";
 import { hexToNumber, isHex, numberToHex, pad, trim } from "viem";
 import type { Log } from "./block";
-import type { Filter, LogFilter } from "./filter";
+import type { Filter } from "./filter";
 import type { ViemRpcClient } from "./stream-config";
 import { viemRpcLogToDna } from "./transform";
 
@@ -94,7 +95,10 @@ export async function fetchLogsForRange({
             fromBlock: numberToHex(fromBlock),
             toBlock: numberToHex(toBlock),
             address: logFilter.address,
-            topics: logFilter.topics ? [...logFilter.topics] : undefined,
+            topics:
+              logFilter.topics !== undefined
+                ? [...logFilter.topics]
+                : undefined,
           },
         ],
       });
@@ -149,7 +153,11 @@ export async function fetchLogsForRange({
     }
   }
 
-  return { logs: logsByBlock, blockNumbers: Array.from(blockNumbers) };
+  const sortedBlockNumbers = Array.from(blockNumbers).sort((a, b) =>
+    a < b ? -1 : a > b ? 1 : 0,
+  );
+
+  return { logs: logsByBlock, blockNumbers: sortedBlockNumbers };
 }
 
 function refineLog(log: RpcLog, filter: LogFilter): Log | null {
