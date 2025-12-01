@@ -1,7 +1,0 @@
-{
-  "type": "prerelease",
-  "comment": "rpc-evm: add evm rpc client config",
-  "packageName": "@apibara/rpc-evm",
-  "email": "jadejajaipal5@gmail.com",
-  "dependentChangeType": "patch"
-}
