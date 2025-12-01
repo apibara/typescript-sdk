@@ -1,8 +1,16 @@
 # Change Log - @apibara/evm-rpc
 
-<!-- This log was last generated on Mon, 01 Dec 2025 19:13:51 GMT and should not be manually modified. -->
+<!-- This log was last generated on Mon, 01 Dec 2025 20:04:18 GMT and should not be manually modified. -->
 
 <!-- Start content -->
+
+## 2.1.0-beta.45
+
+Mon, 01 Dec 2025 20:04:18 GMT
+
+### Changes
+
+- evm-rpc: sort block numbers (francesco@ceccon.me)
 
 ## 2.1.0-beta.44
 

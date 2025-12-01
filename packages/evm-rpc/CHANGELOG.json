@@ -2,6 +2,21 @@
   "name": "@apibara/evm-rpc",
   "entries": [
     {
+      "date": "Mon, 01 Dec 2025 20:04:18 GMT",
+      "version": "2.1.0-beta.45",
+      "tag": "@apibara/evm-rpc_v2.1.0-beta.45",
+      "comments": {
+        "prerelease": [
+          {
+            "author": "francesco@ceccon.me",
+            "package": "@apibara/evm-rpc",
+            "commit": "8cc12794165135d07beb91df60216e2f375063a6",
+            "comment": "evm-rpc: sort block numbers"
+          }
+        ]
+      }
+    },
+    {
       "date": "Mon, 01 Dec 2025 19:13:51 GMT",
       "version": "2.1.0-beta.44",
       "tag": "@apibara/evm-rpc_v2.1.0-beta.44",
