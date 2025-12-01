@@ -38,7 +38,7 @@
     "@types/long": "^5.0.0",
     "@types/node": "^20.12.12",
     "unbuild": "^2.0.0",
-    "viem": "^2.13.8",
+    "viem": "^2.40.3",
     "vitest": "^1.6.0"
   },
   "dependencies": {

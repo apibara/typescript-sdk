@@ -1,9 +1,9 @@
 import assert from "node:assert";
-import { EvmRpcStream, type Filter } from "@apibara/evm-rpc";
+import { EvmRpcStream, type Filter, rateLimitedHttp } from "@apibara/evm-rpc";
 import { createRpcClient } from "@apibara/protocol/rpc";
 import { defineCommand, runMain } from "citty";
 import consola from "consola";
-import { http, type Chain, createPublicClient } from "viem";
+import { type Chain, createPublicClient } from "viem";
 import { mainnet, sepolia } from "viem/chains";
 
 const command = defineCommand({
@@ -47,16 +47,22 @@ const command = defineCommand({
 
     const viemClient = createPublicClient({
       chain,
-      transport: http(args.rpcUrl, {
+      transport: rateLimitedHttp(args.rpcUrl, {
+        rps: 2,
+        retryCount: 3,
+        retryDelay: 1_000,
         batch: {
-          wait: 200,
+          wait: 10,
         },
+        // async onFetchRequest(request) {
+        //   console.log("Fetching request:", request.url);
+        // },
       }),
     });
 
     const client = createRpcClient(
       new EvmRpcStream(viemClient, {
-        getLogsRangeSize: 100n,
+        getLogsRangeSize: 10n,
       }),
     );
 
@@ -66,7 +72,7 @@ const command = defineCommand({
     consola.info("Finalized:", status.finalized?.orderKey);
 
     const filter: Filter = {
-      header: "always",
+      // header: "always",
       logs: [
         {
           id: 1,
