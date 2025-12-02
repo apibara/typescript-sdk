@@ -3,8 +3,7 @@ import { EvmRpcStream, type Filter, rateLimitedHttp } from "@apibara/evm-rpc";
 import { createRpcClient } from "@apibara/protocol/rpc";
 import { defineCommand, runMain } from "citty";
 import consola from "consola";
-import { type Chain, createPublicClient } from "viem";
-import { mainnet, sepolia } from "viem/chains";
+import { createPublicClient } from "viem";
 
 const command = defineCommand({
   meta: {
@@ -18,19 +17,14 @@ const command = defineCommand({
       description: "EVM RPC endpoint URL (Alchemy, Infura, QuickNode, etc.)",
       required: true,
     },
-    network: {
-      type: "string",
-      default: "mainnet",
-      description: "Network name (mainnet, sepolia)",
-    },
     contract: {
       type: "string",
-      default: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+      default: "0xf08A50178dfcDe18524640EA6618a1f965821715",
       description: "Contract address to monitor",
     },
     startBlock: {
       type: "string",
-      default: "23911400",
+      default: "7902564",
       description: "Starting block number",
     },
     finality: {
@@ -41,28 +35,23 @@ const command = defineCommand({
   },
   async run({ args }) {
     consola.info("Creating EVM RPC client");
-    consola.info("Network:", args.network);
-
-    const chain = (args.network === "mainnet" ? mainnet : sepolia) as Chain;
 
     const viemClient = createPublicClient({
-      chain,
       transport: rateLimitedHttp(args.rpcUrl, {
-        rps: 2,
+        rps: 1, // Requests per second, to avoid rate limiting
         retryCount: 3,
         retryDelay: 1_000,
         batch: {
-          wait: 10,
+          wait: 10, // batch multiple requests together
         },
-        // async onFetchRequest(request) {
-        //   console.log("Fetching request:", request.url);
-        // },
       }),
     });
 
     const client = createRpcClient(
       new EvmRpcStream(viemClient, {
-        getLogsRangeSize: 10n,
+        // This parameter changes based on the rpc provider.
+        // The stream automatically shrinks the batch size when the provider returns an error.
+        getLogsRangeSize: 1_000n,
       }),
     );
 
@@ -72,19 +61,10 @@ const command = defineCommand({
     consola.info("Finalized:", status.finalized?.orderKey);
 
     const filter: Filter = {
-      // header: "always",
       logs: [
         {
           id: 1,
-          address: "0xe0e0e08A6A4b9Dc7bD67BCB7aadE5cF48157d444",
-        },
-        {
-          id: 2,
-          address: "0xA37cc341634AFD9E0919D334606E676dbAb63E17",
-        },
-        {
-          id: 3,
-          address: "0xe0e0e08A6A4b9Dc7bD67BCB7aadE5cF48157d444",
+          address: args.contract as `0x${string}`,
         },
       ],
     };
@@ -102,29 +82,15 @@ const command = defineCommand({
     })) {
       switch (message._tag) {
         case "data": {
-          const { data, endCursor, finality, production } = message.data;
+          const { data } = message.data;
 
           for (const block of data) {
             assert(block !== null);
             const logs = block.logs;
 
-            consola.info(
-              `block ${block.header?.blockNumber} [${finality}/${production}]`,
+            console.log(
+              `block = ${block.header?.blockNumber} logs=${logs.length}`,
             );
-            consola.info(
-              "   logs:",
-              logs.length,
-              logs.map(({ logIndex }) => logIndex),
-            );
-
-            for (const log of logs) {
-              // consola.info(log);
-              // consola.info("   🔔 Log");
-              // consola.info("      Tx:", log.transactionHash);
-              // consola.info("      Address:", log.address);
-              // consola.info("      Topics:", log.topics.join(", "));
-              // consola.info("      Log Index:", log.logIndex);
-            }
           }
 
           break;
