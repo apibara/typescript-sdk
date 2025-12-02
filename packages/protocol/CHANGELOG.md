@@ -1,8 +1,16 @@
 # Change Log - @apibara/protocol
 
-<!-- This log was last generated on Sun, 30 Nov 2025 21:29:41 GMT and should not be manually modified. -->
+<!-- This log was last generated on Tue, 02 Dec 2025 17:18:37 GMT and should not be manually modified. -->
 
 <!-- Start content -->
+
+## 2.1.0-beta.45
+
+Tue, 02 Dec 2025 17:18:37 GMT
+
+### Changes
+
+- rpc: periodically send empty blocks (francesco@ceccon.me)
 
 ## 2.1.0-beta.42
 

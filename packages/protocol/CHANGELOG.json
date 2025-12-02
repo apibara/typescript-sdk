@@ -2,6 +2,21 @@
   "name": "@apibara/protocol",
   "entries": [
     {
+      "date": "Tue, 02 Dec 2025 17:18:37 GMT",
+      "version": "2.1.0-beta.45",
+      "tag": "@apibara/protocol_v2.1.0-beta.45",
+      "comments": {
+        "prerelease": [
+          {
+            "author": "francesco@ceccon.me",
+            "package": "@apibara/protocol",
+            "commit": "f71d689ba7d77692af2eedc054a69c3ec0251c4b",
+            "comment": "rpc: periodically send empty blocks"
+          }
+        ]
+      }
+    },
+    {
       "date": "Sun, 30 Nov 2025 21:29:41 GMT",
       "version": "2.1.0-beta.42",
       "tag": "@apibara/protocol_v2.1.0-beta.42",

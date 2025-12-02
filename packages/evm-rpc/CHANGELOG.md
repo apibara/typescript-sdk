@@ -1,8 +1,16 @@
 # Change Log - @apibara/evm-rpc
 
-<!-- This log was last generated on Mon, 01 Dec 2025 20:04:18 GMT and should not be manually modified. -->
+<!-- This log was last generated on Tue, 02 Dec 2025 17:18:37 GMT and should not be manually modified. -->
 
 <!-- Start content -->
+
+## 2.1.0-beta.46
+
+Tue, 02 Dec 2025 17:18:37 GMT
+
+### Changes
+
+- rpc: periodically send empty blocks (francesco@ceccon.me)
 
 ## 2.1.0-beta.45
 
