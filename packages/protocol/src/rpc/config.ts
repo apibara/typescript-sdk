@@ -27,6 +27,7 @@ export type BlockInfo = {
 export type FetchBlockByNumberArgs<TFilter> = {
   blockNumber: bigint;
   expectedParentBlockHash: Bytes;
+  isAtHead: boolean;
   filter: TFilter;
 };
 

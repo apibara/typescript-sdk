@@ -180,6 +180,7 @@ export class EvmRpcStream extends RpcStreamConfig<Filter, Block> {
   async fetchBlockByNumber({
     blockNumber,
     expectedParentBlockHash,
+    isAtHead,
     filter,
   }: FetchBlockByNumberArgs<Filter>): Promise<FetchBlockByNumberResult<Block>> {
     // Fetch block header and check it matches the expected parent block hash.
@@ -226,8 +227,12 @@ export class EvmRpcStream extends RpcStreamConfig<Filter, Block> {
 
     let block = null;
 
-    // TODO: handle header on new block.
-    if (filter.header === "always" || logs.length > 0) {
+    const shouldSendBlock =
+      filter.header === "always" ||
+      logs.length > 0 ||
+      (filter.header === "on_data_or_on_new_block" && isAtHead);
+
+    if (shouldSendBlock) {
       block = {
         header,
         logs,

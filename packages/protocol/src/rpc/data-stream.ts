@@ -213,6 +213,7 @@ async function* produceNextBlock<TFilter, TBlock>(
 
   const result = await state.config.fetchBlockByNumber({
     blockNumber: state.cursor.orderKey + 1n,
+    isAtHead: isAtHead(state),
     expectedParentBlockHash: currentBlockHash,
     filter: state.filter,
   });
