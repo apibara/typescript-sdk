@@ -1,0 +1,7 @@
+{
+  "type": "prerelease",
+  "comment": "rpc: periodically send empty blocks",
+  "packageName": "@apibara/evm-rpc",
+  "email": "francesco@ceccon.me",
+  "dependentChangeType": "patch"
+}
