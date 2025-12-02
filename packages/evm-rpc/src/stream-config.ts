@@ -121,6 +121,7 @@ export class EvmRpcStream extends RpcStreamConfig<Filter, Block> {
   async fetchBlockRange({
     startBlock,
     finalizedBlock,
+    force,
     filter,
   }: FetchBlockRangeArgs<Filter>): Promise<FetchBlockRangeResult<Block>> {
     const { start: fromBlock, end: toBlock } = this.blockRangeOracle.clampRange(
@@ -151,6 +152,12 @@ export class EvmRpcStream extends RpcStreamConfig<Filter, Block> {
           }),
         );
       }
+    } else if (force && blockNumbers.length === 0) {
+      blockNumberResponses.push(
+        this.fetchBlockHeaderByNumberWithRetry({
+          blockNumber: toBlock,
+        }),
+      );
     } else {
       for (const blockNumber of blockNumbers) {
         blockNumberResponses.push(

@@ -3,6 +3,7 @@ import type { Bytes, Cursor } from "../common";
 export type FetchBlockRangeArgs<TFilter> = {
   startBlock: bigint;
   finalizedBlock: bigint;
+  force: boolean;
   filter: TFilter;
 };
 
