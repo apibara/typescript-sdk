@@ -121,6 +121,7 @@ export class EvmRpcStream extends RpcStreamConfig<Filter, Block> {
   async fetchBlockRange({
     startBlock,
     finalizedBlock,
+    force,
     filter,
   }: FetchBlockRangeArgs<Filter>): Promise<FetchBlockRangeResult<Block>> {
     const { start: fromBlock, end: toBlock } = this.blockRangeOracle.clampRange(
@@ -151,6 +152,12 @@ export class EvmRpcStream extends RpcStreamConfig<Filter, Block> {
           }),
         );
       }
+    } else if (force && blockNumbers.length === 0) {
+      blockNumberResponses.push(
+        this.fetchBlockHeaderByNumberWithRetry({
+          blockNumber: toBlock,
+        }),
+      );
     } else {
       for (const blockNumber of blockNumbers) {
         blockNumberResponses.push(
@@ -180,6 +187,7 @@ export class EvmRpcStream extends RpcStreamConfig<Filter, Block> {
   async fetchBlockByNumber({
     blockNumber,
     expectedParentBlockHash,
+    isAtHead,
     filter,
   }: FetchBlockByNumberArgs<Filter>): Promise<FetchBlockByNumberResult<Block>> {
     // Fetch block header and check it matches the expected parent block hash.
@@ -226,8 +234,12 @@ export class EvmRpcStream extends RpcStreamConfig<Filter, Block> {
 
     let block = null;
 
-    // TODO: handle header on new block.
-    if (filter.header === "always" || logs.length > 0) {
+    const shouldSendBlock =
+      filter.header === "always" ||
+      logs.length > 0 ||
+      (filter.header === "on_data_or_on_new_block" && isAtHead);
+
+    if (shouldSendBlock) {
       block = {
         header,
         logs,

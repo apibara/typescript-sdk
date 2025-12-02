@@ -16,6 +16,8 @@ type State<TFilter, TBlock> = {
   lastFinalizedRefresh: number;
   // When the last heartbeat was sent.
   lastHeartbeat: number;
+  // When the last backfill message was sent.
+  lastBackfillMessage: number;
   // Track the chain's state.
   chainTracker: ChainTracker;
   // Heartbeat interval in milliseconds.
@@ -95,6 +97,7 @@ export class RpcDataStream<TFilter, TBlock> {
       cursor,
       lastHeartbeat: Date.now(),
       lastFinalizedRefresh: Date.now(),
+      lastBackfillMessage: Date.now(),
       chainTracker,
       config: this.config,
       heartbeatIntervalMs: this.heartbeatIntervalMs,
@@ -165,9 +168,14 @@ async function* backfillFinalizedBlocks<TFilter, TBlock>(
   const { cursor, chainTracker, config, filter } = state;
   const finalized = chainTracker.finalized();
 
+  // While backfilling we want to regularly send some blocks (even if empty) so
+  // that the client can store the cursor.
+  const force = shouldForceBackfill(state);
+
   const filterData = await config.fetchBlockRange({
     startBlock: cursor.orderKey + 1n,
     finalizedBlock: finalized.orderKey,
+    force,
     filter,
   });
 
@@ -179,6 +187,7 @@ async function* backfillFinalizedBlocks<TFilter, TBlock>(
 
   for (const data of filterData.data) {
     state.lastHeartbeat = Date.now();
+    state.lastBackfillMessage = Date.now();
     yield {
       _tag: "data",
       data: {
@@ -213,6 +222,7 @@ async function* produceNextBlock<TFilter, TBlock>(
 
   const result = await state.config.fetchBlockByNumber({
     blockNumber: state.cursor.orderKey + 1n,
+    isAtHead: isAtHead(state),
     expectedParentBlockHash: currentBlockHash,
     filter: state.filter,
   });
@@ -323,6 +333,12 @@ function shouldSendHeartbeat(state: State<unknown, unknown>): boolean {
   const { heartbeatIntervalMs, lastHeartbeat } = state;
   const now = Date.now();
   return now - lastHeartbeat >= heartbeatIntervalMs;
+}
+
+function shouldForceBackfill(state: State<unknown, unknown>): boolean {
+  const { lastBackfillMessage, heartbeatIntervalMs } = state;
+  const now = Date.now();
+  return now - lastBackfillMessage >= heartbeatIntervalMs;
 }
 
 function shouldContinue(state: State<unknown, unknown>): boolean {

@@ -1,0 +1,7 @@
+{
+  "type": "prerelease",
+  "comment": "rpc: periodically send empty blocks",
+  "packageName": "@apibara/protocol",
+  "email": "francesco@ceccon.me",
+  "dependentChangeType": "patch"
+}
