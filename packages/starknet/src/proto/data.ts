@@ -346,7 +346,11 @@ export interface BlockHeader {
     | ResourcePrice
     | undefined;
   /** L1 data availability mode. */
-  readonly l1DataAvailabilityMode?: L1DataAvailabilityMode | undefined;
+  readonly l1DataAvailabilityMode?:
+    | L1DataAvailabilityMode
+    | undefined;
+  /** Price of L2 gas in the block. */
+  readonly l2GasPrice?: ResourcePrice | undefined;
 }
 
 /** A transaction. */
@@ -1088,6 +1092,7 @@ function createBaseBlockHeader(): BlockHeader {
     l1GasPrice: undefined,
     l1DataGasPrice: undefined,
     l1DataAvailabilityMode: 0,
+    l2GasPrice: undefined,
   };
 }
 
@@ -1125,6 +1130,9 @@ export const BlockHeader = {
     }
     if (message.l1DataAvailabilityMode !== undefined && message.l1DataAvailabilityMode !== 0) {
       writer.uint32(80).int32(message.l1DataAvailabilityMode);
+    }
+    if (message.l2GasPrice !== undefined) {
+      ResourcePrice.encode(message.l2GasPrice, writer.uint32(90).fork()).ldelim();
     }
     return writer;
   },
@@ -1206,6 +1214,13 @@ export const BlockHeader = {
 
           message.l1DataAvailabilityMode = reader.int32() as any;
           continue;
+        case 11:
+          if (tag !== 90) {
+            break;
+          }
+
+          message.l2GasPrice = ResourcePrice.decode(reader, reader.uint32());
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -1229,6 +1244,7 @@ export const BlockHeader = {
       l1DataAvailabilityMode: isSet(object.l1DataAvailabilityMode)
         ? l1DataAvailabilityModeFromJSON(object.l1DataAvailabilityMode)
         : 0,
+      l2GasPrice: isSet(object.l2GasPrice) ? ResourcePrice.fromJSON(object.l2GasPrice) : undefined,
     };
   },
 
@@ -1264,6 +1280,9 @@ export const BlockHeader = {
     if (message.l1DataAvailabilityMode !== undefined && message.l1DataAvailabilityMode !== 0) {
       obj.l1DataAvailabilityMode = l1DataAvailabilityModeToJSON(message.l1DataAvailabilityMode);
     }
+    if (message.l2GasPrice !== undefined) {
+      obj.l2GasPrice = ResourcePrice.toJSON(message.l2GasPrice);
+    }
     return obj;
   },
 
@@ -1294,6 +1313,9 @@ export const BlockHeader = {
       ? ResourcePrice.fromPartial(object.l1DataGasPrice)
       : undefined;
     message.l1DataAvailabilityMode = object.l1DataAvailabilityMode ?? 0;
+    message.l2GasPrice = (object.l2GasPrice !== undefined && object.l2GasPrice !== null)
+      ? ResourcePrice.fromPartial(object.l2GasPrice)
+      : undefined;
     return message;
   },
 };

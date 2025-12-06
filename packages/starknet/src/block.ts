@@ -182,6 +182,7 @@ export type DataAvailabilityMode = CodecType<typeof DataAvailabilityMode>;
  * @prop l1GasPrice Calldata gas price.
  * @prop l1DataGasPrice Blob gas price.
  * @prop l1DataAvailabilityMode How data is posted to L1.
+ * @prop l2GasPrice L2 gas price.
  */
 export const BlockHeader = MessageCodec({
   blockHash: OptionalCodec(FieldElement),
@@ -194,6 +195,7 @@ export const BlockHeader = MessageCodec({
   l1GasPrice: RequiredCodec(ResourcePrice),
   l1DataGasPrice: RequiredCodec(ResourcePrice),
   l1DataAvailabilityMode: RequiredCodec(L1DataAvailabilityMode),
+  l2GasPrice: OptionalCodec(ResourcePrice),
 });
 
 export type BlockHeader = Readonly<CodecType<typeof BlockHeader>>;
