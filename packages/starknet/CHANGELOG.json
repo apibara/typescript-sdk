@@ -2,6 +2,21 @@
   "name": "@apibara/starknet",
   "entries": [
     {
+      "date": "Sat, 06 Dec 2025 16:15:01 GMT",
+      "version": "2.1.0-beta.46",
+      "tag": "@apibara/starknet_v2.1.0-beta.46",
+      "comments": {
+        "prerelease": [
+          {
+            "author": "francesco@ceccon.me",
+            "package": "@apibara/starknet",
+            "commit": "8e322db6334d7917d420e71d8d2b05cc6a2fbc0b",
+            "comment": "starknet: add l2 gas price header prop"
+          }
+        ]
+      }
+    },
+    {
       "date": "Mon, 01 Dec 2025 15:55:09 GMT",
       "version": "2.1.0-beta.43",
       "tag": "@apibara/starknet_v2.1.0-beta.43",

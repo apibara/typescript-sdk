@@ -1,8 +1,16 @@
 # Change Log - @apibara/starknet
 
-<!-- This log was last generated on Mon, 01 Dec 2025 15:55:09 GMT and should not be manually modified. -->
+<!-- This log was last generated on Sat, 06 Dec 2025 16:15:01 GMT and should not be manually modified. -->
 
 <!-- Start content -->
+
+## 2.1.0-beta.46
+
+Sat, 06 Dec 2025 16:15:01 GMT
+
+### Changes
+
+- starknet: add l2 gas price header prop (francesco@ceccon.me)
 
 ## 2.1.0-beta.43
 

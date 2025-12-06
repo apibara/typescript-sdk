@@ -1,6 +1,6 @@
 {
   "name": "@apibara/evm-rpc",
-  "version": "2.1.0-beta.46",
+  "version": "2.1.0-beta.47",
   "type": "module",
   "files": [
     "dist",
