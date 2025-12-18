@@ -142,8 +142,8 @@ async function* dataStreamLoop<TFilter, TBlock>(
 
     const finalized = chainTracker.finalized();
 
-    // console.log(
-    //   `Loop: c=${cursor.orderKey} f=${finalized.orderKey} h=${chainTracker.head().orderKey}`,
+    // console.debug(
+    //   `RpcLoop: c=${cursor.orderKey} f=${finalized.orderKey} h=${chainTracker.head().orderKey}`,
     // );
 
     if (cursor.orderKey < finalized.orderKey) {
@@ -200,6 +200,7 @@ async function* backfillFinalizedBlocks<TFilter, TBlock>(
     };
   }
 
+  // Notice that we check that filteredData.endBlock <= finalized.orderKey above.
   if (filterData.endBlock === finalized.orderKey) {
     // Prepare for transition to non-finalized data.
     state.cursor = finalized;
@@ -240,8 +241,9 @@ async function* produceNextBlock<TFilter, TBlock>(
     uniqueKey: blockInfo.blockHash,
   };
 
-  const { status: headUpdateStatus } =
-    state.chainTracker.addToCanonicalChain(blockInfo);
+  const { status: headUpdateStatus } = state.chainTracker.addToCanonicalChain({
+    blockInfo,
+  });
 
   if (headUpdateStatus !== "success") {
     throw new Error("Failed to update head. Would cause reorg.");
