@@ -43,6 +43,10 @@ export class ChainTracker {
   }
 
   updateFinalized(newFinalized: BlockInfo) {
+    // console.debug(
+    //   `updateFinalized: new=${newFinalized.blockNumber} old=${this.#finalized.blockNumber}`,
+    // );
+
     if (newFinalized.blockNumber < this.#finalized.blockNumber) {
       throw new Error("Finalized cursor moved backwards");
     }
@@ -70,7 +74,9 @@ export class ChainTracker {
     return true;
   }
 
-  addToCanonicalChain(blockInfo: BlockInfo) {
+  addToCanonicalChain({ blockInfo }: { blockInfo: BlockInfo }) {
+    // console.debug(`addToCanonicalChain: block=${blockInfo.blockNumber}`);
+
     const existing = this.#canonical.get(blockInfo.blockNumber);
 
     if (existing) {
@@ -83,7 +89,7 @@ export class ChainTracker {
 
     const parent = this.#canonical.get(blockInfo.blockNumber - 1n);
     if (!parent) {
-      throw new Error("Parent block not found");
+      throw new Error("Parent block not in canonical chain");
     }
 
     if (parent.blockHash !== blockInfo.parentBlockHash) {
@@ -101,6 +107,10 @@ export class ChainTracker {
     newHead,
     fetchCursorByHash,
   }: UpdateHeadArgs): Promise<UpdateHeadResult> {
+    // console.debug(
+    //   `updateHead: new=${newHead.blockNumber} old=${this.#head.blockNumber}`,
+    // );
+
     // No changes to the chain.
     if (
       newHead.blockNumber === this.#head.blockNumber &&
@@ -245,21 +255,24 @@ export class ChainTracker {
     | { canonical: false; reason: string; fullCursor?: undefined }
   > {
     const head = this.head();
+    const finalized = this.finalized();
+
     if (cursor.orderKey > head.orderKey) {
       return { canonical: false, reason: "cursor is ahead of head" };
     }
 
+    const expectedInfo = await fetchCursor(cursor.orderKey);
     if (!cursor.uniqueKey) {
-      const fullInfo = await fetchCursor(cursor.orderKey);
-
-      if (fullInfo === null) {
+      if (expectedInfo === null) {
         throw new Error("Failed to initialize canonical cursor");
       }
 
-      return { canonical: true, fullCursor: blockInfoToCursor(fullInfo) };
-    }
+      if (expectedInfo.blockNumber > finalized.orderKey) {
+        this.#canonical.set(expectedInfo.blockNumber, expectedInfo);
+      }
 
-    const expectedInfo = await fetchCursor(cursor.orderKey);
+      return { canonical: true, fullCursor: blockInfoToCursor(expectedInfo) };
+    }
 
     if (expectedInfo === null) {
       return {
@@ -293,6 +306,10 @@ export class ChainTracker {
         canonical: false,
         reason: `cursor hash does not match expected hash: ${cursor.uniqueKey} !== ${expectedCursor.uniqueKey}`,
       };
+    }
+
+    if (expectedInfo.blockNumber > finalized.orderKey) {
+      this.#canonical.set(expectedInfo.blockNumber, expectedInfo);
     }
 
     return { canonical: true, fullCursor: expectedCursor };
