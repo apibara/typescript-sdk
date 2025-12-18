@@ -1,0 +1,7 @@
+{
+  "type": "prerelease",
+  "comment": "protocol: insert starting cursor in chain tracker",
+  "packageName": "@apibara/protocol",
+  "email": "francesco@ceccon.me",
+  "dependentChangeType": "patch"
+}
