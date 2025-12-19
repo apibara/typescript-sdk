@@ -2,6 +2,21 @@
   "name": "@apibara/protocol",
   "entries": [
     {
+      "date": "Fri, 19 Dec 2025 10:19:30 GMT",
+      "version": "2.1.0-beta.48",
+      "tag": "@apibara/protocol_v2.1.0-beta.48",
+      "comments": {
+        "prerelease": [
+          {
+            "author": "francesco@ceccon.me",
+            "package": "@apibara/protocol",
+            "commit": "b3443c7af5d8ec3c062c9cc4c24a773f30af57db",
+            "comment": "protocol: insert starting cursor in chain tracker"
+          }
+        ]
+      }
+    },
+    {
       "date": "Tue, 02 Dec 2025 17:18:37 GMT",
       "version": "2.1.0-beta.45",
       "tag": "@apibara/protocol_v2.1.0-beta.45",

@@ -1,8 +1,16 @@
 # Change Log - @apibara/protocol
 
-<!-- This log was last generated on Tue, 02 Dec 2025 17:18:37 GMT and should not be manually modified. -->
+<!-- This log was last generated on Fri, 19 Dec 2025 10:19:30 GMT and should not be manually modified. -->
 
 <!-- Start content -->
+
+## 2.1.0-beta.48
+
+Fri, 19 Dec 2025 10:19:30 GMT
+
+### Changes
+
+- protocol: insert starting cursor in chain tracker (francesco@ceccon.me)
 
 ## 2.1.0-beta.45
 
