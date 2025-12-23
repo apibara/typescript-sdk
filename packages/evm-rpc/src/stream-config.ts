@@ -43,6 +43,8 @@ export type EvmRpcStreamOptions = {
   headRefreshIntervalMs?: number;
   /** How often to refresh the finalized block. */
   finalizedRefreshIntervalMs?: number;
+  /** Force sending accepted headers even if no data matched. */
+  alwaysSendAcceptedHeaders?: boolean;
 };
 
 export class EvmRpcStream extends RpcStreamConfig<Filter, Block> {
@@ -237,7 +239,8 @@ export class EvmRpcStream extends RpcStreamConfig<Filter, Block> {
     const shouldSendBlock =
       filter.header === "always" ||
       logs.length > 0 ||
-      (filter.header === "on_data_or_on_new_block" && isAtHead);
+      (filter.header === "on_data_or_on_new_block" && isAtHead) ||
+      this.options.alwaysSendAcceptedHeaders;
 
     if (shouldSendBlock) {
       block = {
