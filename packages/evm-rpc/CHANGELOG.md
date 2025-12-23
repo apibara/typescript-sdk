@@ -1,8 +1,16 @@
 # Change Log - @apibara/evm-rpc
 
-<!-- This log was last generated on Tue, 02 Dec 2025 17:18:37 GMT and should not be manually modified. -->
+<!-- This log was last generated on Tue, 23 Dec 2025 19:51:00 GMT and should not be manually modified. -->
 
 <!-- Start content -->
+
+## 2.1.0-beta.49
+
+Tue, 23 Dec 2025 19:51:00 GMT
+
+### Changes
+
+- evm-rpc: add option to send all accepted blocks (francesco@ceccon.me)
 
 ## 2.1.0-beta.46
 

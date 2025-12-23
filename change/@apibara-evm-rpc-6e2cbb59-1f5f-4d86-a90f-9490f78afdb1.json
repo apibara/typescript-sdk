@@ -1,7 +1,0 @@
-{
-  "type": "prerelease",
-  "comment": "evm-rpc: add option to send all accepted blocks",
-  "packageName": "@apibara/evm-rpc",
-  "email": "francesco@ceccon.me",
-  "dependentChangeType": "patch"
-}

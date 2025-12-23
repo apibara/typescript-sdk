@@ -2,6 +2,21 @@
   "name": "@apibara/evm-rpc",
   "entries": [
     {
+      "date": "Tue, 23 Dec 2025 19:51:00 GMT",
+      "version": "2.1.0-beta.49",
+      "tag": "@apibara/evm-rpc_v2.1.0-beta.49",
+      "comments": {
+        "prerelease": [
+          {
+            "author": "francesco@ceccon.me",
+            "package": "@apibara/evm-rpc",
+            "commit": "469f9830505536d5a3c6712b3e992450e68608ef",
+            "comment": "evm-rpc: add option to send all accepted blocks"
+          }
+        ]
+      }
+    },
+    {
       "date": "Tue, 02 Dec 2025 17:18:37 GMT",
       "version": "2.1.0-beta.46",
       "tag": "@apibara/evm-rpc_v2.1.0-beta.46",
