@@ -22,11 +22,14 @@
     "typecheck": "tsc --noEmit",
     "lint": "biome check .",
     "lint:fix": "pnpm lint --write",
-    "format": "biome format . --write"
+    "format": "biome format . --write",
+    "test": "vitest",
+    "test:ci": "vitest run"
   },
   "devDependencies": {
     "@types/node": "^20.12.13",
-    "unbuild": "^2.0.0"
+    "unbuild": "^2.0.0",
+    "vitest": "^1.6.0"
   },
   "dependencies": {
     "@apibara/protocol": "workspace:*",

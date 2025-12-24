@@ -1,7 +1,14 @@
 import type { LogFilter } from "@apibara/evm";
 import type { Bytes } from "@apibara/protocol";
 import type { RpcLog } from "viem";
-import { hexToNumber, isHex, numberToHex, pad, trim } from "viem";
+import {
+  hexToNumber,
+  isAddressEqual,
+  isHex,
+  numberToHex,
+  pad,
+  trim,
+} from "viem";
 import type { Log } from "./block";
 import type { Filter } from "./filter";
 import type { ViemRpcClient } from "./stream-config";
@@ -11,56 +18,53 @@ export async function fetchLogsByBlockHash({
   client,
   blockHash,
   filter,
+  mergeGetLogs,
 }: {
   client: ViemRpcClient;
   blockHash: Bytes;
   filter: Filter;
+  mergeGetLogs: boolean;
 }): Promise<{ logs: Log[] }> {
   if (!filter.logs || filter.logs.length === 0) {
     return { logs: [] };
   }
 
-  const responses = await Promise.all(
-    filter.logs.map(async (logFilter) => {
-      const logs = await client.request({
-        method: "eth_getLogs",
-        params: [
-          {
-            blockHash,
-            address: logFilter.address,
-            topics: logFilter.topics ? [...logFilter.topics] : undefined,
-          },
-        ],
+  const responses = mergeGetLogs
+    ? await mergedGetLogsCalls({
+        client,
+        filter,
+        blockHash,
+      })
+    : await standardGetLogsCalls({
+        client,
+        filter,
+        blockHash,
       });
-      return { logs, logFilter };
-    }),
-  );
 
-  // Multiple calls may have produced the same log.
-  // We track all the logs (by their logIndex, which is unique within a block).
-  // logIndex -> position
   const allLogs: Log[] = [];
   const seenLogsByIndex: Record<number, number> = {};
 
-  for (const { logFilter, logs } of responses) {
+  for (const { logFilters, logs } of responses) {
     for (const log of logs) {
       if (log.blockNumber === null) {
         throw new Error("Log block number is null");
       }
 
-      const refinedLog = refineLog(log, logFilter);
+      for (const logFilter of logFilters) {
+        const refinedLog = refineLog(log, logFilter);
 
-      if (refinedLog) {
-        const existingPosition = seenLogsByIndex[refinedLog.logIndex];
+        if (refinedLog) {
+          const existingPosition = seenLogsByIndex[refinedLog.logIndex];
 
-        if (existingPosition !== undefined) {
-          const existingLog = allLogs[existingPosition];
-          (existingLog.filterIds as number[]).push(logFilter.id ?? 0);
-        } else {
-          (refinedLog.filterIds as number[]).push(logFilter.id ?? 0);
+          if (existingPosition !== undefined) {
+            const existingLog = allLogs[existingPosition];
+            (existingLog.filterIds as number[]).push(logFilter.id ?? 0);
+          } else {
+            (refinedLog.filterIds as number[]).push(logFilter.id ?? 0);
 
-          allLogs.push(refinedLog);
-          seenLogsByIndex[refinedLog.logIndex] = allLogs.length - 1;
+            allLogs.push(refinedLog);
+            seenLogsByIndex[refinedLog.logIndex] = allLogs.length - 1;
+          }
         }
       }
     }
@@ -74,11 +78,13 @@ export async function fetchLogsForRange({
   fromBlock,
   toBlock,
   filter,
+  mergeGetLogs,
 }: {
   client: ViemRpcClient;
   fromBlock: bigint;
   toBlock: bigint;
   filter: Filter;
+  mergeGetLogs: boolean;
 }): Promise<{ logs: Record<number, Log[]>; blockNumbers: bigint[] }> {
   const logsByBlock: Record<number, Log[]> = {};
 
@@ -86,68 +92,61 @@ export async function fetchLogsForRange({
     return { logs: logsByBlock, blockNumbers: [] };
   }
 
-  const responses = await Promise.all(
-    filter.logs.map(async (logFilter) => {
-      const logs = await client.request({
-        method: "eth_getLogs",
-        params: [
-          {
-            fromBlock: numberToHex(fromBlock),
-            toBlock: numberToHex(toBlock),
-            address: logFilter.address,
-            topics:
-              logFilter.topics !== undefined
-                ? [...logFilter.topics]
-                : undefined,
-          },
-        ],
+  const responses = mergeGetLogs
+    ? await mergedGetLogsCalls({
+        client,
+        filter,
+        fromBlock: numberToHex(fromBlock),
+        toBlock: numberToHex(toBlock),
+      })
+    : await standardGetLogsCalls({
+        client,
+        filter,
+        fromBlock: numberToHex(fromBlock),
+        toBlock: numberToHex(toBlock),
       });
-      return { logs, logFilter };
-    }),
-  );
 
   const blockNumbers = new Set<bigint>();
 
-  // Multiple calls may have produced the same log.
-  // We track all the logs (by their logIndex, which is unique within a block).
-  // blockNumber -> logIndex -> position
   const seenLogsByBlockNumberAndIndex: Record<
     number,
     Record<number, number>
   > = {};
 
-  for (const { logFilter, logs } of responses) {
+  for (const { logFilters, logs } of responses) {
     for (const log of logs) {
       if (log.blockNumber === null) {
         throw new Error("Log block number is null");
       }
 
-      const refinedLog = refineLog(log, logFilter);
+      for (const logFilter of logFilters) {
+        const refinedLog = refineLog(log, logFilter);
 
-      if (refinedLog) {
-        const blockNumber = hexToNumber(log.blockNumber);
-        blockNumbers.add(BigInt(blockNumber));
+        if (refinedLog) {
+          const blockNumber = hexToNumber(log.blockNumber);
+          blockNumbers.add(BigInt(blockNumber));
 
-        if (!logsByBlock[blockNumber]) {
-          logsByBlock[blockNumber] = [];
-        }
+          if (!logsByBlock[blockNumber]) {
+            logsByBlock[blockNumber] = [];
+          }
 
-        if (!seenLogsByBlockNumberAndIndex[blockNumber]) {
-          seenLogsByBlockNumberAndIndex[blockNumber] = {};
-        }
+          if (!seenLogsByBlockNumberAndIndex[blockNumber]) {
+            seenLogsByBlockNumberAndIndex[blockNumber] = {};
+          }
 
-        const existingPosition =
-          seenLogsByBlockNumberAndIndex[blockNumber][refinedLog.logIndex];
+          const existingPosition =
+            seenLogsByBlockNumberAndIndex[blockNumber][refinedLog.logIndex];
 
-        if (existingPosition !== undefined) {
-          const existingLog = logsByBlock[blockNumber][existingPosition];
-          (existingLog.filterIds as number[]).push(logFilter.id ?? 0);
-        } else {
-          (refinedLog.filterIds as number[]).push(logFilter.id ?? 0);
+          if (existingPosition !== undefined) {
+            const existingLog = logsByBlock[blockNumber][existingPosition];
+            (existingLog.filterIds as number[]).push(logFilter.id ?? 0);
+          } else {
+            (refinedLog.filterIds as number[]).push(logFilter.id ?? 0);
 
-          logsByBlock[blockNumber].push(refinedLog);
-          seenLogsByBlockNumberAndIndex[blockNumber][refinedLog.logIndex] =
-            logsByBlock[blockNumber].length - 1;
+            logsByBlock[blockNumber].push(refinedLog);
+            seenLogsByBlockNumberAndIndex[blockNumber][refinedLog.logIndex] =
+              logsByBlock[blockNumber].length - 1;
+          }
         }
       }
     }
@@ -165,8 +164,11 @@ function refineLog(log: RpcLog, filter: LogFilter): Log | null {
     return null;
   }
 
+  if (filter.address && !isAddressEqual(log.address, filter.address)) {
+    return null;
+  }
+
   const filterTopics = filter.topics ?? [];
-  // Strict mode
   if (filter.strict && log.topics.length !== filterTopics.length) {
     return null;
   }
@@ -200,4 +202,103 @@ function refineLog(log: RpcLog, filter: LogFilter): Log | null {
   }
 
   return viemRpcLogToDna(log);
+}
+
+async function mergedGetLogsCalls({
+  client,
+  filter,
+  blockHash,
+  fromBlock,
+  toBlock,
+}: {
+  client: ViemRpcClient;
+  filter: Filter;
+  blockHash?: Bytes;
+  fromBlock?: `0x${string}`;
+  toBlock?: `0x${string}`;
+}) {
+  const blockParams = blockHash ? { blockHash } : { fromBlock, toBlock };
+
+  const filtersWithAddress = filter.logs.filter((f) => f.address !== undefined);
+  const filtersWithoutAddress = filter.logs.filter(
+    (f) => f.address === undefined,
+  );
+
+  const promises: Promise<{
+    logs: RpcLog[];
+    logFilters: typeof filter.logs;
+  }>[] = [];
+
+  if (filtersWithAddress.length > 0) {
+    const addresses = filtersWithAddress.map((f) => f.address!);
+
+    promises.push(
+      client
+        .request({
+          method: "eth_getLogs",
+          params: [
+            {
+              address: addresses,
+              ...blockParams,
+            },
+          ],
+        })
+        .then((logs: RpcLog[]) => ({ logs, logFilters: filtersWithAddress })),
+    );
+  }
+
+  if (filtersWithoutAddress.length > 0) {
+    promises.push(
+      client
+        .request({
+          method: "eth_getLogs",
+          params: [
+            {
+              ...blockParams,
+            },
+          ],
+        })
+        .then((logs: RpcLog[]) => ({
+          logs,
+          logFilters: filtersWithoutAddress,
+        })),
+    );
+  }
+
+  return await Promise.all(promises);
+}
+
+async function standardGetLogsCalls({
+  client,
+  filter,
+  blockHash,
+  fromBlock,
+  toBlock,
+}: {
+  client: ViemRpcClient;
+  filter: Filter;
+  blockHash?: Bytes;
+  fromBlock?: `0x${string}`;
+  toBlock?: `0x${string}`;
+}) {
+  const blockParams = blockHash ? { blockHash } : { fromBlock, toBlock };
+  return await Promise.all(
+    filter.logs.map(async (logFilter) => {
+      const logs = await client.request({
+        method: "eth_getLogs",
+        params: [
+          {
+            address: logFilter.address,
+            topics:
+              logFilter.topics !== undefined
+                ? [...logFilter.topics]
+                : undefined,
+            ...blockParams,
+          },
+        ],
+      });
+
+      return { logs, logFilters: [logFilter] };
+    }),
+  );
 }
