@@ -1,8 +1,16 @@
 # Change Log - @apibara/evm-rpc
 
-<!-- This log was last generated on Tue, 23 Dec 2025 19:51:00 GMT and should not be manually modified. -->
+<!-- This log was last generated on Wed, 24 Dec 2025 15:46:00 GMT and should not be manually modified. -->
 
 <!-- Start content -->
+
+## 2.1.0-beta.50
+
+Wed, 24 Dec 2025 15:46:00 GMT
+
+### Changes
+
+- Add option to merge eth_getLogs calls and filter client side (francesco@ceccon.me)
 
 ## 2.1.0-beta.49
 

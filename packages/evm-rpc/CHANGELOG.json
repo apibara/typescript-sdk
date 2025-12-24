@@ -2,6 +2,21 @@
   "name": "@apibara/evm-rpc",
   "entries": [
     {
+      "date": "Wed, 24 Dec 2025 15:46:00 GMT",
+      "version": "2.1.0-beta.50",
+      "tag": "@apibara/evm-rpc_v2.1.0-beta.50",
+      "comments": {
+        "prerelease": [
+          {
+            "author": "francesco@ceccon.me",
+            "package": "@apibara/evm-rpc",
+            "commit": "a3053dc9e8bba28530d52206e52d54d2d1dcc6ea",
+            "comment": "Add option to merge eth_getLogs calls and filter client side"
+          }
+        ]
+      }
+    },
+    {
       "date": "Tue, 23 Dec 2025 19:51:00 GMT",
       "version": "2.1.0-beta.49",
       "tag": "@apibara/evm-rpc_v2.1.0-beta.49",
