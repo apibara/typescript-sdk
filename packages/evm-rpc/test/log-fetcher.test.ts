@@ -1,5 +1,6 @@
 import { http, createPublicClient } from "viem";
 import { beforeAll, describe, expect, it } from "vitest";
+import type { Log } from "../src/block";
 import type { Filter } from "../src/filter";
 import { fetchLogsByBlockHash, fetchLogsForRange } from "../src/log-fetcher";
 
@@ -12,6 +13,12 @@ describe("fetchLogsByBlockHash", () => {
   const blockHash =
     "0xa513f32969106b29f6207bceb5f4ce4b3d1192571846b8a63f575762735a275c" as const;
 
+  function sortResult({ logs }: { logs: Log[] }) {
+    return {
+      logs: [...logs].sort((a, b) => a.logIndex - b.logIndex),
+    };
+  }
+
   beforeAll(() => {
     const rpcUrl = process.env.TEST_EVM_RPC_URL;
     if (!rpcUrl) {
@@ -25,14 +32,24 @@ describe("fetchLogsByBlockHash", () => {
 
   it("should return empty logs with empty filter", async () => {
     const filter: Filter = { logs: [] };
-    const result = await fetchLogsByBlockHash({
+    const resultStandard = await fetchLogsByBlockHash({
       client,
       blockHash,
       filter,
       mergeGetLogs: false,
     });
+    const resultMerged = await fetchLogsByBlockHash({
+      client,
+      blockHash,
+      filter,
+      mergeGetLogs: true,
+    });
 
-    expect(result).toMatchSnapshot();
+    const sortedStandard = sortResult(resultStandard);
+    const sortedMerged = sortResult(resultMerged);
+
+    expect(sortedMerged).toEqual(sortedStandard);
+    expect(sortedMerged).toMatchSnapshot();
   });
 
   it("should return logs filtered by contract addresses", async () => {
@@ -42,14 +59,24 @@ describe("fetchLogsByBlockHash", () => {
         { address: contract2, id: 2 },
       ],
     };
-    const result = await fetchLogsByBlockHash({
+    const resultStandard = await fetchLogsByBlockHash({
       client,
       blockHash,
       filter,
       mergeGetLogs: false,
     });
+    const resultMerged = await fetchLogsByBlockHash({
+      client,
+      blockHash,
+      filter,
+      mergeGetLogs: true,
+    });
 
-    expect(result).toMatchSnapshot();
+    const sortedStandard = sortResult(resultStandard);
+    const sortedMerged = sortResult(resultMerged);
+
+    expect(sortedMerged).toEqual(sortedStandard);
+    expect(sortedMerged).toMatchSnapshot();
   });
 
   it("should return logs filtered by contract address with strict empty topics and Transfer event", async () => {
@@ -72,14 +99,24 @@ describe("fetchLogsByBlockHash", () => {
         },
       ],
     };
-    const result = await fetchLogsByBlockHash({
+    const resultStandard = await fetchLogsByBlockHash({
       client,
       blockHash,
       filter,
       mergeGetLogs: false,
     });
+    const resultMerged = await fetchLogsByBlockHash({
+      client,
+      blockHash,
+      filter,
+      mergeGetLogs: true,
+    });
 
-    expect(result).toMatchSnapshot();
+    const sortedStandard = sortResult(resultStandard);
+    const sortedMerged = sortResult(resultMerged);
+
+    expect(sortedMerged).toEqual(sortedStandard);
+    expect(sortedMerged).toMatchSnapshot();
   });
 });
 
@@ -88,6 +125,30 @@ describe("fetchLogsForRange", () => {
   const fromBlock = 24_080_080n;
   const toBlock = 24_080_100n;
 
+  function sortResult({
+    logs,
+    blockNumbers,
+  }: {
+    logs: Record<number, Log[]>;
+    blockNumbers: bigint[];
+  }) {
+    const sortedLogs: Record<number, Log[]> = {};
+    const sortedBlockNumbers = [...blockNumbers].sort(
+      (a, b) => Number(a) - Number(b),
+    );
+
+    for (const blockNumber of sortedBlockNumbers) {
+      sortedLogs[Number(blockNumber)] = [...logs[Number(blockNumber)]].sort(
+        (a, b) => a.logIndex - b.logIndex,
+      );
+    }
+
+    return {
+      logs: sortedLogs,
+      blockNumbers: sortedBlockNumbers,
+    };
+  }
+
   beforeAll(() => {
     const rpcUrl = process.env.TEST_EVM_RPC_URL;
     if (!rpcUrl) {
@@ -101,15 +162,26 @@ describe("fetchLogsForRange", () => {
 
   it("should return empty logs with empty filter", async () => {
     const filter: Filter = { logs: [] };
-    const result = await fetchLogsForRange({
+    const resultStandard = await fetchLogsForRange({
       client,
       fromBlock,
       toBlock,
       filter,
       mergeGetLogs: false,
     });
+    const resultMerged = await fetchLogsForRange({
+      client,
+      fromBlock,
+      toBlock,
+      filter,
+      mergeGetLogs: true,
+    });
 
-    expect(result).toMatchSnapshot();
+    const sortedStandard = sortResult(resultStandard);
+    const sortedMerged = sortResult(resultMerged);
+
+    expect(sortedMerged).toEqual(sortedStandard);
+    expect(sortedMerged).toMatchSnapshot();
   });
 
   it("should return logs filtered by contract addresses", async () => {
@@ -119,15 +191,26 @@ describe("fetchLogsForRange", () => {
         { address: contract2, id: 2 },
       ],
     };
-    const result = await fetchLogsForRange({
+    const resultStandard = await fetchLogsForRange({
       client,
       fromBlock,
       toBlock,
       filter,
       mergeGetLogs: false,
     });
+    const resultMerged = await fetchLogsForRange({
+      client,
+      fromBlock,
+      toBlock,
+      filter,
+      mergeGetLogs: true,
+    });
 
-    expect(result).toMatchSnapshot();
+    const sortedStandard = sortResult(resultStandard);
+    const sortedMerged = sortResult(resultMerged);
+
+    expect(sortedMerged).toEqual(sortedStandard);
+    expect(sortedMerged).toMatchSnapshot();
   });
 
   it("should return logs filtered by contract address with strict empty topics and Transfer event", async () => {
@@ -150,14 +233,25 @@ describe("fetchLogsForRange", () => {
         },
       ],
     };
-    const result = await fetchLogsForRange({
+    const resultStandard = await fetchLogsForRange({
       client,
       fromBlock,
       toBlock,
       filter,
       mergeGetLogs: false,
     });
+    const resultMerged = await fetchLogsForRange({
+      client,
+      fromBlock,
+      toBlock,
+      filter,
+      mergeGetLogs: true,
+    });
 
-    expect(result).toMatchSnapshot();
+    const sortedStandard = sortResult(resultStandard);
+    const sortedMerged = sortResult(resultMerged);
+
+    expect(sortedMerged).toEqual(sortedStandard);
+    expect(sortedMerged).toMatchSnapshot();
   });
 });

@@ -72,20 +72,6 @@ exports[`fetchLogsByBlockHash > should return logs filtered by contract addresse
       "transactionStatus": "succeeded",
     },
     {
-      "address": "0xe0e0e08a6a4b9dc7bd67bcb7aade5cf48157d444",
-      "data": "0x000000000000000000000000a37cc341634afd9e0919d334606e676dbab63e1773916eeb2aca5d7cf28d2f84ca21c97eb38a3420ec9ea39884939ec762afbac800000000000000000000000000000000fef86c2ba9eb362136d473daa92bcc46fffffffffffffffffffffffffffffffffffffffffffffffffffffffffe5a5f52fffffffffffffffffffffffffffffffffffffffffffffffffffffffffe5a5f560000000000000000000000000000000000000000000034eb6e911ebe9d0214a30000000000000000000000000000000000000000000069e10de76676d08000000000000000000000000000000000000000000000000000000000000000000000",
-      "filterIds": [
-        1,
-      ],
-      "logIndex": 538,
-      "topics": [
-        "0xa2d4008be4187c63684f323788e131e1370dbc2205499befe2834005a00c792c",
-      ],
-      "transactionHash": "0xf01ba8385e7cce76b12c7cd01e8b3407498cec1732f806d5cdaa6415b19d5aa0",
-      "transactionIndex": 160,
-      "transactionStatus": "succeeded",
-    },
-    {
       "address": "0xa37cc341634afd9e0919d334606e676dbab63e17",
       "data": "0x",
       "filterIds": [
@@ -97,6 +83,20 @@ exports[`fetchLogsByBlockHash > should return logs filtered by contract addresse
         "0x0000000000000000000000000000000000000000000000000000000000000000",
         "0x000000000000000000000000c6dd9976066f3364b4d6a72cd4f1fa0468327aa7",
         "0x00000000000000000000000000000000fef86c2ba9eb362136d473daa92bcc46",
+      ],
+      "transactionHash": "0xf01ba8385e7cce76b12c7cd01e8b3407498cec1732f806d5cdaa6415b19d5aa0",
+      "transactionIndex": 160,
+      "transactionStatus": "succeeded",
+    },
+    {
+      "address": "0xe0e0e08a6a4b9dc7bd67bcb7aade5cf48157d444",
+      "data": "0x000000000000000000000000a37cc341634afd9e0919d334606e676dbab63e1773916eeb2aca5d7cf28d2f84ca21c97eb38a3420ec9ea39884939ec762afbac800000000000000000000000000000000fef86c2ba9eb362136d473daa92bcc46fffffffffffffffffffffffffffffffffffffffffffffffffffffffffe5a5f52fffffffffffffffffffffffffffffffffffffffffffffffffffffffffe5a5f560000000000000000000000000000000000000000000034eb6e911ebe9d0214a30000000000000000000000000000000000000000000069e10de76676d08000000000000000000000000000000000000000000000000000000000000000000000",
+      "filterIds": [
+        1,
+      ],
+      "logIndex": 538,
+      "topics": [
+        "0xa2d4008be4187c63684f323788e131e1370dbc2205499befe2834005a00c792c",
       ],
       "transactionHash": "0xf01ba8385e7cce76b12c7cd01e8b3407498cec1732f806d5cdaa6415b19d5aa0",
       "transactionIndex": 160,
@@ -732,20 +732,6 @@ exports[`fetchLogsForRange > should return logs filtered by contract addresses 1
         "transactionStatus": "succeeded",
       },
       {
-        "address": "0xe0e0e08a6a4b9dc7bd67bcb7aade5cf48157d444",
-        "data": "0x000000000000000000000000a37cc341634afd9e0919d334606e676dbab63e1773916eeb2aca5d7cf28d2f84ca21c97eb38a3420ec9ea39884939ec762afbac800000000000000000000000000000000fef86c2ba9eb362136d473daa92bcc46fffffffffffffffffffffffffffffffffffffffffffffffffffffffffe5a5f52fffffffffffffffffffffffffffffffffffffffffffffffffffffffffe5a5f560000000000000000000000000000000000000000000034eb6e911ebe9d0214a30000000000000000000000000000000000000000000069e10de76676d08000000000000000000000000000000000000000000000000000000000000000000000",
-        "filterIds": [
-          1,
-        ],
-        "logIndex": 538,
-        "topics": [
-          "0xa2d4008be4187c63684f323788e131e1370dbc2205499befe2834005a00c792c",
-        ],
-        "transactionHash": "0xf01ba8385e7cce76b12c7cd01e8b3407498cec1732f806d5cdaa6415b19d5aa0",
-        "transactionIndex": 160,
-        "transactionStatus": "succeeded",
-      },
-      {
         "address": "0xa37cc341634afd9e0919d334606e676dbab63e17",
         "data": "0x",
         "filterIds": [
@@ -757,6 +743,20 @@ exports[`fetchLogsForRange > should return logs filtered by contract addresses 1
           "0x0000000000000000000000000000000000000000000000000000000000000000",
           "0x000000000000000000000000c6dd9976066f3364b4d6a72cd4f1fa0468327aa7",
           "0x00000000000000000000000000000000fef86c2ba9eb362136d473daa92bcc46",
+        ],
+        "transactionHash": "0xf01ba8385e7cce76b12c7cd01e8b3407498cec1732f806d5cdaa6415b19d5aa0",
+        "transactionIndex": 160,
+        "transactionStatus": "succeeded",
+      },
+      {
+        "address": "0xe0e0e08a6a4b9dc7bd67bcb7aade5cf48157d444",
+        "data": "0x000000000000000000000000a37cc341634afd9e0919d334606e676dbab63e1773916eeb2aca5d7cf28d2f84ca21c97eb38a3420ec9ea39884939ec762afbac800000000000000000000000000000000fef86c2ba9eb362136d473daa92bcc46fffffffffffffffffffffffffffffffffffffffffffffffffffffffffe5a5f52fffffffffffffffffffffffffffffffffffffffffffffffffffffffffe5a5f560000000000000000000000000000000000000000000034eb6e911ebe9d0214a30000000000000000000000000000000000000000000069e10de76676d08000000000000000000000000000000000000000000000000000000000000000000000",
+        "filterIds": [
+          1,
+        ],
+        "logIndex": 538,
+        "topics": [
+          "0xa2d4008be4187c63684f323788e131e1370dbc2205499befe2834005a00c792c",
         ],
         "transactionHash": "0xf01ba8385e7cce76b12c7cd01e8b3407498cec1732f806d5cdaa6415b19d5aa0",
         "transactionIndex": 160,
