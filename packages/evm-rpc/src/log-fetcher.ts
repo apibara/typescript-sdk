@@ -11,10 +11,12 @@ export async function fetchLogsByBlockHash({
   client,
   blockHash,
   filter,
+  mergeGetLogs,
 }: {
   client: ViemRpcClient;
   blockHash: Bytes;
   filter: Filter;
+  mergeGetLogs: boolean;
 }): Promise<{ logs: Log[] }> {
   if (!filter.logs || filter.logs.length === 0) {
     return { logs: [] };
@@ -74,11 +76,13 @@ export async function fetchLogsForRange({
   fromBlock,
   toBlock,
   filter,
+  mergeGetLogs,
 }: {
   client: ViemRpcClient;
   fromBlock: bigint;
   toBlock: bigint;
   filter: Filter;
+  mergeGetLogs: boolean;
 }): Promise<{ logs: Record<number, Log[]>; blockNumbers: bigint[] }> {
   const logsByBlock: Record<number, Log[]> = {};
 
@@ -200,4 +204,28 @@ function refineLog(log: RpcLog, filter: LogFilter): Log | null {
   }
 
   return viemRpcLogToDna(log);
+}
+
+function standardGetLogsCalls({
+  filter,
+  blockHash,
+  fromBlock,
+  toBlock,
+}: {
+  filter: Filter;
+  blockHash?: Bytes;
+  fromBlock?: `0x${string}`;
+  toBlock?: `0x${string}`;
+}) {
+  return filter.logs.map((logFilter) => ({
+    params: [
+      {
+        blockHash,
+        fromBlock,
+        toBlock,
+        address: logFilter.address,
+        topics: logFilter.topics ? [...logFilter.topics] : undefined,
+      },
+    ],
+  }));
 }

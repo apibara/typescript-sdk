@@ -45,6 +45,8 @@ export type EvmRpcStreamOptions = {
   finalizedRefreshIntervalMs?: number;
   /** Force sending accepted headers even if no data matched. */
   alwaysSendAcceptedHeaders?: boolean;
+  /** Merge multiple `eth_getLogs` calls into a single one, filtering data on the client. */
+  mergeGetLogsFilter?: "always" | "accepted" | false;
 };
 
 export class EvmRpcStream extends RpcStreamConfig<Filter, Block> {
@@ -276,6 +278,7 @@ export class EvmRpcStream extends RpcStreamConfig<Filter, Block> {
         fromBlock,
         toBlock,
         filter,
+        mergeGetLogs: this.options.mergeGetLogsFilter === "always",
       });
     } catch (error) {
       this.blockRangeOracle.handleError(error);
@@ -295,6 +298,9 @@ export class EvmRpcStream extends RpcStreamConfig<Filter, Block> {
       client: this.client,
       blockHash,
       filter,
+      mergeGetLogs:
+        this.options.mergeGetLogsFilter === "always" ||
+        this.options.mergeGetLogsFilter === "accepted",
     });
   }
 
