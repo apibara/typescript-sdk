@@ -20,11 +20,8 @@ describe("fetchLogsByBlockHash", () => {
   }
 
   beforeAll(() => {
-    const rpcUrl = process.env.TEST_EVM_RPC_URL;
-    if (!rpcUrl) {
-      throw new Error("TEST_EVM_RPC_URL environment variable is not set");
-    }
-
+    const rpcUrl =
+      process.env.TEST_EVM_RPC_URL ?? "https://ethereum-rpc.publicnode.com";
     client = createPublicClient({
       transport: http(rpcUrl),
     });
@@ -150,11 +147,8 @@ describe("fetchLogsForRange", () => {
   }
 
   beforeAll(() => {
-    const rpcUrl = process.env.TEST_EVM_RPC_URL;
-    if (!rpcUrl) {
-      throw new Error("TEST_EVM_RPC_URL environment variable is not set");
-    }
-
+    const rpcUrl =
+      process.env.TEST_EVM_RPC_URL ?? "https://ethereum-rpc.publicnode.com";
     client = createPublicClient({
       transport: http(rpcUrl),
     });
