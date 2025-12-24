@@ -36,7 +36,7 @@ jobs:
       - name: Start MongoDB
         uses: supercharge/mongodb-github-action@1.11.0
         with:
-          mongodb-version: '7.0'
+          mongodb-version: "7.0"
           mongodb-replica-set: rs0
           mongodb-port: 27017
       - name: Install dependencies
@@ -49,5 +49,7 @@ jobs:
         run: pnpm typecheck
       - name: Run test
         run: pnpm test:ci
+        env:
+          TEST_EVM_RPC_URL: ${{ secrets.TEST_EVM_RPC_URL }}
       - name: Check change files
         run: pnpm beachball check
