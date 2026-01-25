@@ -1,8 +1,16 @@
 # Change Log - @apibara/evm-rpc
 
-<!-- This log was last generated on Wed, 24 Dec 2025 15:46:00 GMT and should not be manually modified. -->
+<!-- This log was last generated on Sun, 25 Jan 2026 12:45:21 GMT and should not be manually modified. -->
 
 <!-- Start content -->
+
+## 2.1.0-beta.51
+
+Sun, 25 Jan 2026 12:45:21 GMT
+
+### Changes
+
+- evm-rpc: retry failed rpc requests (francesco@ceccon.me)
 
 ## 2.1.0-beta.50
 

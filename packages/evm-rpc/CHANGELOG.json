@@ -2,6 +2,21 @@
   "name": "@apibara/evm-rpc",
   "entries": [
     {
+      "date": "Sun, 25 Jan 2026 12:45:21 GMT",
+      "version": "2.1.0-beta.51",
+      "tag": "@apibara/evm-rpc_v2.1.0-beta.51",
+      "comments": {
+        "prerelease": [
+          {
+            "author": "francesco@ceccon.me",
+            "package": "@apibara/evm-rpc",
+            "commit": "4bb9c3ea04ba82dbbec221d7c0c3dd0546adc232",
+            "comment": "evm-rpc: retry failed rpc requests"
+          }
+        ]
+      }
+    },
+    {
       "date": "Wed, 24 Dec 2025 15:46:00 GMT",
       "version": "2.1.0-beta.50",
       "tag": "@apibara/evm-rpc_v2.1.0-beta.50",

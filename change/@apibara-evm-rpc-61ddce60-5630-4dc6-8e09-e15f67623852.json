@@ -1,7 +1,0 @@
-{
-  "type": "prerelease",
-  "comment": "evm-rpc: retry failed rpc requests",
-  "packageName": "@apibara/evm-rpc",
-  "email": "francesco@ceccon.me",
-  "dependentChangeType": "patch"
-}
