@@ -22,6 +22,7 @@ import type { Block, Log } from "./block";
 import { type Filter, validateFilter } from "./filter";
 import { fetchLogsByBlockHash, fetchLogsForRange } from "./log-fetcher";
 import { type BlockRangeOracle, createBlockRangeOracle } from "./range-oracle";
+import { retry } from "./retry";
 import { rpcBlockHeaderToDna } from "./transform";
 
 export type RequestParameters = EIP1193Parameters<PublicRpcSchema>;
@@ -271,14 +272,16 @@ export class EvmRpcStream extends RpcStreamConfig<Filter, Block> {
     toBlock: bigint;
     filter: Filter;
   }): Promise<{ logs: Record<number, Log[]>; blockNumbers: bigint[] }> {
-    // TODO: implement retry
     try {
-      return await fetchLogsForRange({
-        client: this.client,
-        fromBlock,
-        toBlock,
-        filter,
-        mergeGetLogs: this.options.mergeGetLogsFilter === "always",
+      return await retry({
+        fn: () =>
+          fetchLogsForRange({
+            client: this.client,
+            fromBlock,
+            toBlock,
+            filter,
+            mergeGetLogs: this.options.mergeGetLogsFilter === "always",
+          }),
       });
     } catch (error) {
       this.blockRangeOracle.handleError(error);
@@ -293,14 +296,16 @@ export class EvmRpcStream extends RpcStreamConfig<Filter, Block> {
     blockHash: Bytes;
     filter: Filter;
   }): Promise<{ logs: Log[] }> {
-    // TODO: implement retry
-    return await fetchLogsByBlockHash({
-      client: this.client,
-      blockHash,
-      filter,
-      mergeGetLogs:
-        this.options.mergeGetLogsFilter === "always" ||
-        this.options.mergeGetLogsFilter === "accepted",
+    return await retry({
+      fn: () =>
+        fetchLogsByBlockHash({
+          client: this.client,
+          blockHash,
+          filter,
+          mergeGetLogs:
+            this.options.mergeGetLogsFilter === "always" ||
+            this.options.mergeGetLogsFilter === "accepted",
+        }),
     });
   }
 
@@ -309,10 +314,12 @@ export class EvmRpcStream extends RpcStreamConfig<Filter, Block> {
   }: {
     blockNumber: bigint;
   }) {
-    // TODO: implement retry
-    const block = await this.client.request({
-      method: "eth_getBlockByNumber",
-      params: [numberToHex(blockNumber), false],
+    const block = await retry({
+      fn: () =>
+        this.client.request({
+          method: "eth_getBlockByNumber",
+          params: [numberToHex(blockNumber), false],
+        }),
     });
 
     if (block === null) {
