@@ -272,22 +272,21 @@ export class EvmRpcStream extends RpcStreamConfig<Filter, Block> {
     toBlock: bigint;
     filter: Filter;
   }): Promise<{ logs: Record<number, Log[]>; blockNumbers: bigint[] }> {
-    return await retry({
-      fn: async () => {
-        try {
-          return await fetchLogsForRange({
+    try {
+      return await retry({
+        fn: () =>
+          fetchLogsForRange({
             client: this.client,
             fromBlock,
             toBlock,
             filter,
             mergeGetLogs: this.options.mergeGetLogsFilter === "always",
-          });
-        } catch (error) {
-          this.blockRangeOracle.handleError(error);
-          throw error;
-        }
-      },
-    });
+          }),
+      });
+    } catch (error) {
+      this.blockRangeOracle.handleError(error);
+      throw error;
+    }
   }
 
   private async fetchLogsByBlockHashWithRetry({
