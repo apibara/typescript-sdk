@@ -1,0 +1,7 @@
+{
+  "type": "prerelease",
+  "comment": "evm-rpc: add merge getlogs test",
+  "packageName": "@apibara/evm-rpc",
+  "email": "jadejajaipal5@gmail.com",
+  "dependentChangeType": "patch"
+}
