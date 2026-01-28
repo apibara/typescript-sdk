@@ -2,6 +2,21 @@
   "name": "@apibara/evm-rpc",
   "entries": [
     {
+      "date": "Wed, 28 Jan 2026 13:45:38 GMT",
+      "version": "2.1.0-beta.52",
+      "tag": "@apibara/evm-rpc_v2.1.0-beta.52",
+      "comments": {
+        "prerelease": [
+          {
+            "author": "jadejajaipal5@gmail.com",
+            "package": "@apibara/evm-rpc",
+            "commit": "d4b880aabb95c4e6c77bd975607ec8924553285d",
+            "comment": "evm-rpc: add merge getlogs test"
+          }
+        ]
+      }
+    },
+    {
       "date": "Sun, 25 Jan 2026 12:45:21 GMT",
       "version": "2.1.0-beta.51",
       "tag": "@apibara/evm-rpc_v2.1.0-beta.51",
