@@ -2,6 +2,21 @@
   "name": "@apibara/protocol",
   "entries": [
     {
+      "date": "Tue, 03 Feb 2026 18:58:37 GMT",
+      "version": "2.1.0-beta.53",
+      "tag": "@apibara/protocol_v2.1.0-beta.53",
+      "comments": {
+        "prerelease": [
+          {
+            "author": "francesco@ceccon.me",
+            "package": "@apibara/protocol",
+            "commit": "c2730dbcdc9125e8537a134c381904601b3a7651",
+            "comment": "rpc: reduce the number of rpc calls"
+          }
+        ]
+      }
+    },
+    {
       "date": "Fri, 19 Dec 2025 10:19:30 GMT",
       "version": "2.1.0-beta.48",
       "tag": "@apibara/protocol_v2.1.0-beta.48",

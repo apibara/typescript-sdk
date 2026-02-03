@@ -1,8 +1,16 @@
 # Change Log - @apibara/protocol
 
-<!-- This log was last generated on Fri, 19 Dec 2025 10:19:30 GMT and should not be manually modified. -->
+<!-- This log was last generated on Tue, 03 Feb 2026 18:58:37 GMT and should not be manually modified. -->
 
 <!-- Start content -->
+
+## 2.1.0-beta.53
+
+Tue, 03 Feb 2026 18:58:37 GMT
+
+### Changes
+
+- rpc: reduce the number of rpc calls (francesco@ceccon.me)
 
 ## 2.1.0-beta.48
 

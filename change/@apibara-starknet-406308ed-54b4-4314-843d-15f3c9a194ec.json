@@ -1,7 +1,0 @@
-{
-  "type": "prerelease",
-  "comment": "rpc: reduce the number of rpc calls",
-  "packageName": "@apibara/starknet",
-  "email": "francesco@ceccon.me",
-  "dependentChangeType": "patch"
-}

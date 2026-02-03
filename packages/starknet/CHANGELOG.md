@@ -1,8 +1,16 @@
 # Change Log - @apibara/starknet
 
-<!-- This log was last generated on Sat, 06 Dec 2025 16:15:01 GMT and should not be manually modified. -->
+<!-- This log was last generated on Tue, 03 Feb 2026 18:58:37 GMT and should not be manually modified. -->
 
 <!-- Start content -->
+
+## 2.1.0-beta.53
+
+Tue, 03 Feb 2026 18:58:37 GMT
+
+### Changes
+
+- rpc: reduce the number of rpc calls (francesco@ceccon.me)
 
 ## 2.1.0-beta.46
 
