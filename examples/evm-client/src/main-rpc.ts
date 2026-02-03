@@ -19,7 +19,8 @@ const command = defineCommand({
     },
     contract: {
       type: "string",
-      default: "0xf08A50178dfcDe18524640EA6618a1f965821715",
+      // default: "0xf08A50178dfcDe18524640EA6618a1f965821715",
+      default: "0xaf88d065e77c8cC2239327C5EDb3A432268e5831",
       description: "Contract address to monitor",
     },
     startBlock: {
@@ -29,7 +30,7 @@ const command = defineCommand({
     },
     finality: {
       type: "string",
-      default: "finalized",
+      default: "accepted",
       description: "Block finality (finalized, accepted)",
     },
   },
@@ -51,7 +52,11 @@ const command = defineCommand({
       new EvmRpcStream(viemClient, {
         // This parameter changes based on the rpc provider.
         // The stream automatically shrinks the batch size when the provider returns an error.
-        getLogsRangeSize: 1_000n,
+        // getLogsRangeSize: 1_000n,
+        getLogsRangeSize: 100n,
+        mergeGetLogsFilter: "always",
+        // alwaysSendAcceptedHeaders: true,
+        headRefreshIntervalMs: 500,
       }),
     );
 

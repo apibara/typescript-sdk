@@ -3,7 +3,9 @@
     "target": "ESNext",
     "module": "ESNext",
     "moduleResolution": "Bundler",
-    "types": ["node"],
+    "types": [
+      "node"
+    ],
     "declaration": true,
     "sourceMap": true,
     "esModuleInterop": true,
@@ -18,5 +20,7 @@
     "incremental": true,
     "tsBuildInfoFile": "/home/fra/Hacks/apibara/typescript-sdk/node_modules/.pnpm/vitest@1.6.0_@types+node@20.14.0/node_modules/vitest/dist/vendor/tsconfig.tmp.tsbuildinfo"
   },
-  "exclude": ["dist"]
+  "exclude": [
+    "dist"
+  ]
 }

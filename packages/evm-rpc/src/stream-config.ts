@@ -7,6 +7,7 @@ import {
   type FetchBlockRangeResult,
   type FetchBlockResult,
   type FetchCursorArgs,
+  type FetchCursorRangeArgs,
   RpcStreamConfig,
   type ValidateFilterResult,
 } from "@apibara/protocol/rpc";
@@ -123,14 +124,33 @@ export class EvmRpcStream extends RpcStreamConfig<Filter, Block> {
     };
   }
 
+  async fetchCursorRange({
+    startBlockNumber,
+    endBlockNumber,
+  }: FetchCursorRangeArgs): Promise<BlockInfo[]> {
+    const requestCount = Number(endBlockNumber - startBlockNumber + 1n);
+    return await Promise.all(
+      Array.from({ length: requestCount }, async (_, i) => {
+        const blockNumber = startBlockNumber + BigInt(i);
+        const info = await this.fetchCursor({ blockNumber });
+        if (!info) {
+          throw new Error(
+            `RPC returned null block for block number ${blockNumber}`,
+          );
+        }
+        return info;
+      }),
+    );
+  }
+
   async fetchBlockRange({
     startBlock,
-    finalizedBlock,
+    maxBlock,
     force,
     filter,
   }: FetchBlockRangeArgs<Filter>): Promise<FetchBlockRangeResult<Block>> {
     const { start: fromBlock, end: toBlock } = this.blockRangeOracle.clampRange(
-      { start: startBlock, end: finalizedBlock },
+      { start: startBlock, end: maxBlock },
     );
 
     // console.log("Fetching block range", fromBlock, toBlock, filter);

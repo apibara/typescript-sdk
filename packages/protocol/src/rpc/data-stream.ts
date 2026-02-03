@@ -14,6 +14,8 @@ type State<TFilter, TBlock> = {
   cursor: Cursor;
   // When the finalized block was last refreshed.
   lastFinalizedRefresh: number;
+  // When the head was last refreshed.
+  lastHeadRefresh: number;
   // When the last heartbeat was sent.
   lastHeartbeat: number;
   // When the last backfill message was sent.
@@ -71,6 +73,7 @@ export class RpcDataStream<TFilter, TBlock> {
     const chainTracker = createChainTracker({
       head,
       finalized,
+      batchSize: 20n,
     });
 
     let cursor: Cursor;
@@ -97,6 +100,7 @@ export class RpcDataStream<TFilter, TBlock> {
       cursor,
       lastHeartbeat: Date.now(),
       lastFinalizedRefresh: Date.now(),
+      lastHeadRefresh: Date.now(),
       lastBackfillMessage: Date.now(),
       chainTracker,
       config: this.config,
@@ -156,7 +160,7 @@ async function* dataStreamLoop<TFilter, TBlock>(
       if (isAtHead(state)) {
         yield* waitForHeadChange(state);
       } else {
-        yield* produceNextBlock(state);
+        yield* produceLiveBlocks(state);
       }
     }
   }
@@ -174,7 +178,7 @@ async function* backfillFinalizedBlocks<TFilter, TBlock>(
 
   const filterData = await config.fetchBlockRange({
     startBlock: cursor.orderKey + 1n,
-    finalizedBlock: finalized.orderKey,
+    maxBlock: finalized.orderKey,
     force,
     filter,
   });
@@ -209,59 +213,77 @@ async function* backfillFinalizedBlocks<TFilter, TBlock>(
   }
 }
 
-// This is a generator to possibly produce data for the next block.
+// This is a generator to possibly produce data for live blocks.
 //
 // It's a generator because it's not guaranteed to produce data for the next block.
-async function* produceNextBlock<TFilter, TBlock>(
+async function* produceLiveBlocks<TFilter, TBlock>(
   state: State<TFilter, TBlock>,
 ): AsyncGenerator<StreamDataResponse<TBlock>> {
-  const currentBlockHash = state.cursor.uniqueKey;
+  const { config, cursor, chainTracker, filter } = state;
 
-  if (currentBlockHash === undefined) {
-    throw new Error("Live production phase without cursor's hash.");
+  if (shouldRefreshHead(state)) {
+    const maybeNewHead = await config.fetchCursor({ blockTag: "latest" });
+    if (maybeNewHead === null) {
+      throw new Error("Failed to fetch the latest block");
+    }
+
+    const result = await chainTracker.updateHead({
+      newHead: maybeNewHead,
+      fetchCursorByHash: (blockHash) => config.fetchCursor({ blockHash }),
+      fetchCursorRange: (args) => config.fetchCursorRange(args),
+    });
+
+    state.lastHeadRefresh = Date.now();
+
+    if (result.status === "reorg") {
+      const { cursor } = result;
+      // Only handle reorgs if they involve blocks already processed.
+      if (cursor.orderKey < state.cursor.orderKey) {
+        state.cursor = cursor;
+
+        yield {
+          _tag: "invalidate",
+          invalidate: { cursor },
+        };
+
+        return;
+      }
+    }
   }
 
-  const result = await state.config.fetchBlockByNumber({
-    blockNumber: state.cursor.orderKey + 1n,
-    isAtHead: isAtHead(state),
-    expectedParentBlockHash: currentBlockHash,
-    filter: state.filter,
+  const head = chainTracker.head();
+
+  const filterData = await config.fetchBlockRange({
+    startBlock: cursor.orderKey + 1n,
+    maxBlock: head.orderKey,
+    force: false,
+    filter,
   });
 
-  // TODO: use the output of result to update the chain tracker.
+  for (const { cursor, endCursor, block } of filterData.data) {
+    if (!chainTracker.isCanonical(endCursor)) {
+      throw new Error("Trying to process non-canonical block");
+    }
 
-  if (result.status === "reorg") {
-    throw new Error("Reorg not implemented");
-  }
+    if (block !== null) {
+      state.lastHeartbeat = Date.now();
+      const production = isAtHead(state) ? "live" : "backfill";
 
-  const { data, blockInfo } = result;
+      yield {
+        _tag: "data",
+        data: {
+          cursor,
+          endCursor,
+          data: [block],
+          finality: "accepted",
+          production,
+        },
+      };
+    }
 
-  state.cursor = {
-    orderKey: blockInfo.blockNumber,
-    uniqueKey: blockInfo.blockHash,
-  };
-
-  const { status: headUpdateStatus } = state.chainTracker.addToCanonicalChain({
-    blockInfo,
-  });
-
-  if (headUpdateStatus !== "success") {
-    throw new Error("Failed to update head. Would cause reorg.");
-  }
-
-  if (data.block !== null) {
-    state.lastHeartbeat = Date.now();
-    const production = isAtHead(state) ? "live" : "backfill";
-
-    yield {
-      _tag: "data",
-      data: {
-        cursor: data.cursor,
-        endCursor: data.endCursor,
-        data: [data.block],
-        finality: "accepted",
-        production,
-      },
+    state.cursor = {
+      orderKey: endCursor.orderKey,
+      uniqueKey: endCursor.uniqueKey,
     };
   }
 }
@@ -291,6 +313,7 @@ async function* waitForHeadChange<TBlock>(
     const result = await chainTracker.updateHead({
       newHead: maybeNewHead,
       fetchCursorByHash: (blockHash) => config.fetchCursor({ blockHash }),
+      fetchCursorRange: (args) => config.fetchCursorRange(args),
     });
 
     switch (result.status) {
@@ -354,6 +377,12 @@ function shouldRefreshFinalized(state: State<unknown, unknown>): boolean {
   const { lastFinalizedRefresh, config } = state;
   const now = Date.now();
   return now - lastFinalizedRefresh >= config.finalizedRefreshIntervalMs();
+}
+
+function shouldRefreshHead(state: State<unknown, unknown>): boolean {
+  const { lastHeadRefresh, config } = state;
+  const now = Date.now();
+  return now - lastHeadRefresh >= config.headRefreshIntervalMs();
 }
 
 function isAtHead(state: State<unknown, unknown>): boolean {
