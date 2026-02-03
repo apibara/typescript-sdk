@@ -2,7 +2,7 @@ import type { Bytes, Cursor } from "../common";
 
 export type FetchBlockRangeArgs<TFilter> = {
   startBlock: bigint;
-  finalizedBlock: bigint;
+  maxBlock: bigint;
   force: boolean;
   filter: TFilter;
 };
@@ -43,6 +43,11 @@ export type FetchBlockByNumberResult<TBlock> =
       blockInfo: BlockInfo;
     };
 
+export type FetchCursorRangeArgs = {
+  startBlockNumber: bigint;
+  endBlockNumber: bigint;
+};
+
 export type FetchCursorArgs =
   | {
       blockTag: "latest" | "finalized";
@@ -74,6 +79,7 @@ export abstract class RpcStreamConfig<TFilter, TBlock> {
   abstract headRefreshIntervalMs(): number;
   abstract finalizedRefreshIntervalMs(): number;
 
+  abstract fetchCursorRange(args: FetchCursorRangeArgs): Promise<BlockInfo[]>;
   abstract fetchCursor(args: FetchCursorArgs): Promise<BlockInfo | null>;
 
   abstract validateFilter(filter: TFilter): ValidateFilterResult;

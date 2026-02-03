@@ -38,6 +38,7 @@
   "scripts": {
     "build": "pnpm build:proto && unbuild",
     "build:proto": "buf generate proto",
+    "buf": "buf",
     "typecheck": "tsc --noEmit",
     "test": "vitest",
     "test:ci": "vitest run",

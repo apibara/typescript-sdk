@@ -7,6 +7,7 @@ export {
   type FetchBlockByNumberResult,
   type ValidateFilterResult,
   type FetchCursorArgs,
+  type FetchCursorRangeArgs,
   RpcStreamConfig,
 } from "./config";
 export { RpcClient, createRpcClient } from "./client";

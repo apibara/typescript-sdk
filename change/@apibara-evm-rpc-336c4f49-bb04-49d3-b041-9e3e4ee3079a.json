@@ -1,0 +1,7 @@
+{
+  "type": "prerelease",
+  "comment": "rpc: reduce the number of rpc calls",
+  "packageName": "@apibara/evm-rpc",
+  "email": "francesco@ceccon.me",
+  "dependentChangeType": "patch"
+}

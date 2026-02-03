@@ -1,11 +1,12 @@
 import { fromHex } from "viem";
 import type { Bytes, Cursor } from "../common";
-import type { BlockInfo } from "./config";
+import type { BlockInfo, FetchCursorRangeArgs } from "./config";
 import { blockInfoToCursor } from "./helpers";
 
 type UpdateHeadArgs = {
   newHead: BlockInfo;
   fetchCursorByHash: (hash: Bytes) => Promise<BlockInfo | null>;
+  fetchCursorRange: (args: FetchCursorRangeArgs) => Promise<BlockInfo[]>;
 };
 
 type UpdateHeadResult =
@@ -24,10 +25,21 @@ export class ChainTracker {
   #finalized: BlockInfo;
   #head: BlockInfo;
   #canonical: Map<bigint, BlockInfo>;
+  #batchSize: bigint;
 
-  constructor({ head, finalized }: { finalized: BlockInfo; head: BlockInfo }) {
+  constructor({
+    head,
+    finalized,
+    batchSize,
+  }: {
+    finalized: BlockInfo;
+    head: BlockInfo;
+    batchSize: bigint;
+  }) {
     this.#finalized = finalized;
     this.#head = head;
+    this.#batchSize = batchSize;
+
     this.#canonical = new Map([
       [finalized.blockNumber, finalized],
       [head.blockNumber, head],
@@ -106,6 +118,7 @@ export class ChainTracker {
   async updateHead({
     newHead,
     fetchCursorByHash,
+    fetchCursorRange,
   }: UpdateHeadArgs): Promise<UpdateHeadResult> {
     // console.debug(
     //   `updateHead: new=${newHead.blockNumber} old=${this.#head.blockNumber}`,
@@ -192,10 +205,47 @@ export class ChainTracker {
     // The new chain is longer and we need the missing blocks.
     // This may result in reorgs.
 
-    let current = newHead;
-    let reorgDetected = false;
-    const blocksToApply = [newHead];
+    // console.log(
+    //   `Moving from ${this.#head.blockNumber} to ${newHead.blockNumber} (${newHead.blockNumber - this.#head.blockNumber} blocks)`,
+    // );
 
+    let currentBlockNumber = this.#head.blockNumber + 1n;
+
+    while (true) {
+      let endBlockNumber = currentBlockNumber + this.#batchSize;
+      if (endBlockNumber > newHead.blockNumber) {
+        endBlockNumber = newHead.blockNumber;
+      }
+
+      const missing = await fetchCursorRange({
+        startBlockNumber: currentBlockNumber,
+        endBlockNumber,
+      });
+
+      for (const block of missing) {
+        const canonicalParent = this.#canonical.get(block.blockNumber - 1n);
+        if (
+          !canonicalParent ||
+          canonicalParent.blockHash !== block.parentBlockHash
+        ) {
+          throw new Error(
+            "Chain reorganization detected. Recovery not implemented",
+          );
+        }
+
+        this.#canonical.set(block.blockNumber, block);
+
+        // console.log(`Applied block ${block.blockNumber}`);
+      }
+
+      if (endBlockNumber === newHead.blockNumber) {
+        break;
+      }
+
+      currentBlockNumber = endBlockNumber + 1n;
+    }
+
+    /*
     while (true) {
       const parent = await fetchCursorByHash(current.parentBlockHash);
 
@@ -226,22 +276,37 @@ export class ChainTracker {
       blocksToApply.push(parent);
       current = parent;
     }
+    */
+    // throw new Error("FUCK IT");
 
-    for (const block of blocksToApply.reverse()) {
-      this.#canonical.set(block.blockNumber, block);
-    }
+    // for (const block of blocksToApply.reverse()) {
+    //   this.#canonical.set(block.blockNumber, block);
+    // }
 
-    const previousHead = this.#head;
+    // const previousHead = this.#head;
     this.#head = newHead;
 
-    if (reorgDetected) {
-      return {
-        status: "reorg",
-        cursor: blockInfoToCursor(previousHead),
-      };
-    }
+    // if (reorgDetected) {
+    //   return {
+    //     status: "reorg",
+    //     cursor: blockInfoToCursor(previousHead),
+    //   };
+    // }
 
     return { status: "success" };
+  }
+
+  isCanonical({ orderKey, uniqueKey }: Cursor) {
+    if (!uniqueKey) {
+      return true;
+    }
+
+    const block = this.#canonical.get(orderKey);
+    if (!block) {
+      return true;
+    }
+
+    return block.blockHash === uniqueKey;
   }
 
   async initializeStartingCursor({
@@ -319,9 +384,11 @@ export class ChainTracker {
 export function createChainTracker({
   head,
   finalized,
+  batchSize,
 }: {
   head: BlockInfo;
   finalized: BlockInfo;
+  batchSize: bigint;
 }): ChainTracker {
-  return new ChainTracker({ finalized, head });
+  return new ChainTracker({ finalized, head, batchSize });
 }

@@ -340,14 +340,14 @@ describe("EvmRpcStream", () => {
 
     const merged = await mergedStream.fetchBlockRange({
       startBlock,
-      finalizedBlock: endBlock,
+      maxBlock: endBlock,
       force: true,
       filter,
     });
 
     const standard = await standardStream.fetchBlockRange({
       startBlock,
-      finalizedBlock: endBlock,
+      maxBlock: endBlock,
       force: true,
       filter,
     });
