@@ -1,7 +1,0 @@
-{
-  "type": "prerelease",
-  "comment": "rpc: send empty head",
-  "packageName": "@apibara/protocol",
-  "email": "francesco@ceccon.me",
-  "dependentChangeType": "patch"
-}

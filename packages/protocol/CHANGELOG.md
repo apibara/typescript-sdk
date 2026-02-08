@@ -1,8 +1,16 @@
 # Change Log - @apibara/protocol
 
-<!-- This log was last generated on Tue, 03 Feb 2026 18:58:37 GMT and should not be manually modified. -->
+<!-- This log was last generated on Sun, 08 Feb 2026 14:03:56 GMT and should not be manually modified. -->
 
 <!-- Start content -->
+
+## 2.1.0-beta.54
+
+Sun, 08 Feb 2026 14:03:56 GMT
+
+### Changes
+
+- rpc: send empty head (francesco@ceccon.me)
 
 ## 2.1.0-beta.53
 
