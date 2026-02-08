@@ -20,6 +20,8 @@ type State<TFilter, TBlock> = {
   lastHeartbeat: number;
   // When the last backfill message was sent.
   lastBackfillMessage: number;
+  // The last empty header sent.
+  lastEmptyBlockNumber: bigint | undefined;
   // Track the chain's state.
   chainTracker: ChainTracker;
   // Heartbeat interval in milliseconds.
@@ -102,6 +104,7 @@ export class RpcDataStream<TFilter, TBlock> {
       lastFinalizedRefresh: Date.now(),
       lastHeadRefresh: Date.now(),
       lastBackfillMessage: Date.now(),
+      lastEmptyBlockNumber: undefined,
       chainTracker,
       config: this.config,
       heartbeatIntervalMs: this.heartbeatIntervalMs,
@@ -238,7 +241,11 @@ async function* produceLiveBlocks<TFilter, TBlock>(
     if (result.status === "reorg") {
       const { cursor } = result;
       // Only handle reorgs if they involve blocks already processed.
-      if (cursor.orderKey < state.cursor.orderKey) {
+      if (
+        cursor.orderKey < state.cursor.orderKey ||
+        (state.lastEmptyBlockNumber !== undefined &&
+          cursor.orderKey < state.lastEmptyBlockNumber)
+      ) {
         state.cursor = cursor;
 
         yield {
@@ -259,6 +266,33 @@ async function* produceLiveBlocks<TFilter, TBlock>(
     force: false,
     filter,
   });
+
+  if (filterData.data.length === 0 && head.uniqueKey !== undefined) {
+    // Send an empty block if we reached the head, but don't update the cursor.
+    if (
+      state.lastEmptyBlockNumber === undefined ||
+      head.orderKey > state.lastEmptyBlockNumber
+    ) {
+      const { data } = await config.fetchBlockByHash({
+        blockHash: head.uniqueKey,
+        isAtHead: true,
+        filter,
+      });
+
+      yield {
+        _tag: "data",
+        data: {
+          cursor: data.cursor,
+          endCursor: data.endCursor,
+          data: [data.block],
+          finality: "accepted",
+          production: "live",
+        },
+      };
+
+      state.lastEmptyBlockNumber = head.orderKey;
+    }
+  }
 
   for (const { cursor, endCursor, block } of filterData.data) {
     if (!chainTracker.isCanonical(endCursor)) {
