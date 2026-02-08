@@ -1,8 +1,8 @@
 import type { Bytes } from "@apibara/protocol";
 import {
   type BlockInfo,
-  type FetchBlockByNumberArgs,
-  type FetchBlockByNumberResult,
+  type FetchBlockByHashArgs,
+  type FetchBlockByHashResult,
   type FetchBlockRangeArgs,
   type FetchBlockRangeResult,
   type FetchBlockResult,
@@ -209,19 +209,18 @@ export class EvmRpcStream extends RpcStreamConfig<Filter, Block> {
     return { startBlock: fromBlock, endBlock: toBlock, data };
   }
 
-  async fetchBlockByNumber({
-    blockNumber,
-    expectedParentBlockHash,
+  async fetchBlockByHash({
+    blockHash,
     isAtHead,
     filter,
-  }: FetchBlockByNumberArgs<Filter>): Promise<FetchBlockByNumberResult<Block>> {
+  }: FetchBlockByHashArgs<Filter>): Promise<FetchBlockByHashResult<Block>> {
     // Fetch block header and check it matches the expected parent block hash.
-    const { header } = await this.fetchBlockHeaderByNumberWithRetry({
-      blockNumber,
+    const { header } = await this.fetchBlockHeaderByHashWithRetry({
+      blockHash,
     });
 
     if (header.blockHash === undefined) {
-      throw new Error(`Block ${blockNumber} has no block hash`);
+      throw new Error(`Block ${blockHash} has no block hash`);
     }
 
     const blockInfo: BlockInfo = {
@@ -230,50 +229,25 @@ export class EvmRpcStream extends RpcStreamConfig<Filter, Block> {
       parentBlockHash: header.parentBlockHash,
     };
 
-    if (header.parentBlockHash !== expectedParentBlockHash) {
-      return {
-        status: "reorg",
-        blockInfo,
-      };
-    }
-
-    // Use the hash from the current block to fetch logs in a reorg-safe way.
-    const { logs } = await this.fetchLogsByBlockHashWithRetry({
-      blockHash: header.blockHash,
-      filter,
-    });
-
-    logs.sort((a, b) => a.logIndex - b.logIndex);
-
     let cursor = undefined;
-    if (blockNumber > 0n) {
+    if (header.blockNumber > 0n) {
       cursor = {
-        orderKey: blockNumber - 1n,
+        orderKey: header.blockNumber - 1n,
         uniqueKey: header.parentBlockHash,
       };
     }
+
     const endCursor = {
-      orderKey: blockNumber,
+      orderKey: header.blockNumber,
       uniqueKey: header.blockHash,
     };
 
-    let block = null;
-
-    const shouldSendBlock =
-      filter.header === "always" ||
-      logs.length > 0 ||
-      (filter.header === "on_data_or_on_new_block" && isAtHead) ||
-      this.options.alwaysSendAcceptedHeaders;
-
-    if (shouldSendBlock) {
-      block = {
-        header,
-        logs,
-      };
-    }
+    const block = {
+      header,
+      logs: [],
+    };
 
     return {
-      status: "success",
       blockInfo,
       data: {
         cursor,
@@ -347,5 +321,25 @@ export class EvmRpcStream extends RpcStreamConfig<Filter, Block> {
     }
 
     return { header: rpcBlockHeaderToDna(block), blockNumber };
+  }
+
+  private async fetchBlockHeaderByHashWithRetry({
+    blockHash,
+  }: {
+    blockHash: Bytes;
+  }) {
+    const block = await retry({
+      fn: () =>
+        this.client.request({
+          method: "eth_getBlockByHash",
+          params: [blockHash, false],
+        }),
+    });
+
+    if (block === null) {
+      throw new Error(`Block ${blockHash} not found`);
+    }
+
+    return { header: rpcBlockHeaderToDna(block) };
   }
 }

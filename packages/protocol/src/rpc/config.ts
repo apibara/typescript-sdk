@@ -25,23 +25,16 @@ export type BlockInfo = {
   parentBlockHash: Bytes;
 };
 
-export type FetchBlockByNumberArgs<TFilter> = {
-  blockNumber: bigint;
-  expectedParentBlockHash: Bytes;
+export type FetchBlockByHashArgs<TFilter> = {
+  blockHash: Bytes;
   isAtHead: boolean;
   filter: TFilter;
 };
 
-export type FetchBlockByNumberResult<TBlock> =
-  | {
-      status: "success";
-      data: FetchBlockResult<TBlock>;
-      blockInfo: BlockInfo;
-    }
-  | {
-      status: "reorg";
-      blockInfo: BlockInfo;
-    };
+export type FetchBlockByHashResult<TBlock> = {
+  data: FetchBlockResult<TBlock>;
+  blockInfo: BlockInfo;
+};
 
 export type FetchCursorRangeArgs = {
   startBlockNumber: bigint;
@@ -88,7 +81,7 @@ export abstract class RpcStreamConfig<TFilter, TBlock> {
     args: FetchBlockRangeArgs<TFilter>,
   ): Promise<FetchBlockRangeResult<TBlock>>;
 
-  abstract fetchBlockByNumber(
-    args: FetchBlockByNumberArgs<TFilter>,
-  ): Promise<FetchBlockByNumberResult<TBlock>>;
+  abstract fetchBlockByHash(
+    args: FetchBlockByHashArgs<TFilter>,
+  ): Promise<FetchBlockByHashResult<TBlock>>;
 }
