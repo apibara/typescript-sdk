@@ -1,0 +1,7 @@
+{
+  "type": "prerelease",
+  "comment": "rpc: send empty head",
+  "packageName": "@apibara/evm-rpc",
+  "email": "francesco@ceccon.me",
+  "dependentChangeType": "patch"
+}
