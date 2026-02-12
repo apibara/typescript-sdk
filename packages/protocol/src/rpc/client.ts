@@ -32,12 +32,14 @@ export class RpcClient<TFilter, TBlock> implements Client<TFilter, TBlock> {
     request: StreamDataRequest<TFilter>,
     options?: StreamDataOptions,
   ): AsyncIterable<StreamDataResponse<TBlock>> {
-    const index = 0;
+    let index = 0;
     for (const filter of request.filter) {
       const { valid, error } = this.config.validateFilter(filter);
       if (!valid) {
         throw new Error(`Filter at position ${index} is invalid: ${error}`);
       }
+
+      index += 1;
     }
 
     return new RpcDataStream(this.config, request, options);

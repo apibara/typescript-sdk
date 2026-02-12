@@ -369,7 +369,11 @@ async function* waitForHeadChange<TBlock>(
       case "reorg": {
         const { cursor } = result;
         // Only handle reorgs if they involve blocks already processed.
-        if (cursor.orderKey < state.cursor.orderKey) {
+        if (
+          cursor.orderKey < state.cursor.orderKey ||
+          (state.lastEmptyBlockNumber !== undefined &&
+            cursor.orderKey < state.lastEmptyBlockNumber)
+        ) {
           state.cursor = cursor;
 
           yield {
