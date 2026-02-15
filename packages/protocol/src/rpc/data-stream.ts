@@ -149,9 +149,9 @@ async function* dataStreamLoop<TFilter, TBlock>(
 
     const finalized = chainTracker.finalized();
 
-    // console.debug(
-    //   `RpcLoop: c=${cursor.orderKey} f=${finalized.orderKey} h=${chainTracker.head().orderKey}`,
-    // );
+    console.log(
+      `[DS] RpcLoop: c=${cursor.orderKey} f=${finalized.orderKey} h=${chainTracker.head().orderKey}`,
+    );
 
     if (cursor.orderKey < finalized.orderKey) {
       yield* backfillFinalizedBlocks(state);
