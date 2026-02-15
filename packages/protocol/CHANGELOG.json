@@ -2,6 +2,21 @@
   "name": "@apibara/protocol",
   "entries": [
     {
+      "date": "Sun, 15 Feb 2026 01:50:46 GMT",
+      "version": "2.1.0-beta.55",
+      "tag": "@apibara/protocol_v2.1.0-beta.55",
+      "comments": {
+        "prerelease": [
+          {
+            "author": "francesco@ceccon.me",
+            "package": "@apibara/protocol",
+            "commit": "a56d540c6f9f3475229adf129bf8a549779f4783",
+            "comment": "protocol: enable more logs"
+          }
+        ]
+      }
+    },
+    {
       "date": "Sun, 08 Feb 2026 14:03:56 GMT",
       "version": "2.1.0-beta.54",
       "tag": "@apibara/protocol_v2.1.0-beta.54",

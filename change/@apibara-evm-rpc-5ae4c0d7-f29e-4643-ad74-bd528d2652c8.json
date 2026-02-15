@@ -1,7 +1,0 @@
-{
-  "type": "prerelease",
-  "comment": "evm-rpc: add debug logs",
-  "packageName": "@apibara/evm-rpc",
-  "email": "francesco@ceccon.me",
-  "dependentChangeType": "patch"
-}

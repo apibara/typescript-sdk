@@ -1,7 +1,0 @@
-{
-  "type": "prerelease",
-  "comment": "protocol: enable more logs",
-  "packageName": "@apibara/protocol",
-  "email": "francesco@ceccon.me",
-  "dependentChangeType": "patch"
-}
