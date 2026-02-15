@@ -34,9 +34,9 @@ jobs:
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
       - name: Start MongoDB
-        uses: supercharge/mongodb-github-action@1.11.0
+        uses: supercharge/mongodb-github-action@1.12.1
         with:
-          mongodb-version: "7.0"
+          mongodb-version: "8.0"
           mongodb-replica-set: rs0
           mongodb-port: 27017
       - name: Install dependencies
