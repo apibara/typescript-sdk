@@ -212,7 +212,7 @@ export class ChainTracker {
     let currentBlockNumber = this.#head.blockNumber + 1n;
 
     while (true) {
-      let endBlockNumber = currentBlockNumber + this.#batchSize;
+      let endBlockNumber = currentBlockNumber + this.#batchSize - 1n;
       if (endBlockNumber > newHead.blockNumber) {
         endBlockNumber = newHead.blockNumber;
       }
