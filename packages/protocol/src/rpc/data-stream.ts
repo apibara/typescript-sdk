@@ -267,31 +267,38 @@ async function* produceLiveBlocks<TFilter, TBlock>(
     filter,
   });
 
-  if (filterData.data.length === 0 && head.uniqueKey !== undefined) {
-    // Send an empty block if we reached the head, but don't update the cursor.
-    if (
-      state.lastEmptyBlockNumber === undefined ||
-      head.orderKey > state.lastEmptyBlockNumber
-    ) {
-      const { data } = await config.fetchBlockByHash({
-        blockHash: head.uniqueKey,
-        isAtHead: true,
-        filter,
-      });
+  const reachedHead = filterData.endBlock === head.orderKey;
+  if (filterData.data.length === 0) {
+    if (reachedHead && head.uniqueKey !== undefined) {
+      if (
+        state.lastEmptyBlockNumber === undefined ||
+        head.orderKey > state.lastEmptyBlockNumber
+      ) {
+        const { data } = await config.fetchBlockByHash({
+          blockHash: head.uniqueKey,
+          isAtHead: true,
+          filter,
+        });
 
-      yield {
-        _tag: "data",
-        data: {
-          cursor: data.cursor,
-          endCursor: data.endCursor,
-          data: [data.block],
-          finality: "accepted",
-          production: "live",
-        },
-      };
+        yield {
+          _tag: "data",
+          data: {
+            cursor: data.cursor,
+            endCursor: data.endCursor,
+            data: [data.block],
+            finality: "accepted",
+            production: "live",
+          },
+        };
 
-      state.lastEmptyBlockNumber = head.orderKey;
+        state.lastEmptyBlockNumber = head.orderKey;
+      }
     }
+
+    state.cursor = reachedHead
+      ? { orderKey: filterData.endBlock, uniqueKey: head.uniqueKey }
+      : { orderKey: filterData.endBlock };
+    return;
   }
 
   for (const { cursor, endCursor, block } of filterData.data) {
