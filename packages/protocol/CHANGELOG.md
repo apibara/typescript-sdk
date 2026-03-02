@@ -1,8 +1,16 @@
 # Change Log - @apibara/protocol
 
-<!-- This log was last generated on Sun, 15 Feb 2026 01:50:46 GMT and should not be manually modified. -->
+<!-- This log was last generated on Mon, 02 Mar 2026 04:00:12 GMT and should not be manually modified. -->
 
 <!-- Start content -->
+
+## 2.1.0-beta.56
+
+Mon, 02 Mar 2026 04:00:12 GMT
+
+### Changes
+
+- protocol: fix clamping live blocks range (francesco@ceccon.me)
 
 ## 2.1.0-beta.55
 

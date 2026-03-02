@@ -1,7 +1,0 @@
-{
-  "type": "prerelease",
-  "comment": "protocol: fix clamping live blocks range",
-  "packageName": "@apibara/evm-rpc",
-  "email": "francesco@ceccon.me",
-  "dependentChangeType": "patch"
-}

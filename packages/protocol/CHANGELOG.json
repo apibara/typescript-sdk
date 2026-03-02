@@ -2,6 +2,21 @@
   "name": "@apibara/protocol",
   "entries": [
     {
+      "date": "Mon, 02 Mar 2026 04:00:12 GMT",
+      "version": "2.1.0-beta.56",
+      "tag": "@apibara/protocol_v2.1.0-beta.56",
+      "comments": {
+        "prerelease": [
+          {
+            "author": "francesco@ceccon.me",
+            "package": "@apibara/protocol",
+            "commit": "1cb5f2843bbc99fd9328c4385ff83eab665975ee",
+            "comment": "protocol: fix clamping live blocks range"
+          }
+        ]
+      }
+    },
+    {
       "date": "Sun, 15 Feb 2026 01:50:46 GMT",
       "version": "2.1.0-beta.55",
       "tag": "@apibara/protocol_v2.1.0-beta.55",
