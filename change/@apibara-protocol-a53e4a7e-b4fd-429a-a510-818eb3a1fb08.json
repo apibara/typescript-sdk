@@ -1,0 +1,7 @@
+{
+  "type": "prerelease",
+  "comment": "protocol: fix clamping live blocks range",
+  "packageName": "@apibara/protocol",
+  "email": "francesco@ceccon.me",
+  "dependentChangeType": "patch"
+}
