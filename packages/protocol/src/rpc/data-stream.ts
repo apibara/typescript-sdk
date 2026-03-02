@@ -183,6 +183,7 @@ async function* backfillFinalizedBlocks<TFilter, TBlock>(
     startBlock: cursor.orderKey + 1n,
     maxBlock: finalized.orderKey,
     force,
+    clampAllowed: true,
     filter,
   });
 
@@ -264,6 +265,7 @@ async function* produceLiveBlocks<TFilter, TBlock>(
     startBlock: cursor.orderKey + 1n,
     maxBlock: head.orderKey,
     force: false,
+    clampAllowed: false,
     filter,
   });
 
@@ -273,10 +275,8 @@ async function* produceLiveBlocks<TFilter, TBlock>(
       state.lastEmptyBlockNumber === undefined ||
       head.orderKey > state.lastEmptyBlockNumber
     ) {
-      const { data } = await config.fetchBlockByHash({
+      const { data } = await config.fetchHeaderByHash({
         blockHash: head.uniqueKey,
-        isAtHead: true,
-        filter,
       });
 
       yield {

@@ -14,65 +14,6 @@ import type { Filter } from "./filter";
 import type { ViemRpcClient } from "./stream-config";
 import { viemRpcLogToDna } from "./transform";
 
-export async function fetchLogsByBlockHash({
-  client,
-  blockHash,
-  filter,
-  mergeGetLogs,
-}: {
-  client: ViemRpcClient;
-  blockHash: Bytes;
-  filter: Filter;
-  mergeGetLogs: boolean;
-}): Promise<{ logs: Log[] }> {
-  if (!filter.logs || filter.logs.length === 0) {
-    return { logs: [] };
-  }
-
-  const responses = mergeGetLogs
-    ? await mergedGetLogsCalls({
-        client,
-        filter,
-        blockHash,
-      })
-    : await standardGetLogsCalls({
-        client,
-        filter,
-        blockHash,
-      });
-
-  const allLogs: Log[] = [];
-  const seenLogsByIndex: Record<number, number> = {};
-
-  for (const { logFilters, logs } of responses) {
-    for (const log of logs) {
-      if (log.blockNumber === null) {
-        throw new Error("Log block number is null");
-      }
-
-      for (const logFilter of logFilters) {
-        const refinedLog = refineLog(log, logFilter);
-
-        if (refinedLog) {
-          const existingPosition = seenLogsByIndex[refinedLog.logIndex];
-
-          if (existingPosition !== undefined) {
-            const existingLog = allLogs[existingPosition];
-            (existingLog.filterIds as number[]).push(logFilter.id ?? 0);
-          } else {
-            (refinedLog.filterIds as number[]).push(logFilter.id ?? 0);
-
-            allLogs.push(refinedLog);
-            seenLogsByIndex[refinedLog.logIndex] = allLogs.length - 1;
-          }
-        }
-      }
-    }
-  }
-
-  return { logs: allLogs };
-}
-
 export async function fetchLogsForRange({
   client,
   fromBlock,

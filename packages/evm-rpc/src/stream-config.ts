@@ -21,7 +21,7 @@ import {
 } from "viem";
 import type { Block, Log } from "./block";
 import { type Filter, validateFilter } from "./filter";
-import { fetchLogsByBlockHash, fetchLogsForRange } from "./log-fetcher";
+import { fetchLogsForRange } from "./log-fetcher";
 import { type BlockRangeOracle, createBlockRangeOracle } from "./range-oracle";
 import { retry } from "./retry";
 import { rpcBlockHeaderToDna } from "./transform";
@@ -132,7 +132,7 @@ export class EvmRpcStream extends RpcStreamConfig<Filter, Block> {
     return await Promise.all(
       Array.from({ length: requestCount }, async (_, i) => {
         const blockNumber = startBlockNumber + BigInt(i);
-        const info = await this.fetchCursor({ blockNumber });
+        const info = await this.fetchCursorWithRetry({ blockNumber });
         if (!info) {
           throw new Error(
             `RPC returned null block for block number ${blockNumber}`,
@@ -147,11 +147,18 @@ export class EvmRpcStream extends RpcStreamConfig<Filter, Block> {
     startBlock,
     maxBlock,
     force,
+    clampAllowed,
     filter,
   }: FetchBlockRangeArgs<Filter>): Promise<FetchBlockRangeResult<Block>> {
-    const { start: fromBlock, end: toBlock } = this.blockRangeOracle.clampRange(
-      { start: startBlock, end: maxBlock },
-    );
+    let fromBlock = startBlock;
+    let toBlock = maxBlock;
+
+    if (clampAllowed) {
+      const { start: newFromBlock, end: newToBlock } =
+        this.blockRangeOracle.clampRange({ start: startBlock, end: maxBlock });
+      fromBlock = newFromBlock;
+      toBlock = newToBlock;
+    }
 
     // console.log("Fetching block range", fromBlock, toBlock, filter);
 
@@ -209,10 +216,8 @@ export class EvmRpcStream extends RpcStreamConfig<Filter, Block> {
     return { startBlock: fromBlock, endBlock: toBlock, data };
   }
 
-  async fetchBlockByHash({
+  async fetchHeaderByHash({
     blockHash,
-    isAtHead,
-    filter,
   }: FetchBlockByHashArgs<Filter>): Promise<FetchBlockByHashResult<Block>> {
     // Fetch block header and check it matches the expected parent block hash.
     const { header } = await this.fetchBlockHeaderByHashWithRetry({
@@ -283,26 +288,6 @@ export class EvmRpcStream extends RpcStreamConfig<Filter, Block> {
     }
   }
 
-  private async fetchLogsByBlockHashWithRetry({
-    blockHash,
-    filter,
-  }: {
-    blockHash: Bytes;
-    filter: Filter;
-  }): Promise<{ logs: Log[] }> {
-    return await retry({
-      fn: () =>
-        fetchLogsByBlockHash({
-          client: this.client,
-          blockHash,
-          filter,
-          mergeGetLogs:
-            this.options.mergeGetLogsFilter === "always" ||
-            this.options.mergeGetLogsFilter === "accepted",
-        }),
-    });
-  }
-
   private async fetchBlockHeaderByNumberWithRetry({
     blockNumber,
   }: {
@@ -341,5 +326,11 @@ export class EvmRpcStream extends RpcStreamConfig<Filter, Block> {
     }
 
     return { header: rpcBlockHeaderToDna(block) };
+  }
+
+  private async fetchCursorWithRetry(args: FetchCursorArgs) {
+    return await retry({
+      fn: () => this.fetchCursor(args),
+    });
   }
 }

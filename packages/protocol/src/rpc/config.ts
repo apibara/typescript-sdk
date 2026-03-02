@@ -4,6 +4,7 @@ export type FetchBlockRangeArgs<TFilter> = {
   startBlock: bigint;
   maxBlock: bigint;
   force: boolean;
+  clampAllowed: boolean;
   filter: TFilter;
 };
 
@@ -27,8 +28,6 @@ export type BlockInfo = {
 
 export type FetchBlockByHashArgs<TFilter> = {
   blockHash: Bytes;
-  isAtHead: boolean;
-  filter: TFilter;
 };
 
 export type FetchBlockByHashResult<TBlock> = {
@@ -81,7 +80,7 @@ export abstract class RpcStreamConfig<TFilter, TBlock> {
     args: FetchBlockRangeArgs<TFilter>,
   ): Promise<FetchBlockRangeResult<TBlock>>;
 
-  abstract fetchBlockByHash(
+  abstract fetchHeaderByHash(
     args: FetchBlockByHashArgs<TFilter>,
   ): Promise<FetchBlockByHashResult<TBlock>>;
 }

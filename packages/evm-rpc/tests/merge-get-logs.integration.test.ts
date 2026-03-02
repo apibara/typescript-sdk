@@ -343,6 +343,7 @@ describe("EvmRpcStream", () => {
       maxBlock: endBlock,
       force: true,
       filter,
+      clampAllowed: true,
     });
 
     const standard = await standardStream.fetchBlockRange({
@@ -350,6 +351,7 @@ describe("EvmRpcStream", () => {
       maxBlock: endBlock,
       force: true,
       filter,
+      clampAllowed: true,
     });
 
     expect(normalizeResult(merged)).toEqual(normalizeResult(standard));
