@@ -237,6 +237,7 @@ export function drizzleStorage<
 
       indexerId = generateIndexerId(indexerFileName, identifier);
       // Reset runtime flags on init in case the plugin instance is reused.
+      prevFinality = undefined;
       reorgTriggersRegistered = false;
 
       let retries = 0;

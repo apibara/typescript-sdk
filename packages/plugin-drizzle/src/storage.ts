@@ -203,7 +203,7 @@ export async function detectStaleReorgTriggers<
         FROM pg_trigger tg
         JOIN pg_class cls ON cls.oid = tg.tgrelid
         WHERE cls.relname = '${table}'
-          AND tg.tgname LIKE '${table}_reorg_%'
+          AND left(tg.tgname, length('${table}_reorg_')) = '${table}_reorg_'
           AND tg.tgname <> '${currentTriggerName}'
           AND tg.tgisinternal = false;
       `),

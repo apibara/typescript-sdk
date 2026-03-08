@@ -11,7 +11,7 @@ import {
 import { eq, sql } from "drizzle-orm";
 import { describe, expect, it } from "vitest";
 import { drizzleStorage, useDrizzleStorage } from "../src";
-import { reorgRollbackTable } from "../src/storage";
+import { detectStaleReorgTriggers, reorgRollbackTable } from "../src/storage";
 import { getPgliteDb, testTable } from "./helper";
 
 describe("Drizzle storage", () => {
@@ -668,6 +668,46 @@ describe("Drizzle storage", () => {
     expect(triggerQuery.rows).toEqual([
       { tgname: "test_reorg_indexer_testing_default" },
     ]);
+  });
+
+  it("should only detect stale triggers that match the exact reorg prefix", async () => {
+    const db = await getPgliteDb();
+    const currentIndexerId = "indexer_testing_default";
+
+    await db.execute(
+      sql.raw(`
+      CREATE OR REPLACE FUNCTION __test_noop_trigger()
+      RETURNS TRIGGER AS $$
+      BEGIN
+        RETURN NEW;
+      END;
+      $$ LANGUAGE plpgsql;
+    `),
+    );
+
+    // Looks similar but does not use the exact `<table>_reorg_` prefix.
+    await db.execute(
+      sql.raw(`
+      CREATE TRIGGER testXreorg_noise
+      BEFORE INSERT ON test
+      FOR EACH ROW EXECUTE FUNCTION __test_noop_trigger();
+    `),
+    );
+
+    // Stale trigger for a different indexer identifier.
+    await db.execute(
+      sql.raw(`
+      CREATE TRIGGER test_reorg_other_indexer
+      BEFORE INSERT ON test
+      FOR EACH ROW EXECUTE FUNCTION __test_noop_trigger();
+    `),
+    );
+
+    const staleTriggers = await db.transaction(async (tx) => {
+      return detectStaleReorgTriggers(tx, ["test"], currentIndexerId);
+    });
+
+    expect(staleTriggers.sort()).toEqual(["test_reorg_other_indexer"]);
   });
 
   it("should not record invalidate transaction writes in rollback history", async () => {
