@@ -91,11 +91,18 @@ export async function initializeReorgRollbackTable<
       DECLARE
         table_name TEXT := TG_ARGV[0]::TEXT;
         id_col TEXT := TG_ARGV[1]::TEXT;
-        order_key INTEGER := TG_ARGV[2]::INTEGER;
-        indexer_id TEXT := TG_ARGV[3]::TEXT;
+        order_key_text TEXT := current_setting('${SCHEMA_NAME}.reorg_order_key', true);
+        order_key INTEGER;
+        indexer_id TEXT := TG_ARGV[2]::TEXT;
         new_id_value TEXT := row_to_json(NEW.*)->>id_col;
         old_id_value TEXT := row_to_json(OLD.*)->>id_col;
       BEGIN
+        IF order_key_text IS NULL OR order_key_text = '' THEN
+          RETURN NULL;
+        END IF;
+
+        order_key := order_key_text::INTEGER;
+
         IF (TG_OP = 'DELETE') THEN
           INSERT INTO ${SCHEMA_NAME}.${ROLLBACK_TABLE_NAME}(op, table_name, cursor, row_id, row_value, indexer_id)
             SELECT 'D', table_name, order_key, old_id_value, row_to_json(OLD.*), indexer_id;
@@ -129,7 +136,6 @@ export async function registerTriggers<
 >(
   tx: PgTransaction<TQueryResult, TFullSchema, TSchema>,
   tables: string[],
-  endCursor: Cursor,
   idColumnMap: IdColumnMap,
   indexerId: string,
 ) {
@@ -148,12 +154,31 @@ export async function registerTriggers<
           CREATE CONSTRAINT TRIGGER ${getReorgTriggerName(table, indexerId)}
           AFTER INSERT OR UPDATE OR DELETE ON ${table}
           DEFERRABLE INITIALLY DEFERRED
-          FOR EACH ROW EXECUTE FUNCTION ${SCHEMA_NAME}.reorg_checkpoint('${table}', '${tableIdColumn}', ${Number(endCursor.orderKey)}, '${indexerId}');
+          FOR EACH ROW EXECUTE FUNCTION ${SCHEMA_NAME}.reorg_checkpoint('${table}', '${tableIdColumn}', '${indexerId}');
         `),
       );
     }
   } catch (error) {
     throw new DrizzleStorageError("Failed to register triggers", {
+      cause: error,
+    });
+  }
+}
+
+export async function setReorgOrderKey<
+  TQueryResult extends PgQueryResultHKT,
+  TFullSchema extends Record<string, unknown> = Record<string, never>,
+  TSchema extends
+    TablesRelationalConfig = ExtractTablesWithRelations<TFullSchema>,
+>(tx: PgTransaction<TQueryResult, TFullSchema, TSchema>, endCursor: Cursor) {
+  try {
+    await tx.execute(
+      sql.raw(
+        `SELECT set_config('${SCHEMA_NAME}.reorg_order_key', '${Number(endCursor.orderKey)}', true);`,
+      ),
+    );
+  } catch (error) {
+    throw new DrizzleStorageError("Failed to set reorg order key", {
       cause: error,
     });
   }
