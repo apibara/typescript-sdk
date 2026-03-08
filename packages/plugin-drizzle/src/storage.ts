@@ -183,6 +183,38 @@ export async function setReorgOrderKey<
   }
 }
 
+export async function detectStaleReorgTriggers<
+  TQueryResult extends PgQueryResultHKT,
+  TFullSchema extends Record<string, unknown> = Record<string, never>,
+  TSchema extends
+    TablesRelationalConfig = ExtractTablesWithRelations<TFullSchema>,
+>(
+  tx: PgTransaction<TQueryResult, TFullSchema, TSchema>,
+  tables: string[],
+  indexerId: string,
+): Promise<string[]> {
+  const staleTriggerNames: string[] = [];
+
+  for (const table of tables) {
+    const currentTriggerName = getReorgTriggerName(table, indexerId);
+    const { rows } = (await tx.execute(
+      sql.raw(`
+        SELECT tg.tgname
+        FROM pg_trigger tg
+        JOIN pg_class cls ON cls.oid = tg.tgrelid
+        WHERE cls.relname = '${table}'
+          AND tg.tgname LIKE '${table}_reorg_%'
+          AND tg.tgname <> '${currentTriggerName}'
+          AND tg.tgisinternal = false;
+      `),
+    )) as { rows: Array<{ tgname: string }> };
+
+    staleTriggerNames.push(...rows.map((row) => row.tgname));
+  }
+
+  return staleTriggerNames;
+}
+
 export async function invalidate<
   TQueryResult extends PgQueryResultHKT,
   TFullSchema extends Record<string, unknown> = Record<string, never>,

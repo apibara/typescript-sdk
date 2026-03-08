@@ -27,6 +27,7 @@ import {
 } from "./persistence";
 import {
   cleanupStorage,
+  detectStaleReorgTriggers,
   finalize,
   initializeReorgRollbackTable,
   invalidate,
@@ -108,6 +109,9 @@ export interface DrizzleStorageOptions<
   persistState?: boolean;
   /**
    * The name of the indexer. Default value is 'default'.
+   *
+   * Keep this stable for a given table set. Changing it will create a new
+   * trigger suffix and may leave stale reorg triggers from previous runs.
    */
   indexerName?: string;
   /**
@@ -251,6 +255,18 @@ export function drizzleStorage<
           }
           await withTransaction(db, async (tx) => {
             await initializeReorgRollbackTable(tx, indexerId);
+            const staleTriggers = await detectStaleReorgTriggers(
+              tx,
+              tableNames,
+              indexerId,
+            );
+            if (staleTriggers.length > 0) {
+              logger.warn(
+                `Detected stale reorg triggers for other indexer identifiers: ${staleTriggers.join(", ")}. ` +
+                  "Keep `indexerName` stable or clean them up manually.",
+              );
+            }
+
             if (enablePersistence) {
               await initializePersistentState(tx);
             }
@@ -452,14 +468,14 @@ export function drizzleStorage<
               indexerId,
             });
           }
-
-          prevFinality = finality;
         });
 
         if (registeredTriggersInTxn) {
           // Mark registration only after the transaction commits successfully.
           reorgTriggersRegistered = true;
         }
+        // Persist finality marker only after successful commit.
+        prevFinality = finality;
       });
     });
   });
