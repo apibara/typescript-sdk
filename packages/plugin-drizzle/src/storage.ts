@@ -5,7 +5,6 @@ import {
   sql,
 } from "drizzle-orm";
 import {
-  type PgDatabase,
   type PgQueryResultHKT,
   type PgTransaction,
   char,
@@ -179,31 +178,6 @@ export async function setReorgOrderKey<
     );
   } catch (error) {
     throw new DrizzleStorageError("Failed to set reorg order key", {
-      cause: error,
-    });
-  }
-}
-
-export async function removeTriggers<
-  TQueryResult extends PgQueryResultHKT,
-  TFullSchema extends Record<string, unknown> = Record<string, never>,
-  TSchema extends
-    TablesRelationalConfig = ExtractTablesWithRelations<TFullSchema>,
->(
-  db: PgDatabase<TQueryResult, TFullSchema, TSchema>,
-  tables: string[],
-  indexerId: string,
-) {
-  try {
-    for (const table of tables) {
-      await db.execute(
-        sql.raw(
-          `DROP TRIGGER IF EXISTS ${getReorgTriggerName(table, indexerId)} ON ${table};`,
-        ),
-      );
-    }
-  } catch (error) {
-    throw new DrizzleStorageError("Failed to remove triggers", {
       cause: error,
     });
   }

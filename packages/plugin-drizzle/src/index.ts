@@ -186,6 +186,8 @@ export function drizzleStorage<
     let indexerId = "";
     const alwaysReindex = process.env["APIBARA_ALWAYS_REINDEX"] === "true";
     let prevFinality: DataFinality | undefined;
+    // Middleware execution is sequential. If concurrent block handling is introduced,
+    // this flag will need synchronization.
     let reorgTriggersRegistered = false;
     const schema: TSchema = (_schema as TSchema) ?? db._.schema ?? {};
     const idColumnMap: IdColumnMap = {
@@ -230,6 +232,8 @@ export function drizzleStorage<
         internalContext;
 
       indexerId = generateIndexerId(indexerFileName, identifier);
+      // Reset runtime flags on init in case the plugin instance is reused.
+      reorgTriggersRegistered = false;
 
       let retries = 0;
 
@@ -430,6 +434,8 @@ export function drizzleStorage<
 
           if (finality !== "finalized") {
             if (!reorgTriggersRegistered) {
+              // Triggers persist across transactions; only the order key changes
+              // per non-finalized block.
               await registerTriggers(tx, tableNames, idColumnMap, indexerId);
               registeredTriggersInTxn = true;
             }
