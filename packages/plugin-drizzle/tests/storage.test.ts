@@ -8,7 +8,7 @@ import {
   MockClient,
   type MockFilter,
 } from "@apibara/protocol/testing";
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { describe, expect, it } from "vitest";
 import { drizzleStorage, useDrizzleStorage } from "../src";
 import { reorgRollbackTable } from "../src/storage";
@@ -630,6 +630,116 @@ describe("Drizzle storage", () => {
       ]
     `);
     expect(rollBackResult).toMatchInlineSnapshot("[]");
+  });
+
+  it("should keep reorg triggers registered for non-finalized blocks", async () => {
+    const db = await getPgliteDb();
+
+    const indexer = getMockIndexer({
+      override: {
+        plugins: [drizzleStorage({ db, persistState: true })],
+        async transform({ endCursor, block: { data } }) {
+          const { db: tx } = useDrizzleStorage(db);
+
+          await tx.insert(testTable).values({
+            blockNumber: Number(endCursor?.orderKey),
+            data,
+          });
+        },
+      },
+    });
+
+    const mockClient = new MockClient<MockFilter, MockBlock>(
+      (request, options) => {
+        return generateMockMessages(3);
+      },
+    );
+
+    await run(mockClient, indexer);
+
+    const triggerQuery = (await db.execute(
+      sql.raw(`
+        SELECT tgname
+        FROM pg_trigger
+        WHERE tgname = 'test_reorg_indexer_testing_default';
+      `),
+    )) as { rows: Array<{ tgname: string }> };
+
+    expect(triggerQuery.rows).toEqual([
+      { tgname: "test_reorg_indexer_testing_default" },
+    ]);
+  });
+
+  it("should not record invalidate transaction writes in rollback history", async () => {
+    const db = await getPgliteDb();
+
+    const indexer = getMockIndexer({
+      override: {
+        plugins: [drizzleStorage({ db, persistState: true })],
+        async transform({ endCursor, finality }) {
+          const { db: tx } = useDrizzleStorage(db);
+
+          await tx.insert(testTable).values({
+            blockNumber: Number(endCursor?.orderKey),
+            key: finality,
+            data: finality,
+          });
+        },
+      },
+    });
+
+    const mockClient = new MockClient<MockFilter, MockBlock>(
+      (request, options) => {
+        return [
+          {
+            _tag: "data",
+            data: {
+              cursor: { orderKey: 5000000n },
+              endCursor: { orderKey: 5000001n },
+              finality: "pending",
+              data: [{ data: "pending" }],
+              production: "backfill",
+            },
+          },
+          {
+            _tag: "data",
+            data: {
+              cursor: { orderKey: 5000000n },
+              endCursor: { orderKey: 5000001n },
+              finality: "accepted",
+              data: [{ data: "accepted" }],
+              production: "backfill",
+            },
+          },
+        ];
+      },
+    );
+
+    await run(mockClient, indexer);
+
+    const result = await db.select().from(testTable);
+    const rollbackRows = await db.select().from(reorgRollbackTable);
+
+    expect(result.map(({ key, data }) => ({ key, data }))).toEqual([
+      { key: "accepted", data: "accepted" },
+    ]);
+
+    // The pending rollback row is removed during invalidate; only accepted writes remain.
+    expect(
+      rollbackRows.map(({ cursor, op, table_name, row_id }) => ({
+        cursor,
+        op,
+        table_name,
+        row_id,
+      })),
+    ).toEqual([
+      {
+        cursor: 5000001,
+        op: "I",
+        table_name: "test",
+        row_id: "2",
+      },
+    ]);
   });
 
   it("should handle pending data correctly", async () => {
