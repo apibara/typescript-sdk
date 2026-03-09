@@ -73,8 +73,12 @@ export default async function (runtimeConfig: ApibaraRuntimeConfig) {
         }
       }
 
+      if (endCursor?.orderKey === undefined) {
+        return;
+      }
+
       const rows = Array.from(transactionHashes).map((transactionHash) => ({
-        number: Number(endCursor?.orderKey),
+        number: Number(endCursor.orderKey),
         hash: transactionHash,
       }));
 
