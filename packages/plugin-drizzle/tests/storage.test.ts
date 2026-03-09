@@ -74,7 +74,7 @@ describe("Drizzle storage", () => {
     expect(rollBackResult).toMatchInlineSnapshot(`
       [
         {
-          "cursor": 5000000,
+          "cursor": 5000000n,
           "indexer_id": "indexer_testing_default",
           "n": 1,
           "op": "I",
@@ -83,7 +83,7 @@ describe("Drizzle storage", () => {
           "table_name": "test",
         },
         {
-          "cursor": 5000001,
+          "cursor": 5000001n,
           "indexer_id": "indexer_testing_default",
           "n": 2,
           "op": "I",
@@ -92,7 +92,7 @@ describe("Drizzle storage", () => {
           "table_name": "test",
         },
         {
-          "cursor": 5000002,
+          "cursor": 5000002n,
           "indexer_id": "indexer_testing_default",
           "n": 3,
           "op": "I",
@@ -162,7 +162,7 @@ describe("Drizzle storage", () => {
     expect(rollBackResult).toMatchInlineSnapshot(`
       [
         {
-          "cursor": 5000000,
+          "cursor": 5000000n,
           "indexer_id": "indexer_testing_default",
           "n": 1,
           "op": "I",
@@ -171,7 +171,7 @@ describe("Drizzle storage", () => {
           "table_name": "test",
         },
         {
-          "cursor": 5000001,
+          "cursor": 5000001n,
           "indexer_id": "indexer_testing_default",
           "n": 2,
           "op": "U",
@@ -187,7 +187,7 @@ describe("Drizzle storage", () => {
           "table_name": "test",
         },
         {
-          "cursor": 5000002,
+          "cursor": 5000002n,
           "indexer_id": "indexer_testing_default",
           "n": 3,
           "op": "U",
@@ -259,7 +259,7 @@ describe("Drizzle storage", () => {
     expect(rollBackResult).toMatchInlineSnapshot(`
       [
         {
-          "cursor": 5000000,
+          "cursor": 5000000n,
           "indexer_id": "indexer_testing_default",
           "n": 1,
           "op": "I",
@@ -268,7 +268,7 @@ describe("Drizzle storage", () => {
           "table_name": "test",
         },
         {
-          "cursor": 5000001,
+          "cursor": 5000001n,
           "indexer_id": "indexer_testing_default",
           "n": 2,
           "op": "D",
@@ -284,7 +284,7 @@ describe("Drizzle storage", () => {
           "table_name": "test",
         },
         {
-          "cursor": 5000002,
+          "cursor": 5000002n,
           "indexer_id": "indexer_testing_default",
           "n": 3,
           "op": "I",
@@ -427,7 +427,7 @@ describe("Drizzle storage", () => {
     expect(rollBackResult).toMatchInlineSnapshot(`
       [
         {
-          "cursor": 5000000,
+          "cursor": 5000000n,
           "indexer_id": "indexer_testing_default",
           "n": 1,
           "op": "I",
@@ -436,7 +436,7 @@ describe("Drizzle storage", () => {
           "table_name": "test",
         },
         {
-          "cursor": 5000001,
+          "cursor": 5000001n,
           "indexer_id": "indexer_testing_default",
           "n": 2,
           "op": "I",
@@ -445,7 +445,7 @@ describe("Drizzle storage", () => {
           "table_name": "test",
         },
         {
-          "cursor": 5000002,
+          "cursor": 5000002n,
           "indexer_id": "indexer_testing_default",
           "n": 3,
           "op": "I",
@@ -454,7 +454,7 @@ describe("Drizzle storage", () => {
           "table_name": "test",
         },
         {
-          "cursor": 5000003,
+          "cursor": 5000003n,
           "indexer_id": "indexer_testing_default",
           "n": 4,
           "op": "I",
@@ -463,7 +463,7 @@ describe("Drizzle storage", () => {
           "table_name": "test",
         },
         {
-          "cursor": 5000004,
+          "cursor": 5000004n,
           "indexer_id": "indexer_testing_default",
           "n": 5,
           "op": "I",
@@ -472,7 +472,7 @@ describe("Drizzle storage", () => {
           "table_name": "test",
         },
         {
-          "cursor": 5000004,
+          "cursor": 5000004n,
           "indexer_id": "indexer_testing_default",
           "n": 6,
           "op": "U",
@@ -488,7 +488,7 @@ describe("Drizzle storage", () => {
           "table_name": "test",
         },
         {
-          "cursor": 5000005,
+          "cursor": 5000005n,
           "indexer_id": "indexer_testing_default",
           "n": 7,
           "op": "I",
@@ -497,7 +497,7 @@ describe("Drizzle storage", () => {
           "table_name": "test",
         },
         {
-          "cursor": 5000009,
+          "cursor": 5000009n,
           "indexer_id": "indexer_testing_default",
           "n": 13,
           "op": "I",
@@ -774,7 +774,7 @@ describe("Drizzle storage", () => {
       })),
     ).toEqual([
       {
-        cursor: 5000001,
+        cursor: 5000001n,
         op: "I",
         table_name: "test",
         row_id: "2",

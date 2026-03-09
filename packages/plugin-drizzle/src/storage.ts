@@ -7,8 +7,8 @@ import {
 import {
   type PgQueryResultHKT,
   type PgTransaction,
+  bigint,
   char,
-  integer,
   jsonb,
   pgSchema,
   serial,
@@ -36,7 +36,7 @@ export const reorgRollbackTable = schema.table(ROLLBACK_TABLE_NAME, {
   n: serial("n").primaryKey(),
   op: char("op", { length: 1 }).$type<ReorgOperation>().notNull(),
   table_name: text("table_name").notNull(),
-  cursor: integer("cursor").notNull(),
+  cursor: bigint("cursor", { mode: "bigint" }).notNull(),
   row_id: text("row_id"),
   row_value: jsonb("row_value"),
   indexer_id: text("indexer_id").notNull(),
@@ -62,7 +62,7 @@ export async function initializeReorgRollbackTable<
           n SERIAL PRIMARY KEY,
           op CHAR(1) NOT NULL,
           table_name TEXT NOT NULL,
-          cursor INTEGER NOT NULL,
+          cursor BIGINT NOT NULL,
           row_id TEXT,
           row_value JSONB,
           indexer_id TEXT NOT NULL
@@ -91,7 +91,7 @@ export async function initializeReorgRollbackTable<
         table_name TEXT := TG_ARGV[0]::TEXT;
         id_col TEXT := TG_ARGV[1]::TEXT;
         order_key_text TEXT := current_setting('${SCHEMA_NAME}.reorg_order_key', true);
-        order_key INTEGER;
+        order_key BIGINT;
         indexer_id TEXT := TG_ARGV[2]::TEXT;
         new_id_value TEXT := row_to_json(NEW.*)->>id_col;
         old_id_value TEXT := row_to_json(OLD.*)->>id_col;
@@ -100,7 +100,7 @@ export async function initializeReorgRollbackTable<
           RETURN NULL;
         END IF;
 
-        order_key := order_key_text::INTEGER;
+        order_key := order_key_text::BIGINT;
 
         IF (TG_OP = 'DELETE') THEN
           INSERT INTO ${SCHEMA_NAME}.${ROLLBACK_TABLE_NAME}(op, table_name, cursor, row_id, row_value, indexer_id)
@@ -173,7 +173,7 @@ export async function setReorgOrderKey<
   try {
     await tx.execute(
       sql.raw(
-        `SELECT set_config('${SCHEMA_NAME}.reorg_order_key', '${Number(endCursor.orderKey)}', true);`,
+        `SELECT set_config('${SCHEMA_NAME}.reorg_order_key', '${endCursor.orderKey.toString()}', true);`,
       ),
     );
   } catch (error) {
@@ -231,7 +231,7 @@ export async function invalidate<
     sql.raw(`
       WITH deleted AS (
         DELETE FROM ${SCHEMA_NAME}.${ROLLBACK_TABLE_NAME}
-        WHERE cursor > ${Number(cursor.orderKey)}
+        WHERE cursor > ${cursor.orderKey}
         AND indexer_id = '${indexerId}'
         RETURNING *
       )
@@ -360,7 +360,7 @@ export async function finalize<
     await tx.execute(
       sql.raw(`
       DELETE FROM ${SCHEMA_NAME}.${ROLLBACK_TABLE_NAME}
-      WHERE cursor <= ${Number(cursor.orderKey)}
+      WHERE cursor <= ${cursor.orderKey}
       AND indexer_id = '${indexerId}'
     `),
     );
