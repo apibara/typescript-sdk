@@ -310,7 +310,7 @@ export async function getState<
 
     const cursor = checkpointRows[0]
       ? normalizeCursor({
-          orderKey: BigInt(checkpointRows[0].orderKey),
+          orderKey: checkpointRows[0].orderKey,
           uniqueKey: checkpointRows[0].uniqueKey,
         })
       : undefined;

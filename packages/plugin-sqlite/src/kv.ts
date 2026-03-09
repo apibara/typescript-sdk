@@ -27,6 +27,7 @@ export class KeyValueStore {
   get<T>(key: string): T | undefined {
     const row = this.db
       .prepare<[string, string], KeyValueRow>(statements.get)
+      .safeIntegers()
       .get(key, this.indexerId);
 
     return row ? this.deserialize(row.v) : undefined;
