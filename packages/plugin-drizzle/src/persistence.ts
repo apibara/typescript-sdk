@@ -73,13 +73,14 @@ export const CURRENT_SCHEMA_VERSION = 1;
 
 // Each array at index i contains SQL statements to migrate from version i to i+1.
 const MIGRATIONS: string[][] = [
-  // v0 -> v1: block-number columns promoted from INTEGER to BIGINT
+  // v0 -> v1: block-number columns promoted from INTEGER to BIGINT.
   [
     `ALTER TABLE ${SCHEMA_NAME}.${CHECKPOINTS_TABLE_NAME} ALTER COLUMN order_key TYPE BIGINT`,
     `ALTER TABLE ${SCHEMA_NAME}.${FILTERS_TABLE_NAME} ALTER COLUMN from_block TYPE BIGINT`,
     `ALTER TABLE ${SCHEMA_NAME}.${FILTERS_TABLE_NAME} ALTER COLUMN to_block TYPE BIGINT`,
     `ALTER TABLE ${SCHEMA_NAME}.chain_reorganizations ALTER COLUMN old_head_order_key TYPE BIGINT`,
     `ALTER TABLE ${SCHEMA_NAME}.chain_reorganizations ALTER COLUMN new_head_order_key TYPE BIGINT`,
+    `ALTER TABLE ${SCHEMA_NAME}.chain_reorganizations ADD COLUMN IF NOT EXISTS recorded_at TIMESTAMP NOT NULL DEFAULT NOW()`,
   ],
 ];
 

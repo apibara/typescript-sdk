@@ -55,7 +55,10 @@ export function getState<TFilter>(props: {
   let cursor: Cursor | undefined;
   let filter: TFilter | undefined;
 
-  if (storedCursor?.order_key) {
+  if (
+    storedCursor &&
+    (storedCursor.order_key != null || storedCursor.order_key !== undefined)
+  ) {
     cursor = normalizeCursor({
       orderKey: storedCursor.order_key,
       uniqueKey: storedCursor.unique_key ? storedCursor.unique_key : null,
