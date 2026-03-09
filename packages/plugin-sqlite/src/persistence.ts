@@ -19,11 +19,9 @@ export function persistState<TFilter>(props: {
 
   assertInTransaction(db);
 
-  db.prepare<[string, bigint, string | undefined]>(statements.putCheckpoint).run(
-    indexerId,
-    endCursor.orderKey,
-    endCursor.uniqueKey,
-  );
+  db.prepare<[string, bigint, string | undefined]>(
+    statements.putCheckpoint,
+  ).run(indexerId, endCursor.orderKey, endCursor.uniqueKey);
 
   if (filter) {
     db.prepare<[bigint, string]>(statements.updateFilterToBlock).run(
