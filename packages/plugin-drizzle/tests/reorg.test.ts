@@ -56,7 +56,7 @@ describe("Drizzle reorg", () => {
       [
         {
           "id": "indexer_testing_default",
-          "orderKey": 1009,
+          "orderKey": 1009n,
           "uniqueKey": "0xff001009",
         },
       ]
@@ -66,9 +66,9 @@ describe("Drizzle reorg", () => {
     expect(reorgsResult.length).toBe(1);
 
     const reorg = reorgsResult[0];
-    expect(reorg.oldHeadOrderKey).toBe(1007);
+    expect(reorg.oldHeadOrderKey).toBe(1007n);
     expect(reorg.oldHeadUniqueKey).toBe("0xff001007");
-    expect(reorg.newHeadOrderKey).toBe(1005);
+    expect(reorg.newHeadOrderKey).toBe(1005n);
     expect(reorg.newHeadUniqueKey).toBe("0xff001005");
     expect(reorg.recordedAt).toBeInstanceOf(Date);
     expect(reorg.indexerId).toBe("indexer_testing_default");
@@ -121,19 +121,19 @@ describe("Drizzle reorg", () => {
     expect(reorgsResult.length).toBe(2);
 
     const firstReorg = reorgsResult[0];
-    expect(firstReorg.oldHeadOrderKey).toBe(107);
+    expect(firstReorg.oldHeadOrderKey).toBe(107n);
     expect(firstReorg.oldHeadUniqueKey).toBe("0xff00107");
-    expect(firstReorg.newHeadOrderKey).toBe(105);
+    expect(firstReorg.newHeadOrderKey).toBe(105n);
     expect(firstReorg.newHeadUniqueKey).toBe("0xff00105");
 
     const secondReorg = reorgsResult[1];
-    expect(secondReorg.oldHeadOrderKey).toBe(114);
+    expect(secondReorg.oldHeadOrderKey).toBe(114n);
     expect(secondReorg.oldHeadUniqueKey).toBe("0xff00114");
-    expect(secondReorg.newHeadOrderKey).toBe(112);
+    expect(secondReorg.newHeadOrderKey).toBe(112n);
     expect(secondReorg.newHeadUniqueKey).toBe("0xff00112");
 
     const checkpointsResult = await db.select().from(checkpoints);
-    expect(checkpointsResult[0].orderKey).toBe(119);
+    expect(checkpointsResult[0].orderKey).toBe(119n);
   });
 
   it("should NOT record reorgs when flag is disabled", async () => {

@@ -75,6 +75,25 @@ export async function initializeReorgRollbackTable<
         CREATE INDEX IF NOT EXISTS idx_reorg_rollback_indexer_id_cursor ON ${SCHEMA_NAME}.${ROLLBACK_TABLE_NAME}(indexer_id, cursor);
       `),
     );
+
+    // Migrate cursor column from INTEGER to BIGINT for existing installations.
+    // INTEGER overflows at ~2.1B blocks; BIGINT is a lossless superset so no data is lost.
+    await tx.execute(
+      sql.raw(`
+        DO $$
+        BEGIN
+          IF EXISTS (
+            SELECT 1 FROM information_schema.columns
+            WHERE table_schema = '${SCHEMA_NAME}'
+              AND table_name   = '${ROLLBACK_TABLE_NAME}'
+              AND column_name  = 'cursor'
+              AND data_type    = 'integer'
+          ) THEN
+            ALTER TABLE ${SCHEMA_NAME}.${ROLLBACK_TABLE_NAME} ALTER COLUMN cursor TYPE BIGINT;
+          END IF;
+        END $$;
+      `),
+    );
   } catch (error) {
     throw new DrizzleStorageError("Failed to initialize reorg rollback table", {
       cause: error,
