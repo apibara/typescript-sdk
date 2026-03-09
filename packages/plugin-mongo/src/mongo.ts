@@ -7,13 +7,12 @@ export async function invalidate(
   cursor: Cursor,
   collections: string[],
 ) {
-  const orderKeyValue = Number(cursor.orderKey);
   for (const collection of collections) {
     // Delete documents where the lower bound of _cursor is greater than the invalidate cursor
     await db.collection(collection).deleteMany(
       {
         "_cursor.from": {
-          $gt: orderKeyValue,
+          $gt: cursor.orderKey,
         },
       },
       { session },
@@ -21,7 +20,7 @@ export async function invalidate(
 
     // Update documents where the upper bound of _cursor is greater than the invalidate cursor
     await db.collection(collection).updateMany(
-      { "_cursor.to": { $gt: orderKeyValue } },
+      { "_cursor.to": { $gt: cursor.orderKey } },
       {
         $set: {
           "_cursor.to": null,
@@ -38,12 +37,11 @@ export async function finalize(
   cursor: Cursor,
   collections: string[],
 ) {
-  const orderKeyValue = Number(cursor.orderKey);
   for (const collection of collections) {
     // Delete documents where the upper bound of _cursor is less than the finalize cursor
     await db.collection(collection).deleteMany(
       {
-        "_cursor.to": { $lte: orderKeyValue },
+        "_cursor.to": { $lte: cursor.orderKey },
       },
       { session },
     );

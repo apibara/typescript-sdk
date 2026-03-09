@@ -19,21 +19,21 @@ export function persistState<TFilter>(props: {
 
   assertInTransaction(db);
 
-  db.prepare(statements.putCheckpoint).run(
+  db.prepare<[string, bigint, string | undefined]>(statements.putCheckpoint).run(
     indexerId,
-    Number(endCursor.orderKey),
+    endCursor.orderKey,
     endCursor.uniqueKey,
   );
 
   if (filter) {
-    db.prepare(statements.updateFilterToBlock).run(
-      Number(endCursor.orderKey),
+    db.prepare<[bigint, string]>(statements.updateFilterToBlock).run(
+      endCursor.orderKey,
       indexerId,
     );
-    db.prepare(statements.insertFilter).run(
+    db.prepare<[string, string, bigint]>(statements.insertFilter).run(
       indexerId,
       serialize(filter as Record<string, unknown>),
-      Number(endCursor.orderKey),
+      endCursor.orderKey,
     );
   }
 }
@@ -45,9 +45,10 @@ export function getState<TFilter>(props: {
   const { db, indexerId } = props;
   assertInTransaction(db);
   const storedCursor = db
-    .prepare<string, { order_key?: number; unique_key?: string }>(
+    .prepare<string, { order_key?: bigint; unique_key?: string }>(
       statements.getCheckpoint,
     )
+    .safeIntegers()
     .get(indexerId);
   const storedFilter = db
     .prepare<string, { filter: string }>(statements.getFilter)
@@ -58,7 +59,7 @@ export function getState<TFilter>(props: {
 
   if (storedCursor?.order_key) {
     cursor = normalizeCursor({
-      orderKey: BigInt(storedCursor.order_key),
+      orderKey: storedCursor.order_key,
       uniqueKey: storedCursor.unique_key ? storedCursor.unique_key : null,
     });
   }
@@ -77,9 +78,9 @@ export function finalizeState(props: {
 }) {
   const { cursor, db, indexerId } = props;
   assertInTransaction(db);
-  db.prepare<[string, number]>(statements.finalizeFilter).run(
+  db.prepare<[string, bigint]>(statements.finalizeFilter).run(
     indexerId,
-    Number(cursor.orderKey),
+    cursor.orderKey,
   );
 }
 
@@ -90,13 +91,13 @@ export function invalidateState(props: {
 }) {
   const { cursor, db, indexerId } = props;
   assertInTransaction(db);
-  db.prepare<[string, number]>(statements.invalidateFilterDelete).run(
+  db.prepare<[string, bigint]>(statements.invalidateFilterDelete).run(
     indexerId,
-    Number(cursor.orderKey),
+    cursor.orderKey,
   );
-  db.prepare<[string, number]>(statements.invalidateFilterUpdate).run(
+  db.prepare<[string, bigint]>(statements.invalidateFilterUpdate).run(
     indexerId,
-    Number(cursor.orderKey),
+    cursor.orderKey,
   );
 }
 
@@ -112,15 +113,15 @@ export function resetPersistence(props: {
 
 export type CheckpointRow = {
   id: string;
-  order_key: number;
+  order_key: bigint;
   unique_key: string | null;
 };
 
 export type FilterRow = {
   id: string;
   filter: string;
-  from_block: number;
-  to_block: number | null;
+  from_block: bigint;
+  to_block: bigint | null;
 };
 
 const statements = {

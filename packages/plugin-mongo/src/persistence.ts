@@ -4,15 +4,15 @@ import { MongoStorageError } from "./utils";
 
 export type CheckpointSchema = {
   id: string;
-  orderKey: number;
+  orderKey: bigint;
   uniqueKey: string | null;
 };
 
 export type FilterSchema = {
   id: string;
   filter: Record<string, unknown>;
-  fromBlock: number;
-  toBlock: number | null;
+  fromBlock: bigint;
+  toBlock: bigint | null;
 };
 
 export const checkpointCollectionName = "checkpoints";
@@ -43,7 +43,7 @@ export async function persistState<TFilter>(props: {
       { id: indexerId },
       {
         $set: {
-          orderKey: Number(endCursor.orderKey),
+          orderKey: endCursor.orderKey,
           uniqueKey: endCursor.uniqueKey ? endCursor.uniqueKey : null,
         },
       },
@@ -56,7 +56,7 @@ export async function persistState<TFilter>(props: {
         .collection<FilterSchema>(filterCollectionName)
         .updateMany(
           { id: indexerId, toBlock: null },
-          { $set: { toBlock: Number(endCursor.orderKey) } },
+          { $set: { toBlock: endCursor.orderKey } },
           { session },
         );
 
@@ -64,12 +64,12 @@ export async function persistState<TFilter>(props: {
       await db.collection<FilterSchema>(filterCollectionName).updateOne(
         {
           id: indexerId,
-          fromBlock: Number(endCursor.orderKey),
+          fromBlock: endCursor.orderKey,
         },
         {
           $set: {
             filter: filter as Record<string, unknown>,
-            fromBlock: Number(endCursor.orderKey),
+            fromBlock: endCursor.orderKey,
             toBlock: null,
           },
         },
@@ -128,14 +128,14 @@ export async function invalidateState(props: {
   await db
     .collection<FilterSchema>(filterCollectionName)
     .deleteMany(
-      { id: indexerId, fromBlock: { $gt: Number(cursor.orderKey) } },
+      { id: indexerId, fromBlock: { $gt: cursor.orderKey } },
       { session },
     );
 
   await db
     .collection<FilterSchema>(filterCollectionName)
     .updateMany(
-      { id: indexerId, toBlock: { $gt: Number(cursor.orderKey) } },
+      { id: indexerId, toBlock: { $gt: cursor.orderKey } },
       { $set: { toBlock: null } },
       { session },
     );
@@ -152,7 +152,7 @@ export async function finalizeState(props: {
   await db.collection<FilterSchema>(filterCollectionName).deleteMany(
     {
       id: indexerId,
-      toBlock: { $lte: Number(cursor.orderKey) },
+      toBlock: { $lte: cursor.orderKey },
     },
     { session },
   );
