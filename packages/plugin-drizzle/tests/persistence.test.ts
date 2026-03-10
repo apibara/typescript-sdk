@@ -61,7 +61,7 @@ describe("Drizzle persistence", () => {
       [
         {
           "id": "indexer_testing_default",
-          "orderKey": 5000005,
+          "orderKey": 5000005n,
           "uniqueKey": null,
         },
       ]
@@ -93,7 +93,7 @@ describe("Drizzle persistence", () => {
       [
         {
           "id": "indexer_testing_default",
-          "orderKey": 1000009,
+          "orderKey": 1000009n,
           "uniqueKey": "0xff001000009",
         },
       ]
@@ -114,7 +114,7 @@ describe("Drizzle persistence", () => {
       [
         {
           "id": "indexer_testing_default",
-          "orderKey": 1000019,
+          "orderKey": 1000019n,
           "uniqueKey": null,
         },
       ]
@@ -280,7 +280,7 @@ describe("Drizzle persistence", () => {
       [
         {
           "id": "indexer_testing_default",
-          "orderKey": 108,
+          "orderKey": 108n,
           "uniqueKey": null,
         },
       ]
@@ -291,15 +291,15 @@ describe("Drizzle persistence", () => {
           "filter": "{
       	"filter": "B"
       }",
-          "fromBlock": 103,
+          "fromBlock": 103n,
           "id": "indexer_testing_default",
-          "toBlock": 106,
+          "toBlock": 106n,
         },
         {
           "filter": "{
       	"filter": "BC"
       }",
-          "fromBlock": 106,
+          "fromBlock": 106n,
           "id": "indexer_testing_default",
           "toBlock": null,
         },
@@ -464,7 +464,7 @@ describe("Drizzle persistence", () => {
       [
         {
           "id": "indexer_testing_default",
-          "orderKey": 105,
+          "orderKey": 105n,
           "uniqueKey": null,
         },
       ]
@@ -475,7 +475,7 @@ describe("Drizzle persistence", () => {
           "filter": "{
       	"filter": "B"
       }",
-          "fromBlock": 103,
+          "fromBlock": 103n,
           "id": "indexer_testing_default",
           "toBlock": null,
         },
@@ -640,7 +640,7 @@ describe("Drizzle persistence", () => {
       [
         {
           "id": "indexer_testing_default",
-          "orderKey": 107,
+          "orderKey": 107n,
           "uniqueKey": null,
         },
       ]
@@ -651,7 +651,7 @@ describe("Drizzle persistence", () => {
           "filter": "{
       	"filter": "BC"
       }",
-          "fromBlock": 106,
+          "fromBlock": 106n,
           "id": "indexer_testing_default",
           "toBlock": null,
         },
@@ -693,7 +693,7 @@ describe("Drizzle persistence", () => {
       [
         {
           "k": 0,
-          "version": 0,
+          "version": 1,
         },
       ]
     `);
@@ -827,14 +827,14 @@ describe("Drizzle persistence", () => {
       [
         {
           "id": "indexer_testing_default",
-          "orderKey": 5000002,
+          "orderKey": 5000002n,
           "uniqueKey": null,
         },
       ]
     `);
 
     // The checkpoint should be at block 2, which is the last accepted block
-    expect(checkpointsResult[0].orderKey).toBe(5000002);
+    expect(checkpointsResult[0].orderKey).toBe(5000002n);
 
     // Check the rollback table - it should have entries for all blocks
     const rollbackResult = await db.select().from(reorgRollbackTable);

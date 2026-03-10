@@ -8,10 +8,10 @@ import {
   MockClient,
   type MockFilter,
 } from "@apibara/protocol/testing";
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { describe, expect, it } from "vitest";
 import { drizzleStorage, useDrizzleStorage } from "../src";
-import { reorgRollbackTable } from "../src/storage";
+import { detectStaleReorgTriggers, reorgRollbackTable } from "../src/storage";
 import { getPgliteDb, testTable } from "./helper";
 
 describe("Drizzle storage", () => {
@@ -74,7 +74,7 @@ describe("Drizzle storage", () => {
     expect(rollBackResult).toMatchInlineSnapshot(`
       [
         {
-          "cursor": 5000000,
+          "cursor": 5000000n,
           "indexer_id": "indexer_testing_default",
           "n": 1,
           "op": "I",
@@ -83,7 +83,7 @@ describe("Drizzle storage", () => {
           "table_name": "test",
         },
         {
-          "cursor": 5000001,
+          "cursor": 5000001n,
           "indexer_id": "indexer_testing_default",
           "n": 2,
           "op": "I",
@@ -92,7 +92,7 @@ describe("Drizzle storage", () => {
           "table_name": "test",
         },
         {
-          "cursor": 5000002,
+          "cursor": 5000002n,
           "indexer_id": "indexer_testing_default",
           "n": 3,
           "op": "I",
@@ -162,7 +162,7 @@ describe("Drizzle storage", () => {
     expect(rollBackResult).toMatchInlineSnapshot(`
       [
         {
-          "cursor": 5000000,
+          "cursor": 5000000n,
           "indexer_id": "indexer_testing_default",
           "n": 1,
           "op": "I",
@@ -171,7 +171,7 @@ describe("Drizzle storage", () => {
           "table_name": "test",
         },
         {
-          "cursor": 5000001,
+          "cursor": 5000001n,
           "indexer_id": "indexer_testing_default",
           "n": 2,
           "op": "U",
@@ -187,7 +187,7 @@ describe("Drizzle storage", () => {
           "table_name": "test",
         },
         {
-          "cursor": 5000002,
+          "cursor": 5000002n,
           "indexer_id": "indexer_testing_default",
           "n": 3,
           "op": "U",
@@ -259,7 +259,7 @@ describe("Drizzle storage", () => {
     expect(rollBackResult).toMatchInlineSnapshot(`
       [
         {
-          "cursor": 5000000,
+          "cursor": 5000000n,
           "indexer_id": "indexer_testing_default",
           "n": 1,
           "op": "I",
@@ -268,7 +268,7 @@ describe("Drizzle storage", () => {
           "table_name": "test",
         },
         {
-          "cursor": 5000001,
+          "cursor": 5000001n,
           "indexer_id": "indexer_testing_default",
           "n": 2,
           "op": "D",
@@ -284,7 +284,7 @@ describe("Drizzle storage", () => {
           "table_name": "test",
         },
         {
-          "cursor": 5000002,
+          "cursor": 5000002n,
           "indexer_id": "indexer_testing_default",
           "n": 3,
           "op": "I",
@@ -427,7 +427,7 @@ describe("Drizzle storage", () => {
     expect(rollBackResult).toMatchInlineSnapshot(`
       [
         {
-          "cursor": 5000000,
+          "cursor": 5000000n,
           "indexer_id": "indexer_testing_default",
           "n": 1,
           "op": "I",
@@ -436,7 +436,7 @@ describe("Drizzle storage", () => {
           "table_name": "test",
         },
         {
-          "cursor": 5000001,
+          "cursor": 5000001n,
           "indexer_id": "indexer_testing_default",
           "n": 2,
           "op": "I",
@@ -445,7 +445,7 @@ describe("Drizzle storage", () => {
           "table_name": "test",
         },
         {
-          "cursor": 5000002,
+          "cursor": 5000002n,
           "indexer_id": "indexer_testing_default",
           "n": 3,
           "op": "I",
@@ -454,7 +454,7 @@ describe("Drizzle storage", () => {
           "table_name": "test",
         },
         {
-          "cursor": 5000003,
+          "cursor": 5000003n,
           "indexer_id": "indexer_testing_default",
           "n": 4,
           "op": "I",
@@ -463,7 +463,7 @@ describe("Drizzle storage", () => {
           "table_name": "test",
         },
         {
-          "cursor": 5000004,
+          "cursor": 5000004n,
           "indexer_id": "indexer_testing_default",
           "n": 5,
           "op": "I",
@@ -472,7 +472,7 @@ describe("Drizzle storage", () => {
           "table_name": "test",
         },
         {
-          "cursor": 5000004,
+          "cursor": 5000004n,
           "indexer_id": "indexer_testing_default",
           "n": 6,
           "op": "U",
@@ -488,7 +488,7 @@ describe("Drizzle storage", () => {
           "table_name": "test",
         },
         {
-          "cursor": 5000005,
+          "cursor": 5000005n,
           "indexer_id": "indexer_testing_default",
           "n": 7,
           "op": "I",
@@ -497,7 +497,7 @@ describe("Drizzle storage", () => {
           "table_name": "test",
         },
         {
-          "cursor": 5000009,
+          "cursor": 5000009n,
           "indexer_id": "indexer_testing_default",
           "n": 13,
           "op": "I",
@@ -630,6 +630,156 @@ describe("Drizzle storage", () => {
       ]
     `);
     expect(rollBackResult).toMatchInlineSnapshot("[]");
+  });
+
+  it("should keep reorg triggers registered for non-finalized blocks", async () => {
+    const db = await getPgliteDb();
+
+    const indexer = getMockIndexer({
+      override: {
+        plugins: [drizzleStorage({ db, persistState: true })],
+        async transform({ endCursor, block: { data } }) {
+          const { db: tx } = useDrizzleStorage(db);
+
+          await tx.insert(testTable).values({
+            blockNumber: Number(endCursor?.orderKey),
+            data,
+          });
+        },
+      },
+    });
+
+    const mockClient = new MockClient<MockFilter, MockBlock>(
+      (request, options) => {
+        return generateMockMessages(3);
+      },
+    );
+
+    await run(mockClient, indexer);
+
+    const triggerQuery = (await db.execute(
+      sql.raw(`
+        SELECT tgname
+        FROM pg_trigger
+        WHERE tgname = 'test_reorg_indexer_testing_default';
+      `),
+    )) as { rows: Array<{ tgname: string }> };
+
+    expect(triggerQuery.rows).toEqual([
+      { tgname: "test_reorg_indexer_testing_default" },
+    ]);
+  });
+
+  it("should only detect stale triggers that match the exact reorg prefix", async () => {
+    const db = await getPgliteDb();
+    const currentIndexerId = "indexer_testing_default";
+
+    await db.execute(
+      sql.raw(`
+      CREATE OR REPLACE FUNCTION __test_noop_trigger()
+      RETURNS TRIGGER AS $$
+      BEGIN
+        RETURN NEW;
+      END;
+      $$ LANGUAGE plpgsql;
+    `),
+    );
+
+    // Looks similar but does not use the exact `<table>_reorg_` prefix.
+    await db.execute(
+      sql.raw(`
+      CREATE TRIGGER testXreorg_noise
+      BEFORE INSERT ON test
+      FOR EACH ROW EXECUTE FUNCTION __test_noop_trigger();
+    `),
+    );
+
+    // Stale trigger for a different indexer identifier.
+    await db.execute(
+      sql.raw(`
+      CREATE TRIGGER test_reorg_other_indexer
+      BEFORE INSERT ON test
+      FOR EACH ROW EXECUTE FUNCTION __test_noop_trigger();
+    `),
+    );
+
+    const staleTriggers = await db.transaction(async (tx) => {
+      return detectStaleReorgTriggers(tx, ["test"], currentIndexerId);
+    });
+
+    expect(staleTriggers.sort()).toEqual(["test_reorg_other_indexer"]);
+  });
+
+  it("should not record invalidate transaction writes in rollback history", async () => {
+    const db = await getPgliteDb();
+
+    const indexer = getMockIndexer({
+      override: {
+        plugins: [drizzleStorage({ db, persistState: true })],
+        async transform({ endCursor, finality }) {
+          const { db: tx } = useDrizzleStorage(db);
+
+          await tx.insert(testTable).values({
+            blockNumber: Number(endCursor?.orderKey),
+            key: finality,
+            data: finality,
+          });
+        },
+      },
+    });
+
+    const mockClient = new MockClient<MockFilter, MockBlock>(
+      (request, options) => {
+        return [
+          {
+            _tag: "data",
+            data: {
+              cursor: { orderKey: 5000000n },
+              endCursor: { orderKey: 5000001n },
+              finality: "pending",
+              data: [{ data: "pending" }],
+              production: "backfill",
+            },
+          },
+          {
+            _tag: "data",
+            data: {
+              cursor: { orderKey: 5000000n },
+              endCursor: { orderKey: 5000001n },
+              finality: "accepted",
+              data: [{ data: "accepted" }],
+              production: "backfill",
+            },
+          },
+        ];
+      },
+    );
+
+    await run(mockClient, indexer);
+
+    const result = await db.select().from(testTable);
+    const rollbackRows = await db.select().from(reorgRollbackTable);
+
+    expect(result.map(({ key, data }) => ({ key, data }))).toEqual([
+      { key: "accepted", data: "accepted" },
+    ]);
+
+    // The pending rollback row is removed during invalidate; only accepted writes remain.
+    expect(
+      rollbackRows.map(({ cursor, op, table_name, row_id }) => ({
+        cursor,
+        op,
+        table_name,
+        row_id,
+      })),
+    ).toEqual([
+      {
+        cursor: 5000001n,
+        op: "I",
+        table_name: "test",
+        row_id: "2",
+      },
+    ]);
   });
 
   it("should handle pending data correctly", async () => {

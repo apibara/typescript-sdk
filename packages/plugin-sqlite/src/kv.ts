@@ -27,6 +27,7 @@ export class KeyValueStore {
   get<T>(key: string): T | undefined {
     const row = this.db
       .prepare<[string, string], KeyValueRow>(statements.get)
+      .safeIntegers()
       .get(key, this.indexerId);
 
     return row ? this.deserialize(row.v) : undefined;
@@ -34,15 +35,15 @@ export class KeyValueStore {
 
   put<T>(key: string, value: T) {
     this.db
-      .prepare<[number, string, string], KeyValueRow>(statements.updateToBlock)
-      .run(Number(this.endCursor.orderKey), key, this.indexerId);
+      .prepare<[bigint, string, string], KeyValueRow>(statements.updateToBlock)
+      .run(this.endCursor.orderKey, key, this.indexerId);
 
     this.db
-      .prepare<[number, string, string, string], KeyValueRow>(
+      .prepare<[bigint, string, string, string], KeyValueRow>(
         statements.insertIntoKvs,
       )
       .run(
-        Number(this.endCursor.orderKey),
+        this.endCursor.orderKey,
         key,
         this.serialize(value as Record<string, unknown>),
         this.indexerId,
@@ -51,16 +52,16 @@ export class KeyValueStore {
 
   del(key: string) {
     this.db
-      .prepare<[number, string, string], KeyValueRow>(statements.del)
-      .run(Number(this.endCursor.orderKey), key, this.indexerId);
+      .prepare<[bigint, string, string], KeyValueRow>(statements.del)
+      .run(this.endCursor.orderKey, key, this.indexerId);
   }
 }
 
 export function finalizeKV(db: Database, cursor: Cursor, indexerId: string) {
   assertInTransaction(db);
 
-  db.prepare<[number, string], KeyValueRow>(statements.finalize).run(
-    Number(cursor.orderKey),
+  db.prepare<[bigint, string], KeyValueRow>(statements.finalize).run(
+    cursor.orderKey,
     indexerId,
   );
 }
@@ -69,14 +70,14 @@ export function invalidateKV(db: Database, cursor: Cursor, indexerId: string) {
   assertInTransaction(db);
 
   // Delete entries that started after the invalidation cursor
-  db.prepare<[number, string], KeyValueRow>(statements.invalidateDelete).run(
-    Number(cursor.orderKey),
+  db.prepare<[bigint, string], KeyValueRow>(statements.invalidateDelete).run(
+    cursor.orderKey,
     indexerId,
   );
 
   // Update entries that were supposed to end after the invalidation cursor
-  db.prepare<[number, string], KeyValueRow>(statements.invalidateUpdate).run(
-    Number(cursor.orderKey),
+  db.prepare<[bigint, string], KeyValueRow>(statements.invalidateUpdate).run(
+    cursor.orderKey,
     indexerId,
   );
 }
@@ -88,8 +89,8 @@ export function cleanupKV(db: Database, indexerId: string) {
 }
 
 export type KeyValueRow = {
-  from_block: number;
-  to_block: number;
+  from_block: bigint;
+  to_block: bigint;
   k: string;
   v: string;
   id: string;

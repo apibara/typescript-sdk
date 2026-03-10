@@ -44,8 +44,8 @@ export class MongoStorage {
 }
 
 export type MongoCursor = {
-  from: number | null;
-  to: number | null;
+  from: bigint | null;
+  to: bigint | null;
 };
 
 export type CursoredSchema<TSchema extends Document> = TSchema & {
@@ -67,7 +67,7 @@ export class MongoCollection<TSchema extends Document> {
       {
         ...doc,
         _cursor: {
-          from: Number(this.endCursor?.orderKey),
+          from: this.endCursor?.orderKey ?? null,
           to: null,
         } as MongoCursor,
       },
@@ -83,7 +83,7 @@ export class MongoCollection<TSchema extends Document> {
       docs.map((doc) => ({
         ...doc,
         _cursor: {
-          from: Number(this.endCursor?.orderKey),
+          from: this.endCursor?.orderKey ?? null,
           to: null,
         } as MongoCursor,
       })),
@@ -106,7 +106,7 @@ export class MongoCollection<TSchema extends Document> {
         ...update,
         $set: {
           ...update.$set,
-          "_cursor.from": Number(this.endCursor?.orderKey),
+          "_cursor.from": this.endCursor?.orderKey ?? null,
         } as unknown as MatchKeysAndValues<TSchema>,
       },
       {
@@ -124,7 +124,7 @@ export class MongoCollection<TSchema extends Document> {
           ...doc,
           _cursor: {
             ...oldDoc._cursor,
-            to: Number(this.endCursor?.orderKey),
+            to: this.endCursor?.orderKey ?? null,
           },
         } as unknown as OptionalUnlessRequiredId<TSchema>,
         { session: this.session },
@@ -168,7 +168,7 @@ export class MongoCollection<TSchema extends Document> {
         ...update,
         $set: {
           ...update.$set,
-          "_cursor.from": Number(this.endCursor?.orderKey),
+          "_cursor.from": this.endCursor?.orderKey ?? null,
         } as unknown as MatchKeysAndValues<TSchema>,
       },
       { ...options, session: this.session },
@@ -179,7 +179,7 @@ export class MongoCollection<TSchema extends Document> {
       ...doc,
       _cursor: {
         ...doc._cursor,
-        to: Number(this.endCursor?.orderKey),
+        to: this.endCursor?.orderKey ?? null,
       },
     }));
 
@@ -205,7 +205,7 @@ export class MongoCollection<TSchema extends Document> {
       },
       {
         $set: {
-          "_cursor.to": Number(this.endCursor?.orderKey),
+          "_cursor.to": this.endCursor?.orderKey ?? null,
         } as unknown as MatchKeysAndValues<TSchema>,
       },
       { ...options, session: this.session },
@@ -223,7 +223,7 @@ export class MongoCollection<TSchema extends Document> {
       },
       {
         $set: {
-          "_cursor.to": Number(this.endCursor?.orderKey),
+          "_cursor.to": this.endCursor?.orderKey ?? null,
         } as unknown as MatchKeysAndValues<TSchema>,
       },
       { ...options, session: this.session },

@@ -27,11 +27,12 @@ import {
 } from "./persistence";
 import {
   cleanupStorage,
+  detectStaleReorgTriggers,
   finalize,
   initializeReorgRollbackTable,
   invalidate,
   registerTriggers,
-  removeTriggers,
+  setReorgOrderKey,
 } from "./storage";
 import {
   DrizzleStorageError,
@@ -108,6 +109,9 @@ export interface DrizzleStorageOptions<
   persistState?: boolean;
   /**
    * The name of the indexer. Default value is 'default'.
+   *
+   * Keep this stable for a given table set. Changing it will create a new
+   * trigger suffix and may leave stale reorg triggers from previous runs.
    */
   indexerName?: string;
   /**
@@ -186,6 +190,9 @@ export function drizzleStorage<
     let indexerId = "";
     const alwaysReindex = process.env["APIBARA_ALWAYS_REINDEX"] === "true";
     let prevFinality: DataFinality | undefined;
+    // Middleware execution is sequential. If concurrent block handling is introduced,
+    // this flag will need synchronization.
+    let reorgTriggersRegistered = false;
     const schema: TSchema = (_schema as TSchema) ?? db._.schema ?? {};
     const idColumnMap: IdColumnMap = {
       "*": typeof idColumn === "string" ? idColumn : "id",
@@ -229,6 +236,9 @@ export function drizzleStorage<
         internalContext;
 
       indexerId = generateIndexerId(indexerFileName, identifier);
+      // Reset runtime flags on init in case the plugin instance is reused.
+      prevFinality = undefined;
+      reorgTriggersRegistered = false;
 
       let retries = 0;
 
@@ -246,6 +256,18 @@ export function drizzleStorage<
           }
           await withTransaction(db, async (tx) => {
             await initializeReorgRollbackTable(tx, indexerId);
+            const staleTriggers = await detectStaleReorgTriggers(
+              tx,
+              tableNames,
+              indexerId,
+            );
+            if (staleTriggers.length > 0) {
+              logger.warn(
+                `Detected stale reorg triggers for other indexer identifiers: ${staleTriggers.join(", ")}. ` +
+                  "Keep `indexerName` stable or clean them up manually.",
+              );
+            }
+
             if (enablePersistence) {
               await initializePersistentState(tx);
             }
@@ -401,62 +423,60 @@ export function drizzleStorage<
 
     indexer.hooks.hook("handler:middleware", async ({ use }) => {
       use(async (context, next) => {
-        try {
-          const { endCursor, finality, cursor } = context as {
-            cursor: Cursor;
-            endCursor: Cursor;
-            finality: DataFinality;
-          };
+        let registeredTriggersInTxn = false;
+        const { endCursor, finality, cursor } = context as {
+          cursor: Cursor;
+          endCursor: Cursor;
+          finality: DataFinality;
+        };
 
-          if (!endCursor) {
-            throw new DrizzleStorageError("End Cursor is undefined");
-          }
+        if (!endCursor) {
+          throw new DrizzleStorageError("End Cursor is undefined");
+        }
 
+        if (prevFinality === "pending") {
           await withTransaction(db, async (tx) => {
-            context[DRIZZLE_PROPERTY] = { db: tx } as DrizzleStorage<
-              TQueryResult,
-              TFullSchema,
-              TSchema
-            >;
-
-            if (prevFinality === "pending") {
-              // invalidate if previous block's finality was "pending"
-              await invalidate(tx, cursor, idColumnMap, indexerId);
-            }
-
-            if (finality !== "finalized") {
-              await registerTriggers(
-                tx,
-                tableNames,
-                endCursor,
-                idColumnMap,
-                indexerId,
-              );
-            }
-
-            await next();
-            delete context[DRIZZLE_PROPERTY];
-
-            if (enablePersistence && finality !== "pending") {
-              await persistState({
-                tx,
-                endCursor,
-                indexerId,
-              });
-            }
-
-            prevFinality = finality;
+            // Invalidate in a dedicated transaction so rollback writes are
+            // never captured with the current block's reorg_order_key.
+            await invalidate(tx, cursor, idColumnMap, indexerId);
           });
+        }
+
+        await withTransaction(db, async (tx) => {
+          context[DRIZZLE_PROPERTY] = { db: tx } as DrizzleStorage<
+            TQueryResult,
+            TFullSchema,
+            TSchema
+          >;
 
           if (finality !== "finalized") {
-            // remove trigger outside of the transaction or it won't be triggered.
-            await removeTriggers(db, tableNames, indexerId);
+            if (!reorgTriggersRegistered) {
+              // Triggers persist across transactions; only the order key changes
+              // per non-finalized block.
+              await registerTriggers(tx, tableNames, idColumnMap, indexerId);
+              registeredTriggersInTxn = true;
+            }
+            await setReorgOrderKey(tx, endCursor);
           }
-        } catch (error) {
-          await removeTriggers(db, tableNames, indexerId);
 
-          throw error;
+          await next();
+          delete context[DRIZZLE_PROPERTY];
+
+          if (enablePersistence && finality !== "pending") {
+            await persistState({
+              tx,
+              endCursor,
+              indexerId,
+            });
+          }
+        });
+
+        if (registeredTriggersInTxn) {
+          // Mark registration only after the transaction commits successfully.
+          reorgTriggersRegistered = true;
         }
+        // Persist finality marker only after successful commit.
+        prevFinality = finality;
       });
     });
   });

@@ -6,6 +6,7 @@ import type {
 } from "drizzle-orm";
 import type { PgQueryResultHKT, PgTransaction } from "drizzle-orm/pg-core";
 import {
+  bigint,
   integer,
   pgSchema,
   primaryKey,
@@ -25,7 +26,7 @@ const schema = pgSchema(SCHEMA_NAME);
 /** This table is not used for migrations, its only used for ease of internal operations with drizzle. */
 export const checkpoints = schema.table(CHECKPOINTS_TABLE_NAME, {
   id: text("id").notNull().primaryKey(),
-  orderKey: integer("order_key").notNull(),
+  orderKey: bigint("order_key", { mode: "bigint" }).notNull(),
   uniqueKey: text("unique_key"),
 });
 
@@ -35,8 +36,10 @@ export const filters = schema.table(
   {
     id: text("id").notNull(),
     filter: text("filter").notNull(),
-    fromBlock: integer("from_block").notNull(),
-    toBlock: integer("to_block").$type<number | null>().default(null),
+    fromBlock: bigint("from_block", { mode: "bigint" }).notNull(),
+    toBlock: bigint("to_block", { mode: "bigint" })
+      .$type<bigint | null>()
+      .default(null),
   },
   (table) => [
     {
@@ -49,11 +52,11 @@ export const filters = schema.table(
 export const chainReorganizations = schema.table("chain_reorganizations", {
   id: serial("id").primaryKey(),
   indexerId: text("indexer_id").notNull(),
-  oldHeadOrderKey: integer("old_head_order_key"),
+  oldHeadOrderKey: bigint("old_head_order_key", { mode: "bigint" }),
   oldHeadUniqueKey: text("old_head_unique_key")
     .$type<string | null>()
     .default(null),
-  newHeadOrderKey: integer("new_head_order_key").notNull(),
+  newHeadOrderKey: bigint("new_head_order_key", { mode: "bigint" }).notNull(),
   newHeadUniqueKey: text("new_head_unique_key")
     .$type<string | null>()
     .default(null),
@@ -66,13 +69,19 @@ export const schemaVersion = schema.table(SCHEMA_VERSION_TABLE_NAME, {
   version: integer("version").notNull(),
 });
 
-export const CURRENT_SCHEMA_VERSION = 0;
+export const CURRENT_SCHEMA_VERSION = 1;
 
-// migrations for future schema updates
+// Each array at index i contains SQL statements to migrate from version i to i+1.
 const MIGRATIONS: string[][] = [
-  // migrations[0]: v0 -> v1 (for future use)
-  [],
-  // Add more migration arrays for future versions
+  // v0 -> v1: block-number columns promoted from INTEGER to BIGINT.
+  [
+    `ALTER TABLE ${SCHEMA_NAME}.${CHECKPOINTS_TABLE_NAME} ALTER COLUMN order_key TYPE BIGINT`,
+    `ALTER TABLE ${SCHEMA_NAME}.${FILTERS_TABLE_NAME} ALTER COLUMN from_block TYPE BIGINT`,
+    `ALTER TABLE ${SCHEMA_NAME}.${FILTERS_TABLE_NAME} ALTER COLUMN to_block TYPE BIGINT`,
+    `ALTER TABLE ${SCHEMA_NAME}.chain_reorganizations ALTER COLUMN old_head_order_key TYPE BIGINT`,
+    `ALTER TABLE ${SCHEMA_NAME}.chain_reorganizations ALTER COLUMN new_head_order_key TYPE BIGINT`,
+    `ALTER TABLE ${SCHEMA_NAME}.chain_reorganizations ADD COLUMN IF NOT EXISTS recorded_at TIMESTAMP NOT NULL DEFAULT NOW()`,
+  ],
 ];
 
 export async function initializePersistentState<
@@ -103,9 +112,9 @@ export async function initializePersistentState<
       CREATE TABLE IF NOT EXISTS ${SCHEMA_NAME}.chain_reorganizations (
         id SERIAL PRIMARY KEY,
         indexer_id TEXT NOT NULL,
-        old_head_order_key INTEGER,
+        old_head_order_key BIGINT,
         old_head_unique_key TEXT DEFAULT NULL,
-        new_head_order_key INTEGER NOT NULL,
+        new_head_order_key BIGINT NOT NULL,
         new_head_unique_key TEXT DEFAULT NULL,
         recorded_at TIMESTAMP NOT NULL DEFAULT NOW()
       );
@@ -142,7 +151,7 @@ export async function initializePersistentState<
         sql.raw(`
         CREATE TABLE IF NOT EXISTS ${SCHEMA_NAME}.${CHECKPOINTS_TABLE_NAME} (
           id TEXT PRIMARY KEY,
-          order_key INTEGER NOT NULL,
+          order_key BIGINT NOT NULL,
           unique_key TEXT
         );
       `),
@@ -153,8 +162,8 @@ export async function initializePersistentState<
         CREATE TABLE IF NOT EXISTS ${SCHEMA_NAME}.${FILTERS_TABLE_NAME} (
           id TEXT NOT NULL,
           filter TEXT NOT NULL,
-          from_block INTEGER NOT NULL,
-          to_block INTEGER DEFAULT NULL,
+          from_block BIGINT NOT NULL,
+          to_block BIGINT DEFAULT NULL,
           PRIMARY KEY (id, from_block)
         );
       `),
@@ -206,9 +215,9 @@ export async function recordChainReorganization<
   try {
     await tx.insert(chainReorganizations).values({
       indexerId: indexerId,
-      oldHeadOrderKey: oldHead ? Number(oldHead.orderKey) : null,
+      oldHeadOrderKey: oldHead ? oldHead.orderKey : null,
       oldHeadUniqueKey: oldHead?.uniqueKey ? oldHead.uniqueKey : null,
-      newHeadOrderKey: Number(newHead.orderKey),
+      newHeadOrderKey: newHead.orderKey,
       newHeadUniqueKey: newHead.uniqueKey ? newHead.uniqueKey : null,
     });
   } catch (error) {
@@ -238,13 +247,13 @@ export async function persistState<
         .insert(checkpoints)
         .values({
           id: indexerId,
-          orderKey: Number(endCursor.orderKey),
+          orderKey: endCursor.orderKey,
           uniqueKey: endCursor.uniqueKey,
         })
         .onConflictDoUpdate({
           target: checkpoints.id,
           set: {
-            orderKey: Number(endCursor.orderKey),
+            orderKey: endCursor.orderKey,
             // Explicitly set the unique key to `null` to indicate that it has been deleted
             // Otherwise drizzle will not update its value.
             uniqueKey: endCursor.uniqueKey ? endCursor.uniqueKey : null,
@@ -254,7 +263,7 @@ export async function persistState<
       if (filter) {
         await tx
           .update(filters)
-          .set({ toBlock: Number(endCursor.orderKey) })
+          .set({ toBlock: endCursor.orderKey })
           .where(and(eq(filters.id, indexerId), isNull(filters.toBlock)));
 
         await tx
@@ -262,14 +271,14 @@ export async function persistState<
           .values({
             id: indexerId,
             filter: serialize(filter),
-            fromBlock: Number(endCursor.orderKey),
+            fromBlock: endCursor.orderKey,
             toBlock: null,
           })
           .onConflictDoUpdate({
             target: [filters.id, filters.fromBlock],
             set: {
               filter: serialize(filter),
-              fromBlock: Number(endCursor.orderKey),
+              fromBlock: endCursor.orderKey,
               toBlock: null,
             },
           });
@@ -302,7 +311,7 @@ export async function getState<
 
     const cursor = checkpointRows[0]
       ? normalizeCursor({
-          orderKey: BigInt(checkpointRows[0].orderKey),
+          orderKey: checkpointRows[0].orderKey,
           uniqueKey: checkpointRows[0].uniqueKey,
         })
       : undefined;
@@ -340,7 +349,7 @@ export async function invalidateState<
     await tx
       .update(checkpoints)
       .set({
-        orderKey: Number(cursor.orderKey),
+        orderKey: cursor.orderKey,
         uniqueKey: cursor.uniqueKey ? cursor.uniqueKey : null,
       })
       .where(eq(checkpoints.id, indexerId));
@@ -348,20 +357,14 @@ export async function invalidateState<
     await tx
       .delete(filters)
       .where(
-        and(
-          eq(filters.id, indexerId),
-          gt(filters.fromBlock, Number(cursor.orderKey)),
-        ),
+        and(eq(filters.id, indexerId), gt(filters.fromBlock, cursor.orderKey)),
       );
 
     await tx
       .update(filters)
       .set({ toBlock: null })
       .where(
-        and(
-          eq(filters.id, indexerId),
-          gt(filters.toBlock, Number(cursor.orderKey)),
-        ),
+        and(eq(filters.id, indexerId), gt(filters.toBlock, cursor.orderKey)),
       );
   } catch (error) {
     throw new DrizzleStorageError("Failed to invalidate state", {
@@ -386,10 +389,7 @@ export async function finalizeState<
     await tx
       .delete(filters)
       .where(
-        and(
-          eq(filters.id, indexerId),
-          lt(filters.toBlock, Number(cursor.orderKey)),
-        ),
+        and(eq(filters.id, indexerId), lt(filters.toBlock, cursor.orderKey)),
       );
   } catch (error) {
     throw new DrizzleStorageError("Failed to finalize state", {

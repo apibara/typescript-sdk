@@ -73,16 +73,18 @@ export default async function (runtimeConfig: ApibaraRuntimeConfig) {
         }
       }
 
-      await db.insert(starknetUsdcTransfers).values(
-        Array.from(transactionHashes)
-          .map((transactionHash) => ({
-            number: Number(endCursor?.orderKey),
-            hash: transactionHash,
-          }))
-          .filter(
-            ({ number }) => number !== undefined && !Number.isNaN(number),
-          ),
-      );
+      if (endCursor?.orderKey === undefined) {
+        return;
+      }
+
+      const rows = Array.from(transactionHashes).map((transactionHash) => ({
+        number: Number(endCursor.orderKey),
+        hash: transactionHash,
+      }));
+
+      if (rows.length > 0) {
+        await db.insert(starknetUsdcTransfers).values(rows);
+      }
     },
   });
 }

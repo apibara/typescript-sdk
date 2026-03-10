@@ -5,11 +5,10 @@ import {
   sql,
 } from "drizzle-orm";
 import {
-  type PgDatabase,
   type PgQueryResultHKT,
   type PgTransaction,
+  bigint,
   char,
-  integer,
   jsonb,
   pgSchema,
   serial,
@@ -37,7 +36,7 @@ export const reorgRollbackTable = schema.table(ROLLBACK_TABLE_NAME, {
   n: serial("n").primaryKey(),
   op: char("op", { length: 1 }).$type<ReorgOperation>().notNull(),
   table_name: text("table_name").notNull(),
-  cursor: integer("cursor").notNull(),
+  cursor: bigint("cursor", { mode: "bigint" }).notNull(),
   row_id: text("row_id"),
   row_value: jsonb("row_value"),
   indexer_id: text("indexer_id").notNull(),
@@ -63,7 +62,7 @@ export async function initializeReorgRollbackTable<
           n SERIAL PRIMARY KEY,
           op CHAR(1) NOT NULL,
           table_name TEXT NOT NULL,
-          cursor INTEGER NOT NULL,
+          cursor BIGINT NOT NULL,
           row_id TEXT,
           row_value JSONB,
           indexer_id TEXT NOT NULL
@@ -74,6 +73,25 @@ export async function initializeReorgRollbackTable<
     await tx.execute(
       sql.raw(`
         CREATE INDEX IF NOT EXISTS idx_reorg_rollback_indexer_id_cursor ON ${SCHEMA_NAME}.${ROLLBACK_TABLE_NAME}(indexer_id, cursor);
+      `),
+    );
+
+    // Migrate cursor column from INTEGER to BIGINT for existing installations.
+    // INTEGER overflows at ~2.1B blocks; BIGINT is a lossless superset so no data is lost.
+    await tx.execute(
+      sql.raw(`
+        DO $$
+        BEGIN
+          IF EXISTS (
+            SELECT 1 FROM information_schema.columns
+            WHERE table_schema = '${SCHEMA_NAME}'
+              AND table_name   = '${ROLLBACK_TABLE_NAME}'
+              AND column_name  = 'cursor'
+              AND data_type    = 'integer'
+          ) THEN
+            ALTER TABLE ${SCHEMA_NAME}.${ROLLBACK_TABLE_NAME} ALTER COLUMN cursor TYPE BIGINT;
+          END IF;
+        END $$;
       `),
     );
   } catch (error) {
@@ -91,11 +109,18 @@ export async function initializeReorgRollbackTable<
       DECLARE
         table_name TEXT := TG_ARGV[0]::TEXT;
         id_col TEXT := TG_ARGV[1]::TEXT;
-        order_key INTEGER := TG_ARGV[2]::INTEGER;
-        indexer_id TEXT := TG_ARGV[3]::TEXT;
+        order_key_text TEXT := current_setting('${SCHEMA_NAME}.reorg_order_key', true);
+        order_key BIGINT;
+        indexer_id TEXT := TG_ARGV[2]::TEXT;
         new_id_value TEXT := row_to_json(NEW.*)->>id_col;
         old_id_value TEXT := row_to_json(OLD.*)->>id_col;
       BEGIN
+        IF order_key_text IS NULL OR order_key_text = '' THEN
+          RETURN NULL;
+        END IF;
+
+        order_key := order_key_text::BIGINT;
+
         IF (TG_OP = 'DELETE') THEN
           INSERT INTO ${SCHEMA_NAME}.${ROLLBACK_TABLE_NAME}(op, table_name, cursor, row_id, row_value, indexer_id)
             SELECT 'D', table_name, order_key, old_id_value, row_to_json(OLD.*), indexer_id;
@@ -129,7 +154,6 @@ export async function registerTriggers<
 >(
   tx: PgTransaction<TQueryResult, TFullSchema, TSchema>,
   tables: string[],
-  endCursor: Cursor,
   idColumnMap: IdColumnMap,
   indexerId: string,
 ) {
@@ -148,7 +172,7 @@ export async function registerTriggers<
           CREATE CONSTRAINT TRIGGER ${getReorgTriggerName(table, indexerId)}
           AFTER INSERT OR UPDATE OR DELETE ON ${table}
           DEFERRABLE INITIALLY DEFERRED
-          FOR EACH ROW EXECUTE FUNCTION ${SCHEMA_NAME}.reorg_checkpoint('${table}', '${tableIdColumn}', ${Number(endCursor.orderKey)}, '${indexerId}');
+          FOR EACH ROW EXECUTE FUNCTION ${SCHEMA_NAME}.reorg_checkpoint('${table}', '${tableIdColumn}', '${indexerId}');
         `),
       );
     }
@@ -159,29 +183,55 @@ export async function registerTriggers<
   }
 }
 
-export async function removeTriggers<
+export async function setReorgOrderKey<
+  TQueryResult extends PgQueryResultHKT,
+  TFullSchema extends Record<string, unknown> = Record<string, never>,
+  TSchema extends
+    TablesRelationalConfig = ExtractTablesWithRelations<TFullSchema>,
+>(tx: PgTransaction<TQueryResult, TFullSchema, TSchema>, endCursor: Cursor) {
+  try {
+    await tx.execute(
+      sql.raw(
+        `SELECT set_config('${SCHEMA_NAME}.reorg_order_key', '${endCursor.orderKey.toString()}', true);`,
+      ),
+    );
+  } catch (error) {
+    throw new DrizzleStorageError("Failed to set reorg order key", {
+      cause: error,
+    });
+  }
+}
+
+export async function detectStaleReorgTriggers<
   TQueryResult extends PgQueryResultHKT,
   TFullSchema extends Record<string, unknown> = Record<string, never>,
   TSchema extends
     TablesRelationalConfig = ExtractTablesWithRelations<TFullSchema>,
 >(
-  db: PgDatabase<TQueryResult, TFullSchema, TSchema>,
+  tx: PgTransaction<TQueryResult, TFullSchema, TSchema>,
   tables: string[],
   indexerId: string,
-) {
-  try {
-    for (const table of tables) {
-      await db.execute(
-        sql.raw(
-          `DROP TRIGGER IF EXISTS ${getReorgTriggerName(table, indexerId)} ON ${table};`,
-        ),
-      );
-    }
-  } catch (error) {
-    throw new DrizzleStorageError("Failed to remove triggers", {
-      cause: error,
-    });
+): Promise<string[]> {
+  const staleTriggerNames: string[] = [];
+
+  for (const table of tables) {
+    const currentTriggerName = getReorgTriggerName(table, indexerId);
+    const { rows } = (await tx.execute(
+      sql.raw(`
+        SELECT tg.tgname
+        FROM pg_trigger tg
+        JOIN pg_class cls ON cls.oid = tg.tgrelid
+        WHERE cls.relname = '${table}'
+          AND left(tg.tgname, length('${table}_reorg_')) = '${table}_reorg_'
+          AND tg.tgname <> '${currentTriggerName}'
+          AND tg.tgisinternal = false;
+      `),
+    )) as { rows: Array<{ tgname: string }> };
+
+    staleTriggerNames.push(...rows.map((row) => row.tgname));
   }
+
+  return staleTriggerNames;
 }
 
 export async function invalidate<
@@ -200,7 +250,7 @@ export async function invalidate<
     sql.raw(`
       WITH deleted AS (
         DELETE FROM ${SCHEMA_NAME}.${ROLLBACK_TABLE_NAME}
-        WHERE cursor > ${Number(cursor.orderKey)}
+        WHERE cursor > ${cursor.orderKey}
         AND indexer_id = '${indexerId}'
         RETURNING *
       )
@@ -329,7 +379,7 @@ export async function finalize<
     await tx.execute(
       sql.raw(`
       DELETE FROM ${SCHEMA_NAME}.${ROLLBACK_TABLE_NAME}
-      WHERE cursor <= ${Number(cursor.orderKey)}
+      WHERE cursor <= ${cursor.orderKey}
       AND indexer_id = '${indexerId}'
     `),
     );
