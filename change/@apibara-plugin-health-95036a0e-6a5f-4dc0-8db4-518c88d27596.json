@@ -1,0 +1,7 @@
+{
+  "type": "prerelease",
+  "comment": "feat: add plugin-health for health check",
+  "packageName": "@apibara/plugin-health",
+  "email": "jadejajaipal5@gmail.com",
+  "dependentChangeType": "patch"
+}
