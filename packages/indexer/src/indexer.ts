@@ -181,6 +181,7 @@ export interface ReconnectOptions {
   maxRetries?: number;
   retryDelay?: number;
   maxWait?: number;
+  signal?: AbortSignal;
 }
 
 export async function runWithReconnect<TFilter, TBlock>(
@@ -193,9 +194,17 @@ export async function runWithReconnect<TFilter, TBlock>(
   const maxRetries = options.maxRetries ?? 10;
   const retryDelay = options.retryDelay ?? 1_000;
   const maxWait = options.maxWait ?? 30_000;
+  const { signal } = options;
 
   while (true) {
+    if (signal?.aborted) return;
+
     const abortController = new AbortController();
+
+    // Forward external abort into the per-run internal controller so that
+    // run() sees the abort signal and can break its loop cleanly.
+    const forwardAbort = () => abortController.abort(signal?.reason);
+    signal?.addEventListener("abort", forwardAbort, { once: true });
 
     const runOptions: RunOptions = {
       onConnect() {
@@ -206,7 +215,6 @@ export async function runWithReconnect<TFilter, TBlock>(
 
     try {
       await run(client, indexer, runOptions);
-      abortController.abort();
       return;
     } catch (error) {
       // Only reconnect on internal/server errors.
@@ -214,7 +222,7 @@ export async function runWithReconnect<TFilter, TBlock>(
 
       retryCount++;
 
-      abortController.abort();
+      if (signal?.aborted) return;
 
       if (error instanceof ClientError || error instanceof ServerError) {
         const isServerError = error instanceof ServerError;
@@ -231,15 +239,29 @@ export async function runWithReconnect<TFilter, TBlock>(
 
             // Add jitter to the retry delay to avoid all clients retrying at the same time.
             const delay = Math.random() * (retryDelay * 0.2) + retryDelay;
-            await new Promise((resolve) =>
-              setTimeout(resolve, Math.min(retryCount * delay, maxWait)),
-            );
+            await new Promise<void>((resolve) => {
+              const t = setTimeout(
+                resolve,
+                Math.min(retryCount * delay, maxWait),
+              );
+              // wake up immediately if externally aborted during the delay.
+              signal?.addEventListener(
+                "abort",
+                () => {
+                  clearTimeout(t);
+                  resolve();
+                },
+                { once: true },
+              );
+            });
 
             continue;
           }
         }
       }
       throw error;
+    } finally {
+      signal?.removeEventListener("abort", forwardAbort);
     }
   }
 }
@@ -322,8 +344,29 @@ export async function run<TFilter, TBlock>(
 
     let onConnectCalled = false;
 
+    const abortPromise = abortSignal ? waitForAbort(abortSignal) : null;
+
     while (true) {
-      const { value: message, done } = await stream.next();
+      let result: IteratorResult<
+        StreamDataResponse<TBlock>,
+        StreamDataResponse<TBlock>
+      >;
+
+      try {
+        result = abortPromise
+          ? await Promise.race([stream.next(), abortPromise])
+          : await stream.next();
+      } catch (e) {
+        if (abortSignal?.aborted) {
+          // cancel the underlying gRPC stream and exit the loop cleanly so
+          // that run:after hooks are still called below.
+          await stream.return?.();
+          break;
+        }
+        throw e;
+      }
+
+      const { value: message, done } = result;
 
       if (done) {
         break;
@@ -524,6 +567,22 @@ export async function run<TFilter, TBlock>(
     }
 
     await indexer.hooks.callHook("run:after", { abortSignal });
+  });
+}
+
+/**
+ * Returns a promise that rejects as soon as the given AbortSignal fires.
+ * Used to race against stream.next() so the loop can break on abort.
+ */
+function waitForAbort(signal: AbortSignal): Promise<never> {
+  return new Promise<never>((_, reject) => {
+    if (signal.aborted) {
+      reject(signal.reason);
+      return;
+    }
+    signal.addEventListener("abort", () => reject(signal.reason), {
+      once: true,
+    });
   });
 }
 
