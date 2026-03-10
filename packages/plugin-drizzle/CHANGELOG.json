@@ -2,6 +2,21 @@
   "name": "@apibara/plugin-drizzle",
   "entries": [
     {
+      "date": "Tue, 10 Mar 2026 08:41:26 GMT",
+      "version": "2.1.0-beta.56",
+      "tag": "@apibara/plugin-drizzle_v2.1.0-beta.56",
+      "comments": {
+        "prerelease": [
+          {
+            "author": "jadejajaipal5@gmail.com",
+            "package": "@apibara/plugin-drizzle",
+            "commit": "9e1156a65948ccd9b7f83dea357d12ee91230053",
+            "comment": "plugin-drizzle: the plugin-level trigger churn that occurs for non-finalized messages"
+          }
+        ]
+      }
+    },
+    {
       "date": "Wed, 19 Nov 2025 11:42:55 GMT",
       "version": "2.1.0-beta.41",
       "tag": "@apibara/plugin-drizzle_v2.1.0-beta.41",

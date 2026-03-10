@@ -1,7 +1,0 @@
-{
-  "type": "prerelease",
-  "comment": "fix: migrate orderKey and block fields from number to bigint for improved precision and capacity",
-  "packageName": "@apibara/plugin-sqlite",
-  "email": "jadejajaipal5@gmail.com",
-  "dependentChangeType": "patch"
-}

@@ -2,6 +2,21 @@
   "name": "@apibara/plugin-sqlite",
   "entries": [
     {
+      "date": "Tue, 10 Mar 2026 08:41:26 GMT",
+      "version": "2.1.0-beta.56",
+      "tag": "@apibara/plugin-sqlite_v2.1.0-beta.56",
+      "comments": {
+        "prerelease": [
+          {
+            "author": "jadejajaipal5@gmail.com",
+            "package": "@apibara/plugin-sqlite",
+            "commit": "9e1156a65948ccd9b7f83dea357d12ee91230053",
+            "comment": "fix: migrate orderKey and block fields from number to bigint for improved precision and capacity"
+          }
+        ]
+      }
+    },
+    {
       "date": "Fri, 12 Sep 2025 15:31:39 GMT",
       "version": "2.1.0-beta.40",
       "tag": "@apibara/plugin-sqlite_v2.1.0-beta.40",

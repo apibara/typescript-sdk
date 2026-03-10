@@ -1,8 +1,16 @@
 # Change Log - @apibara/plugin-drizzle
 
-<!-- This log was last generated on Wed, 19 Nov 2025 11:42:55 GMT and should not be manually modified. -->
+<!-- This log was last generated on Tue, 10 Mar 2026 08:41:26 GMT and should not be manually modified. -->
 
 <!-- Start content -->
+
+## 2.1.0-beta.56
+
+Tue, 10 Mar 2026 08:41:26 GMT
+
+### Changes
+
+- plugin-drizzle: the plugin-level trigger churn that occurs for non-finalized messages (jadejajaipal5@gmail.com)
 
 ## 2.1.0-beta.41
 

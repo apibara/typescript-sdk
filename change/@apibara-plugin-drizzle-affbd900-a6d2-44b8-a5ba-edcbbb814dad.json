@@ -1,7 +1,0 @@
-{
-  "type": "prerelease",
-  "comment": "plugin-drizzle: the plugin-level trigger churn that occurs for non-finalized messages",
-  "packageName": "@apibara/plugin-drizzle",
-  "email": "jadejajaipal5@gmail.com",
-  "dependentChangeType": "patch"
-}
