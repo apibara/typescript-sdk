@@ -27,11 +27,13 @@
     "@apibara/evm": "workspace:*",
     "@apibara/indexer": "workspace:*",
     "@apibara/plugin-drizzle": "workspace:*",
+    "@apibara/plugin-health": "workspace:*",
     "@apibara/protocol": "workspace:*",
     "@apibara/starknet": "workspace:*",
     "@electric-sql/pglite": "^0.2.17",
     "apibara": "workspace:*",
     "drizzle-orm": "^0.40.1",
+    "elysia": "^1.4.27",
     "pg": "^8.13.1",
     "starknet": "^6.11.0",
     "viem": "^2.40.0"

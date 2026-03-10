@@ -1,6 +1,7 @@
 import { starknetUsdcTransfers } from "@/lib/schema";
 import { drizzleStorage, useDrizzleStorage } from "@apibara/plugin-drizzle";
 import { drizzle } from "@apibara/plugin-drizzle";
+import { healthPlugin } from "@apibara/plugin-health";
 import { StarknetStream } from "@apibara/starknet";
 import { defineIndexer } from "apibara/indexer";
 import { useLogger } from "apibara/plugins";
@@ -32,6 +33,7 @@ export default async function (runtimeConfig: ApibaraRuntimeConfig) {
     finality: "accepted",
     startingBlock: BigInt(startingBlock),
     plugins: [
+      healthPlugin(),
       drizzleStorage({
         db: database,
         idColumn: {
