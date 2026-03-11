@@ -46,8 +46,10 @@ export function healthPlugin<TFilter, TBlock>(options?: HealthPluginOptions) {
     indexer.hooks.hook("plugins:init", async () => {
       const logger = useLogger();
 
-      app.listen(port);
-      logger.info(`Health server listening on port ${port}`);
+      if (!app.server) {
+        app.listen(port);
+        logger.info(`Health server listening on port ${port}`);
+      }
     });
 
     indexer.hooks.hook("run:before", async () => {
