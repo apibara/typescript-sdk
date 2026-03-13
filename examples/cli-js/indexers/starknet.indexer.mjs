@@ -1,4 +1,5 @@
 import { defineIndexer } from "@apibara/indexer";
+import { health } from "@apibara/plugin-health";
 import { StarknetStream } from "@apibara/starknet";
 import { hash } from "starknet";
 
@@ -15,6 +16,7 @@ export default function (config) {
     startingCursor: {
       orderKey: 1_380_000n,
     },
+    plugins: [health()],
     filter: {
       events: [
         {

@@ -170,6 +170,9 @@ importers:
       '@apibara/indexer':
         specifier: workspace:*
         version: link:../../packages/indexer
+      '@apibara/plugin-health':
+        specifier: workspace:*
+        version: link:../../packages/plugin-health
       '@apibara/protocol':
         specifier: workspace:*
         version: link:../../packages/protocol

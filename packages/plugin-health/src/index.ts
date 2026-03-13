@@ -28,7 +28,7 @@ export type HealthPluginOptions = {
  *
  * @param options.port - Port to listen on (default: 9090)
  */
-export function healthPlugin<TFilter, TBlock>(options?: HealthPluginOptions) {
+export function health<TFilter, TBlock>(options?: HealthPluginOptions) {
   const port = options?.port ?? 9090;
 
   return defineIndexerPlugin<TFilter, TBlock>((indexer) => {

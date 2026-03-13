@@ -21,6 +21,7 @@
     "@apibara/protocol": "workspace:*",
     "@apibara/starknet": "workspace:*",
     "@apibara/evm": "workspace:*",
+    "@apibara/plugin-health": "workspace:*",
     "apibara": "workspace:*",
     "starknet": "^6.11.0"
   }
