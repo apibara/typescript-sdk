@@ -2,6 +2,21 @@
   "name": "apibara",
   "entries": [
     {
+      "date": "Fri, 13 Mar 2026 10:35:02 GMT",
+      "version": "2.1.0-beta.57",
+      "tag": "apibara_v2.1.0-beta.57",
+      "comments": {
+        "prerelease": [
+          {
+            "author": "jadejajaipal5@gmail.com",
+            "package": "apibara",
+            "commit": "89449f82d5e0b1c065976b61ef83f193c70eabc7",
+            "comment": "feat: add abort signal support to indexer and runWithReconnect to support graceful shutdown"
+          }
+        ]
+      }
+    },
+    {
       "date": "Mon, 01 Dec 2025 15:55:09 GMT",
       "version": "2.1.0-beta.43",
       "tag": "apibara_v2.1.0-beta.43",

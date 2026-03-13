@@ -1,8 +1,16 @@
 # Change Log - apibara
 
-<!-- This log was last generated on Mon, 01 Dec 2025 15:55:09 GMT and should not be manually modified. -->
+<!-- This log was last generated on Fri, 13 Mar 2026 10:35:02 GMT and should not be manually modified. -->
 
 <!-- Start content -->
+
+## 2.1.0-beta.57
+
+Fri, 13 Mar 2026 10:35:02 GMT
+
+### Changes
+
+- feat: add abort signal support to indexer and runWithReconnect to support graceful shutdown (jadejajaipal5@gmail.com)
 
 ## 2.1.0-beta.43
 

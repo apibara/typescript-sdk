@@ -1,0 +1,20 @@
+{
+  "name": "@apibara/plugin-health",
+  "entries": [
+    {
+      "date": "Fri, 13 Mar 2026 10:35:02 GMT",
+      "version": "2.1.0-beta.57",
+      "tag": "@apibara/plugin-health_v2.1.0-beta.57",
+      "comments": {
+        "prerelease": [
+          {
+            "author": "jadejajaipal5@gmail.com",
+            "package": "@apibara/plugin-health",
+            "commit": "89449f82d5e0b1c065976b61ef83f193c70eabc7",
+            "comment": "feat: add plugin-health for health check"
+          }
+        ]
+      }
+    }
+  ]
+}

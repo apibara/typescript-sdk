@@ -1,8 +1,16 @@
 # Change Log - @apibara/indexer
 
-<!-- This log was last generated on Wed, 19 Nov 2025 11:42:55 GMT and should not be manually modified. -->
+<!-- This log was last generated on Fri, 13 Mar 2026 10:35:02 GMT and should not be manually modified. -->
 
 <!-- Start content -->
+
+## 2.1.0-beta.58
+
+Fri, 13 Mar 2026 10:35:02 GMT
+
+### Changes
+
+- feat: add abort signal support to indexer and runWithReconnect to support graceful shutdown (jadejajaipal5@gmail.com)
 
 ## 2.1.0-beta.41
 
