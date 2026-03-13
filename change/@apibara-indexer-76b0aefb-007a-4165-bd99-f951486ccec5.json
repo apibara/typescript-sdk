@@ -1,0 +1,7 @@
+{
+  "type": "prerelease",
+  "comment": "feat: add abort signal support to indexer and runWithReconnect to support graceful shutdown",
+  "packageName": "@apibara/indexer",
+  "email": "jadejajaipal5@gmail.com",
+  "dependentChangeType": "patch"
+}

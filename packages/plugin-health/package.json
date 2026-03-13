@@ -1,0 +1,39 @@
+{
+  "name": "@apibara/plugin-health",
+  "version": "2.1.0-beta.56",
+  "type": "module",
+  "files": [
+    "dist",
+    "src",
+    "README.md"
+  ],
+  "main": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs",
+      "default": "./dist/index.mjs"
+    }
+  },
+  "scripts": {
+    "build": "unbuild",
+    "typecheck": "tsc --noEmit",
+    "lint": "biome check .",
+    "lint:fix": "pnpm lint --write"
+  },
+  "peerDependencies": {
+    "elysia": ">=1.4.0"
+  },
+  "devDependencies": {
+    "@sinclair/typebox": "^0.34.0",
+    "@types/node": "^20.14.0",
+    "elysia": "^1.4.27",
+    "unbuild": "^2.0.0"
+  },
+  "dependencies": {
+    "@apibara/indexer": "workspace:*",
+    "@elysiajs/node": "^1.4.5"
+  }
+}

@@ -39,7 +39,8 @@
           "packages/starknet",
           "packages/plugin-drizzle",
           "packages/plugin-mongo",
-          "packages/plugin-sqlite"
+          "packages/plugin-sqlite",
+          "packages/plugin-health"
         ]
       }
     ],

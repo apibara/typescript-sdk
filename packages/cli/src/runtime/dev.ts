@@ -6,7 +6,7 @@ import type { ConsolaInstance } from "consola";
 import { blueBright } from "picocolors";
 import { availableIndexers, createIndexer } from "./internal/app";
 
-async function startIndexer(indexer: string) {
+async function startIndexer(indexer: string, signal: AbortSignal) {
   let _logger: ConsolaInstance | undefined;
   while (true) {
     try {
@@ -35,7 +35,7 @@ async function startIndexer(indexer: string) {
         logger.info(`Indexer ${blueBright(indexer)} started`);
       }
 
-      await runWithReconnect(client, indexerInstance);
+      await runWithReconnect(client, indexerInstance, { signal });
 
       return;
     } catch (error) {
@@ -75,7 +75,21 @@ const startCommand = defineCommand({
       }
     }
 
-    await Promise.all(selectedIndexers.map((indexer) => startIndexer(indexer)));
+    const abortController = new AbortController();
+    const onSignal = () => abortController.abort();
+    process.once("SIGINT", onSignal);
+    process.once("SIGTERM", onSignal);
+
+    try {
+      await Promise.all(
+        selectedIndexers.map((indexer) =>
+          startIndexer(indexer, abortController.signal),
+        ),
+      );
+    } finally {
+      process.off("SIGINT", onSignal);
+      process.off("SIGTERM", onSignal);
+    }
   },
 });
 
