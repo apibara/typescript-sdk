@@ -128,9 +128,9 @@ export class EvmRpcStream extends RpcStreamConfig<Filter, Block> {
     startBlockNumber,
     endBlockNumber,
   }: FetchCursorRangeArgs): Promise<BlockInfo[]> {
-    console.log(
-      `[EVM] fetchCursorRange: start=${startBlockNumber} end=${endBlockNumber}`,
-    );
+    // console.log(
+    //   `[EVM] fetchCursorRange: start=${startBlockNumber} end=${endBlockNumber}`,
+    // );
 
     const requestCount = Number(endBlockNumber - startBlockNumber + 1n);
     return await Promise.all(
@@ -164,7 +164,7 @@ export class EvmRpcStream extends RpcStreamConfig<Filter, Block> {
       toBlock = newToBlock;
     }
 
-    console.log(`[EVM] fetchBlockRange: start=${fromBlock} end=${toBlock}`);
+    // console.log(`[EVM] fetchBlockRange: start=${fromBlock} end=${toBlock}`);
 
     const { logs: logsByBlockNumber, blockNumbers } =
       await this.fetchLogsForRangeWithRetry({
@@ -223,7 +223,7 @@ export class EvmRpcStream extends RpcStreamConfig<Filter, Block> {
   async fetchHeaderByHash({
     blockHash,
   }: FetchBlockByHashArgs<Filter>): Promise<FetchBlockByHashResult<Block>> {
-    console.log(`[EVM] fetchBlockByHash: hash=${blockHash}`);
+    // console.log(`[EVM] fetchBlockByHash: hash=${blockHash}`);
     // Fetch block header and check it matches the expected parent block hash.
     const { header } = await this.fetchBlockHeaderByHashWithRetry({
       blockHash,
