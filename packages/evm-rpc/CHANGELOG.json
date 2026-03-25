@@ -2,6 +2,21 @@
   "name": "@apibara/evm-rpc",
   "entries": [
     {
+      "date": "Wed, 25 Mar 2026 19:23:23 GMT",
+      "version": "2.1.0-beta.59",
+      "tag": "@apibara/evm-rpc_v2.1.0-beta.59",
+      "comments": {
+        "prerelease": [
+          {
+            "author": "francesco@ceccon.me",
+            "package": "@apibara/evm-rpc",
+            "commit": "11a1b91d26fe00e1efd4ce904d3470516bfe0b78",
+            "comment": "remove logs"
+          }
+        ]
+      }
+    },
+    {
       "date": "Mon, 02 Mar 2026 04:00:12 GMT",
       "version": "2.1.0-beta.56",
       "tag": "@apibara/evm-rpc_v2.1.0-beta.56",
