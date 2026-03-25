@@ -55,9 +55,9 @@ export class ChainTracker {
   }
 
   updateFinalized(newFinalized: BlockInfo) {
-    console.log(
-      `[CT] updateFinalized: new=${newFinalized.blockNumber} old=${this.#finalized.blockNumber}`,
-    );
+    // console.log(
+    //   `[CT] updateFinalized: new=${newFinalized.blockNumber} old=${this.#finalized.blockNumber}`,
+    // );
 
     if (newFinalized.blockNumber < this.#finalized.blockNumber) {
       throw new Error("Finalized cursor moved backwards");
@@ -87,7 +87,7 @@ export class ChainTracker {
   }
 
   addToCanonicalChain({ blockInfo }: { blockInfo: BlockInfo }) {
-    console.log(`[CT] addToCanonicalChain: block=${blockInfo.blockNumber}`);
+    // console.log(`[CT] addToCanonicalChain: block=${blockInfo.blockNumber}`);
 
     const existing = this.#canonical.get(blockInfo.blockNumber);
 
@@ -120,9 +120,9 @@ export class ChainTracker {
     fetchCursorByHash,
     fetchCursorRange,
   }: UpdateHeadArgs): Promise<UpdateHeadResult> {
-    console.log(
-      `[CT] updateHead: new=${newHead.blockNumber} old=${this.#head.blockNumber}`,
-    );
+    // console.log(
+    //   `[CT] updateHead: new=${newHead.blockNumber} old=${this.#head.blockNumber}`,
+    // );
 
     // No changes to the chain.
     if (
@@ -205,9 +205,9 @@ export class ChainTracker {
     // The new chain is longer and we need the missing blocks.
     // This may result in reorgs.
 
-    console.log(
-      `[CT] moving from ${this.#head.blockNumber} to ${newHead.blockNumber} (${newHead.blockNumber - this.#head.blockNumber} blocks)`,
-    );
+    // console.log(
+    //   `[CT] moving from ${this.#head.blockNumber} to ${newHead.blockNumber} (${newHead.blockNumber - this.#head.blockNumber} blocks)`,
+    // );
 
     let currentBlockNumber = this.#head.blockNumber + 1n;
 
