@@ -227,10 +227,17 @@ export async function runWithReconnect<TFilter, TBlock>(
       if (error instanceof ClientError || error instanceof ServerError) {
         const isServerError = error instanceof ServerError;
 
-        if (error.code === Status.INTERNAL) {
+        const retryableCodes = [
+          Status.INTERNAL,
+          Status.UNAVAILABLE,
+          Status.DEADLINE_EXCEEDED,
+          Status.RESOURCE_EXHAUSTED,
+        ];
+
+        if (retryableCodes.includes(error.code)) {
           if (retryCount < maxRetries) {
             consola.error(
-              `Internal ${isServerError ? "server" : "client"} error: ${
+              `Transient ${isServerError ? "server" : "client"} error: ${
                 error.message
               }`,
             );
