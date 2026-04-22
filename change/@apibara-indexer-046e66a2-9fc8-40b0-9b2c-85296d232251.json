@@ -1,7 +1,0 @@
-{
-  "type": "patch",
-  "comment": "fix: retry UNAVAILABLE and other transient gRPC errors in runWithReconnect",
-  "packageName": "@apibara/indexer",
-  "email": "francesco@ceccon.me",
-  "dependentChangeType": "patch"
-}

@@ -1,8 +1,16 @@
 # Change Log - @apibara/indexer
 
-<!-- This log was last generated on Fri, 13 Mar 2026 10:35:02 GMT and should not be manually modified. -->
+<!-- This log was last generated on Wed, 22 Apr 2026 12:58:39 GMT and should not be manually modified. -->
 
 <!-- Start content -->
+
+## 2.1.0-beta.60
+
+Wed, 22 Apr 2026 12:58:39 GMT
+
+### Patches
+
+- fix: retry UNAVAILABLE and other transient gRPC errors in runWithReconnect (francesco@ceccon.me)
 
 ## 2.1.0-beta.58
 
