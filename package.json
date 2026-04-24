@@ -25,29 +25,10 @@
   },
   "packageManager": "pnpm@10.24.0",
   "beachball": {
-    "prereleasePrefix": "beta",
     "disallowedChangeTypes": [
       "major"
     ],
     "changehint": "Run 'pnpm beachball change' to generate a change file",
-    "groups": [
-      {
-        "name": "v2",
-        "include": [
-          "packages/beaconchain",
-          "packages/cli",
-          "packages/evm",
-          "packages/evm-rpc",
-          "packages/indexer",
-          "packages/protocol",
-          "packages/starknet",
-          "packages/plugin-drizzle",
-          "packages/plugin-mongo",
-          "packages/plugin-sqlite",
-          "packages/plugin-health"
-        ]
-      }
-    ],
     "ignorePatterns": [
       "examples/**"
     ]
