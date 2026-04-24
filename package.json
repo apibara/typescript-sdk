@@ -19,16 +19,20 @@
   },
   "devDependencies": {
     "@biomejs/biome": "^1.9.1",
-    "beachball": "^2.47.1",
+    "beachball": "^2.65.0",
     "turbo": "^2.1.2",
     "typescript": "^5.6.2"
   },
-  "packageManager": "pnpm@9.10.0",
+  "packageManager": "pnpm@10.24.0",
   "beachball": {
     "prereleasePrefix": "beta",
+    "disallowedChangeTypes": [
+      "major"
+    ],
+    "changehint": "Run 'pnpm beachball change' to generate a change file",
     "groups": [
       {
-        "name": "v2-prerelease",
+        "name": "v2",
         "include": [
           "packages/beaconchain",
           "packages/cli",
