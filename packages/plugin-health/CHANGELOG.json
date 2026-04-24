@@ -2,6 +2,21 @@
   "name": "@apibara/plugin-health",
   "entries": [
     {
+      "date": "Fri, 24 Apr 2026 14:40:35 GMT",
+      "version": "2.1.1-beta.0",
+      "tag": "@apibara/plugin-health_v2.1.1-beta.0",
+      "comments": {
+        "patch": [
+          {
+            "author": "francesco@ceccon.me",
+            "package": "@apibara/plugin-health",
+            "commit": "f51f768c8becb7889ec459cdeecdfd4e9b72f3ec",
+            "comment": "build: update package version"
+          }
+        ]
+      }
+    },
+    {
       "date": "Fri, 13 Mar 2026 10:35:02 GMT",
       "version": "2.1.0-beta.57",
       "tag": "@apibara/plugin-health_v2.1.0-beta.57",

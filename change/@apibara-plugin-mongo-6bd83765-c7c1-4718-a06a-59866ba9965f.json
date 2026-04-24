@@ -1,7 +1,0 @@
-{
-  "type": "patch",
-  "comment": "build: update package version",
-  "packageName": "@apibara/plugin-mongo",
-  "email": "francesco@ceccon.me",
-  "dependentChangeType": "patch"
-}
