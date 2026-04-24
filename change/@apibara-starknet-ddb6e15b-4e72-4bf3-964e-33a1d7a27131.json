@@ -1,7 +1,0 @@
-{
-  "type": "patch",
-  "comment": "build: sync release version",
-  "packageName": "@apibara/starknet",
-  "email": "francesco@ceccon.me",
-  "dependentChangeType": "patch"
-}

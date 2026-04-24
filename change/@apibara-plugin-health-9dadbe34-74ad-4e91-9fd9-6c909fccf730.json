@@ -1,7 +1,0 @@
-{
-  "type": "patch",
-  "comment": "build: sync release version",
-  "packageName": "@apibara/plugin-health",
-  "email": "francesco@ceccon.me",
-  "dependentChangeType": "patch"
-}
