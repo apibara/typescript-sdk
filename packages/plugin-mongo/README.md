@@ -1,4 +1,4 @@
-# `@apibara/sink-mongo`
+# `@apibara/plugin-mongo`
 
 TODO
 
