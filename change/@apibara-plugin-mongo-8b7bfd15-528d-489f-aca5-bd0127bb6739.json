@@ -1,7 +1,0 @@
-{
-  "type": "patch",
-  "comment": "plugin-mongo: update readme",
-  "packageName": "@apibara/plugin-mongo",
-  "email": "francesco@ceccon.me",
-  "dependentChangeType": "patch"
-}

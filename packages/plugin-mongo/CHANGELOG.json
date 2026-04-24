@@ -2,6 +2,27 @@
   "name": "@apibara/plugin-mongo",
   "entries": [
     {
+      "date": "Fri, 24 Apr 2026 17:44:08 GMT",
+      "version": "2.1.3",
+      "tag": "@apibara/plugin-mongo_v2.1.3",
+      "comments": {
+        "patch": [
+          {
+            "author": "francesco@ceccon.me",
+            "package": "@apibara/plugin-mongo",
+            "commit": "65d1746b5be6b9849535c1ea0ccb2ea4cd49c487",
+            "comment": "sync"
+          },
+          {
+            "author": "francesco@ceccon.me",
+            "package": "@apibara/plugin-mongo",
+            "commit": "65d1746b5be6b9849535c1ea0ccb2ea4cd49c487",
+            "comment": "plugin-mongo: update readme"
+          }
+        ]
+      }
+    },
+    {
       "date": "Tue, 10 Mar 2026 08:41:26 GMT",
       "version": "2.1.0-beta.56",
       "tag": "@apibara/plugin-mongo_v2.1.0-beta.56",
