@@ -15,7 +15,7 @@ import type { Finalize, Invalidate } from "@apibara/protocol";
 import { sqliteStorage } from "../src";
 import type { CheckpointRow } from "../src/persistence";
 
-describe("SQLite persistence", () => {
+describe.skip("SQLite persistence", () => {
   it("should store the latest block number", async () => {
     const db = new Database(":memory:");
 

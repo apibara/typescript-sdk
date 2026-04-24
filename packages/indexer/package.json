@@ -64,7 +64,7 @@
   },
   "devDependencies": {
     "@electric-sql/pglite": "^0.2.17",
-    "@types/better-sqlite3": "^7.6.11",
+    "@types/better-sqlite3": "^7.6.13",
     "@types/node": "^20.14.0",
     "@types/pg": "^8.11.10",
     "unbuild": "^2.0.0",
