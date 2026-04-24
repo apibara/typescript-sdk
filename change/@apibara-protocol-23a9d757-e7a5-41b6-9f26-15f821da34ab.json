@@ -1,7 +1,7 @@
 {
   "type": "patch",
-  "comment": "build: update package version",
-  "packageName": "@apibara/plugin-drizzle",
+  "comment": "build: sync release version",
+  "packageName": "@apibara/protocol",
   "email": "francesco@ceccon.me",
   "dependentChangeType": "patch"
 }
