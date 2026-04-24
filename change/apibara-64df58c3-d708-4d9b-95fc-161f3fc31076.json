@@ -1,0 +1,7 @@
+{
+  "type": "patch",
+  "comment": "build: update package version",
+  "packageName": "apibara",
+  "email": "francesco@ceccon.me",
+  "dependentChangeType": "patch"
+}
