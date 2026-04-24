@@ -33,11 +33,6 @@ jobs:
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Check gh auth status
-        run: gh auth status
-        env:
-          GH_TOKEN: ${{ secrets.GIT_TOKEN }}
-
       - name: Install dependencies
         run: pnpm install --strict-peer-dependencies=false --no-frozen-lockfile
       - name: Run build
@@ -50,9 +45,4 @@ jobs:
         env:
           GIT_TOKEN: ${{ secrets.GIT_TOKEN }}
       - name: Publish package
-        run: pnpm beachball publish --access public -y --no-push --no-git-tags
-      - name: Open PR
-        run: |
-          gh pr create --title "apply package updates" --body ""
-        env:
-          GH_TOKEN: ${{ secrets.GIT_TOKEN }}
+        run: pnpm beachball publish --access public -y
