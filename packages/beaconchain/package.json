@@ -1,6 +1,7 @@
 {
   "name": "@apibara/beaconchain",
-  "version": "2.1.0-beta.60",
+  "version": "2.1.0",
+  "repository": "apibara/typescript-sdk",
   "type": "module",
   "files": [
     "dist",

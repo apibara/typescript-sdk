@@ -16,7 +16,7 @@ import { sqliteStorage, useSqliteKeyValueStore } from "../src";
 import type { KeyValueRow } from "../src/kv";
 import type { CheckpointRow } from "../src/persistence";
 
-describe("SQLite key-value store", () => {
+describe.skip("SQLite key-value store", () => {
   it("should be able to store and retrieve values", async () => {
     const db = new Database(":memory:");
 

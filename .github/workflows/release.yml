@@ -1,42 +1,48 @@
 name: Release
 
 on:
-  push:
-    branches:
-      - main
+  # Releases are triggered manually to avoid making a billion releases by
+  # accident.
+  workflow_dispatch:
+
+permissions: {}
 
 jobs:
   release:
-    environment: Release
     runs-on: ubuntu-latest
+
+    # The PAT token used for publishing is in this environment
+    environment: Release
+
+    permissions:
+      # Used by trusted publishing
+      id-token: write
+
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v6
         with:
           persist-credentials: false
       - name: Set Node version
         uses: actions/setup-node@v4
         with:
-          node-version: 20
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 9.10.0
+          node-version: 24
+      - uses: pnpm/action-setup@v6
       - name: Install Protoc
         uses: arduino/setup-protoc@v1
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Install dependencies
         run: pnpm install --strict-peer-dependencies=false --no-frozen-lockfile
       - name: Run build
         run: pnpm build
       - name: Set git credentials
         run: |
-          git config user.name "Capy Bot"
+          git config user.name "Kapy Bot"
           git config user.email "capy-bot@apibara.com"
-          git remote set-url origin "https://${GIT_TOKEN}@github.com/apibara/typescript-sdk"
+          git remote set-url origin "https://${GIT_TOKEN}@github.com/${GITHUB_REPOSITORY}"
         env:
           GIT_TOKEN: ${{ secrets.GIT_TOKEN }}
       - name: Publish package
-        run: pnpm beachball publish --access public --token "${NPM_TOKEN}" --tag next
-        env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: pnpm beachball publish --access public -y
