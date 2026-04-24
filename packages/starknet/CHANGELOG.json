@@ -2,6 +2,21 @@
   "name": "@apibara/starknet",
   "entries": [
     {
+      "date": "Fri, 24 Apr 2026 15:05:29 GMT",
+      "version": "2.1.1",
+      "tag": "@apibara/starknet_v2.1.1",
+      "comments": {
+        "patch": [
+          {
+            "author": "francesco@ceccon.me",
+            "package": "@apibara/starknet",
+            "commit": "078f260082f38f6b1bd9a3d90ec5817c48135def",
+            "comment": "build: sync release version"
+          }
+        ]
+      }
+    },
+    {
       "date": "Tue, 03 Feb 2026 18:58:37 GMT",
       "version": "2.1.0-beta.53",
       "tag": "@apibara/starknet_v2.1.0-beta.53",

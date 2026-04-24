@@ -2,6 +2,21 @@
   "name": "@apibara/indexer",
   "entries": [
     {
+      "date": "Fri, 24 Apr 2026 15:05:29 GMT",
+      "version": "2.1.1",
+      "tag": "@apibara/indexer_v2.1.1",
+      "comments": {
+        "patch": [
+          {
+            "author": "francesco@ceccon.me",
+            "package": "@apibara/indexer",
+            "commit": "078f260082f38f6b1bd9a3d90ec5817c48135def",
+            "comment": "build: sync release version"
+          }
+        ]
+      }
+    },
+    {
       "date": "Wed, 22 Apr 2026 12:58:39 GMT",
       "version": "2.1.0-beta.60",
       "tag": "@apibara/indexer_v2.1.0-beta.60",
