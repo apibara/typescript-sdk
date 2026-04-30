@@ -1,0 +1,7 @@
+{
+  "type": "patch",
+  "comment": "evm-rpc: include uniqueKey in data message",
+  "packageName": "@apibara/beaconchain",
+  "email": "francesco@ceccon.me",
+  "dependentChangeType": "patch"
+}
