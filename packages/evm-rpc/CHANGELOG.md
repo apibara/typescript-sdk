@@ -1,8 +1,16 @@
 # Change Log - @apibara/evm-rpc
 
-<!-- This log was last generated on Wed, 25 Mar 2026 19:23:23 GMT and should not be manually modified. -->
+<!-- This log was last generated on Thu, 30 Apr 2026 19:15:51 GMT and should not be manually modified. -->
 
 <!-- Start content -->
+
+## 2.1.2
+
+Thu, 30 Apr 2026 19:15:51 GMT
+
+### Patches
+
+- evm-rpc: include uniqueKey in data message (francesco@ceccon.me)
 
 ## 2.1.0-beta.59
 
