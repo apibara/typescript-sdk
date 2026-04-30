@@ -212,7 +212,7 @@ export class EvmRpcStream extends RpcStreamConfig<Filter, Block> {
 
       data.push({
         cursor: undefined,
-        endCursor: { orderKey: blockNumber },
+        endCursor: { orderKey: blockNumber, uniqueKey: header.blockHash },
         block: { header, logs },
       });
     }
