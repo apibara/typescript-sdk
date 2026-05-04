@@ -1,0 +1,7 @@
+{
+  "type": "patch",
+  "comment": "evm-rpc: add traces",
+  "packageName": "@apibara/evm-rpc",
+  "email": "francesco@ceccon.me",
+  "dependentChangeType": "patch"
+}

@@ -1,6 +1,13 @@
 import assert from "node:assert";
 import { EvmRpcStream, type Filter, rateLimitedHttp } from "@apibara/evm-rpc";
 import { createRpcClient } from "@apibara/protocol/rpc";
+import { trace } from "@opentelemetry/api";
+import { OTLPTraceExporter } from "@opentelemetry/exporter-trace-otlp-grpc";
+import { Resource } from "@opentelemetry/resources";
+import {
+  BatchSpanProcessor,
+  NodeTracerProvider,
+} from "@opentelemetry/sdk-trace-node";
 import { defineCommand, runMain } from "citty";
 import consola from "consola";
 import { createPublicClient } from "viem";
@@ -33,8 +40,29 @@ const command = defineCommand({
       default: "accepted",
       description: "Block finality (finalized, accepted)",
     },
+    trace: {
+      type: "string",
+      description:
+        "Enable OpenTelemetry tracing and specify the OTLP gRPC endpoint URL (e.g. http://localhost:4317)",
+    },
   },
   async run({ args }) {
+    if (args.trace) {
+      const provider = new NodeTracerProvider({
+        resource: new Resource({
+          "service.name": "example-evm-rpc-client",
+        }),
+      });
+
+      const exporter = new OTLPTraceExporter({ url: args.trace });
+      provider.addSpanProcessor(new BatchSpanProcessor(exporter));
+      provider.register();
+
+      trace.setGlobalTracerProvider(provider);
+
+      consola.info("OpenTelemetry tracing enabled:", args.trace);
+    }
+
     consola.info("Creating EVM RPC client");
 
     const viemClient = createPublicClient({

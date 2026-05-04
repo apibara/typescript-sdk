@@ -28,6 +28,7 @@
     "test:ci": "vitest run"
   },
   "devDependencies": {
+    "@opentelemetry/sdk-trace-base": "^1.30.1",
     "@types/node": "^20.12.13",
     "unbuild": "^2.0.0",
     "vitest": "^1.6.0"
@@ -35,6 +36,7 @@
   "dependencies": {
     "@apibara/protocol": "workspace:*",
     "@apibara/evm": "workspace:*",
+    "@opentelemetry/api": "^1.9.0",
     "viem": "^2.40.3"
   }
 }
