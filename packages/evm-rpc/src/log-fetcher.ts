@@ -11,8 +11,11 @@ import {
 } from "viem";
 import type { Log } from "./block";
 import type { Filter } from "./filter";
+import { createTracer } from "./otel";
 import type { ViemRpcClient } from "./stream-config";
 import { viemRpcLogToDna } from "./transform";
+
+const tracer = createTracer();
 
 export async function fetchLogsForRange({
   client,
@@ -27,77 +30,102 @@ export async function fetchLogsForRange({
   filter: Filter;
   mergeGetLogs: boolean;
 }): Promise<{ logs: Record<number, Log[]>; blockNumbers: bigint[] }> {
-  const logsByBlock: Record<number, Log[]> = {};
-
-  if (!filter.logs || filter.logs.length === 0) {
-    return { logs: logsByBlock, blockNumbers: [] };
-  }
-
-  const responses = mergeGetLogs
-    ? await mergedGetLogsCalls({
-        client,
-        filter,
-        fromBlock: numberToHex(fromBlock),
-        toBlock: numberToHex(toBlock),
-      })
-    : await standardGetLogsCalls({
-        client,
-        filter,
-        fromBlock: numberToHex(fromBlock),
-        toBlock: numberToHex(toBlock),
+  return tracer.startActiveSpan("evm-rpc.fetchLogsForRange", async (span) => {
+    try {
+      span.setAttributes({
+        fromBlock: fromBlock.toString(),
+        toBlock: toBlock.toString(),
+        mergeGetLogs,
+        "filter.logs.length": filter.logs?.length ?? 0,
       });
 
-  const blockNumbers = new Set<bigint>();
+      const logsByBlock: Record<number, Log[]> = {};
 
-  const seenLogsByBlockNumberAndIndex: Record<
-    number,
-    Record<number, number>
-  > = {};
-
-  for (const { logFilters, logs } of responses) {
-    for (const log of logs) {
-      if (log.blockNumber === null) {
-        throw new Error("Log block number is null");
+      if (!filter.logs || filter.logs.length === 0) {
+        return { logs: logsByBlock, blockNumbers: [] };
       }
 
-      for (const logFilter of logFilters) {
-        const refinedLog = refineLog(log, logFilter);
+      const responses = mergeGetLogs
+        ? await mergedGetLogsCalls({
+            client,
+            filter,
+            fromBlock: numberToHex(fromBlock),
+            toBlock: numberToHex(toBlock),
+          })
+        : await standardGetLogsCalls({
+            client,
+            filter,
+            fromBlock: numberToHex(fromBlock),
+            toBlock: numberToHex(toBlock),
+          });
 
-        if (refinedLog) {
-          const blockNumber = hexToNumber(log.blockNumber);
-          blockNumbers.add(BigInt(blockNumber));
+      const blockNumbers = new Set<bigint>();
 
-          if (!logsByBlock[blockNumber]) {
-            logsByBlock[blockNumber] = [];
+      const seenLogsByBlockNumberAndIndex: Record<
+        number,
+        Record<number, number>
+      > = {};
+
+      for (const { logFilters, logs } of responses) {
+        for (const log of logs) {
+          if (log.blockNumber === null) {
+            throw new Error("Log block number is null");
           }
 
-          if (!seenLogsByBlockNumberAndIndex[blockNumber]) {
-            seenLogsByBlockNumberAndIndex[blockNumber] = {};
-          }
+          for (const logFilter of logFilters) {
+            const refinedLog = refineLog(log, logFilter);
 
-          const existingPosition =
-            seenLogsByBlockNumberAndIndex[blockNumber][refinedLog.logIndex];
+            if (refinedLog) {
+              const blockNumber = hexToNumber(log.blockNumber);
+              blockNumbers.add(BigInt(blockNumber));
 
-          if (existingPosition !== undefined) {
-            const existingLog = logsByBlock[blockNumber][existingPosition];
-            (existingLog.filterIds as number[]).push(logFilter.id ?? 0);
-          } else {
-            (refinedLog.filterIds as number[]).push(logFilter.id ?? 0);
+              if (!logsByBlock[blockNumber]) {
+                logsByBlock[blockNumber] = [];
+              }
 
-            logsByBlock[blockNumber].push(refinedLog);
-            seenLogsByBlockNumberAndIndex[blockNumber][refinedLog.logIndex] =
-              logsByBlock[blockNumber].length - 1;
+              if (!seenLogsByBlockNumberAndIndex[blockNumber]) {
+                seenLogsByBlockNumberAndIndex[blockNumber] = {};
+              }
+
+              const existingPosition =
+                seenLogsByBlockNumberAndIndex[blockNumber][refinedLog.logIndex];
+
+              if (existingPosition !== undefined) {
+                const existingLog = logsByBlock[blockNumber][existingPosition];
+                (existingLog.filterIds as number[]).push(logFilter.id ?? 0);
+              } else {
+                (refinedLog.filterIds as number[]).push(logFilter.id ?? 0);
+
+                logsByBlock[blockNumber].push(refinedLog);
+                seenLogsByBlockNumberAndIndex[blockNumber][
+                  refinedLog.logIndex
+                ] = logsByBlock[blockNumber].length - 1;
+              }
+            }
           }
         }
       }
+
+      const sortedBlockNumbers = Array.from(blockNumbers).sort((a, b) =>
+        a < b ? -1 : a > b ? 1 : 0,
+      );
+
+      span.setAttributes({
+        "result.blockCount": sortedBlockNumbers.length,
+        "result.logCount": Object.values(logsByBlock).reduce(
+          (sum, logs) => sum + logs.length,
+          0,
+        ),
+      });
+
+      return { logs: logsByBlock, blockNumbers: sortedBlockNumbers };
+    } catch (error) {
+      span.recordException(error as Error);
+      throw error;
+    } finally {
+      span.end();
     }
-  }
-
-  const sortedBlockNumbers = Array.from(blockNumbers).sort((a, b) =>
-    a < b ? -1 : a > b ? 1 : 0,
-  );
-
-  return { logs: logsByBlock, blockNumbers: sortedBlockNumbers };
+  });
 }
 
 function refineLog(log: RpcLog, filter: LogFilter): Log | null {
@@ -158,55 +186,86 @@ async function mergedGetLogsCalls({
   fromBlock?: `0x${string}`;
   toBlock?: `0x${string}`;
 }) {
-  const blockParams = blockHash ? { blockHash } : { fromBlock, toBlock };
+  return tracer.startActiveSpan("evm-rpc.mergedGetLogsCalls", async (span) => {
+    try {
+      const blockParams = blockHash ? { blockHash } : { fromBlock, toBlock };
 
-  const filtersWithAddress = filter.logs.filter((f) => f.address !== undefined);
-  const filtersWithoutAddress = filter.logs.filter(
-    (f) => f.address === undefined,
-  );
+      const filtersWithAddress = filter.logs.filter(
+        (f) => f.address !== undefined,
+      );
+      const filtersWithoutAddress = filter.logs.filter(
+        (f) => f.address === undefined,
+      );
 
-  const promises: Promise<{
-    logs: RpcLog[];
-    logFilters: typeof filter.logs;
-  }>[] = [];
+      span.setAttributes({
+        ...(fromBlock !== undefined && { fromBlock }),
+        ...(toBlock !== undefined && { toBlock }),
+        ...(blockHash !== undefined && { blockHash }),
+        "filter.count": filter.logs.length,
+        "filter.withAddress": filtersWithAddress.length,
+        "filter.withoutAddress": filtersWithoutAddress.length,
+      });
 
-  if (filtersWithAddress.length > 0) {
-    const addresses = filtersWithAddress.map((f) => f.address!);
+      const promises: Promise<{
+        logs: RpcLog[];
+        logFilters: typeof filter.logs;
+      }>[] = [];
 
-    promises.push(
-      client
-        .request({
-          method: "eth_getLogs",
-          params: [
-            {
-              address: addresses,
-              ...blockParams,
-            },
-          ],
-        })
-        .then((logs: RpcLog[]) => ({ logs, logFilters: filtersWithAddress })),
-    );
-  }
+      if (filtersWithAddress.length > 0) {
+        const addresses = filtersWithAddress.map((f) => f.address!);
 
-  if (filtersWithoutAddress.length > 0) {
-    promises.push(
-      client
-        .request({
-          method: "eth_getLogs",
-          params: [
-            {
-              ...blockParams,
-            },
-          ],
-        })
-        .then((logs: RpcLog[]) => ({
-          logs,
-          logFilters: filtersWithoutAddress,
-        })),
-    );
-  }
+        promises.push(
+          client
+            .request({
+              method: "eth_getLogs",
+              params: [
+                {
+                  address: addresses,
+                  ...blockParams,
+                },
+              ],
+            })
+            .then((logs: RpcLog[]) => ({
+              logs,
+              logFilters: filtersWithAddress,
+            })),
+        );
+      }
 
-  return await Promise.all(promises);
+      if (filtersWithoutAddress.length > 0) {
+        promises.push(
+          client
+            .request({
+              method: "eth_getLogs",
+              params: [
+                {
+                  ...blockParams,
+                },
+              ],
+            })
+            .then((logs: RpcLog[]) => ({
+              logs,
+              logFilters: filtersWithoutAddress,
+            })),
+        );
+      }
+
+      const result = await Promise.all(promises);
+
+      const totalLogs = result.reduce((sum, r) => sum + r.logs.length, 0);
+      span.setAttributes({
+        "result.callCount": result.length,
+        "result.logCount": totalLogs,
+      });
+
+      return result;
+    } catch (error) {
+      span.recordException(error as Error);
+      throw error;
+    } finally {
+      span.end();
+    }
+  });
 }
 
 async function standardGetLogsCalls({
@@ -222,24 +281,52 @@ async function standardGetLogsCalls({
   fromBlock?: `0x${string}`;
   toBlock?: `0x${string}`;
 }) {
-  const blockParams = blockHash ? { blockHash } : { fromBlock, toBlock };
-  return await Promise.all(
-    filter.logs.map(async (logFilter) => {
-      const logs = await client.request({
-        method: "eth_getLogs",
-        params: [
-          {
-            address: logFilter.address,
-            topics:
-              logFilter.topics !== undefined
-                ? [...logFilter.topics]
-                : undefined,
-            ...blockParams,
-          },
-        ],
-      });
+  return tracer.startActiveSpan(
+    "evm-rpc.standardGetLogsCalls",
+    async (span) => {
+      try {
+        const blockParams = blockHash ? { blockHash } : { fromBlock, toBlock };
 
-      return { logs, logFilters: [logFilter] };
-    }),
+        span.setAttributes({
+          ...(fromBlock !== undefined && { fromBlock }),
+          ...(toBlock !== undefined && { toBlock }),
+          ...(blockHash !== undefined && { blockHash }),
+          "filter.count": filter.logs.length,
+        });
+
+        const result = await Promise.all(
+          filter.logs.map(async (logFilter) => {
+            const logs = await client.request({
+              method: "eth_getLogs",
+              params: [
+                {
+                  address: logFilter.address,
+                  topics:
+                    logFilter.topics !== undefined
+                      ? [...logFilter.topics]
+                      : undefined,
+                  ...blockParams,
+                },
+              ],
+            });
+
+            return { logs, logFilters: [logFilter] };
+          }),
+        );
+
+        const totalLogs = result.reduce((sum, r) => sum + r.logs.length, 0);
+        span.setAttributes({
+          "result.callCount": result.length,
+          "result.logCount": totalLogs,
+        });
+
+        return result;
+      } catch (error) {
+        span.recordException(error as Error);
+        throw error;
+      } finally {
+        span.end();
+      }
+    },
   );
 }

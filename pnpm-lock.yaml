@@ -468,10 +468,16 @@ importers:
       '@apibara/protocol':
         specifier: workspace:*
         version: link:../protocol
+      '@opentelemetry/api':
+        specifier: ^1.9.0
+        version: 1.9.1
       viem:
         specifier: ^2.40.3
         version: 2.48.4(typescript@5.9.3)
     devDependencies:
+      '@opentelemetry/sdk-trace-base':
+        specifier: ^1.30.1
+        version: 1.30.1(@opentelemetry/api@1.9.1)
       '@types/node':
         specifier: ^20.12.13
         version: 20.19.39

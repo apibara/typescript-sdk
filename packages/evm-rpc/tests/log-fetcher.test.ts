@@ -1,8 +1,9 @@
 import { http, createPublicClient } from "viem";
-import { beforeAll, describe, expect, it } from "vitest";
+import { beforeAll, beforeEach, describe, expect, it } from "vitest";
 import type { Log } from "../src/block";
 import type { Filter } from "../src/filter";
 import { fetchLogsForRange } from "../src/log-fetcher";
+import { getFinishedSpans, resetSpans, setupTestTracer } from "./otel-helper";
 
 const contract1 = "0xe0e0e08A6A4b9Dc7bD67BCB7aadE5cF48157d444" as const;
 const contract2 = "0xA37cc341634AFD9E0919D334606E676dbAb63E17" as const;
@@ -37,11 +38,17 @@ describe("fetchLogsForRange", () => {
   }
 
   beforeAll(() => {
+    setupTestTracer();
+
     const rpcUrl =
       process.env.TEST_EVM_RPC_URL ?? "https://ethereum-rpc.publicnode.com";
     client = createPublicClient({
       transport: http(rpcUrl),
     });
+  });
+
+  beforeEach(() => {
+    resetSpans();
   });
 
   it("should return empty logs with empty filter", async () => {
@@ -66,6 +73,21 @@ describe("fetchLogsForRange", () => {
 
     expect(sortedMerged).toEqual(sortedStandard);
     expect(sortedMerged).toMatchSnapshot();
+
+    // Empty filter returns early so only the outer span is emitted.
+    const spans = getFinishedSpans();
+    expect(spans.map((s) => s.name)).toEqual([
+      "evm-rpc.fetchLogsForRange",
+      "evm-rpc.fetchLogsForRange",
+    ]);
+    for (const span of spans) {
+      expect(span.attributes).toMatchObject({
+        fromBlock: fromBlock.toString(),
+        toBlock: toBlock.toString(),
+        mergeGetLogs: span.attributes.mergeGetLogs as boolean,
+        "filter.logs.length": 0,
+      });
+    }
   });
 
   it("should return logs filtered by contract addresses", async () => {
@@ -95,6 +117,44 @@ describe("fetchLogsForRange", () => {
 
     expect(sortedMerged).toEqual(sortedStandard);
     expect(sortedMerged).toMatchSnapshot();
+
+    const spans = getFinishedSpans();
+    const standardFetch = spans.find(
+      (s) =>
+        s.name === "evm-rpc.fetchLogsForRange" && !s.attributes.mergeGetLogs,
+    );
+    const mergedFetch = spans.find(
+      (s) =>
+        s.name === "evm-rpc.fetchLogsForRange" && s.attributes.mergeGetLogs,
+    );
+
+    expect(standardFetch).toBeDefined();
+    expect(standardFetch!.attributes).toMatchObject({
+      fromBlock: fromBlock.toString(),
+      toBlock: toBlock.toString(),
+      mergeGetLogs: false,
+      "filter.logs.length": 2,
+      "result.blockCount": expect.any(Number),
+      "result.logCount": expect.any(Number),
+    });
+
+    expect(mergedFetch).toBeDefined();
+    expect(mergedFetch!.attributes).toMatchObject({
+      fromBlock: fromBlock.toString(),
+      toBlock: toBlock.toString(),
+      mergeGetLogs: true,
+      "filter.logs.length": 2,
+      "result.blockCount": expect.any(Number),
+      "result.logCount": expect.any(Number),
+    });
+
+    // Nested helpers should also have emitted spans.
+    expect(spans.some((s) => s.name === "evm-rpc.standardGetLogsCalls")).toBe(
+      true,
+    );
+    expect(spans.some((s) => s.name === "evm-rpc.mergedGetLogsCalls")).toBe(
+      true,
+    );
   });
 
   it("should return logs filtered by contract address with strict empty topics and Transfer event", async () => {
@@ -137,5 +197,42 @@ describe("fetchLogsForRange", () => {
 
     expect(sortedMerged).toEqual(sortedStandard);
     expect(sortedMerged).toMatchSnapshot();
+
+    const spans = getFinishedSpans();
+    const standardFetch = spans.find(
+      (s) =>
+        s.name === "evm-rpc.fetchLogsForRange" && !s.attributes.mergeGetLogs,
+    );
+    const mergedFetch = spans.find(
+      (s) =>
+        s.name === "evm-rpc.fetchLogsForRange" && s.attributes.mergeGetLogs,
+    );
+
+    expect(standardFetch).toBeDefined();
+    expect(standardFetch!.attributes).toMatchObject({
+      fromBlock: fromBlock.toString(),
+      toBlock: toBlock.toString(),
+      mergeGetLogs: false,
+      "filter.logs.length": 3,
+      "result.blockCount": expect.any(Number),
+      "result.logCount": expect.any(Number),
+    });
+
+    expect(mergedFetch).toBeDefined();
+    expect(mergedFetch!.attributes).toMatchObject({
+      fromBlock: fromBlock.toString(),
+      toBlock: toBlock.toString(),
+      mergeGetLogs: true,
+      "filter.logs.length": 3,
+      "result.blockCount": expect.any(Number),
+      "result.logCount": expect.any(Number),
+    });
+
+    expect(spans.some((s) => s.name === "evm-rpc.standardGetLogsCalls")).toBe(
+      true,
+    );
+    expect(spans.some((s) => s.name === "evm-rpc.mergedGetLogsCalls")).toBe(
+      true,
+    );
   });
 });
