@@ -1,8 +1,16 @@
 # Change Log - @apibara/evm-rpc
 
-<!-- This log was last generated on Thu, 30 Apr 2026 19:15:51 GMT and should not be manually modified. -->
+<!-- This log was last generated on Mon, 04 May 2026 11:12:40 GMT and should not be manually modified. -->
 
 <!-- Start content -->
+
+## 2.1.3
+
+Mon, 04 May 2026 11:12:40 GMT
+
+### Patches
+
+- evm-rpc: add traces (francesco@ceccon.me)
 
 ## 2.1.2
 

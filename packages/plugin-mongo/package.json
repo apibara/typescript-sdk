@@ -1,6 +1,6 @@
 {
   "name": "@apibara/plugin-mongo",
-  "version": "2.1.3",
+  "version": "2.1.4",
   "repository": "apibara/typescript-sdk",
   "type": "module",
   "files": [
