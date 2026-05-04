@@ -4,8 +4,11 @@ import type { StreamDataRequest, StreamDataResponse } from "../stream";
 import { type ChainTracker, createChainTracker } from "./chain-tracker";
 import type { RpcStreamConfig } from "./config";
 import { blockInfoToCursor } from "./helpers";
+import { createTracer } from "./otel";
 
 const DEFAULT_HEARTBEAT_INTERVAL_MS = 30_000;
+
+const tracer = createTracer();
 
 type State<TFilter, TBlock> = {
   // The network-specific config.
@@ -118,53 +121,93 @@ async function* dataStreamLoop<TFilter, TBlock>(
   state: State<TFilter, TBlock>,
 ): AsyncGenerator<StreamDataResponse<TBlock>> {
   while (shouldContinue(state)) {
-    const { cursor, chainTracker } = state;
+    const messages = await tracer.startActiveSpan(
+      "data-stream.loop",
+      async (span) => {
+        try {
+          const { cursor, chainTracker } = state;
 
-    // Always check for heartbeats first to ensure we don't miss any.
-    if (shouldSendHeartbeat(state)) {
-      state.lastHeartbeat = Date.now();
-      yield { _tag: "heartbeat" };
-    }
+          const attributes: Record<string, string | number | boolean> = {
+            cursor: cursor.orderKey.toString(),
+            head: chainTracker.head().orderKey.toString(),
+            finalized: chainTracker.finalized().orderKey.toString(),
+            actionSendHeartbeat: false,
+            actionRefreshFinalized: false,
+            actionBackfillFinalized: false,
+            actionWaitForHeadChange: false,
+            actionProduceLiveBlocks: false,
+          };
 
-    if (shouldRefreshFinalized(state)) {
-      const finalizedInfo = await state.config.fetchCursor({
-        blockTag: "finalized",
-      });
+          const messages: StreamDataResponse<TBlock>[] = [];
 
-      if (finalizedInfo === null) {
-        throw new Error("Failed to fetch finalized cursor");
-      }
+          if (shouldSendHeartbeat(state)) {
+            state.lastHeartbeat = Date.now();
+            attributes.actionSendHeartbeat = true;
+            messages.push({ _tag: "heartbeat" });
+          }
 
-      const finalized = blockInfoToCursor(finalizedInfo);
-      const finalizedChanged =
-        state.chainTracker.updateFinalized(finalizedInfo);
+          if (shouldRefreshFinalized(state)) {
+            attributes.actionRefreshFinalized = true;
+            const finalizedInfo = await state.config.fetchCursor({
+              blockTag: "finalized",
+            });
 
-      // Only send finalized if it's needed.
-      if (finalizedChanged && state.cursor.orderKey > finalized.orderKey) {
-        yield { _tag: "finalize", finalize: { cursor: finalized } };
-      }
+            if (finalizedInfo === null) {
+              throw new Error("Failed to fetch finalized cursor");
+            }
 
-      state.lastFinalizedRefresh = Date.now();
-    }
+            const finalized = blockInfoToCursor(finalizedInfo);
+            const finalizedChanged =
+              state.chainTracker.updateFinalized(finalizedInfo);
 
-    const finalized = chainTracker.finalized();
+            if (
+              finalizedChanged &&
+              state.cursor.orderKey > finalized.orderKey
+            ) {
+              messages.push({
+                _tag: "finalize",
+                finalize: { cursor: finalized },
+              });
+            }
 
-    // console.log(
-    //   `[DS] RpcLoop: c=${cursor.orderKey} f=${finalized.orderKey} h=${chainTracker.head().orderKey}`,
-    // );
+            state.lastFinalizedRefresh = Date.now();
+          }
 
-    if (cursor.orderKey < finalized.orderKey) {
-      yield* backfillFinalizedBlocks(state);
-    } else {
-      // If we're at the head, wait for a change.
-      //
-      // We don't want to produce a block immediately, but re-run the loop so
-      // that it's like any other iteration.
-      if (isAtHead(state)) {
-        yield* waitForHeadChange(state);
-      } else {
-        yield* produceLiveBlocks(state);
-      }
+          const finalized = chainTracker.finalized();
+
+          if (cursor.orderKey < finalized.orderKey) {
+            attributes.actionBackfillFinalized = true;
+            for await (const msg of backfillFinalizedBlocks(state)) {
+              messages.push(msg);
+            }
+          } else {
+            if (isAtHead(state)) {
+              attributes.actionWaitForHeadChange = true;
+              for await (const msg of waitForHeadChange(state)) {
+                messages.push(msg);
+              }
+            } else {
+              attributes.actionProduceLiveBlocks = true;
+              for await (const msg of produceLiveBlocks(state)) {
+                messages.push(msg);
+              }
+            }
+          }
+
+          span.setAttributes(attributes);
+
+          return messages;
+        } catch (error) {
+          span.recordException(error as Error);
+          throw error;
+        } finally {
+          span.end();
+        }
+      },
+    );
+
+    for (const message of messages) {
+      yield message;
     }
   }
 }
