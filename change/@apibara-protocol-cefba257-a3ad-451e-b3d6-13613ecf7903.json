@@ -1,0 +1,7 @@
+{
+  "type": "patch",
+  "comment": "Avoid refetching empty live RPC ranges",
+  "packageName": "@apibara/protocol",
+  "email": "francesco@ceccon.me",
+  "dependentChangeType": "patch"
+}
