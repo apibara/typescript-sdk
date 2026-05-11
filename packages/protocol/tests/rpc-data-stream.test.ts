@@ -45,7 +45,7 @@ class EmptyLiveHeadConfig extends RpcStreamConfig<string, TestBlock> {
       return blockInfo(args.blockNumber);
     }
 
-    return blockInfo(blockNumberFromHash(args.blockHash));
+    return blockInfo(blockNumberFromHash(args.blockHash ?? "0x0"));
   }
 
   async fetchCursorRange({
@@ -78,9 +78,7 @@ class EmptyLiveHeadConfig extends RpcStreamConfig<string, TestBlock> {
 
   async fetchHeaderByHash({
     blockHash,
-  }: FetchBlockByHashArgs<string>): Promise<
-    FetchBlockByHashResult<TestBlock>
-  > {
+  }: FetchBlockByHashArgs<string>): Promise<FetchBlockByHashResult<TestBlock>> {
     const blockNumber = blockNumberFromHash(blockHash);
     const info = blockInfo(blockNumber);
 
@@ -138,7 +136,7 @@ describe("RpcDataStream", () => {
       });
       expect(config.fetchBlockRangeCalls).toHaveLength(2);
       expect(config.fetchBlockRangeCalls[1]).toMatchObject({
-        startBlock: 3n,
+        startBlock: 2n,
         maxBlock: 3n,
       });
       await iterator.return?.();

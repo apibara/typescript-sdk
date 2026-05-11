@@ -300,10 +300,9 @@ async function* produceLiveBlocks<TFilter, TBlock>(
   }
 
   const head = chainTracker.head();
-  const startBlock = lastProcessedLiveBlock(state) + 1n;
 
   const filterData = await config.fetchBlockRange({
-    startBlock,
+    startBlock: cursor.orderKey + 1n,
     maxBlock: head.orderKey,
     force: false,
     clampAllowed: false,
