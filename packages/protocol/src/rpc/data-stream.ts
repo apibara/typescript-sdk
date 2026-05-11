@@ -285,12 +285,9 @@ async function* produceLiveBlocks<TFilter, TBlock>(
     if (result.status === "reorg") {
       const { cursor } = result;
       // Only handle reorgs if they involve blocks already processed.
-      if (
-        cursor.orderKey < state.cursor.orderKey ||
-        (state.lastEmptyBlockNumber !== undefined &&
-          cursor.orderKey < state.lastEmptyBlockNumber)
-      ) {
+      if (shouldInvalidateProcessedLiveData(state, cursor)) {
         state.cursor = cursor;
+        state.lastEmptyBlockNumber = undefined;
 
         yield {
           _tag: "invalidate",
@@ -303,9 +300,10 @@ async function* produceLiveBlocks<TFilter, TBlock>(
   }
 
   const head = chainTracker.head();
+  const startBlock = lastProcessedLiveBlock(state) + 1n;
 
   const filterData = await config.fetchBlockRange({
-    startBlock: cursor.orderKey + 1n,
+    startBlock,
     maxBlock: head.orderKey,
     force: false,
     clampAllowed: false,
@@ -412,8 +410,9 @@ async function* waitForHeadChange<TBlock>(
       case "reorg": {
         const { cursor } = result;
         // Only handle reorgs if they involve blocks already processed.
-        if (cursor.orderKey < state.cursor.orderKey) {
+        if (shouldInvalidateProcessedLiveData(state, cursor)) {
           state.cursor = cursor;
+          state.lastEmptyBlockNumber = undefined;
 
           yield {
             _tag: "invalidate",
@@ -464,7 +463,32 @@ function shouldRefreshHead(state: State<unknown, unknown>): boolean {
 
 function isAtHead(state: State<unknown, unknown>): boolean {
   const head = state.chainTracker.head();
-  return state.cursor.orderKey === head.orderKey;
+  return (
+    state.cursor.orderKey === head.orderKey ||
+    state.lastEmptyBlockNumber === head.orderKey
+  );
+}
+
+function shouldInvalidateProcessedLiveData(
+  state: State<unknown, unknown>,
+  cursor: Cursor,
+): boolean {
+  return (
+    cursor.orderKey < state.cursor.orderKey ||
+    (state.lastEmptyBlockNumber !== undefined &&
+      cursor.orderKey < state.lastEmptyBlockNumber)
+  );
+}
+
+function lastProcessedLiveBlock(state: State<unknown, unknown>): bigint {
+  if (
+    state.lastEmptyBlockNumber !== undefined &&
+    state.lastEmptyBlockNumber > state.cursor.orderKey
+  ) {
+    return state.lastEmptyBlockNumber;
+  }
+
+  return state.cursor.orderKey;
 }
 
 function sleep(duration: number): Promise<void> {
