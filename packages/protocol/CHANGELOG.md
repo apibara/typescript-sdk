@@ -1,8 +1,16 @@
 # Change Log - @apibara/protocol
 
-<!-- This log was last generated on Mon, 04 May 2026 11:12:40 GMT and should not be manually modified. -->
+<!-- This log was last generated on Mon, 11 May 2026 19:20:53 GMT and should not be manually modified. -->
 
 <!-- Start content -->
+
+## 2.1.3
+
+Mon, 11 May 2026 19:20:53 GMT
+
+### Patches
+
+- Avoid refetching empty live RPC ranges (francesco@ceccon.me)
 
 ## 2.1.2
 
