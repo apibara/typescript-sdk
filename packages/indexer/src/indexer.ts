@@ -15,6 +15,7 @@ import {
   type StreamDataResponse,
   type SystemMessage,
 } from "@apibara/protocol";
+import type { RpcStreamConfig } from "@apibara/protocol/rpc";
 import consola from "consola";
 import {
   type Hookable,
@@ -116,8 +117,7 @@ export type HandlerArgs<TBlock> = {
   abortSignal?: AbortSignal;
 };
 
-export type IndexerConfig<TFilter, TBlock> = {
-  streamUrl: string;
+export type BaseIndexerConfig<TFilter, TBlock> = {
   filter: TFilter;
   finality?: DataFinality;
   clientOptions?: CreateClientOptions;
@@ -130,27 +130,68 @@ export type IndexerConfig<TFilter, TBlock> = {
   debug?: boolean;
 } & IndexerStartingCursor;
 
-export type IndexerWithStreamConfig<TFilter, TBlock> = IndexerConfig<
+export type IndexerConfig<TFilter, TBlock> = BaseIndexerConfig<
+  TFilter,
+  TBlock
+> & {
+  streamUrl: string;
+};
+
+export type RpcIndexerConfig<TFilter, TBlock> = BaseIndexerConfig<
+  TFilter,
+  TBlock
+> & {
+  streamUrl?: string;
+};
+
+export type IndexerStreamConfig<TFilter, TBlock> =
+  | StreamConfig<TFilter, TBlock>
+  | RpcStreamConfig<TFilter, TBlock>;
+
+export type IndexerWithDnaStreamConfig<TFilter, TBlock> = IndexerConfig<
   TFilter,
   TBlock
 > & {
   streamConfig: StreamConfig<TFilter, TBlock>;
 };
 
+export type IndexerWithRpcStreamConfig<TFilter, TBlock> = RpcIndexerConfig<
+  TFilter,
+  TBlock
+> & {
+  streamConfig: RpcStreamConfig<TFilter, TBlock>;
+};
+
+export type IndexerWithStreamConfig<TFilter, TBlock> =
+  | IndexerWithDnaStreamConfig<TFilter, TBlock>
+  | IndexerWithRpcStreamConfig<TFilter, TBlock>;
+
 export function defineIndexer<TFilter, TBlock>(
   streamConfig: StreamConfig<TFilter, TBlock>,
-) {
+): (
+  config: IndexerConfig<TFilter, TBlock>,
+) => IndexerWithDnaStreamConfig<TFilter, TBlock>;
+
+export function defineIndexer<TFilter, TBlock>(
+  streamConfig: RpcStreamConfig<TFilter, TBlock>,
+): (
+  config: RpcIndexerConfig<TFilter, TBlock>,
+) => IndexerWithRpcStreamConfig<TFilter, TBlock>;
+
+export function defineIndexer<TFilter, TBlock>(
+  streamConfig: IndexerStreamConfig<TFilter, TBlock>,
+): unknown {
   return (
-    config: IndexerConfig<TFilter, TBlock>,
-  ): IndexerWithStreamConfig<TFilter, TBlock> => ({
+    config: IndexerConfig<TFilter, TBlock> | RpcIndexerConfig<TFilter, TBlock>,
+  ) => ({
     streamConfig,
     ...config,
   });
 }
 
 export interface Indexer<TFilter, TBlock> {
-  streamConfig: StreamConfig<TFilter, TBlock>;
-  options: IndexerConfig<TFilter, TBlock>;
+  streamConfig: IndexerStreamConfig<TFilter, TBlock>;
+  options: IndexerConfig<TFilter, TBlock> | RpcIndexerConfig<TFilter, TBlock>;
   hooks: Hookable<IndexerHooks<TFilter, TBlock>>;
 }
 
@@ -175,6 +216,20 @@ export function createIndexer<TFilter, TBlock>({
   }
 
   return indexer;
+}
+
+function mergeFilterWithStreamConfig<TFilter, TBlock>(
+  streamConfig: IndexerStreamConfig<TFilter, TBlock>,
+  a: TFilter,
+  b: TFilter,
+): TFilter {
+  if ("mergeFilter" in streamConfig) {
+    return streamConfig.mergeFilter(a, b);
+  }
+
+  throw new Error(
+    "Factory mode requires a stream config with mergeFilter support.",
+  );
 }
 
 export interface ReconnectOptions {
@@ -432,7 +487,8 @@ export async function run<TFilter, TBlock>(
                   if (filter) {
                     // when filter is defined
                     // merge old and new filters
-                    mainFilter = indexer.streamConfig.mergeFilter(
+                    mainFilter = mergeFilterWithStreamConfig(
+                      indexer.streamConfig,
                       mainFilter,
                       filter,
                     );

@@ -1,0 +1,7 @@
+{
+  "type": "patch",
+  "comment": "Allow indexers to use RPC stream configs",
+  "packageName": "@apibara/indexer",
+  "email": "loothero@provable.games",
+  "dependentChangeType": "patch"
+}

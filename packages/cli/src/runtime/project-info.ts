@@ -59,7 +59,7 @@ const startCommand = defineCommand({
         projectInfo.indexers[indexer] = {
           ...(projectInfo.indexers[indexer] ?? {}),
           [preset]: {
-            type: indexerInstance.streamConfig.name,
+            type: streamConfigType(indexerInstance.streamConfig),
             isFactory: indexerInstance.options.factory !== undefined,
           },
         };
@@ -74,6 +74,29 @@ const startCommand = defineCommand({
     writeFileSync(projectInfoPath, JSON.stringify(projectInfo, null, 2));
   },
 });
+
+function streamConfigType(streamConfig: unknown): string {
+  if (
+    typeof streamConfig === "object" &&
+    streamConfig !== null &&
+    "name" in streamConfig &&
+    typeof streamConfig.name === "string"
+  ) {
+    return streamConfig.name;
+  }
+
+  if (
+    typeof streamConfig === "object" &&
+    streamConfig !== null &&
+    "constructor" in streamConfig &&
+    typeof streamConfig.constructor === "function" &&
+    streamConfig.constructor.name
+  ) {
+    return streamConfig.constructor.name;
+  }
+
+  return "RpcStreamConfig";
+}
 
 export const mainCli = defineCommand({
   meta: {

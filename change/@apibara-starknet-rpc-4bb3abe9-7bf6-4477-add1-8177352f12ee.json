@@ -1,0 +1,7 @@
+{
+  "type": "minor",
+  "comment": "Add Starknet RPC event helpers",
+  "packageName": "@apibara/starknet-rpc",
+  "email": "loothero@provable.games",
+  "dependentChangeType": "patch"
+}

@@ -1,10 +1,10 @@
 import { ReloadIndexerRequest, runWithReconnect } from "@apibara/indexer";
-import { createAuthenticatedClient } from "@apibara/protocol";
 import { getRuntimeDataFromEnv } from "apibara/common";
 import { defineCommand, runMain } from "citty";
 import type { ConsolaInstance } from "consola";
 import { blueBright } from "picocolors";
 import { availableIndexers, createIndexer } from "./internal/app";
+import { createRuntimeClient } from "./internal/client";
 
 async function startIndexer(indexer: string, signal: AbortSignal) {
   let _logger: ConsolaInstance | undefined;
@@ -25,11 +25,11 @@ async function startIndexer(indexer: string, signal: AbortSignal) {
         return;
       }
 
-      const client = createAuthenticatedClient(
-        indexerInstance.streamConfig,
-        indexerInstance.options.streamUrl,
-        indexerInstance.options.clientOptions,
-      );
+      const client = createRuntimeClient({
+        streamConfig: indexerInstance.streamConfig,
+        streamUrl: indexerInstance.options.streamUrl,
+        clientOptions: indexerInstance.options.clientOptions,
+      });
 
       if (logger) {
         logger.info(`Indexer ${blueBright(indexer)} started`);

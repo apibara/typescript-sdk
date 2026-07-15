@@ -67,6 +67,14 @@ export function createVcr() {
           throw new Error("Cannot record cassette in CI");
         }
 
+        if (!("Request" in indexer.streamConfig)) {
+          throw new Error("VCR recording requires a DNA StreamConfig");
+        }
+
+        if (!indexer.options.streamUrl) {
+          throw new Error("VCR recording requires streamUrl");
+        }
+
         const client = createAuthenticatedClient(
           indexer.streamConfig,
           indexer.options.streamUrl,

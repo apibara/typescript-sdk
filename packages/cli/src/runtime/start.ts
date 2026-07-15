@@ -1,5 +1,4 @@
 import { ReloadIndexerRequest, runWithReconnect } from "@apibara/indexer";
-import { createAuthenticatedClient } from "@apibara/protocol";
 import {
   checkForUnknownArgs,
   getProcessedRuntimeConfig,
@@ -17,6 +16,7 @@ import {
   userEnvRuntimeConfig,
 } from "#apibara-internal-virtual/static-config";
 import { createIndexer } from "./internal/app";
+import { createRuntimeClient } from "./internal/client";
 
 const startCommand = defineCommand({
   meta: {
@@ -83,11 +83,11 @@ const startCommand = defineCommand({
           process.exit(1);
         }
 
-        const client = createAuthenticatedClient(
-          indexerInstance.streamConfig,
-          indexerInstance.options.streamUrl,
-          indexerInstance.options.clientOptions,
-        );
+        const client = createRuntimeClient({
+          streamConfig: indexerInstance.streamConfig,
+          streamUrl: indexerInstance.options.streamUrl,
+          clientOptions: indexerInstance.options.clientOptions,
+        });
 
         if (register) {
           consola.start("Registering from instrumentation");
