@@ -12,11 +12,11 @@ import { eq, sql } from "drizzle-orm";
 import { describe, expect, it } from "vitest";
 import { drizzleStorage, useDrizzleStorage } from "../src";
 import { detectStaleReorgTriggers, reorgRollbackTable } from "../src/storage";
-import { getPgliteDb, testTable } from "./helper";
+import { getTestDb, testTable } from "./helper";
 
 describe("Drizzle storage", () => {
   it("should store data along with audit", async () => {
-    const db = await getPgliteDb();
+    const db = await getTestDb();
 
     const indexer = getMockIndexer({
       override: {
@@ -105,7 +105,7 @@ describe("Drizzle storage", () => {
   });
 
   it("should update data along with audit", async () => {
-    const db = await getPgliteDb();
+    const db = await getTestDb();
 
     const indexer = getMockIndexer({
       override: {
@@ -207,7 +207,7 @@ describe("Drizzle storage", () => {
   });
 
   it("should delete data along with audit", async () => {
-    const db = await getPgliteDb();
+    const db = await getTestDb();
 
     const indexer = getMockIndexer({
       override: {
@@ -297,7 +297,7 @@ describe("Drizzle storage", () => {
   });
 
   it("should invalidate data", async () => {
-    const db = await getPgliteDb();
+    const db = await getTestDb();
 
     const indexer = getMockIndexer({
       override: {
@@ -511,7 +511,7 @@ describe("Drizzle storage", () => {
 
   it("should finalize data", async () => {
     // Same test as invalidate just we finalize at the end
-    const db = await getPgliteDb();
+    const db = await getTestDb();
 
     const indexer = getMockIndexer({
       override: {
@@ -633,7 +633,7 @@ describe("Drizzle storage", () => {
   });
 
   it("should keep reorg triggers registered for non-finalized blocks", async () => {
-    const db = await getPgliteDb();
+    const db = await getTestDb();
 
     const indexer = getMockIndexer({
       override: {
@@ -671,7 +671,7 @@ describe("Drizzle storage", () => {
   });
 
   it("should only detect stale triggers that match the exact reorg prefix", async () => {
-    const db = await getPgliteDb();
+    const db = await getTestDb();
     const currentIndexerId = "indexer_testing_default";
 
     await db.execute(
@@ -711,7 +711,7 @@ describe("Drizzle storage", () => {
   });
 
   it("should not record invalidate transaction writes in rollback history", async () => {
-    const db = await getPgliteDb();
+    const db = await getTestDb();
 
     const indexer = getMockIndexer({
       override: {
@@ -783,7 +783,7 @@ describe("Drizzle storage", () => {
   });
 
   it("should handle pending data correctly", async () => {
-    const db = await getPgliteDb();
+    const db = await getTestDb();
 
     // This test simulates the below scenario:
     // 1. We have a pending block with transactions A, B, C
@@ -906,7 +906,7 @@ describe("Drizzle storage", () => {
   });
 
   it("should handle multiple pending blocks with updates", async () => {
-    const db = await getPgliteDb();
+    const db = await getTestDb();
 
     // This test simulates a more complex scenario:
     // 1. First a pending block with transactions A, B

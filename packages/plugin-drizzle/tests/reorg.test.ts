@@ -12,11 +12,11 @@ import {
 import { describe, expect, it } from "vitest";
 import { drizzleStorage, useDrizzleStorage } from "../src";
 import { chainReorganizations, checkpoints } from "../src/persistence";
-import { getPgliteDb, testTable } from "./helper";
+import { getTestDb, testTable } from "./helper";
 
 describe("Drizzle reorg", () => {
   it("should record single chain reorganization", async () => {
-    const db = await getPgliteDb();
+    const db = await getTestDb();
 
     const indexer = getMockIndexer({
       override: {
@@ -75,7 +75,7 @@ describe("Drizzle reorg", () => {
   });
 
   it("should record multiple chain reorganizations", async () => {
-    const db = await getPgliteDb();
+    const db = await getTestDb();
 
     const indexer = getMockIndexer({
       override: {
@@ -137,7 +137,7 @@ describe("Drizzle reorg", () => {
   });
 
   it("should NOT record reorgs when flag is disabled", async () => {
-    const db = await getPgliteDb();
+    const db = await getTestDb();
 
     const indexer = getMockIndexer({
       override: {

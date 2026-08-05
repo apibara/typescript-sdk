@@ -13,11 +13,11 @@ import { describe, expect, it } from "vitest";
 import { drizzleStorage, useDrizzleStorage } from "../src";
 import { checkpoints, filters, schemaVersion } from "../src/persistence";
 import { reorgRollbackTable } from "../src/storage";
-import { getPgliteDb, testTable } from "./helper";
+import { getTestDb, testTable } from "./helper";
 
 describe("Drizzle persistence", () => {
   it("should persist state", async () => {
-    const db = await getPgliteDb();
+    const db = await getTestDb();
 
     const indexer = getMockIndexer({
       override: {
@@ -69,7 +69,7 @@ describe("Drizzle persistence", () => {
   });
 
   it("should override the persisted uniqueKey", async () => {
-    const db = await getPgliteDb();
+    const db = await getTestDb();
 
     const indexer = getMockIndexer({
       override: {
@@ -122,7 +122,7 @@ describe("Drizzle persistence", () => {
   });
 
   it("should persist the filters and latest block number (factory mode)", async () => {
-    const db = await getPgliteDb();
+    const db = await getTestDb();
 
     const mockClient = new MockClient<MockFilter, MockBlock>(
       (request, options) => {
@@ -308,7 +308,7 @@ describe("Drizzle persistence", () => {
   });
 
   it("should invalidate state (factory mode)", async () => {
-    const db = await getPgliteDb();
+    const db = await getTestDb();
 
     const mockClient = new MockClient<MockFilter, MockBlock>(
       (request, options) => {
@@ -484,7 +484,7 @@ describe("Drizzle persistence", () => {
   });
 
   it("should finalize state (factory mode)", async () => {
-    const db = await getPgliteDb();
+    const db = await getTestDb();
 
     const mockClient = new MockClient<MockFilter, MockBlock>(
       (request, options) => {
@@ -660,7 +660,7 @@ describe("Drizzle persistence", () => {
   });
 
   it("persistence schema version check ", async () => {
-    const db = await getPgliteDb();
+    const db = await getTestDb();
 
     const indexer = getMockIndexer({
       override: {
@@ -700,7 +700,7 @@ describe("Drizzle persistence", () => {
   });
 
   it("should not persist state for pending blocks", async () => {
-    const db = await getPgliteDb();
+    const db = await getTestDb();
     // This test verifies that state is not persisted for pending blocks
     // and that the checkpoint only advances for accepted blocks
 

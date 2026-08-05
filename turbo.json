@@ -9,7 +9,11 @@
       "dependsOn": ["build"]
     },
     "test:ci": {
-      "dependsOn": ["build"]
+      "dependsOn": ["build"],
+      "env": [
+        "TEST_EVM_RPC_URL",
+        "TEST_POSTGRES_CONNECTION_STRING"
+      ]
     },
     "typecheck": {
       "cache": false
