@@ -54,8 +54,17 @@ export type EvmRpcStreamOptions = {
   mergeGetLogsFilter?: "always" | "accepted" | false;
 };
 
+/**
+ * How many recently fetched block headers to keep so that a lookup by hash can
+ * be answered from the response to an earlier lookup by number. The stream only
+ * ever asks for the block it just saw at the head, so this needs to be big
+ * enough to survive a burst of head refreshes, not to be a general cache.
+ */
+const RECENT_BLOCK_CACHE_SIZE = 64;
+
 export class EvmRpcStream extends RpcStreamConfig<Filter, Block> {
   private blockRangeOracle: BlockRangeOracle;
+  private recentBlocksByHash = new Map<Bytes, RpcBlock>();
 
   constructor(
     private client: ViemRpcClient,
@@ -119,6 +128,8 @@ export class EvmRpcStream extends RpcStreamConfig<Filter, Block> {
         if (!block) {
           return null;
         }
+
+        this.rememberBlock(block);
 
         const formattedBlock = formatBlock(block);
 
@@ -399,6 +410,8 @@ export class EvmRpcStream extends RpcStreamConfig<Filter, Block> {
             throw new Error(`Block ${blockNumber} not found`);
           }
 
+          this.rememberBlock(block);
+
           const header = rpcBlockHeaderToDna(block);
 
           if (header.blockHash !== undefined) {
@@ -416,11 +429,40 @@ export class EvmRpcStream extends RpcStreamConfig<Filter, Block> {
     );
   }
 
+  private rememberBlock(block: RpcBlock) {
+    if (!block.hash) {
+      return;
+    }
+
+    // Refresh insertion order so the head, which is asked for repeatedly,
+    // does not age out behind blocks fetched once during a reorg.
+    this.recentBlocksByHash.delete(block.hash);
+    this.recentBlocksByHash.set(block.hash, block);
+
+    while (this.recentBlocksByHash.size > RECENT_BLOCK_CACHE_SIZE) {
+      const oldest = this.recentBlocksByHash.keys().next();
+      if (oldest.done) {
+        break;
+      }
+      this.recentBlocksByHash.delete(oldest.value);
+    }
+  }
+
   private async fetchBlockHeaderByHashWithRetry({
     blockHash,
   }: {
     blockHash: Bytes;
   }) {
+    // The stream asks for the header of the block it just saw at the head, so
+    // this is nearly always the block the preceding `eth_getBlockByNumber`
+    // already returned. A block is immutable once it has a hash, so serving it
+    // from that response is the same answer for one fewer request.
+    const cached = this.recentBlocksByHash.get(blockHash);
+
+    if (cached) {
+      return { header: rpcBlockHeaderToDna(cached) };
+    }
+
     const block = await retry({
       fn: () =>
         this.client.request({
@@ -432,6 +474,8 @@ export class EvmRpcStream extends RpcStreamConfig<Filter, Block> {
     if (block === null) {
       throw new Error(`Block ${blockHash} not found`);
     }
+
+    this.rememberBlock(block);
 
     return { header: rpcBlockHeaderToDna(block) };
   }

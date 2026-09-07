@@ -25,20 +25,21 @@ export class ChainTracker {
   #finalized: BlockInfo;
   #head: BlockInfo;
   #canonical: Map<bigint, BlockInfo>;
-  #batchSize: bigint;
 
   constructor({
     head,
     finalized,
-    batchSize,
   }: {
     finalized: BlockInfo;
     head: BlockInfo;
-    batchSize: bigint;
+    /**
+     * @deprecated No longer used. `updateHead` connects the two heads with a
+     * single lookup, so there is no longer a range of blocks to batch.
+     */
+    batchSize?: bigint;
   }) {
     this.#finalized = finalized;
     this.#head = head;
-    this.#batchSize = batchSize;
 
     this.#canonical = new Map([
       [finalized.blockNumber, finalized],
@@ -60,7 +61,11 @@ export class ChainTracker {
     // );
 
     if (newFinalized.blockNumber < this.#finalized.blockNumber) {
-      throw new Error("Finalized cursor moved backwards");
+      // Finalized blocks never revert, so an older answer is a stale view of
+      // the chain rather than a change to it. A node that is catching up, or
+      // one backend of a load-balanced endpoint, can return one at any time.
+      // Ignore it and keep the finalized block we already have.
+      return false;
     }
 
     if (newFinalized.blockNumber === this.#finalized.blockNumber) {
@@ -82,6 +87,17 @@ export class ChainTracker {
 
     this.#canonical.set(newFinalized.blockNumber, newFinalized);
     this.#finalized = newFinalized;
+
+    // The head and the finalized block are refreshed on independent intervals,
+    // so on a chain that finalizes faster than the head refresh interval the
+    // new finalized block can be ahead of the head we are tracking. The loop
+    // above then deletes the head's own entry from the canonical chain, and
+    // the next call to `updateHead` cannot link the new head to anything.
+    //
+    // A finalized block is canonical by definition, so adopt it as the head.
+    if (newFinalized.blockNumber >= this.#head.blockNumber) {
+      this.#head = newFinalized;
+    }
 
     return true;
   }
@@ -145,7 +161,6 @@ export class ChainTracker {
     // The new chain is not longer.
     if (newHead.blockNumber <= this.#head.blockNumber) {
       // console.log("head=", this.#head, "newhead=", newHead);
-      let currentNewHead = newHead;
       // Delete all blocks from canonical chain after the new head.
       for (
         let bn = newHead.blockNumber + 1n;
@@ -156,8 +171,8 @@ export class ChainTracker {
       }
 
       // Check if the chain was simply shrunk to this block.
-      const existing = this.#canonical.get(currentNewHead.blockNumber);
-      if (existing && existing.blockHash === currentNewHead.blockHash) {
+      const existing = this.#canonical.get(newHead.blockNumber);
+      if (existing && existing.blockHash === newHead.blockHash) {
         this.#head = existing;
         return {
           status: "reorg",
@@ -165,87 +180,118 @@ export class ChainTracker {
         };
       }
 
-      while (currentNewHead.blockNumber > this.#finalized.blockNumber) {
-        this.#canonical.delete(currentNewHead.blockNumber);
-
-        const canonicalParent = this.#canonical.get(
-          currentNewHead.blockNumber - 1n,
-        );
-
-        if (!canonicalParent) {
-          throw new Error(
-            "Cannot reconcile new head with canonical chain: missing parent in canonical chain",
-          );
-        }
-
-        // We found the common ancestor.
-        if (canonicalParent.blockHash === currentNewHead.parentBlockHash) {
-          this.#head = canonicalParent;
-          return {
-            status: "reorg",
-            cursor: blockInfoToCursor(canonicalParent),
-          };
-        }
-
-        const parent = await fetchCursorByHash(currentNewHead.parentBlockHash);
-
-        if (!parent) {
-          throw new Error(
-            "Cannot reconcile new head with canonical chain: failed to fetch parent",
-          );
-        }
-
-        currentNewHead = parent;
-      }
-
-      throw new Error("Cannot reconcile new head with canonical chain.");
+      return await this.#reconcileToCommonAncestor({
+        block: newHead,
+        fetchCursorByHash,
+      });
     }
 
-    // In all other cases we need to "join" the new head with the existing chain.
-    // The new chain is longer and we need the missing blocks.
-    // This may result in reorgs.
+    // In all other cases we need to "join" the new head with the existing
+    // chain. The new chain is longer and we have to decide whether it extends
+    // the chain we know about or replaces part of it.
+    //
+    // This used to walk every block between the two heads, checking that each
+    // one's parent hash matched the block before it. That costs one request
+    // per block produced since the last refresh, which on a chain producing
+    // blocks faster than the refresh interval is most of the requests the
+    // stream makes.
+    //
+    // One request answers the same question. Ask the chain for the block it
+    // now has at the old head's height: the node returns it from the chain
+    // that ends at `newHead`, so if it is still the old head then the old head
+    // is on that chain and the two are connected. If it is a different block,
+    // the chain reorganized at or below the old head and the walk below finds
+    // the block the two chains still agree on.
 
     // console.log(
     //   `[CT] moving from ${this.#head.blockNumber} to ${newHead.blockNumber} (${newHead.blockNumber - this.#head.blockNumber} blocks)`,
     // );
 
-    let currentBlockNumber = this.#head.blockNumber + 1n;
+    const [atOldHead] = await fetchCursorRange({
+      startBlockNumber: this.#head.blockNumber,
+      endBlockNumber: this.#head.blockNumber,
+    });
 
-    while (true) {
-      let endBlockNumber = currentBlockNumber + this.#batchSize;
-      if (endBlockNumber > newHead.blockNumber) {
-        endBlockNumber = newHead.blockNumber;
-      }
-
-      const missing = await fetchCursorRange({
-        startBlockNumber: currentBlockNumber,
-        endBlockNumber,
+    if (!atOldHead || atOldHead.blockHash !== this.#head.blockHash) {
+      // Walk back from the block the new chain has at the old head's height,
+      // not from the new head: the two chains diverge at or below that height,
+      // so starting there skips the blocks above it, which are on the new
+      // chain and cannot be the common ancestor.
+      return await this.#reconcileToCommonAncestor({
+        block: atOldHead ?? newHead,
+        fetchCursorByHash,
       });
-
-      for (const block of missing) {
-        const canonicalParent = this.#canonical.get(block.blockNumber - 1n);
-        if (
-          !canonicalParent ||
-          canonicalParent.blockHash !== block.parentBlockHash
-        ) {
-          throw new Error(
-            "Chain reorganization detected. Recovery not implemented",
-          );
-        }
-
-        this.#canonical.set(block.blockNumber, block);
-      }
-
-      if (endBlockNumber === newHead.blockNumber) {
-        break;
-      }
-
-      currentBlockNumber = endBlockNumber + 1n;
     }
 
+    this.#canonical.set(newHead.blockNumber, newHead);
     this.#head = newHead;
 
     return { status: "success" };
+  }
+
+  /**
+   * Walks back from a block that does not connect to the canonical chain until
+   * it reaches the most recent block the two chains agree on, pruning the
+   * blocks that are no longer canonical on the way.
+   *
+   * The canonical chain is sparse: it only holds the blocks the tracker has
+   * seen, so a missing parent is not by itself evidence of a reorg and the walk
+   * continues by hash until it meets a block that is present and matches, or
+   * reaches the finalized block, which is a common ancestor by definition.
+   */
+  async #reconcileToCommonAncestor({
+    block,
+    fetchCursorByHash,
+  }: {
+    block: BlockInfo;
+    fetchCursorByHash: (hash: Bytes) => Promise<BlockInfo | null>;
+  }): Promise<UpdateHeadResult> {
+    let current = block;
+
+    while (current.blockNumber > this.#finalized.blockNumber) {
+      this.#canonical.delete(current.blockNumber);
+
+      const parentBlockNumber = current.blockNumber - 1n;
+      const canonicalParent = this.#canonical.get(parentBlockNumber);
+
+      // We found the common ancestor.
+      if (
+        canonicalParent &&
+        canonicalParent.blockHash === current.parentBlockHash
+      ) {
+        this.#head = canonicalParent;
+        return {
+          status: "reorg",
+          cursor: blockInfoToCursor(canonicalParent),
+        };
+      }
+
+      if (parentBlockNumber === this.#finalized.blockNumber) {
+        if (current.parentBlockHash !== this.#finalized.blockHash) {
+          throw new Error(
+            "Cannot reconcile new head with canonical chain: the chain reorganized below the finalized block",
+          );
+        }
+
+        this.#head = this.#finalized;
+        return {
+          status: "reorg",
+          cursor: blockInfoToCursor(this.#finalized),
+        };
+      }
+
+      const parent = await fetchCursorByHash(current.parentBlockHash);
+
+      if (!parent) {
+        throw new Error(
+          "Cannot reconcile new head with canonical chain: failed to fetch parent",
+        );
+      }
+
+      current = parent;
+    }
+
+    throw new Error("Cannot reconcile new head with canonical chain.");
   }
 
   isCanonical({ orderKey, uniqueKey }: Cursor) {
@@ -336,11 +382,14 @@ export class ChainTracker {
 export function createChainTracker({
   head,
   finalized,
-  batchSize,
 }: {
   head: BlockInfo;
   finalized: BlockInfo;
-  batchSize: bigint;
+  /**
+   * @deprecated No longer used. `updateHead` connects the two heads with a
+   * single lookup, so there is no longer a range of blocks to batch.
+   */
+  batchSize?: bigint;
 }): ChainTracker {
-  return new ChainTracker({ finalized, head, batchSize });
+  return new ChainTracker({ finalized, head });
 }

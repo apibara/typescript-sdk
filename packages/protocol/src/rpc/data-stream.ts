@@ -78,7 +78,6 @@ export class RpcDataStream<TFilter, TBlock> {
     const chainTracker = createChainTracker({
       head,
       finalized,
-      batchSize: 20n,
     });
 
     let cursor: Cursor;

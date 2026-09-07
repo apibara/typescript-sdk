@@ -1,0 +1,7 @@
+{
+  "type": "patch",
+  "comment": "perf: connect a new head to the canonical chain with one request instead of one per block",
+  "packageName": "@apibara/protocol",
+  "email": "moody.salem@gmail.com",
+  "dependentChangeType": "patch"
+}

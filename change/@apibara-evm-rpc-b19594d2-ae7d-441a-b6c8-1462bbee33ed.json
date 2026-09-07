@@ -1,0 +1,7 @@
+{
+  "type": "patch",
+  "comment": "perf: reuse the block fetched by the head refresh when asked for it by hash",
+  "packageName": "@apibara/evm-rpc",
+  "email": "moody.salem@gmail.com",
+  "dependentChangeType": "patch"
+}
