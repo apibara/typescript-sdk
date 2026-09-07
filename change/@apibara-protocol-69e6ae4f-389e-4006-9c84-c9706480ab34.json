@@ -1,0 +1,7 @@
+{
+  "type": "patch",
+  "comment": "fix: keep the head in the canonical chain when finalized moves past it, and recover from reorgs on a longer chain",
+  "packageName": "@apibara/protocol",
+  "email": "moody.salem@gmail.com",
+  "dependentChangeType": "patch"
+}
